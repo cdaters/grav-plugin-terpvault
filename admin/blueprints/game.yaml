@@ -1,0 +1,46 @@
+form:
+  validation: loose
+  fields:
+    title:
+      type: text
+      label: Title
+      validate:
+        required: true
+    slug:
+      type: text
+      label: Slug
+    tagline:
+      type: text
+      label: Tagline
+    status:
+      type: select
+      label: Status
+      default: draft
+      options:
+        draft: Draft
+        published: Published
+    format:
+      type: select
+      label: Story Format
+      default: zcode
+      options:
+        zcode: Z-code
+        zblorb: Z-code Blorb
+        glulx: Glulx
+        gblorb: Glulx Blorb
+        tads: TADS
+        hugo: Hugo
+    story_file:
+      type: text
+      label: Story File
+      help: Relative path inside the package folder, for example game.z5.
+    cover:
+      type: text
+      label: Cover Image
+    splash:
+      type: text
+      label: Splash Image
+    description:
+      type: textarea
+      label: Description
+      rows: 6

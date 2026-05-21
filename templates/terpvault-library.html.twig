@@ -1,0 +1,26 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+  <section class="terpvault terpvault-library">
+    <header class="terpvault-hero">
+      <p class="terpvault-kicker">Interactive Fiction</p>
+      <h1>{{ terpvault.config.library.title|default('Interactive Fiction Library') }}</h1>
+      {% if terpvault.config.library.intro %}
+        <p>{{ terpvault.config.library.intro }}</p>
+      {% endif %}
+    </header>
+
+    {% set games = terpvault.games|default([]) %}
+    {% if games|length %}
+      <div class="terpvault-grid">
+        {% for game in games %}
+          {% include 'partials/terpvault-card.html.twig' with { game: game } %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="terpvault-alert">
+        No TerpVault game packages were found. Add packages under <code>user/data/terpvault/games</code>.
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,186 @@
+.terpvault {
+  --tv-border: rgba(127, 127, 127, 0.25);
+  --tv-muted: rgba(127, 127, 127, 0.82);
+  --tv-panel: rgba(127, 127, 127, 0.08);
+  --tv-panel-strong: rgba(127, 127, 127, 0.14);
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(1rem, 2vw, 2rem);
+}
+
+.terpvault a { text-decoration-thickness: .08em; text-underline-offset: .18em; }
+.terpvault code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.terpvault-hero,
+.terpvault-panel,
+.terpvault-game-hero,
+.terpvault-play-header,
+.terpvault-player-shell {
+  border: 1px solid var(--tv-border);
+  border-radius: 1.25rem;
+  background: var(--tv-panel);
+  padding: clamp(1rem, 2vw, 1.5rem);
+  margin-bottom: 1rem;
+}
+
+.terpvault-hero h1,
+.terpvault-game-hero h1,
+.terpvault-play-header h1 {
+  margin: .1rem 0 .35rem;
+  line-height: 1.05;
+}
+
+.terpvault-kicker {
+  margin: 0 0 .25rem;
+  font-size: .78rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .72;
+}
+
+.terpvault-tagline { font-size: 1.15rem; opacity: .86; }
+.terpvault-meta { display: flex; flex-wrap: wrap; gap: .5rem; opacity: .74; }
+.terpvault-breadcrumb { margin-bottom: 1rem; }
+
+.terpvault-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 1rem;
+}
+
+.terpvault-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border: 1px solid var(--tv-border);
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--tv-panel);
+}
+
+.terpvault-card-media {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  background: var(--tv-panel-strong);
+}
+
+.terpvault-card-media img {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  object-fit: cover;
+}
+
+.terpvault-placeholder {
+  display: grid;
+  place-items: center;
+  width: 5rem;
+  height: 5rem;
+  border: 1px solid var(--tv-border);
+  border-radius: 50%;
+  font-size: 2.4rem;
+  opacity: .72;
+}
+
+.terpvault-card-body { padding: 1rem; }
+.terpvault-card-body h2 { margin: .15rem 0 .35rem; font-size: 1.25rem; }
+.terpvault-card-actions { display: flex; align-items: center; gap: .75rem; margin-top: 1rem; }
+
+.terpvault-button,
+.terpvault-player-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  border: 1px solid var(--tv-border);
+  border-radius: 999px;
+  padding: .55rem .9rem;
+  background: var(--tv-panel-strong);
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.terpvault-button:hover,
+.terpvault-player-toolbar button:hover { filter: brightness(1.08); }
+.terpvault-button-secondary { opacity: .82; }
+.terpvault-link { opacity: .82; }
+
+.terpvault-game-hero,
+.terpvault-play-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.terpvault-cover {
+  width: min(220px, 40vw);
+  border-radius: 1rem;
+  border: 1px solid var(--tv-border);
+  object-fit: cover;
+}
+
+.terpvault-splash img,
+.terpvault-screenshots img {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid var(--tv-border);
+}
+
+.terpvault-screenshots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .75rem;
+}
+
+.terpvault-accordions details {
+  border-top: 1px solid var(--tv-border);
+  padding: .75rem 0;
+}
+
+.terpvault-accordions summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.terpvault-player-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-bottom: .75rem;
+}
+
+.terpvault-player-frame {
+  width: 100%;
+  min-height: min(75vh, 760px);
+  border: 1px solid var(--tv-border);
+  border-radius: 1rem;
+  background: #111;
+}
+
+.terpvault-save-note,
+.terpvault-alert {
+  margin-top: .75rem;
+  border: 1px dashed var(--tv-border);
+  border-radius: .85rem;
+  padding: .75rem;
+  opacity: .85;
+}
+
+.terpvault-player-shell:fullscreen {
+  background: #000;
+  padding: 1rem;
+}
+
+.terpvault-player-shell:fullscreen .terpvault-player-frame {
+  min-height: calc(100vh - 7rem);
+}
+
+@media (max-width: 720px) {
+  .terpvault-game-hero,
+  .terpvault-play-header { align-items: flex-start; flex-direction: column; }
+  .terpvault-cover { width: 100%; max-height: 360px; }
+}

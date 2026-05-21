@@ -1,0 +1,54 @@
+enabled: true
+
+# Public library base route. TerpVault can render virtual pages under this route.
+route: /if
+
+# Enable automatic virtual pages for library, detail, and play views.
+auto_routes: true
+
+library:
+  title: Interactive Fiction Library
+  intro: >
+    A curated shelf of playable parser fiction, Z-machine stories, and digital cave maps.
+  show_unpublished: false
+  cards_per_row: 3
+
+player:
+  engine: parchment
+  # Leave blank to use the bundled placeholder page. For real playback, install Parchment
+  # into assets/vendor/parchment/ or set this to your hosted Parchment index URL.
+  parchment_url: ''
+  theme: retro-terminal
+  allow_fullscreen: true
+  allow_download_saves: true
+  allow_upload_saves: true
+  autosave: true
+
+storage:
+  games_path: user://data/terpvault/games
+
+security:
+  allowed_story_extensions:
+    - z1
+    - z2
+    - z3
+    - z4
+    - z5
+    - z6
+    - z7
+    - z8
+    - zblorb
+    - ulx
+    - gblorb
+  allowed_asset_extensions:
+    - jpg
+    - jpeg
+    - png
+    - webp
+    - gif
+    - svg
+    - md
+    - txt
+
+admin:
+  enable_admin2_page: true

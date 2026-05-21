@@ -1,0 +1,125 @@
+name: TerpVault
+slug: terpvault
+type: plugin
+version: 0.1.0
+description: "Curate, present, and play classic interactive fiction story files in Grav."
+icon: book-reader
+author:
+  name: Craig Daters / RetroRealm
+  email: craig@daters.net
+homepage: https://github.com/cdaters/grav-plugin-terpvault
+demo: https://retrorealm.org
+keywords: grav, plugin, interactive fiction, z-machine, zcode, parchment, frotz, retro, games
+bugs: https://github.com/cdaters/grav-plugin-terpvault/issues
+license: MIT
+
+compatibility:
+  grav:
+    - 1.7
+    - 2.0
+  api:
+    - 1.0
+
+form:
+  validation: loose
+  fields:
+    enabled:
+      type: toggle
+      label: Plugin Enabled
+      highlight: 1
+      default: 1
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
+
+    route:
+      type: text
+      label: Library Route
+      help: Base route for TerpVault virtual pages, such as /if.
+      default: /if
+
+    auto_routes:
+      type: toggle
+      label: Enable Virtual Routes
+      help: Render TerpVault library/detail/play pages without creating Grav pages.
+      highlight: 1
+      default: 1
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
+
+    library.title:
+      type: text
+      label: Library Title
+      default: Interactive Fiction Library
+
+    library.intro:
+      type: textarea
+      label: Library Intro
+      rows: 4
+
+    library.show_unpublished:
+      type: toggle
+      label: Show Unpublished Games
+      help: Useful during development. Keep disabled on public sites.
+      highlight: 0
+      default: 0
+      options:
+        1: Yes
+        0: No
+      validate:
+        type: bool
+
+    player.engine:
+      type: select
+      label: Player Engine
+      default: parchment
+      options:
+        parchment: Parchment Adapter
+        custom: Custom / Future Adapter
+
+    player.parchment_url:
+      type: text
+      label: Parchment URL
+      help: Optional URL to a hosted Parchment index page. Leave blank to use a local bundled copy if installed.
+
+    player.theme:
+      type: select
+      label: Player Theme
+      default: retro-terminal
+      options:
+        retro-terminal: Retro Terminal
+        parchment: Parchment Paper
+        clean: Clean
+
+    player.allow_fullscreen:
+      type: toggle
+      label: Allow Fullscreen Player
+      highlight: 1
+      default: 1
+      options:
+        1: Yes
+        0: No
+      validate:
+        type: bool
+
+    storage.games_path:
+      type: text
+      label: Games Storage Path
+      help: Stream path where game package directories live.
+      default: user://data/terpvault/games
+
+    admin.enable_admin2_page:
+      type: toggle
+      label: Enable Admin2 Sidebar Page
+      highlight: 1
+      default: 1
+      options:
+        1: Yes
+        0: No
+      validate:
+        type: bool

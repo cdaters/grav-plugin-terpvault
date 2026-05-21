@@ -1,0 +1,49 @@
+# macOS goblins
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+__MACOSX/
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.buildpath
+
+# Logs / temp
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
+.cache/
+
+# Dependencies / build output
+node_modules/
+vendor/
+dist/
+build/
+coverage/
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Grav runtime/test-site noise
+cache/
+backup/
+logs/
+images/
+user/cache/
+user/backup/
+user/logs/
+user/data/compiled/

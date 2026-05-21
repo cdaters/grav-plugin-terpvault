@@ -1,0 +1,18 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+  {% set game = terpvault_current_game %}
+  <article class="terpvault terpvault-play-page">
+    <nav class="terpvault-breadcrumb"><a href="{{ game.url('detail') }}">← {{ game.title }}</a></nav>
+    <header class="terpvault-play-header">
+      <div>
+        <p class="terpvault-kicker">Now Playing</p>
+        <h1>{{ game.title }}</h1>
+        {% if game.tagline %}<p>{{ game.tagline }}</p>{% endif %}
+      </div>
+      <a class="terpvault-button terpvault-button-secondary" href="{{ game.url('detail') }}">Details</a>
+    </header>
+
+    {% include 'partials/terpvault-player.html.twig' with { game: game, config: terpvault.config } %}
+  </article>
+{% endblock %}

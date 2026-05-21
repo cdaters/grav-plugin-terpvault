@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-label="Sample Cave cover">
+  <rect width="800" height="1000" fill="#13170f"/>
+  <circle cx="400" cy="340" r="170" fill="#d5b45d" opacity="0.85"/>
+  <path d="M140 820 C220 610 300 520 400 520 C510 520 600 620 660 820 Z" fill="#25301f"/>
+  <path d="M310 820 C330 690 365 630 400 630 C435 630 470 690 490 820 Z" fill="#050604"/>
+  <text x="400" y="130" font-size="70" text-anchor="middle" fill="#e8f1d0" font-family="monospace">Sample Cave</text>
+  <text x="400" y="910" font-size="32" text-anchor="middle" fill="#a9bd86" font-family="monospace">A TerpVault Package</text>
+</svg>

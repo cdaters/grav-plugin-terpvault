@@ -1,0 +1,79 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+  {% set game = terpvault_current_game %}
+  <article class="terpvault terpvault-detail">
+    <nav class="terpvault-breadcrumb"><a href="{{ terpvault.route }}">← Library</a></nav>
+
+    <header class="terpvault-game-hero">
+      <div>
+        <p class="terpvault-kicker">{{ game.format|upper }}</p>
+        <h1>{{ game.title }}</h1>
+        {% if game.tagline %}<p class="terpvault-tagline">{{ game.tagline }}</p>{% endif %}
+        <p class="terpvault-meta">
+          {% if game.get('author') %}<span>By {{ game.get('author') }}</span>{% endif %}
+          {% if game.get('year') %}<span>{{ game.get('year') }}</span>{% endif %}
+          <span>{{ game.status|capitalize }}</span>
+        </p>
+        <p><a class="terpvault-button" href="{{ game.url('play') }}">Play {{ game.title }}</a></p>
+      </div>
+
+      {% if game.coverUrl %}
+        <img class="terpvault-cover" src="{{ game.coverUrl }}" alt="{{ game.title }} cover art">
+      {% endif %}
+    </header>
+
+    {% if game.splashUrl %}
+      <figure class="terpvault-splash">
+        <img src="{{ game.splashUrl }}" alt="{{ game.title }} splash image">
+      </figure>
+    {% endif %}
+
+    {% if game.description %}
+      <section class="terpvault-panel">
+        <h2>About this game</h2>
+        <p>{{ game.description|nl2br }}</p>
+      </section>
+    {% endif %}
+
+    {% set screenshots = game.screenshots %}
+    {% if screenshots|length %}
+      <section class="terpvault-panel">
+        <h2>Screenshots</h2>
+        <div class="terpvault-screenshots">
+          {% for screenshot in screenshots %}
+            <img src="{{ screenshot }}" alt="{{ game.title }} screenshot {{ loop.index }}">
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    {% set howto = game.markdownPath(game.get('how_to_play')) %}
+    {% set hints = game.markdownPath(game.get('hints')) %}
+    {% set walkthrough = game.markdownPath(game.get('walkthrough')) %}
+
+    {% if howto or hints or walkthrough %}
+      <section class="terpvault-panel terpvault-accordions">
+        <h2>Help & Reference</h2>
+        {% if howto %}
+          <details open>
+            <summary>How to Play</summary>
+            {{ terpvault_render_markdown(howto)|raw }}
+          </details>
+        {% endif %}
+        {% if hints %}
+          <details>
+            <summary>Hints</summary>
+            {{ terpvault_render_markdown(hints)|raw }}
+          </details>
+        {% endif %}
+        {% if walkthrough %}
+          <details>
+            <summary>Walkthrough</summary>
+            {{ terpvault_render_markdown(walkthrough)|raw }}
+          </details>
+        {% endif %}
+      </section>
+    {% endif %}
+  </article>
+{% endblock %}

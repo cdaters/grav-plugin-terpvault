@@ -1,0 +1,29 @@
+title: Sample Cave
+slug: sample-cave
+tagline: A tiny lantern-lit placeholder package for TerpVault testing.
+status: published
+format: zcode
+story_file: game.z5
+
+author: RetroRealm Lab
+year: 2026
+license: Original placeholder metadata; no playable story file included.
+
+cover: cover.svg
+splash: splash.svg
+screenshots:
+  - screenshots/01.svg
+
+description: |
+  This is a sample TerpVault package. Replace the placeholder story file with
+  a legal Z-machine story file such as a public-domain, freeware, or original
+  Inform-compiled game.
+
+how_to_play: how-to-play.md
+hints: hints.md
+walkthrough: walkthrough.md
+
+player:
+  engine: parchment
+  theme: retro-terminal
+  autosave: true

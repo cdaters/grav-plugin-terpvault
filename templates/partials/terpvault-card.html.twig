@@ -1,0 +1,18 @@
+<article class="terpvault-card">
+  <a class="terpvault-card-media" href="{{ game.url('detail') }}" aria-label="View {{ game.title }}">
+    {% if game.coverUrl %}
+      <img src="{{ game.coverUrl }}" alt="{{ game.title }} cover art">
+    {% else %}
+      <span class="terpvault-placeholder">{{ game.title|slice(0, 1)|upper }}</span>
+    {% endif %}
+  </a>
+  <div class="terpvault-card-body">
+    <p class="terpvault-kicker">{{ game.format|upper }}</p>
+    <h2><a href="{{ game.url('detail') }}">{{ game.title }}</a></h2>
+    {% if game.tagline %}<p>{{ game.tagline }}</p>{% endif %}
+    <p class="terpvault-card-actions">
+      <a class="terpvault-button" href="{{ game.url('play') }}">Play</a>
+      <a class="terpvault-link" href="{{ game.url('detail') }}">Details</a>
+    </p>
+  </div>
+</article>

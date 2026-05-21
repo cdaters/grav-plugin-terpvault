@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="Sample terminal screenshot">
+  <rect width="900" height="520" fill="#061006"/>
+  <text x="44" y="70" fill="#b8ff9f" font-size="28" font-family="monospace">SAMPLE CAVE</text>
+  <text x="44" y="130" fill="#b8ff9f" font-size="22" font-family="monospace">You are standing before a cave entrance.</text>
+  <text x="44" y="170" fill="#b8ff9f" font-size="22" font-family="monospace">A brass lantern rests beside an old sign.</text>
+  <text x="44" y="250" fill="#b8ff9f" font-size="22" font-family="monospace">&gt; take lantern</text>
+  <text x="44" y="290" fill="#b8ff9f" font-size="22" font-family="monospace">Taken.</text>
+</svg>
