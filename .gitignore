@@ -1,4 +1,4 @@
-# macOS / Finder goblins
+# macOS / Finder cruft
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -24,6 +24,7 @@ Desktop.ini
 *.log
 *.tmp
 *.temp
+*.ppm
 *.swp
 *.swo
 *~

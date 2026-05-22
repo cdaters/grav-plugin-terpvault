@@ -167,12 +167,6 @@ cp -R /path/to/adventure user/data/terpvault/games/adventure
 bin/grav clearcache
 ```
 
-Some local environments use:
-
-```bash
-bin/grav clearcache
-```
-
 ## Package creation checklist
 
 - Choose a stable lowercase slug and directory name.

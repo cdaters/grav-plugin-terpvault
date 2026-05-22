@@ -25,9 +25,19 @@ This is a **v0.1.x foundation build**. It is intentionally repo-ready and readab
 ## What it does not do yet
 
 - It does not yet provide full Admin2 create/edit/upload/import forms.
+- It does not yet enable Admin2/API package endpoints.
 - It does not yet provide named save slots or server-side save syncing.
 - It does not yet import/export iFiction XML automatically, but the package metadata model now maps toward Treaty of Babel/iFiction concepts.
 - It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
+
+## Known limitations
+
+- The Admin2 Library Hub is an experimental read-only scaffold, disabled by default with `admin.enable_admin2_page: false`.
+- Admin2/API endpoints are not enabled yet; public virtual routes and future Admin2 API routes are separate integration surfaces.
+- `.terpvault.zip` import/export is planned but not implemented.
+- Parchment save/restore is interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
+- The `_demo` tree includes development starter packages for testing. Real IF packages need license/provenance review before broad redistribution.
+- `sample-cave` is the public-safe original structure demo, but its placeholder `game.z5` is not a playable story file.
 
 ## Installation for local development
 
@@ -49,6 +59,18 @@ Then clear cache:
 ```bash
 bin/grav clearcache
 ```
+
+## Updating
+
+From an existing install:
+
+```bash
+cd user/plugins/terpvault
+git pull
+bin/grav clearcache
+```
+
+If your shell is inside the Grav root instead of the plugin directory, run `bin/grav clearcache` from the Grav root after replacing or updating the plugin files.
 
 ## Configuration
 
@@ -212,8 +234,6 @@ Then visit:
 /if/adventure
 ```
 
-Some local environments use `bin/grav clearcache` instead of `bin/grav clearcache`.
-
 Future import/export work is expected to use a `.terpvault.zip` package convention containing `game.yaml`, a playable story file, and package-local relative paths. TerpVault does not import or export those zip files yet.
 
 ### Package creation checklist
@@ -310,16 +330,19 @@ The library cards are intentionally compact so a shelf of packages scans quickly
 
 ## Installing starter packages
 
-This package includes starter packages under:
+This development package includes starter packages under:
 
 ```text
 user/plugins/terpvault/_demo/data/terpvault/games/
+  sample-cave/
   adventure/
   you-are-standing/
   grue/
 ```
 
-To install them into a Grav site:
+`sample-cave` is original placeholder/demo content intended for public-safe structure testing. It is not a playable game. `adventure`, `you-are-standing`, and `grue` are real IF development starter packages with source/license notes in their manifests. Review their provenance before broad redistribution or before including them in a public plugin release.
+
+To install the real development starter packages into a local Grav site:
 
 ```bash
 mkdir -p user/data/terpvault/games
@@ -337,6 +360,22 @@ Then visit:
 /if/you-are-standing
 /if/grue
 ```
+
+## Public release checklist
+
+- Run `git diff --check`.
+- Run PHP lint where PHP is available.
+- Install into a clean Grav 2 site and run `bin/grav clearcache`.
+- Confirm `/if`, `/if/{slug}`, `/if/{slug}/play`, `/_story`, and `/_asset` routes work, including a subdirectory install.
+- Confirm Admin2 loads with `admin.enable_admin2_page: false`.
+- Confirm no Admin2/API endpoints are advertised as production-ready.
+- Confirm Parchment launches and save/restore guidance still points to interpreter-native `SAVE` / `RESTORE`.
+- Confirm package manifests include source, license, and redistribution notes.
+- Confirm no `.DS_Store`, `__MACOSX`, AppleDouble `._*`, or temporary generated image source files are included.
+
+## Public GPM release contents
+
+For a public GPM-ready package, ship the plugin, bundled Parchment notices, and the public-safe `sample-cave` structure demo only. Keep real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, and metadata source.
 
 ## Admin2 Library Hub
 

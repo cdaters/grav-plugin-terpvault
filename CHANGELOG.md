@@ -1,3 +1,19 @@
+# v0.1.20
+
+## 05/22/2026
+
+1. Documentation
+    - Added release-readiness guidance covering install/update checks, public route verification, starter-package policy, and GPM packaging expectations.
+    - Added a README Known Limitations section that distinguishes stable public routes from disabled Admin2/API work.
+    - Clarified that real IF starter packages are development/demo material unless redistribution review is completed.
+    - Documented that `sample-cave` is the public-safe original structure demo and not a playable game.
+    - Standardized cache command examples on `bin/grav clearcache`.
+    - Tightened release hygiene ignores and binary attributes for generated image sources and supported story-file formats.
+
+2. Notes
+    - No new starter packages or import/export code were added.
+    - Routing, Admin2/API integration, and Parchment/player behavior remain unchanged.
+
 # v0.1.19
 
 ## 05/22/2026
