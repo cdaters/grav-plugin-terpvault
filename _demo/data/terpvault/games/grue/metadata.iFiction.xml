@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ifindex version="1.0" xmlns="http://babel.ifarchive.org/protocol/iFiction/">
+  <story>
+    <identification>
+      <ifid>47DEC7E0-8F4D-4791-BFB8-382E1F4E6A16</ifid>
+      <format>zcode</format>
+    </identification>
+    <bibliographic>
+      <title>Grue</title>
+      <author>Charles Mangin</author>
+      <language>en</language>
+      <firstpublished>2017</firstpublished>
+    </bibliographic>
+  </story>
+</ifindex>

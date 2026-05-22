@@ -182,6 +182,7 @@ bin/grav clearcache
 - Add title, author, year/date, language, and description.
 - Add IFIDs when known.
 - Add cover and small-cover artwork when redistribution rights allow it.
+- Use clearly labeled generated placeholder art when original cover rights are unclear.
 - Add source, license, and redistribution notes before publishing broadly.
 - Add IFDB, IFWiki, and IF Archive links when known.
 - Add how-to-play, hints, and walkthrough Markdown when useful.

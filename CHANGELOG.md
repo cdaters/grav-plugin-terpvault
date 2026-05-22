@@ -1,3 +1,21 @@
+# v0.1.19
+
+## 05/22/2026
+
+1. New
+    - Added `you-are-standing` and `grue` real starter packages under `_demo/data/terpvault/games`.
+    - Bundled playable Z-code story files with Treaty/iFiction-aligned `game.yaml` manifests, IFIDs, catalog links, source notes, license notes, and generated placeholder cover art.
+    - Added curator-created how-to-play and hint notes for both new starter packages.
+
+2. Documentation
+    - Updated starter-library notes with package provenance and licensing rationale.
+    - Updated README starter install instructions for the multi-game demo library.
+    - Clarified that generated placeholder art is appropriate when original cover rights are unclear.
+
+3. Notes
+    - No import/export code was added.
+    - Routing, Admin2/API integration, and Parchment/player behavior remain unchanged.
+
 # v0.1.18
 
 ## 05/22/2026

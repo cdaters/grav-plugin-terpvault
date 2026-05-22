@@ -308,27 +308,34 @@ TerpVault's public CSS is scoped under `.terpvault` and exposes CSS variables fo
 
 The library cards are intentionally compact so a shelf of packages scans quickly instead of behaving like oversized poster tiles.
 
-## Installing the Adventure starter package
+## Installing starter packages
 
-This package includes a cleaned Adventure starter package under:
+This package includes starter packages under:
 
 ```text
-user/plugins/terpvault/_demo/data/terpvault/games/adventure
+user/plugins/terpvault/_demo/data/terpvault/games/
+  adventure/
+  you-are-standing/
+  grue/
 ```
 
-To install it into a Grav site:
+To install them into a Grav site:
 
 ```bash
 mkdir -p user/data/terpvault/games
 cp -R user/plugins/terpvault/_demo/data/terpvault/games/adventure user/data/terpvault/games/
+cp -R user/plugins/terpvault/_demo/data/terpvault/games/you-are-standing user/data/terpvault/games/
+cp -R user/plugins/terpvault/_demo/data/terpvault/games/grue user/data/terpvault/games/
 bin/grav clearcache
 ```
 
 Then visit:
 
 ```text
+/if
 /if/adventure
-/if/adventure/play
+/if/you-are-standing
+/if/grue
 ```
 
 ## Admin2 Library Hub

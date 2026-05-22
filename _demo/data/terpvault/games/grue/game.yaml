@@ -1,0 +1,65 @@
+id: grue
+slug: grue
+
+identification:
+  format: zcode
+  ifids:
+    - 47DEC7E0-8F4D-4791-BFB8-382E1F4E6A16
+  bafn: ''
+
+bibliographic:
+  title: Grue
+  author: Charles Mangin
+  headline: A short parser game from the other side of the dark.
+  first_published: '2017'
+  genre: Zorkian
+  language: en
+  description: |
+    **Grue** is a short Z-code parser game by Charles Mangin. Instead of adventuring through darkness as a treasure hunter, you play the creature waiting inside it.
+
+    This TerpVault starter package uses generated placeholder artwork and curator-created helper notes. The story file is the Release 5 Z8 build available from IF Archive and the author's GitHub repository.
+
+resources:
+  story_file: grue.z8
+  cover: cover.jpg
+  small_cover: small-cover.jpg
+  how_to_play: how-to-play.md
+  hints: hints.md
+
+catalog:
+  ifdb:
+    tuid: ji9b06p3iyhcyf8y
+    url: https://ifdb.org/viewgame?id=ji9b06p3iyhcyf8y
+  ifwiki:
+    url: https://www.ifwiki.org/Grue_(by_Mangin)
+  ifarchive:
+    path: if-archive/games/zcode/Grue.z8
+    url: https://ifarchive.org/if-archive/games/zcode/Grue.z8
+  babel:
+    url: ''
+
+release:
+  license:
+    name: Creative Commons Attribution-ShareAlike 4.0 International
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+    notes: IFDB lists the work as Creative Commons. The author's GitHub README identifies the work as licensed under Creative Commons Attribution-ShareAlike 4.0 International.
+  source:
+    url: https://github.com/option8/grue
+    retrieved: '2026-05-22'
+    notes: Story file downloaded from IF Archive and compared with the GitHub GRUE.z8 file; SHA-256 hashes matched.
+
+terpvault:
+  status: published
+  featured: false
+  difficulty: easy
+  estimated_play_time: 15 minutes
+  tags:
+    - parser
+    - z-code
+    - zorkian
+    - short
+
+player:
+  engine: parchment
+  theme: retro-terminal
+  autosave: true

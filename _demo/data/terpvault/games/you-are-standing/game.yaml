@@ -1,0 +1,66 @@
+id: you-are-standing
+slug: you-are-standing
+
+identification:
+  format: zcode
+  ifids:
+    - ZCODE-2-231227-5C4E
+    - ZCODE-3-240105-9704
+  bafn: ''
+
+bibliographic:
+  title: You Are Standing
+  author: Aaron A. Reed
+  headline: A compact parser work about the changing shapes of text games.
+  first_published: '2023'
+  genre: Parser
+  language: en
+  description: |
+    **You Are Standing** is a compact Z-code work by Aaron A. Reed, created as a bonus game for the *50 Years of Text Games* Ultimate Collector's Edition.
+
+    The piece moves through several eras of text-game style while staying small enough for vintage-friendly distribution. This TerpVault starter package uses generated placeholder artwork and curator-created helper notes; the bundled story file remains the original game artifact.
+
+resources:
+  story_file: standing.z5
+  cover: cover.jpg
+  small_cover: small-cover.jpg
+  how_to_play: how-to-play.md
+  hints: hints.md
+
+catalog:
+  ifdb:
+    tuid: 8krn2lj9iob8cz36
+    url: https://ifdb.org/viewgame?id=8krn2lj9iob8cz36
+  ifwiki:
+    url: https://www.ifwiki.org/You_Are_Standing
+  ifarchive:
+    path: if-archive/games/zcode/standing.z5
+    url: https://ifarchive.org/if-archive/games/zcode/standing.z5
+  babel:
+    url: ''
+
+release:
+  license:
+    name: Creative Commons
+    url: ''
+    notes: IFDB lists the work as Creative Commons; verify exact CC variant before redistribution beyond this starter/demo package.
+  source:
+    url: https://ifarchive.org/if-archive/games/zcode/standing.z5
+    retrieved: '2026-05-22'
+    notes: Story file downloaded from IF Archive. IFDB also links author-hosted source at https://aaronareed.net/standing/standing-src.zip; that source package was checked for this starter package but did not clarify the exact Creative Commons variant.
+
+terpvault:
+  status: published
+  featured: false
+  difficulty: medium
+  estimated_play_time: 1 hour
+  tags:
+    - parser
+    - z-code
+    - contemporary
+    - history
+
+player:
+  engine: parchment
+  theme: retro-terminal
+  autosave: true

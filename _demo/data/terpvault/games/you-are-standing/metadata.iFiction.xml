@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ifindex version="1.0" xmlns="http://babel.ifarchive.org/protocol/iFiction/">
+  <story>
+    <identification>
+      <ifid>ZCODE-2-231227-5C4E</ifid>
+      <ifid>ZCODE-3-240105-9704</ifid>
+      <format>zcode</format>
+    </identification>
+    <bibliographic>
+      <title>You Are Standing</title>
+      <author>Aaron A. Reed</author>
+      <language>en</language>
+      <firstpublished>2023</firstpublished>
+    </bibliographic>
+  </story>
+</ifindex>
