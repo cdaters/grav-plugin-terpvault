@@ -237,6 +237,17 @@ The bundled Parchment adapter can be used for these broad story families:
 
 Format labels are shown per package, based on package metadata and story-file extension where useful.
 
+## Save and restore
+
+With the bundled Parchment player, TerpVault expects players to use the story/interpreter's native save workflow. In many parser works, that means typing:
+
+```text
+SAVE
+RESTORE
+```
+
+Parchment handles the save interaction inside the embedded player. TerpVault does not provide named save slots or server-side save syncing yet. See `docs/PARCHMENT-SAVES.md` for details.
+
 ## Public page theming
 
 TerpVault's public CSS is scoped under `.terpvault` and exposes CSS variables for quick theme adjustments:

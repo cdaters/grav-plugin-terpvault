@@ -1,3 +1,15 @@
+# v0.1.16
+
+## 05/21/2026
+
+1. Improved
+    - Clarified the public player save/restore note for bundled Parchment playback.
+    - Added Parchment save/restore documentation that treats interpreter-native `SAVE` / `RESTORE` as the current baseline.
+
+2. Notes
+    - No custom TerpVault save-slot UI was added in this pass.
+    - Routing, Admin2/API integration, and the Parchment iframe contract remain unchanged.
+
 # v0.1.15
 
 ## 05/21/2026

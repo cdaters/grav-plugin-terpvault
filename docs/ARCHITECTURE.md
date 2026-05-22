@@ -95,7 +95,8 @@ When explicitly enabled, TerpVault registers only the Admin2 sidebar/page scaffo
 Phase 1:
 
 - rely on interpreter commands: `SAVE` and `RESTORE`
-- allow download/upload saves if the interpreter supports it
+- let Parchment handle save files or browser storage inside the iframe
+- document save behavior instead of adding TerpVault-owned slots prematurely
 
 Phase 2:
 

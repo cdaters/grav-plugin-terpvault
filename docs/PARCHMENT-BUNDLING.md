@@ -37,6 +37,10 @@ player:
 
 TerpVault will pass the same JSON `story=` parameter to that URL.
 
+## Save and restore behavior
+
+TerpVault does not add custom save slots around Parchment yet. Players should use the story/interpreter's native `SAVE` and `RESTORE` flow inside the iframe. See `docs/PARCHMENT-SAVES.md` for the current expectations and future save-manager direction.
+
 ## Licensing checklist when updating
 
 Parchment itself is MIT licensed, but its web build may incorporate upstream interpreters and assets with their own licenses. Before distributing a TerpVault package that includes Parchment, confirm and preserve notices for the exact release you bundle.
