@@ -15,8 +15,8 @@ library:
 
 player:
   engine: parchment
-  # Leave blank to use the bundled placeholder page. For real playback, install Parchment
-  # into assets/vendor/parchment/ or set this to your hosted Parchment index URL.
+  # Leave blank to use the bundled local Parchment build. Set this only if you
+  # want to use a separately hosted Parchment index URL.
   parchment_url: ''
   theme: retro-terminal
   allow_fullscreen: true
@@ -38,8 +38,15 @@ security:
     - z7
     - z8
     - zblorb
+    - zlb
     - ulx
     - gblorb
+    - glb
+    - blorb
+    - hex
+    - gam
+    - t3
+    - taf
   allowed_asset_extensions:
     - jpg
     - jpeg

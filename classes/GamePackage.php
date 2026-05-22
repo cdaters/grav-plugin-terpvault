@@ -73,7 +73,7 @@ class GamePackage
 
     public function storyFile(): string
     {
-        return (string) $this->get('story_file', $this->get('file', ''));
+        return (string) $this->get('story_file', $this->get('story', $this->get('file', '')));
     }
 
     public function storyPath(): ?string
@@ -119,6 +119,9 @@ class GamePackage
                 return $this->route . '/' . rawurlencode($this->slug) . '/play';
             case 'file':
                 return $this->route . '/_file/' . rawurlencode($this->slug);
+            case 'story':
+                $storyFile = basename(str_replace('\\', '/', $this->storyFile()));
+                return $this->route . '/_story/' . rawurlencode($this->slug) . '/' . rawurlencode($storyFile ?: 'story.z5');
             case 'asset':
                 return $this->route . '/_asset/' . rawurlencode($this->slug);
             case 'detail':
@@ -136,14 +139,60 @@ class GamePackage
         return $this->url('asset') . '/' . ltrim(str_replace('\\', '/', $relative), '/');
     }
 
-    public function coverUrl(): ?string
+    /**
+     * Inform-style small cover art, used by TerpVault library cards.
+     *
+     * Preferred package field: small_cover: small-cover.jpg
+     * Backward compatible aliases: small-cover, thumbnail, thumbnail_file.
+     * If no field is provided, common Inform filenames are detected.
+     */
+    public function smallCoverUrl(): ?string
     {
-        return $this->assetUrl($this->get('cover'));
+        return $this->firstAssetUrl([
+            $this->get('small_cover'),
+            $this->get('small-cover'),
+            $this->get('thumbnail'),
+            $this->get('thumbnail_file'),
+            'small-cover.jpg',
+            'small-cover.png',
+            'Small Cover.jpg',
+            'Small Cover.png',
+        ]) ?: $this->coverUrl();
     }
 
+    /**
+     * Backward-compatible alias retained for earlier templates/docs.
+     */
+    public function thumbnailUrl(): ?string
+    {
+        return $this->smallCoverUrl();
+    }
+
+    /**
+     * Inform-style cover art. TerpVault expects a display/box/title image here.
+     */
+    public function coverUrl(): ?string
+    {
+        return $this->firstAssetUrl([
+            $this->get('cover'),
+            $this->get('cover_art'),
+            'cover.jpg',
+            'cover.png',
+            'Cover.jpg',
+            'Cover.png',
+        ]);
+    }
+
+    /**
+     * Optional legacy/extra wide splash art. New packages should usually use cover.
+     */
     public function splashUrl(): ?string
     {
-        return $this->assetUrl($this->get('splash'));
+        return $this->firstAssetUrl([
+            $this->get('splash'),
+            $this->get('title_image'),
+            $this->get('hero'),
+        ]);
     }
 
     public function screenshots(): array
@@ -170,13 +219,18 @@ class GamePackage
         $data['slug'] = $this->slug;
         $data['status'] = $this->status();
         $data['format'] = $this->format();
+        $data['story_file'] = $this->storyFile();
         $data['has_story_file'] = $this->hasStoryFile();
 
         if ($includeUrls) {
+            $smallCover = $this->smallCoverUrl();
             $data['urls'] = [
                 'detail' => $this->url('detail'),
                 'play' => $this->url('play'),
                 'file' => $this->url('file'),
+                'story' => $this->url('story'),
+                'small_cover' => $smallCover,
+                'thumbnail' => $smallCover,
                 'cover' => $this->coverUrl(),
                 'splash' => $this->splashUrl(),
                 'screenshots' => $this->screenshots(),
@@ -184,6 +238,23 @@ class GamePackage
         }
 
         return $data;
+    }
+
+    private function firstAssetUrl(array $candidates): ?string
+    {
+        foreach ($candidates as $candidate) {
+            $candidate = is_string($candidate) ? trim($candidate) : '';
+            if ($candidate === '') {
+                continue;
+            }
+
+            $url = $this->assetUrl($candidate);
+            if ($url) {
+                return $url;
+            }
+        }
+
+        return null;
     }
 
     private function safePath(string $relative): string

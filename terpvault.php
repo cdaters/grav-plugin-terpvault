@@ -14,7 +14,7 @@ require_once __DIR__ . '/classes/GameRepository.php';
 /**
  * TerpVault plugin.
  *
- * v0.1.0 is a repo-ready foundation: package metadata, virtual library/detail/play
+ * v0.1.x is a repo-ready foundation: package metadata, virtual library/detail/play
  * pages, controlled file serving, Twig helpers, shortcode-style embedding, and
  * Admin2 page registration scaffolding.
  */
@@ -36,23 +36,27 @@ class TerpVaultPlugin extends Plugin
             return;
         }
 
-        if ($this->isAdmin()) {
-            $this->enable([
-                'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
-                'onApiSidebarItems' => ['onApiSidebarItems', 0],
-                'onApiPluginPageInfo' => ['onApiPluginPageInfo', 0],
-                'onApiRegisterRoutes' => ['onApiRegisterRoutes', 0],
-            ]);
-            return;
+        // Register API/Admin2 hooks for both Admin2's SPA/API requests and
+        // classic admin contexts. API calls are not always considered `isAdmin()`
+        // by Grav's plugin helper, so limiting these hooks to isAdmin() can keep
+        // the custom sidebar item from appearing.
+        $events = [
+            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
+            'onApiSidebarItems' => ['onApiSidebarItems', 0],
+            'onApiPluginPageInfo' => ['onApiPluginPageInfo', 0],
+            'onApiRegisterRoutes' => ['onApiRegisterRoutes', 0],
+        ];
+
+        if (!$this->isAdmin()) {
+            $events += [
+                'onTwigInitialized' => ['onTwigInitialized', 0],
+                'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
+                'onPagesInitialized' => ['onPagesInitialized', 0],
+                'onPageContentProcessed' => ['onPageContentProcessed', 0],
+            ];
         }
 
-        $this->enable([
-            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
-            'onTwigInitialized' => ['onTwigInitialized', 0],
-            'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
-            'onPagesInitialized' => ['onPagesInitialized', 0],
-            'onPageContentProcessed' => ['onPageContentProcessed', 0],
-        ]);
+        $this->enable($events);
     }
 
     public function onTwigTemplatePaths(): void
@@ -67,6 +71,7 @@ class TerpVaultPlugin extends Plugin
         $twig->addFunction(new TwigFunction('terpvault_game', [$this, 'twigGame']));
         $twig->addFunction(new TwigFunction('terpvault_player_url', [$this, 'twigPlayerUrl']));
         $twig->addFunction(new TwigFunction('terpvault_render_markdown', [$this, 'twigRenderMarkdown'], ['is_safe' => ['html']]));
+        $twig->addFunction(new TwigFunction('terpvault_markdown', [$this, 'twigMarkdown'], ['is_safe' => ['html']]));
     }
 
     public function onTwigSiteVariables(): void
@@ -95,15 +100,26 @@ class TerpVaultPlugin extends Plugin
         $route = '/' . trim($this->grav['uri']->route(), '/');
         $base = $this->baseRoute();
 
+        if ($route === $base . '/_engine/parchment') {
+            $this->serveParchment();
+        }
+
         if ($route === $base . '/_manifest') {
             $this->serveJson(['games' => array_map(static function (GamePackage $game) {
                 return $game->toArray();
             }, $this->repository()->all(true))]);
         }
 
+        if (strpos($route, $base . '/_story/') === 0) {
+            $remaining = substr($route, strlen($base . '/_story/'));
+            [$slug] = array_pad(explode('/', $remaining, 2), 1, '');
+            $this->serveStoryFile(rawurldecode($slug));
+        }
+
         if (strpos($route, $base . '/_file/') === 0) {
-            $slug = rawurldecode(substr($route, strlen($base . '/_file/')));
-            $this->serveStoryFile($slug);
+            $remaining = substr($route, strlen($base . '/_file/'));
+            [$slug] = array_pad(explode('/', $remaining, 2), 1, '');
+            $this->serveStoryFile(rawurldecode($slug));
         }
 
         if (strpos($route, $base . '/_asset/') === 0) {
@@ -180,9 +196,9 @@ class TerpVaultPlugin extends Plugin
             'id' => 'terpvault',
             'plugin' => 'terpvault',
             'label' => 'TerpVault',
-            'icon' => 'fa-book-reader',
+            'icon' => 'fa-book-open',
             'route' => '/plugin/terpvault',
-            'priority' => 5,
+            'priority' => 35,
         ];
         $event['items'] = $items;
     }
@@ -197,14 +213,14 @@ class TerpVaultPlugin extends Plugin
             'id' => 'terpvault',
             'plugin' => 'terpvault',
             'title' => 'TerpVault',
-            'icon' => 'fa-book-reader',
+            'icon' => 'fa-book-open',
             'page_type' => 'component',
             'actions' => [],
         ];
     }
 
     /**
-     * Admin2/API routes. Kept simple for v0.1.0: read-only endpoints the custom
+     * Admin2/API routes. Kept simple for now: read-only endpoints the custom
      * Admin2 page can use without mutating files yet.
      */
     public function onApiRegisterRoutes(Event $event): void
@@ -231,6 +247,15 @@ class TerpVaultPlugin extends Plugin
 
             return ['status' => 'success', 'game' => $game->toArray()];
         });
+
+        $routes->get('/terpvault/status', function () {
+            return [
+                'status' => 'success',
+                'config' => $this->pluginConfig(),
+                'storage_path' => $this->repository()->basePath(),
+                'formats' => $this->supportedFormats(),
+            ];
+        });
     }
 
     public function twigGames(bool $includeUnpublished = false): array
@@ -246,20 +271,70 @@ class TerpVaultPlugin extends Plugin
     public function twigPlayerUrl(GamePackage $game): string
     {
         $config = $this->pluginConfig();
-        $storyUrl = $this->absoluteUrl($game->url('file'));
+        $storyPayload = $this->parchmentStoryPayload($game);
+        $storyQuery = rawurlencode(json_encode($storyPayload, JSON_UNESCAPED_SLASHES));
         $configured = trim((string)($config['player']['parchment_url'] ?? ''));
 
         if ($configured !== '') {
-            return $configured . (strpos($configured, '?') === false ? '?' : '&') . 'story=' . rawurlencode($storyUrl);
+            return $configured . (strpos($configured, '?') === false ? '?' : '&') . 'story=' . $storyQuery;
         }
 
-        $local = __DIR__ . '/assets/vendor/parchment/index.html';
-        if (is_file($local)) {
-            $base = $this->grav['base_url'] . '/user/plugins/terpvault/assets/vendor/parchment/index.html';
-            return $base . '?story=' . rawurlencode($storyUrl);
+        $engineRoute = $this->absoluteUrl($this->baseRoute() . '/_engine/parchment');
+
+        return $engineRoute . '?story=' . $storyQuery;
+    }
+
+    /**
+     * Parchment can infer story formats from file extensions, but TerpVault
+     * serves story files through a controlled route such as /if/_story/slug/game.z5.
+     * The explicit filename keeps browser interpreters happier while the
+     * route still prevents arbitrary file access.
+     */
+    protected function parchmentStoryPayload(GamePackage $game): array
+    {
+        return [
+            'url' => $this->absoluteUrl($game->url('story')),
+            'format' => $this->parchmentFormat($game),
+            'title' => $game->title(),
+        ];
+    }
+
+    protected function parchmentFormat(GamePackage $game): string
+    {
+        $format = strtolower(trim((string)$game->format()));
+        $storyFile = strtolower((string)$game->storyFile());
+        $ext = strtolower(pathinfo($storyFile, PATHINFO_EXTENSION));
+
+        if (in_array($format, ['zcode', 'z-machine', 'zmachine'], true) || preg_match('/^z[1-8]$/', $ext) || in_array($ext, ['zblorb', 'zlb'], true)) {
+            return 'zcode';
         }
 
-        return $this->grav['base_url'] . '/user/plugins/terpvault/assets/vendor/parchment/placeholder.html?story=' . rawurlencode($storyUrl);
+        if (in_array($format, ['glulx', 'ulx'], true) || in_array($ext, ['ulx', 'gblorb', 'glb', 'blorb'], true)) {
+            return 'glulx';
+        }
+
+        if ($format === 'hugo' || $ext === 'hex') {
+            return 'hugo';
+        }
+
+        if (in_array($format, ['tads', 'tads2', 'tads3'], true) || in_array($ext, ['gam', 't3'], true)) {
+            return 'tads';
+        }
+
+        if ($format === 'adrift' || $ext === 'taf') {
+            return 'adrift';
+        }
+
+        return $format ?: 'zcode';
+    }
+
+    public function twigMarkdown(?string $markdown): string
+    {
+        if ($markdown === null || trim($markdown) === '') {
+            return '';
+        }
+
+        return $this->markdownToHtml($markdown);
     }
 
     public function twigRenderMarkdown(?string $file): string
@@ -269,7 +344,109 @@ class TerpVaultPlugin extends Plugin
         }
 
         $markdown = file_get_contents($file) ?: '';
-        return $this->grav['parsedown']->text($markdown);
+        return $this->markdownToHtml($markdown);
+    }
+
+    /**
+     * Render package Markdown without assuming Grav exposes a `parsedown`
+     * service. Grav 2/Admin2 installs may not register that container key,
+     * so we try common Parsedown classes first and then fall back to a small,
+     * safe renderer instead of throwing a template exception.
+     */
+    protected function markdownToHtml(string $markdown): string
+    {
+        foreach ([
+            '\ParsedownExtra',
+            '\Parsedown',
+            '\RocketTheme\Toolbox\Parsedown\ParsedownExtra',
+            '\RocketTheme\Toolbox\Parsedown\Parsedown',
+        ] as $class) {
+            if (class_exists($class)) {
+                $parser = new $class();
+                if (method_exists($parser, 'setSafeMode')) {
+                    $parser->setSafeMode(true);
+                }
+                return (string) $parser->text($markdown);
+            }
+        }
+
+        return $this->basicMarkdownToHtml($markdown);
+    }
+
+    /**
+     * Tiny fallback for package help files if no Markdown parser class is
+     * available. This intentionally supports only common, safe formatting.
+     */
+    protected function basicMarkdownToHtml(string $markdown): string
+    {
+        $lines = preg_split('/\R/', trim($markdown));
+        if (!$lines) {
+            return '';
+        }
+
+        $html = [];
+        $paragraph = [];
+        $inList = false;
+
+        $flushParagraph = static function () use (&$html, &$paragraph): void {
+            if ($paragraph) {
+                $html[] = '<p>' . implode(' ', $paragraph) . '</p>';
+                $paragraph = [];
+            }
+        };
+
+        $closeList = static function () use (&$html, &$inList): void {
+            if ($inList) {
+                $html[] = '</ul>';
+                $inList = false;
+            }
+        };
+
+        foreach ($lines as $line) {
+            $line = rtrim($line);
+
+            if ($line === '') {
+                $flushParagraph();
+                $closeList();
+                continue;
+            }
+
+            if (preg_match('/^(#{1,4})\s+(.+)$/', $line, $matches)) {
+                $flushParagraph();
+                $closeList();
+                $level = strlen($matches[1]);
+                $html[] = '<h' . $level . '>' . htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8') . '</h' . $level . '>';
+                continue;
+            }
+
+            if (preg_match('/^[-*]\s+(.+)$/', $line, $matches)) {
+                $flushParagraph();
+                if (!$inList) {
+                    $html[] = '<ul>';
+                    $inList = true;
+                }
+                $html[] = '<li>' . htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8') . '</li>';
+                continue;
+            }
+
+            $paragraph[] = htmlspecialchars($line, ENT_QUOTES, 'UTF-8');
+        }
+
+        $flushParagraph();
+        $closeList();
+
+        return implode("\n", $html);
+    }
+
+    protected function supportedFormats(): array
+    {
+        return [
+            'zcode' => ['label' => 'Z-code / Z-machine', 'extensions' => ['z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb']],
+            'glulx' => ['label' => 'Glulx', 'extensions' => ['ulx', 'gblorb', 'glb', 'blorb']],
+            'hugo' => ['label' => 'Hugo', 'extensions' => ['hex']],
+            'tads' => ['label' => 'TADS 2 / TADS 3', 'extensions' => ['gam', 't3']],
+            'adrift' => ['label' => 'ADRIFT 4', 'extensions' => ['taf']],
+        ];
     }
 
     protected function repository(): GameRepository
@@ -317,7 +494,20 @@ class TerpVaultPlugin extends Plugin
             $this->serveStatus(403, 'Story file type is not allowed');
         }
 
-        $this->serveFile($path, 'application/octet-stream');
+        $this->serveFile($path, 'application/octet-stream', basename($path));
+    }
+
+    protected function serveParchment(): void
+    {
+        $index = __DIR__ . '/assets/vendor/parchment/index.html';
+        $placeholder = __DIR__ . '/assets/vendor/parchment/placeholder.html';
+
+        $path = is_file($index) ? $index : $placeholder;
+        if (!is_file($path)) {
+            $this->serveStatus(404, 'Parchment adapter not found');
+        }
+
+        $this->serveFile($path, 'text/html; charset=utf-8');
     }
 
     protected function serveAsset(string $slug, string $asset): void
@@ -336,11 +526,16 @@ class TerpVaultPlugin extends Plugin
         $this->serveFile($path, $mime);
     }
 
-    protected function serveFile(string $path, string $mime): void
+    protected function serveFile(string $path, string $mime, ?string $filename = null): void
     {
         header('Content-Type: ' . $mime);
         header('Content-Length: ' . filesize($path));
         header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: private, max-age=0, must-revalidate');
+        if ($filename) {
+            $safeFilename = str_replace(['"', "\r", "\n"], '', $filename);
+            header('Content-Disposition: inline; filename="' . $safeFilename . '"');
+        }
         readfile($path);
         exit;
     }
@@ -366,8 +561,20 @@ class TerpVaultPlugin extends Plugin
             return $url;
         }
 
-        $base = rtrim((string)$this->grav['uri']->rootUrl(true), '/');
-        return $base . '/' . ltrim($url, '/');
+        $url = '/' . ltrim($url, '/');
+        $root = rtrim((string)$this->grav['uri']->rootUrl(true), '/');
+        $baseUrl = rtrim((string)($this->grav['base_url'] ?? ''), '/');
+
+        // GamePackage URLs already include Grav's base URL, for example
+        // /quark2/if/_story/sample-cave/game.z5. Uri::rootUrl(true) may also
+        // include /quark2 depending on the install and environment. Strip that
+        // trailing base once to avoid /quark2/quark2 URLs inside Parchment.
+        if ($baseUrl !== '' && strpos($url, $baseUrl . '/') === 0 && substr($root, -strlen($baseUrl)) === $baseUrl) {
+            $root = substr($root, 0, -strlen($baseUrl));
+            $root = rtrim($root, '/');
+        }
+
+        return $root . $url;
     }
 
     protected function mimeType(string $path): string

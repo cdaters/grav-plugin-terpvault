@@ -1,32 +1,32 @@
 # TerpVault Plugin
 
-**TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a shelf of digital IF boxes: story file, metadata, cover art, splash art, screenshots, hints, walkthroughs, and a web-player shell.
+**TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, screenshots, hints, walkthroughs, and a bundled web player.
 
-This first release is a **v0.1.0 foundation build**. It is intentionally repo-ready and readable, not a finished public 1.0.
+This is a **v0.1.x foundation build**. It is intentionally repo-ready and readable, not a finished public 1.0.
 
 ## What it does now
 
 - Reads game package folders from `user/data/terpvault/games`.
 - Uses a per-game `game.yaml` metadata file.
-- Supports cover art, splash art, screenshots, how-to-play notes, hints, and walkthrough files.
+- Uses Inform-friendly naming ideas: `cover` for display/title/box art and `small_cover` for compact library card art.
+- Supports screenshots, how-to-play notes, hints, and walkthrough files.
 - Provides virtual frontend routes under `/if` by default:
   - `/if` library page
   - `/if/{slug}` game detail page
   - `/if/{slug}/play` focused play page
-  - `/if/_file/{slug}` controlled story-file endpoint
+  - `/if/_story/{slug}/{filename}` controlled story-file endpoint
   - `/if/_asset/{slug}/{path}` controlled package-asset endpoint
 - Provides a native shortcode-style embed:
-  - `[terpvault game="sample-cave"]`
-- Provides an Admin2 sidebar page scaffold with read-only package discovery.
-- Uses an engine-adapter pattern. Parchment is the first intended adapter, but the plugin does not lock itself to one interpreter forever.
+  - `[terpvault game="adventure"]`
+- Bundles the Parchment 2025.1.14 single-file web build as the first engine adapter.
+- Adds an Admin2 library hub scaffold with collapsible package rows, format support, and runtime settings diagnostics.
 
 ## What it does not do yet
 
-- It does not bundle Parchment yet.
-- It does not include a real playable Z-machine story file.
-- It does not yet provide Admin2 upload/edit/import forms.
+- It does not yet provide full Admin2 create/edit/upload/import forms.
 - It does not yet provide named save slots or server-side save syncing.
 - It does not yet validate iFiction/Babel metadata.
+- It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
 
 ## Installation for local development
 
@@ -84,11 +84,11 @@ Each game lives in its own folder:
 user/data/terpvault/games/
   adventure/
     game.yaml
-    game.z5
-    cover.webp
-    splash.webp
+    advent.z5
+    cover.jpg
+    small-cover.jpg
     screenshots/
-      01.webp
+      01.png
     how-to-play.md
     hints.md
     walkthrough.md
@@ -102,34 +102,43 @@ slug: adventure
 tagline: The cave where parser fiction learned to breathe.
 status: published
 format: zcode
-story_file: game.z5
+story_file: advent.z5
+cover: cover.jpg
+small_cover: small-cover.jpg
 ```
 
 Fuller example:
 
 ```yaml
-title: Sample Cave
-slug: sample-cave
-tagline: A tiny lantern-lit test package for TerpVault.
+title: Adventure
+slug: adventure
+tagline: Before Zork, there was a road, a grate, a lamp, and a cave.
 status: published
 format: zcode
-story_file: game.z5
+story_file: advent.z5
 
-author: RetroRealm Lab
-year: 2026
-license: Original metadata; bring your own legal story file.
+author: Will Crowther and Don Woods
+year: 1977
 
-cover: cover.webp
-splash: splash.webp
+cover: cover.jpg
+small_cover: small-cover.jpg
 screenshots:
-  - screenshots/01.webp
+  - screenshots/01.png
 
 description: |
-  A short description shown on the game detail page.
+  A short Markdown-friendly description shown on the game detail page.
 
 how_to_play: how-to-play.md
 hints: hints.md
 walkthrough: walkthrough.md
+
+license:
+  name: Verify before redistribution
+  url: ''
+  notes: Confirm rights and provenance before publishing broadly.
+source:
+  url: https://ifarchive.org/if-archive/games/zcode/Advent.z5
+  notes: Source/provenance notes for this package.
 
 player:
   engine: parchment
@@ -137,90 +146,73 @@ player:
   autosave: true
 ```
 
-## Parchment adapter
+### Inform-friendly artwork naming
 
-TerpVault expects a browser-based interpreter for actual playback. The intended first adapter is Parchment.
+TerpVault prefers:
 
-You can use either:
+- `cover: cover.jpg` or `cover: cover.png`
+- `small_cover: small-cover.jpg` or `small_cover: small-cover.png`
 
-1. A local Parchment build at:
+For compatibility, TerpVault also auto-detects common Inform-style filenames when metadata is missing:
+
+- `Cover.jpg`
+- `Cover.png`
+- `Small Cover.jpg`
+- `Small Cover.png`
+
+The older `thumbnail` field still works as an alias for `small_cover`, but new packages should use `small_cover`.
+
+## Supported interpreter formats
+
+The bundled Parchment adapter can be used for these broad story families:
+
+| Family | Common extensions |
+| --- | --- |
+| Z-code / Z-machine | `.z1` through `.z8`, `.zblorb` |
+| Glulx | `.ulx`, `.gblorb`, `.glb`, `.blorb` |
+| Hugo | `.hex` |
+| TADS 2 / TADS 3 | `.gam`, `.t3` |
+| ADRIFT 4 | `.taf` |
+
+## Installing the Adventure starter package
+
+This package includes a cleaned Adventure starter package under:
 
 ```text
-user/plugins/terpvault/assets/vendor/parchment/index.html
+user/plugins/terpvault/_demo/data/terpvault/games/adventure
 ```
 
-2. A hosted Parchment URL configured in `user/config/plugins/terpvault.yaml`:
+To install it into a Grav site:
 
-```yaml
-player:
-  parchment_url: 'https://example.com/parchment/index.html'
+```bash
+mkdir -p user/data/terpvault/games
+cp -R user/plugins/terpvault/_demo/data/terpvault/games/adventure user/data/terpvault/games/
+php bin/grav cache
 ```
 
-TerpVault passes the controlled story-file URL as a `story=` query parameter.
+Then visit:
 
-Until Parchment is installed, the included placeholder page explains what is missing.
-
-## Demo content
-
-The `_demo/` folder includes a fake `sample-cave` package and an example page. Grav can optionally install demo content from `_demo` during package installation. If installing manually, copy the contents of `_demo/data` into `user/data` and `_demo/pages` into `user/pages`.
-
-The demo story file is not playable. It is a text placeholder so the package structure is visible.
-
-## Shortcode-style embed
-
-Use this in any Grav page:
-
-```markdown
-[terpvault game="sample-cave"]
+```text
+/if/adventure
+/if/adventure/play
 ```
 
-This plugin implements that simple pattern directly and does not require Shortcode Core for the first pass.
+## Admin2 Library Hub
 
-## Admin2 status
+When the API and Admin2 plugins are enabled, TerpVault registers a sidebar item at:
 
-This package registers a TerpVault sidebar page in Admin2 when the API/Admin2 stack is available. The v0.1.0 page is intentionally read-only and lists detected packages.
+```text
+/plugin/terpvault
+```
 
-Next Admin2 steps:
+The v0.1.5 page is intentionally a scaffold:
 
-- Add package creation wizard.
-- Add upload/import package action.
-- Add `game.yaml` editor using a blueprint form.
-- Add cover/screenshot asset manager.
-- Add package validation report.
+- Library tab with collapsible game package rows.
+- Formats tab showing supported interpreter families.
+- Settings tab showing route/storage/player diagnostics.
 
-## Copyright note
+The next implementation pass should add create/edit/import/upload actions.
 
-Do not ship or publicly host copyrighted commercial story files unless you have the right to distribute them. TerpVault should ship with no copyrighted Infocom files. Use public-domain, freeware, permissively licensed, or original IF works.
+## Notes on game files and rights
 
-## Development roadmap
-
-### v0.2.0
-
-- Admin2 create/edit/import UI.
-- ZIP package import/export.
-- Package validation report.
-- Local Parchment install notes and helper checks.
-
-### v0.3.0
-
-- Browser-local save-slot UI.
-- Download/upload Quetzal save files where supported by the interpreter.
-- Recently played list.
-
-### v0.4.0
-
-- iFiction/Treaty of Babel metadata import/export.
-- IFDB/source/license fields.
-- Search, tags, filters, featured games.
-
-### v1.0.0 target
-
-- Stable library/detail/play flow.
-- Admin2 package management.
-- Documented interpreter adapter system.
-- Save/restore UX.
-- Production-safe package validation.
-
-## License
-
-MIT for TerpVault plugin code. Third-party interpreters such as Parchment may include their own licenses and attribution requirements.
+TerpVault can play story files, but it does not make copyrighted game files free to redistribute. Keep license/provenance notes in each package's `game.yaml`, especially if you publish a starter library on a public site.

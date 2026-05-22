@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 506" role="img" aria-label="Sample Cave thumbnail">
+  <rect width="900" height="506" fill="#0c130a"/>
+  <circle cx="670" cy="120" r="78" fill="#d5b45d" opacity="0.9"/>
+  <path d="M0 462 C130 350 245 310 350 360 C480 424 565 305 700 336 C790 356 835 390 900 442 L900 506 L0 506 Z" fill="#27311f"/>
+  <path d="M330 506 C350 390 395 338 450 338 C505 338 550 390 570 506 Z" fill="#050604"/>
+  <text x="54" y="90" fill="#d8f7c2" font-size="46" font-family="monospace">Sample Cave</text>
+  <text x="58" y="148" fill="#9fb987" font-size="22" font-family="monospace">&gt; enter cave</text>
+</svg>

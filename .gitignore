@@ -1,4 +1,4 @@
-# macOS goblins
+# macOS / Finder goblins
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -9,41 +9,60 @@ Icon?
 .fseventsd
 __MACOSX/
 
-# Editors / IDEs
+# Windows / Linux desktop cruft
+Thumbs.db
+Desktop.ini
+.directory
+
+# Editor / IDE folders
 .idea/
 .vscode/
-*.swp
-*.swo
-*~
-.project
-.settings/
-.buildpath
+*.sublime-project
+*.sublime-workspace
 
-# Logs / temp
+# Logs and temp files
 *.log
 *.tmp
 *.temp
-tmp/
-temp/
-.cache/
+*.swp
+*.swo
+*~
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Dependencies / build output
+# Node / frontend build dependencies
 node_modules/
-vendor/
-dist/
-build/
-coverage/
+npm-packages-offline-cache/
+
+# PHP / Composer dependencies
+/vendor/
+composer.phar
+# Leave composer.lock untracked for reusable Grav plugins unless this plugin later becomes an app-style package.
+composer.lock
+
+# Build artifacts and release packages
+/dist/
+/build/
 *.zip
 *.tar
 *.tar.gz
 *.tgz
+*.xz
 
-# Grav runtime/test-site noise
-cache/
-backup/
-logs/
-images/
-user/cache/
-user/backup/
-user/logs/
-user/data/compiled/
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Grav runtime artifacts if plugin is tested inside a full Grav checkout
+/cache/
+/logs/
+/backup/
+/tmp/
+/images/
+/assets/
+/user/cache/
+/user/logs/
+/user/backup/

@@ -1,9 +1,9 @@
 name: TerpVault
 slug: terpvault
 type: plugin
-version: 0.1.0
+version: 0.1.5
 description: "Curate, present, and play classic interactive fiction story files in Grav."
-icon: book-reader
+icon: book-open
 author:
   name: Craig Daters / RetroRealm
   email: craig@daters.net
@@ -85,7 +85,7 @@ form:
     player.parchment_url:
       type: text
       label: Parchment URL
-      help: Optional URL to a hosted Parchment index page. Leave blank to use a local bundled copy if installed.
+      help: Optional URL to a hosted Parchment index page. Leave blank to use the bundled local Parchment adapter.
 
     player.theme:
       type: select
@@ -115,7 +115,7 @@ form:
 
     admin.enable_admin2_page:
       type: toggle
-      label: Enable Admin2 Sidebar Page
+      label: Enable Admin2 Library Page
       highlight: 1
       default: 1
       options:

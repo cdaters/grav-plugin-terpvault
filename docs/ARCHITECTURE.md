@@ -78,7 +78,7 @@ The Admin2 page is component-mode because TerpVault eventually needs a highly cu
 - validation panel
 - package preview
 
-For v0.1.0, the Admin2 page is read-only package discovery.
+For v0.1.5, the Admin2 page is a read-only library hub scaffold with collapsible package rows, format support, and settings diagnostics.
 
 ## Save/restore plan
 

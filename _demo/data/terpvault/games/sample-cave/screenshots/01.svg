@@ -1,8 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="Sample terminal screenshot">
-  <rect width="900" height="520" fill="#061006"/>
-  <text x="44" y="70" fill="#b8ff9f" font-size="28" font-family="monospace">SAMPLE CAVE</text>
-  <text x="44" y="130" fill="#b8ff9f" font-size="22" font-family="monospace">You are standing before a cave entrance.</text>
-  <text x="44" y="170" fill="#b8ff9f" font-size="22" font-family="monospace">A brass lantern rests beside an old sign.</text>
-  <text x="44" y="250" fill="#b8ff9f" font-size="22" font-family="monospace">&gt; take lantern</text>
-  <text x="44" y="290" fill="#b8ff9f" font-size="22" font-family="monospace">Taken.</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Sample Cave screenshot</title>
+  <desc id="desc">A placeholder terminal-style interactive fiction screenshot.</desc>
+  <rect width="1280" height="720" fill="#0f160f"/>
+  <rect x="80" y="80" width="1120" height="560" rx="28" fill="#111" stroke="#bfe6a4" stroke-opacity="0.35" stroke-width="3"/>
+  <text x="130" y="155" fill="#bfe6a4" font-family="Menlo, Consolas, monospace" font-size="34">&gt; look</text>
+  <text x="130" y="230" fill="#e7ffd5" font-family="Menlo, Consolas, monospace" font-size="42" font-weight="700">Sample Cave</text>
+  <text x="130" y="305" fill="#c8ddb9" font-family="Menlo, Consolas, monospace" font-size="30">You stand in a tiny lantern-lit cave.</text>
+  <text x="130" y="365" fill="#c8ddb9" font-family="Menlo, Consolas, monospace" font-size="30">A brass lamp rests beside a stone archway.</text>
+  <text x="130" y="485" fill="#bfe6a4" font-family="Menlo, Consolas, monospace" font-size="34">&gt; _</text>
 </svg>

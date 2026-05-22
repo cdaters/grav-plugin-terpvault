@@ -44,8 +44,9 @@
 
 .terpvault-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 270px));
   gap: 1rem;
+  align-items: start;
 }
 
 .terpvault-card {
@@ -59,16 +60,19 @@
 
 .terpvault-card-media {
   display: grid;
-  min-height: 180px;
+  aspect-ratio: 16 / 9;
+  max-height: 150px;
   place-items: center;
+  overflow: hidden;
   background: var(--tv-panel-strong);
 }
 
 .terpvault-card-media img {
+  display: block;
   width: 100%;
   height: 100%;
-  min-height: 180px;
   object-fit: cover;
+  object-position: center center;
 }
 
 .terpvault-placeholder {
@@ -82,9 +86,10 @@
   opacity: .72;
 }
 
-.terpvault-card-body { padding: 1rem; }
-.terpvault-card-body h2 { margin: .15rem 0 .35rem; font-size: 1.25rem; }
-.terpvault-card-actions { display: flex; align-items: center; gap: .75rem; margin-top: 1rem; }
+.terpvault-card-body { padding: .9rem; }
+.terpvault-card-body h2 { margin: .15rem 0 .35rem; font-size: 1.15rem; }
+.terpvault-card-body p:not(.terpvault-kicker):not(.terpvault-card-actions) { font-size: .95rem; }
+.terpvault-card-actions { display: flex; align-items: center; gap: .75rem; margin-top: .85rem; }
 
 .terpvault-button,
 .terpvault-player-toolbar button {

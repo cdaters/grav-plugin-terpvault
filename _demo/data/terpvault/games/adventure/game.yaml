@@ -1,0 +1,38 @@
+title: Adventure
+slug: adventure
+tagline: Before Zork, there was a road, a grate, a lamp, and a cave.
+status: published
+format: zcode
+story_file: advent.z5
+
+author: Will Crowther and Don Woods
+year: 1977
+
+# TerpVault follows Inform's release vocabulary where practical:
+# cover = display/title/box art; small_cover = compact library-card art.
+cover: cover.jpg
+small_cover: small-cover.jpg
+screenshots:
+  - screenshots/01.png
+
+description: |
+  **Adventure**, also known as **Colossal Cave Adventure** or **ADVENT**, is the cave where interactive fiction found its voice. In this Z-machine build, you explore a mysterious underground world with typed commands, a brass lamp, a limited inventory, strange passages, treasures, hazards, magic words, and puzzles that reward careful mapping.
+
+  It is old-school, occasionally stubborn, and historically enormous: before *Zork*, before Sierra adventures, before modern story games, there was a locked grate, a dark cave, and the irresistible urge to type `ENTER`.
+
+how_to_play: how-to-play.md
+hints: hints.md
+walkthrough: walkthrough.md
+
+license:
+  name: Verify before redistribution
+  url: ''
+  notes: This starter package was assembled for TerpVault testing from user-provided files. Confirm rights and provenance before publishing broadly.
+source:
+  url: https://ifarchive.org/if-archive/games/zcode/Advent.z5
+  notes: Z-machine Adventure/Colossal Cave variant used for TerpVault starter-library testing.
+
+player:
+  engine: parchment
+  theme: retro-terminal
+  autosave: true

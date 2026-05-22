@@ -1,15 +1,26 @@
+# Normalize text files for cross-platform contributors.
 * text=auto eol=lf
 
-*.php text eol=lf
-*.yaml text eol=lf
-*.yml text eol=lf
+# PHP / Twig / YAML / Markdown / JS / CSS are text.
+*.php  text eol=lf
 *.twig text eol=lf
-*.md text eol=lf
-*.js text eol=lf
-*.css text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.md   text eol=lf
+*.js   text eol=lf
+*.css  text eol=lf
 *.json text eol=lf
+*.xml  text eol=lf
+*.svg  text eol=lf
 
-# Binary interactive fiction/game/save/media files
+# Binary assets.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.zip binary
 *.z1 binary
 *.z2 binary
 *.z3 binary
@@ -22,10 +33,11 @@
 *.ulx binary
 *.gblorb binary
 *.sav binary
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.gif binary
-*.webp binary
-*.svg text eol=lf
-*.zip binary
+*.glksave binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.html text eol=lf
+*.wasm binary
+assets/vendor/parchment/index.html text eol=lf -diff

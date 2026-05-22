@@ -32,7 +32,7 @@
     {% if game.description %}
       <section class="terpvault-panel">
         <h2>About this game</h2>
-        <p>{{ game.description|nl2br }}</p>
+        {{ terpvault_markdown(game.description)|raw }}
       </section>
     {% endif %}
 

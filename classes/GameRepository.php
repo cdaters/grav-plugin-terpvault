@@ -26,7 +26,14 @@ class GameRepository
     {
         $this->grav = $grav;
         $this->config = $config;
-        $this->route = rtrim((string)($config['route'] ?? '/if'), '/');
+
+        // Internal route matching uses the raw plugin route (for example /if),
+        // but generated front-end links/assets need Grav's base URL when the
+        // site lives in a subdirectory such as /quark2.
+        $route = '/' . trim((string)($config['route'] ?? '/if'), '/');
+        $baseUrl = rtrim((string)($grav['base_url'] ?? ''), '/');
+        $this->route = $baseUrl . $route;
+
         $stream = (string)($config['storage']['games_path'] ?? 'user://data/terpvault/games');
         $this->path = $grav['locator']->findResource($stream, true, true) ?: '';
     }

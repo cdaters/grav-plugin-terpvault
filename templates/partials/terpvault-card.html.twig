@@ -1,7 +1,7 @@
 <article class="terpvault-card">
   <a class="terpvault-card-media" href="{{ game.url('detail') }}" aria-label="View {{ game.title }}">
-    {% if game.coverUrl %}
-      <img src="{{ game.coverUrl }}" alt="{{ game.title }} cover art">
+    {% if game.smallCoverUrl %}
+      <img src="{{ game.smallCoverUrl }}" alt="{{ game.title }} small cover art">
     {% else %}
       <span class="terpvault-placeholder">{{ game.title|slice(0, 1)|upper }}</span>
     {% endif %}
