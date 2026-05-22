@@ -8,7 +8,7 @@ This checklist is for preparing TerpVault before starting broader Admin2 Library
 - Public virtual routes support subdirectory installs through Grav base-route-aware URL helpers.
 - Bundled Parchment playback is the current player path.
 - Save and restore are interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
-- The Admin2 Library Hub is an experimental scaffold and is disabled by default with `admin.enable_admin2_page: false`.
+- The Admin2 Library Manager is an experimental read-only scaffold and is disabled by default with `admin.enable_admin2_page: false`.
 - Admin2/API endpoints are not enabled yet.
 - `.terpvault.zip` package import/export is planned but not implemented.
 
@@ -41,6 +41,7 @@ Before tagging:
 - Confirm `/if/_asset/{slug}/cover.jpg` serves package art.
 - Confirm the same routes work when Grav is installed in a subdirectory.
 - Confirm Admin2 loads normally with `admin.enable_admin2_page: false`.
+- If `admin.enable_admin2_page: true` is tested, confirm the TerpVault Admin2 page stays read-only and does not require TerpVault Admin2 API endpoints.
 
 ## GPM/public-release checklist
 

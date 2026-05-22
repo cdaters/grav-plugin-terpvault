@@ -2,7 +2,7 @@
 
 **TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a standards-aware shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, screenshots, hints, walkthroughs, and a bundled web player.
 
-This is a **v0.1.x foundation build**. It is intentionally repo-ready and readable, not a finished public 1.0.
+This is a **v0.2.x foundation build**. It is intentionally repo-ready and readable, not a finished public 1.0.
 
 ## What it does now
 
@@ -20,7 +20,7 @@ This is a **v0.1.x foundation build**. It is intentionally repo-ready and readab
 - Provides a native shortcode-style embed:
   - `[terpvault game="adventure"]`
 - Bundles the Parchment 2025.1.14 single-file web build as the first engine adapter.
-- Includes an optional Admin2 library hub scaffold with collapsible package rows, format support, package validation warnings, and runtime settings diagnostics. It is disabled by default.
+- Includes an optional read-only Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, and runtime settings diagnostics. It is disabled by default.
 
 ## What it does not do yet
 
@@ -32,7 +32,7 @@ This is a **v0.1.x foundation build**. It is intentionally repo-ready and readab
 
 ## Known limitations
 
-- The Admin2 Library Hub is an experimental read-only scaffold, disabled by default with `admin.enable_admin2_page: false`.
+- The Admin2 Library Manager is an experimental read-only scaffold, disabled by default with `admin.enable_admin2_page: false`.
 - Admin2/API endpoints are not enabled yet; public virtual routes and future Admin2 API routes are separate integration surfaces.
 - `.terpvault.zip` import/export is planned but not implemented.
 - Parchment save/restore is interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
@@ -377,9 +377,9 @@ Then visit:
 
 For a public GPM-ready package, ship the plugin, bundled Parchment notices, and the public-safe `sample-cave` structure demo only. Keep real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, and metadata source.
 
-## Admin2 Library Hub
+## Admin2 Library Manager
 
-The Admin2 Library Hub is an experimental read-only scaffold and is disabled by default. To test it, enable:
+The Admin2 Library Manager is an experimental read-only Admin2 page and is disabled by default. To test it, enable:
 
 ```yaml
 admin:
@@ -392,13 +392,15 @@ When that setting is enabled and the current request is an Admin2/API request, T
 /plugin/terpvault
 ```
 
-The current page is intentionally a scaffold:
+The current page is intentionally read-only:
 
-- Library tab with collapsible game package rows.
+- Library tab with collapsible game package rows and package health badges.
 - Formats tab showing supported interpreter families.
 - Settings tab showing route/storage/player diagnostics.
+- Public Detail and Play links for each package.
+- Advisory validation warnings and Catalog & Provenance summaries where package metadata provides them.
 
-The next implementation pass should add create/edit/import/upload actions.
+Editing, upload, delete, import, and export actions are not implemented yet. v0.2.0 deliberately avoids Admin2 API endpoints; the page uses embedded read-only Admin2 page data when available and otherwise falls back to TerpVault's public read-only manifest route.
 
 Public virtual routes and Admin2 API routes are intentionally separate. Frontend routes such as `/if`, `/if/{slug}`, `/if/{slug}/play`, and `/if/_story/{slug}/{filename}` are registered as virtual Grav pages or controlled file endpoints only for frontend requests. Admin2 API endpoints remain disabled until they are implemented with a controller-style Grav 2/Admin2 integration.
 

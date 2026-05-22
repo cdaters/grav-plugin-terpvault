@@ -60,7 +60,7 @@ security:
     - txt
 
 admin:
-  # Experimental Admin2 Library Hub/API scaffold. Disabled by default so public
+  # Experimental read-only Admin2 Library Manager. Disabled by default so public
   # virtual routes cannot affect Admin2 dashboard/API request lifecycles.
   enable_admin2_page: false
 

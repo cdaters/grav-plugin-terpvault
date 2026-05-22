@@ -81,7 +81,7 @@ The Admin2 page is component-mode because TerpVault eventually needs a highly cu
 - validation panel
 - package preview
 
-For now, the Admin2 page is a read-only library hub scaffold with collapsible package rows, format support, and settings diagnostics. It is disabled by default with:
+For now, the Admin2 page is a read-only Library Manager scaffold with collapsible package rows, validation/provenance summaries, format support, and settings diagnostics. It is disabled by default with:
 
 ```yaml
 admin:
