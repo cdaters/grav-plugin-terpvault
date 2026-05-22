@@ -1,3 +1,17 @@
+# v0.1.6
+
+## [0.1.7] - 2026-05-21
+
+### Fixed
+- Fixed the TerpVault global `terpvault.route` value so breadcrumb links respect Grav installations in a subdirectory such as `/quark2`.
+
+
+## 05/21/2026
+
+1. [](#bugfix)
+    * Improved the fallback package Markdown renderer so local help files can render safe `<details>` / `<summary>` disclosure blocks instead of showing the tags as text.
+    * Added inline-code formatting support to the fallback renderer for command examples such as `LOOK`, `SAVE`, and `RESTORE`.
+
 # v0.1.5
 
 ## 05/21/2026

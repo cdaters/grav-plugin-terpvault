@@ -84,7 +84,7 @@ class TerpVaultPlugin extends Plugin
         $twig->twig_vars['terpvault'] = [
             'config' => $this->pluginConfig(),
             'games' => $this->twigGames(),
-            'route' => $this->baseRoute(),
+            'route' => $this->publicRoute(),
         ];
     }
 
@@ -374,6 +374,33 @@ class TerpVaultPlugin extends Plugin
     }
 
     /**
+     * Format a small, safe subset of inline Markdown for the fallback renderer.
+     */
+    protected function basicMarkdownInline(string $text): string
+    {
+        $parts = preg_split('/(`[^`]+`)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+        if (!$parts) {
+            return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+        }
+
+        $html = '';
+        foreach ($parts as $part) {
+            if ($part === '') {
+                continue;
+            }
+
+            if (strlen($part) >= 2 && $part[0] === '`' && substr($part, -1) === '`') {
+                $html .= '<code>' . htmlspecialchars(substr($part, 1, -1), ENT_QUOTES, 'UTF-8') . '</code>';
+                continue;
+            }
+
+            $html .= htmlspecialchars($part, ENT_QUOTES, 'UTF-8');
+        }
+
+        return $html;
+    }
+
+    /**
      * Tiny fallback for package help files if no Markdown parser class is
      * available. This intentionally supports only common, safe formatting.
      */
@@ -415,7 +442,7 @@ class TerpVaultPlugin extends Plugin
                 $flushParagraph();
                 $closeList();
                 $level = strlen($matches[1]);
-                $html[] = '<h' . $level . '>' . htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8') . '</h' . $level . '>';
+                $html[] = '<h' . $level . '>' . $this->basicMarkdownInline($matches[2]) . '</h' . $level . '>';
                 continue;
             }
 
@@ -425,11 +452,18 @@ class TerpVaultPlugin extends Plugin
                     $html[] = '<ul>';
                     $inList = true;
                 }
-                $html[] = '<li>' . htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8') . '</li>';
+                $html[] = '<li>' . $this->basicMarkdownInline($matches[1]) . '</li>';
                 continue;
             }
 
-            $paragraph[] = htmlspecialchars($line, ENT_QUOTES, 'UTF-8');
+            if (preg_match('/^<\/?details>$/i', $line) || preg_match('/^<summary>.*<\/summary>$/i', $line)) {
+                $flushParagraph();
+                $closeList();
+                $html[] = $line;
+                continue;
+            }
+
+            $paragraph[] = $this->basicMarkdownInline($line);
         }
 
         $flushParagraph();
@@ -466,6 +500,18 @@ class TerpVaultPlugin extends Plugin
     protected function baseRoute(): string
     {
         return '/' . trim((string)($this->pluginConfig()['route'] ?? '/if'), '/');
+    }
+
+    protected function publicRoute(): string
+    {
+        $route = $this->baseRoute();
+        $baseUrl = rtrim((string)($this->grav['base_url'] ?? ''), '/');
+
+        if ($baseUrl !== '' && strpos($route, $baseUrl . '/') !== 0 && $route !== $baseUrl) {
+            return $baseUrl . $route;
+        }
+
+        return $route;
     }
 
     protected function showUnpublished(): bool
