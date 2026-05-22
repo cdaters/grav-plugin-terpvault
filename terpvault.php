@@ -51,7 +51,7 @@ class TerpVaultPlugin extends Plugin
             $events += [
                 'onTwigInitialized' => ['onTwigInitialized', 0],
                 'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
-                'onPageInitialized' => ['onPageInitialized', 0],
+                'onPagesInitialized' => ['onPagesInitialized', 0],
                 'onPageContentProcessed' => ['onPageContentProcessed', 0],
             ];
         }
@@ -72,6 +72,7 @@ class TerpVaultPlugin extends Plugin
         $twig->addFunction(new TwigFunction('terpvault_player_url', [$this, 'twigPlayerUrl']));
         $twig->addFunction(new TwigFunction('terpvault_render_markdown', [$this, 'twigRenderMarkdown'], ['is_safe' => ['html']]));
         $twig->addFunction(new TwigFunction('terpvault_markdown', [$this, 'twigMarkdown'], ['is_safe' => ['html']]));
+        $twig->addFunction(new TwigFunction('terpvault_game_from_route', [$this, 'twigGameFromRoute']));
     }
 
     public function onTwigSiteVariables(): void
@@ -91,13 +92,13 @@ class TerpVaultPlugin extends Plugin
     /**
      * Render virtual pages and safely serve package files/assets.
      *
-     * Grav 2/Admin2 freezes the page service by onPagesInitialized in some
-     * environments, so TerpVault installs its virtual pages during
-     * onPageInitialized before the page service becomes immutable.
+     * Grav 2/Admin2 can freeze the page service before plugins attempt to
+     * replace it. TerpVault therefore registers virtual pages with Grav's
+     * page collection instead of overriding the active page service.
      */
-    public function onPageInitialized(): void
+    public function onPagesInitialized(): void
     {
-        if (!$this->pluginConfig()['auto_routes']) {
+        if (!$this->pluginConfig()['auto_routes'] || $this->isAdminRequest()) {
             return;
         }
 
@@ -133,7 +134,7 @@ class TerpVaultPlugin extends Plugin
         }
 
         if ($route === $base) {
-            $this->setVirtualPage(__DIR__ . '/pages/library.md');
+            $this->addVirtualPage(__DIR__ . '/pages/library.md', $route);
             return;
         }
 
@@ -141,7 +142,7 @@ class TerpVaultPlugin extends Plugin
             $game = $this->repository()->find(rawurldecode($matches[1]), $this->showUnpublished());
             if ($game) {
                 $this->grav['twig']->twig_vars['terpvault_current_game'] = $game;
-                $this->setVirtualPage(__DIR__ . '/pages/play.md');
+                $this->addVirtualPage(__DIR__ . '/pages/play.md', $route);
             }
             return;
         }
@@ -150,7 +151,7 @@ class TerpVaultPlugin extends Plugin
             $game = $this->repository()->find(rawurldecode($matches[1]), $this->showUnpublished());
             if ($game) {
                 $this->grav['twig']->twig_vars['terpvault_current_game'] = $game;
-                $this->setVirtualPage(__DIR__ . '/pages/detail.md');
+                $this->addVirtualPage(__DIR__ . '/pages/detail.md', $route);
             }
         }
     }
@@ -527,6 +528,18 @@ class TerpVaultPlugin extends Plugin
         return (array) $this->config->get('plugins.terpvault');
     }
 
+    public function twigGameFromRoute(): ?GamePackage
+    {
+        $route = '/' . trim((string)$this->grav['uri']->route(), '/');
+        $base = $this->baseRoute();
+
+        if (preg_match('#^' . preg_quote($base, '#') . '/([^/]+)(?:/play)?$#', $route, $matches)) {
+            return $this->repository()->find(rawurldecode($matches[1]), $this->showUnpublished());
+        }
+
+        return null;
+    }
+
     protected function baseRoute(): string
     {
         return '/' . trim((string)($this->pluginConfig()['route'] ?? '/if'), '/');
@@ -549,13 +562,31 @@ class TerpVaultPlugin extends Plugin
         return (bool)($this->pluginConfig()['library']['show_unpublished'] ?? false);
     }
 
-    protected function setVirtualPage(string $file): void
+    protected function addVirtualPage(string $file, string $route): void
     {
         $page = new Page();
         $page->init(new \SplFileInfo($file));
+        $page->route($route);
         $page->routable(true);
         $page->visible(false);
-        $this->grav['page'] = $page;
+
+        $this->grav['pages']->addPage($page, $route);
+    }
+
+    protected function isAdminRequest(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $route = '/' . trim((string)$this->grav['uri']->route(), '/');
+        $path = '/' . trim((string)$this->grav['uri']->path(), '/');
+        $adminRoute = '/' . trim((string)$this->config->get('plugins.admin.route', '/admin'), '/');
+
+        return $route === $adminRoute
+            || strpos($route, $adminRoute . '/') === 0
+            || $path === $adminRoute
+            || strpos($path, $adminRoute . '/') === 0;
     }
 
     protected function serveStoryFile(string $slug): void

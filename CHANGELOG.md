@@ -1,3 +1,12 @@
+# v0.1.12
+
+## 05/21/2026
+
+1. Fixed
+    - Stop overriding Grav's frozen `page` service for TerpVault virtual routes.
+    - Register TerpVault library/detail/play pages with Grav's page collection instead of replacing `grav[page]`.
+    - Add extra admin-route guards so TerpVault frontend routing cannot interfere with Admin/Admin2 screens.
+
 
 # v0.1.11
 
