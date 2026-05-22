@@ -199,16 +199,15 @@ The older `thumbnail` field still works as an alias for `small_cover`, but new p
 
 ## Package validation
 
-TerpVault v0.1.11 adds advisory package-health checks used by the Admin2 Library Hub and API responses. These checks do not block early package assembly, but they flag likely issues before a game is published broadly:
+TerpVault package validation is curator-facing. Missing or unreadable story files are the only serious errors because they prevent reliable play. Other checks are advisory completeness notes:
 
-- missing or unreadable story file
-- missing IFID list
-- missing cover or small-cover art
-- missing source/provenance links
-- missing license or redistribution notes
-- missing how-to-play, hints, or walkthrough helper files
+- IFID not recorded
+- cover or small-cover art not found
+- source/provenance URL not recorded
+- license name or redistribution notes not recorded
+- how-to-play, hints, or walkthrough helper files not found
 
-Validation results are exposed through `GamePackage::warnings()` and the `/terpvault/games` API response as `warnings`, `warning_count`, and `error_count`.
+The public detail page may show these as calm package notes. They do not make missing catalog metadata look like a fatal public error. Validation results are exposed through `GamePackage::warnings()`, `advisoryWarnings()`, `warning_count`, and `error_count`.
 
 ## Treaty of Babel / iFiction alignment
 

@@ -1,3 +1,19 @@
+# v0.1.17
+
+## 05/21/2026
+
+1. Improved
+    - Clarified package warning labels so public/detail completeness notes are curator-friendly.
+    - Kept missing story-file data as the only error-level validation condition.
+    - Added provenance row helpers and improved Catalog & Provenance rendering to hide empty fields and show source/license notes clearly.
+    - Added a calm Package Notes section for advisory completeness checks on detail pages.
+
+2. Documentation
+    - Updated package validation docs and README wording to describe advisory provenance, artwork, helper-file, IFID, license, and redistribution checks.
+
+3. Fixed
+    - Quoted toggle option labels in the plugin blueprint so Grav Admin/Admin2 renders `Yes` / `No` and `Enabled` / `Disabled` instead of YAML boolean values.
+
 # v0.1.16
 
 ## 05/21/2026

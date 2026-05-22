@@ -497,6 +497,41 @@ html.light .terpvault,
   opacity: var(--tv-muted-opacity);
 }
 
+.terpvault-completeness {
+  background: var(--tv-surface);
+}
+
+.terpvault-warning-list {
+  display: grid;
+  gap: .55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.terpvault-warning-list li {
+  display: grid;
+  gap: .18rem;
+  padding: .65rem .75rem;
+  border: 1px solid var(--tv-border);
+  border-radius: var(--tv-radius-sm);
+  background: var(--tv-surface-inset);
+}
+
+.terpvault-warning-list strong {
+  font-size: .95rem;
+}
+
+.terpvault-warning-list span {
+  color: var(--tv-text-soft);
+  opacity: var(--tv-soft-opacity);
+}
+
+.terpvault-alert-error {
+  border-style: solid;
+  border-color: var(--tv-border-strong);
+}
+
 .terpvault-play-page {
   max-width: 1320px;
 }

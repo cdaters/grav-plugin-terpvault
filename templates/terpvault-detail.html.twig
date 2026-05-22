@@ -86,27 +86,51 @@
       </section>
     {% endif %}
 
-    {% set ifids = game.ifids %}
-    {% set catalog = game.catalog %}
-    {% set license = game.licenseInfo %}
-    {% set source = game.sourceInfo %}
-    {% if ifids|length or catalog or license or source %}
+    {% set provenance_rows = game.provenanceRows %}
+    {% set advisory_warnings = game.advisoryWarnings %}
+    {% set error_count = game.warningCount('error') %}
+    {% if provenance_rows|length %}
       <section class="terpvault-panel terpvault-provenance">
         <h2>Catalog & Provenance</h2>
         <p class="terpvault-section-note">Identifiers, source references, and redistribution notes stored with this package.</p>
         <dl class="terpvault-definition-list">
-          {% if ifids|length %}
-            <dt>IFID</dt>
+          {% for row in provenance_rows %}
+            <dt>{{ row.label }}</dt>
             <dd>
-              {% for ifid in ifids %}<code>{{ ifid }}</code>{% if not loop.last %}<br>{% endif %}{% endfor %}
+              {% if row.type == 'codes' %}
+                {% for value in row.values %}<code>{{ value }}</code>{% if not loop.last %}<br>{% endif %}{% endfor %}
+              {% elseif row.type == 'link' %}
+                <a href="{{ row.url }}" rel="noopener">{{ row.text }}</a>
+                {% if row.note %}<br><span>{{ row.note }}</span>{% endif %}
+              {% else %}
+                {{ row.text }}
+                {% if row.note %}<br><span>{{ row.note }}</span>{% endif %}
+              {% endif %}
             </dd>
-          {% endif %}
-          {% if catalog.ifdb.url %}<dt>IFDB</dt><dd><a href="{{ catalog.ifdb.url }}" rel="noopener">{{ catalog.ifdb.tuid|default(catalog.ifdb.url) }}</a></dd>{% endif %}
-          {% if catalog.ifwiki.url %}<dt>IFWiki</dt><dd><a href="{{ catalog.ifwiki.url }}" rel="noopener">{{ catalog.ifwiki.url }}</a></dd>{% endif %}
-          {% if catalog.ifarchive.url %}<dt>IF Archive</dt><dd><a href="{{ catalog.ifarchive.url }}" rel="noopener">{{ catalog.ifarchive.path|default(catalog.ifarchive.url) }}</a></dd>{% endif %}
-          {% if source.url %}<dt>Source</dt><dd><a href="{{ source.url }}" rel="noopener">{{ source.url }}</a>{% if source.retrieved %}<br><span>Retrieved {{ source.retrieved }}</span>{% endif %}</dd>{% endif %}
-          {% if license.name %}<dt>License</dt><dd>{% if license.url %}<a href="{{ license.url }}" rel="noopener">{{ license.name }}</a>{% else %}{{ license.name }}{% endif %}{% if license.notes %}<br><span>{{ license.notes }}</span>{% endif %}</dd>{% endif %}
+          {% endfor %}
         </dl>
+      </section>
+    {% endif %}
+
+    {% if advisory_warnings|length or error_count %}
+      <section class="terpvault-panel terpvault-completeness">
+        <h2>Package Notes</h2>
+        {% if error_count %}
+          <p class="terpvault-alert terpvault-alert-error">This package needs a readable story file before it can be played reliably.</p>
+        {% endif %}
+        {% if advisory_warnings|length %}
+          <p class="terpvault-section-note">These are curator-facing completeness notes. They do not prevent the game from being listed or played.</p>
+          <ul class="terpvault-warning-list">
+            {% for warning in advisory_warnings %}
+              <li>
+                <strong>{{ warning.label }}</strong>
+                <span>{{ warning.message }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="terpvault-section-note">Core package metadata and helper files are in good shape.</p>
+        {% endif %}
       </section>
     {% endif %}
   </article>

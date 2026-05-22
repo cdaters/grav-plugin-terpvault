@@ -348,6 +348,56 @@ class GamePackage
         return $links;
     }
 
+    public function provenanceRows(): array
+    {
+        $catalog = $this->catalog();
+        $source = $this->sourceInfo();
+        $license = $this->licenseInfo();
+        $rows = [];
+
+        $ifids = $this->ifids();
+        if ($ifids) {
+            $rows[] = ['label' => 'IFID', 'type' => 'codes', 'values' => $ifids];
+        }
+
+        if (!empty($catalog['ifdb']['url'])) {
+            $rows[] = ['label' => 'IFDB', 'type' => 'link', 'url' => (string)$catalog['ifdb']['url'], 'text' => (string)($catalog['ifdb']['tuid'] ?? $catalog['ifdb']['url'])];
+        }
+        if (!empty($catalog['ifwiki']['url'])) {
+            $rows[] = ['label' => 'IFWiki', 'type' => 'link', 'url' => (string)$catalog['ifwiki']['url'], 'text' => (string)$catalog['ifwiki']['url']];
+        }
+        if (!empty($catalog['ifarchive']['url'])) {
+            $rows[] = ['label' => 'IF Archive', 'type' => 'link', 'url' => (string)$catalog['ifarchive']['url'], 'text' => (string)($catalog['ifarchive']['path'] ?? $catalog['ifarchive']['url'])];
+        }
+        if (!empty($catalog['babel']['url'])) {
+            $rows[] = ['label' => 'Babel', 'type' => 'link', 'url' => (string)$catalog['babel']['url'], 'text' => (string)$catalog['babel']['url']];
+        }
+
+        if (!empty($source['url'])) {
+            $note = trim((string)($source['notes'] ?? ''));
+            if (!empty($source['retrieved'])) {
+                $note = trim('Retrieved ' . (string)$source['retrieved'] . ($note !== '' ? '. ' . $note : ''));
+            }
+            $rows[] = ['label' => 'Source', 'type' => 'link', 'url' => (string)$source['url'], 'text' => (string)$source['url'], 'note' => $note];
+        } elseif (!empty($source['notes'])) {
+            $rows[] = ['label' => 'Source notes', 'type' => 'text', 'text' => (string)$source['notes']];
+        }
+
+        if (!empty($license['name'])) {
+            $rows[] = [
+                'label' => 'License',
+                'type' => !empty($license['url']) ? 'link' : 'text',
+                'url' => (string)($license['url'] ?? ''),
+                'text' => (string)$license['name'],
+                'note' => trim((string)($license['notes'] ?? '')),
+            ];
+        } elseif (!empty($license['notes'])) {
+            $rows[] = ['label' => 'Redistribution notes', 'type' => 'text', 'text' => (string)$license['notes']];
+        }
+
+        return $rows;
+    }
+
     /**
      * Package health checks for Admin/UI diagnostics.
      *
@@ -378,7 +428,7 @@ class GamePackage
         }
 
         if (!count($this->ifids())) {
-            $add('missing-ifid', 'Missing IFID', 'Add one or more Treaty of Babel IFIDs when known.');
+            $add('missing-ifid', 'IFID not recorded', 'Add one or more Treaty of Babel IFIDs when known.');
         }
 
         if (!$this->hasAnyAsset([
@@ -390,7 +440,7 @@ class GamePackage
             'Cover.jpg',
             'Cover.png',
         ])) {
-            $add('missing-cover', 'Missing cover', 'Add resources.cover or a conventional cover.jpg / cover.png file.');
+            $add('missing-cover', 'Cover art not found', 'Add resources.cover or a conventional cover.jpg / cover.png file.');
         }
 
         if (!$this->hasAnyAsset([
@@ -404,30 +454,33 @@ class GamePackage
             'Small Cover.jpg',
             'Small Cover.png',
         ])) {
-            $add('missing-small-cover', 'Missing small cover', 'Add resources.small_cover or a conventional small-cover.jpg / small-cover.png file.');
+            $add('missing-small-cover', 'Small cover art not found', 'Add resources.small_cover or a conventional small-cover.jpg / small-cover.png file.');
         }
 
         $source = $this->sourceInfo();
         if (empty($source['url']) && empty($this->catalog()['ifarchive']['url'])) {
-            $add('missing-source', 'Missing source', 'Add release.source.url or catalog.ifarchive.url for provenance.');
+            $add('missing-source', 'Source URL not recorded', 'Add release.source.url or catalog.ifarchive.url for provenance.');
         }
 
         $license = $this->licenseInfo();
         $licenseName = strtolower(trim((string)($license['name'] ?? '')));
         if ($licenseName === '') {
-            $add('missing-license', 'Missing license', 'Add release.license information or redistribution notes.');
+            $add('missing-license', 'License name not recorded', 'Add release.license.name when redistribution terms are known.');
         } elseif (strpos($licenseName, 'verify') !== false || strpos($licenseName, 'unknown') !== false) {
-            $add('license-review', 'License review', 'The license field indicates this package still needs redistribution review.');
+            $add('license-review', 'License needs review', 'The license field indicates this package still needs redistribution review.');
+        }
+        if (empty($license['notes'])) {
+            $add('missing-redistribution-notes', 'Redistribution notes not recorded', 'Add release.license.notes with curator-facing rights or redistribution context.');
         }
 
         if (!$this->markdownPath($this->resourceFile('how_to_play', 'how_to_play'))) {
-            $add('missing-how-to-play', 'Missing how-to-play', 'Add a how-to-play.md file for player onboarding.', 'info');
+            $add('missing-how-to-play', 'How-to-play notes not found', 'Add a how-to-play.md file for player onboarding.');
         }
         if (!$this->markdownPath($this->resourceFile('hints', 'hints'))) {
-            $add('missing-hints', 'Missing hints', 'Add hints.md for spoiler-safe player help.', 'info');
+            $add('missing-hints', 'Hints not found', 'Add hints.md for spoiler-safe player help.');
         }
         if (!$this->markdownPath($this->resourceFile('walkthrough', 'walkthrough'))) {
-            $add('missing-walkthrough', 'Missing walkthrough', 'Add walkthrough.md when a full solution is available.', 'info');
+            $add('missing-walkthrough', 'Walkthrough not found', 'Add walkthrough.md when a full solution is available.');
         }
 
         return $warnings;
@@ -442,6 +495,13 @@ class GamePackage
 
         return count(array_filter($warnings, static function (array $warning) use ($severity): bool {
             return ($warning['severity'] ?? '') === $severity;
+        }));
+    }
+
+    public function advisoryWarnings(): array
+    {
+        return array_values(array_filter($this->warnings(), static function (array $warning): bool {
+            return ($warning['severity'] ?? 'warning') !== 'error';
         }));
     }
 
