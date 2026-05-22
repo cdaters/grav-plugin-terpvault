@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ifindex version="1.0" xmlns="http://babel.ifarchive.org/protocol/iFiction/">
+  <story>
+    <identification>
+      <ifid></ifid>
+      <format>zcode</format>
+    </identification>
+    <bibliographic>
+      <title>Adventure</title>
+      <author>Will Crowther and Don Woods</author>
+      <headline>Before Zork, there was a road, a grate, a lamp, and a cave.</headline>
+      <firstpublished>1977</firstpublished>
+      <genre>Adventure</genre>
+      <language>en</language>
+      <description>Adventure, also known as Colossal Cave Adventure or ADVENT, is the cave where interactive fiction found its voice.</description>
+    </bibliographic>
+  </story>
+</ifindex>

@@ -110,4 +110,4 @@ Start with the spoiler-light hints. Use the walkthrough only when you are truly 
 
 ## Historical note
 
-*Adventure* began as Will Crowther's cave-exploration game, inspired by real caving in Kentucky and fantasy role-playing. Don Woods later expanded it into the version that became famous across early networked computing culture. This `Advent.z5` build represents the classic 350-point tradition in a portable Z-machine format.
+*Adventure* began as Will Crowther's cave-exploration game, inspired by real caving in Kentucky and fantasy role-playing. Don Woods later expanded it into the version that became famous across early networked computing culture. This `Advent.z5` build represents the classic 350-point tradition in a portable story-file format.

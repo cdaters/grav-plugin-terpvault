@@ -1,6 +1,6 @@
 # TerpVault Plugin
 
-**TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, screenshots, hints, walkthroughs, and a bundled web player.
+**TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a standards-aware shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, screenshots, hints, walkthroughs, and a bundled web player.
 
 This is a **v0.1.x foundation build**. It is intentionally repo-ready and readable, not a finished public 1.0.
 
@@ -25,7 +25,7 @@ This is a **v0.1.x foundation build**. It is intentionally repo-ready and readab
 
 - It does not yet provide full Admin2 create/edit/upload/import forms.
 - It does not yet provide named save slots or server-side save syncing.
-- It does not yet validate iFiction/Babel metadata.
+- It does not yet import/export iFiction XML automatically, but the package metadata model now maps toward Treaty of Babel/iFiction concepts.
 - It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
 
 ## Installation for local development
@@ -97,54 +97,81 @@ user/data/terpvault/games/
 Minimum `game.yaml`:
 
 ```yaml
-title: Adventure
 slug: adventure
-tagline: The cave where parser fiction learned to breathe.
-status: published
-format: zcode
-story_file: advent.z5
-cover: cover.jpg
-small_cover: small-cover.jpg
+identification:
+  format: zcode
+bibliographic:
+  title: Adventure
+resources:
+  story_file: advent.z5
+  cover: cover.jpg
+  small_cover: small-cover.jpg
+terpvault:
+  status: published
 ```
 
-Fuller example:
+Treaty/iFiction-aligned example:
 
 ```yaml
-title: Adventure
 slug: adventure
-tagline: Before Zork, there was a road, a grate, a lamp, and a cave.
-status: published
-format: zcode
-story_file: advent.z5
 
-author: Will Crowther and Don Woods
-year: 1977
+identification:
+  format: zcode
+  ifids: []
+  bafn: ''
 
-cover: cover.jpg
-small_cover: small-cover.jpg
-screenshots:
-  - screenshots/01.png
+bibliographic:
+  title: Adventure
+  author: Will Crowther and Don Woods
+  headline: Before Zork, there was a road, a grate, a lamp, and a cave.
+  first_published: '1977'
+  genre: Adventure
+  language: en
+  description: |
+    A Markdown-friendly description shown on the game detail page.
 
-description: |
-  A short Markdown-friendly description shown on the game detail page.
+resources:
+  story_file: advent.z5
+  cover: cover.jpg
+  small_cover: small-cover.jpg
+  screenshots:
+    - screenshots/01.png
+  how_to_play: how-to-play.md
+  hints: hints.md
+  walkthrough: walkthrough.md
 
-how_to_play: how-to-play.md
-hints: hints.md
-walkthrough: walkthrough.md
+catalog:
+  ifdb:
+    tuid: ''
+    url: ''
+  ifwiki:
+    url: ''
+  ifarchive:
+    path: ''
+    url: ''
 
-license:
-  name: Verify before redistribution
-  url: ''
-  notes: Confirm rights and provenance before publishing broadly.
-source:
-  url: https://ifarchive.org/if-archive/games/zcode/Advent.z5
-  notes: Source/provenance notes for this package.
+release:
+  license:
+    name: Verify before redistribution
+    url: ''
+    notes: Confirm rights and provenance before publishing broadly.
+  source:
+    url: ''
+    retrieved: ''
+    notes: Source/provenance notes for this package.
+
+terpvault:
+  status: published
+  featured: false
+  tags: []
 
 player:
   engine: parchment
   theme: retro-terminal
   autosave: true
 ```
+
+Older flat fields such as `title`, `format`, `story_file`, `cover`, `small_cover`, `description`, `license`, and `source` remain supported as compatibility aliases.
 
 ### Inform-friendly artwork naming
 
@@ -162,13 +189,27 @@ For compatibility, TerpVault also auto-detects common Inform-style filenames whe
 
 The older `thumbnail` field still works as an alias for `small_cover`, but new packages should use `small_cover`.
 
+
+## Treaty of Babel / iFiction alignment
+
+TerpVault keeps a human-friendly `game.yaml` manifest, but its structure now maps toward the IF ecosystem vocabulary used by the Treaty of Babel and iFiction metadata:
+
+- `identification.ifids` stores one or more IFIDs.
+- `identification.format` stores the interpreter/story-file family.
+- `bibliographic.*` stores title, author, headline, first publication date, genre, language, and description.
+- `resources.*` stores the local story file, cover art, small-cover art, screenshots, and Markdown helper files.
+- `catalog.ifdb`, `catalog.ifwiki`, and `catalog.ifarchive` store public catalog/reference links.
+- `release.license` and `release.source` store rights, redistribution, and provenance notes.
+
+A package may also include an optional `metadata.iFiction.xml` file. TerpVault does not parse or export it yet, but the package slot is reserved for future iFiction import/export support.
+
 ## Supported interpreter formats
 
 The bundled Parchment adapter can be used for these broad story families:
 
 | Family | Common extensions |
 | --- | --- |
-| Z-code / Z-machine | `.z1` through `.z8`, `.zblorb` |
+| Z-code | `.z1` through `.z8`, `.zblorb` |
 | Glulx | `.ulx`, `.gblorb`, `.glb`, `.blorb` |
 | Hugo | `.hex` |
 | TADS 2 / TADS 3 | `.gam`, `.t3` |

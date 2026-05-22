@@ -43,22 +43,22 @@ class GamePackage
 
     public function title(): string
     {
-        return (string) $this->get('title', $this->slug);
+        return (string) $this->get('bibliographic.title', $this->get('title', $this->slug));
     }
 
     public function tagline(): string
     {
-        return (string) $this->get('tagline', '');
+        return (string) $this->get('bibliographic.headline', $this->get('tagline', $this->get('headline', '')));
     }
 
     public function description(): string
     {
-        return (string) $this->get('description', '');
+        return (string) $this->get('bibliographic.description', $this->get('description', ''));
     }
 
     public function status(): string
     {
-        return (string) $this->get('status', 'draft');
+        return (string) $this->get('terpvault.status', $this->get('status', 'draft'));
     }
 
     public function isPublished(): bool
@@ -68,12 +68,28 @@ class GamePackage
 
     public function format(): string
     {
-        return (string) $this->get('format', 'zcode');
+        return (string) $this->get('identification.format', $this->get('format', 'zcode'));
+    }
+
+    public function formatLabel(): string
+    {
+        $labels = [
+            'zcode' => 'Z-code',
+            'z-machine' => 'Z-code',
+            'glulx' => 'Glulx',
+            'tads2' => 'TADS 2',
+            'tads3' => 'TADS 3',
+            'tads' => 'TADS',
+            'hugo' => 'Hugo',
+            'adrift' => 'ADRIFT 4',
+        ];
+        $format = strtolower($this->format());
+        return $labels[$format] ?? strtoupper($this->format());
     }
 
     public function storyFile(): string
     {
-        return (string) $this->get('story_file', $this->get('story', $this->get('file', '')));
+        return (string) $this->get('resources.story_file', $this->get('story_file', $this->get('story', $this->get('file', ''))));
     }
 
     public function storyPath(): ?string
@@ -149,6 +165,7 @@ class GamePackage
     public function smallCoverUrl(): ?string
     {
         return $this->firstAssetUrl([
+            $this->get('resources.small_cover'),
             $this->get('small_cover'),
             $this->get('small-cover'),
             $this->get('thumbnail'),
@@ -174,6 +191,7 @@ class GamePackage
     public function coverUrl(): ?string
     {
         return $this->firstAssetUrl([
+            $this->get('resources.cover'),
             $this->get('cover'),
             $this->get('cover_art'),
             'cover.jpg',
@@ -189,6 +207,7 @@ class GamePackage
     public function splashUrl(): ?string
     {
         return $this->firstAssetUrl([
+            $this->get('resources.splash'),
             $this->get('splash'),
             $this->get('title_image'),
             $this->get('hero'),
@@ -197,7 +216,7 @@ class GamePackage
 
     public function screenshots(): array
     {
-        $screenshots = $this->get('screenshots', []);
+        $screenshots = $this->get('resources.screenshots', $this->get('screenshots', []));
         if (!is_array($screenshots)) {
             return [];
         }
@@ -213,14 +232,78 @@ class GamePackage
         return $items;
     }
 
+    public function author(): string
+    {
+        return (string) $this->get('bibliographic.author', $this->get('author', ''));
+    }
+
+    public function year(): string
+    {
+        return (string) $this->get('bibliographic.first_published', $this->get('year', ''));
+    }
+
+    public function genre(): string
+    {
+        return (string) $this->get('bibliographic.genre', $this->get('genre', ''));
+    }
+
+    public function language(): string
+    {
+        return (string) $this->get('bibliographic.language', $this->get('language', ''));
+    }
+
+    public function ifids(): array
+    {
+        $ifids = $this->get('identification.ifids', $this->get('ifids', $this->get('ifid', [])));
+        if (is_string($ifids) && trim($ifids) !== '') {
+            $ifids = [$ifids];
+        }
+        if (!is_array($ifids)) {
+            return [];
+        }
+        return array_values(array_filter(array_map('strval', $ifids)));
+    }
+
+    public function catalog(): array
+    {
+        $catalog = $this->get('catalog', []);
+        return is_array($catalog) ? $catalog : [];
+    }
+
+    public function licenseInfo(): array
+    {
+        $license = $this->get('release.license', $this->get('license', []));
+        return is_array($license) ? $license : [];
+    }
+
+    public function sourceInfo(): array
+    {
+        $source = $this->get('release.source', $this->get('source', []));
+        return is_array($source) ? $source : [];
+    }
+
+    public function resourceFile(string $key, string $legacyKey = ''): string
+    {
+        return (string) $this->get('resources.' . $key, $legacyKey !== '' ? $this->get($legacyKey, '') : '');
+    }
+
     public function toArray(bool $includeUrls = true): array
     {
         $data = $this->meta;
         $data['slug'] = $this->slug;
         $data['status'] = $this->status();
+        $data['title'] = $this->title();
+        $data['tagline'] = $this->tagline();
+        $data['description'] = $this->description();
+        $data['author'] = $this->author();
+        $data['year'] = $this->year();
+        $data['genre'] = $this->genre();
         $data['format'] = $this->format();
+        $data['format_label'] = $this->formatLabel();
         $data['story_file'] = $this->storyFile();
         $data['has_story_file'] = $this->hasStoryFile();
+        $data['ifids'] = $this->ifids();
+        $data['catalog'] = $this->catalog();
 
         if ($includeUrls) {
             $smallCover = $this->smallCoverUrl();

@@ -189,3 +189,29 @@
   .terpvault-play-header { align-items: flex-start; flex-direction: column; }
   .terpvault-cover { width: 100%; max-height: 360px; }
 }
+
+.terpvault-definition-list {
+  display: grid;
+  grid-template-columns: minmax(110px, max-content) minmax(0, 1fr);
+  gap: .55rem 1rem;
+  margin: 0;
+}
+
+.terpvault-definition-list dt {
+  font-weight: 700;
+  opacity: .72;
+}
+
+.terpvault-definition-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.terpvault-definition-list dd span {
+  opacity: .78;
+}
+
+@media (max-width: 720px) {
+  .terpvault-definition-list { grid-template-columns: 1fr; }
+  .terpvault-definition-list dd { margin-bottom: .5rem; }
+}

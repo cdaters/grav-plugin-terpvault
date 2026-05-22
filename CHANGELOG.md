@@ -1,3 +1,19 @@
+# v0.1.9
+
+## 05/21/2026
+
+1. Improved
+    - Adopted a Treaty of Babel / iFiction-aligned `game.yaml` structure while keeping older flat fields as compatibility aliases.
+    - Added IFID list support through `identification.ifids`.
+    - Added catalog/provenance fields for IFDB, IFWiki, IF Archive, source, license, and redistribution notes.
+    - Added optional `metadata.iFiction.xml` placeholder support in the Adventure starter package.
+    - Added catalog/provenance display on game detail pages.
+    - Updated frontend wording to be more interpreter-format agnostic instead of implying only Z-code content.
+
+2. Documentation
+    - Added `docs/ECOSYSTEM-METADATA.md` explaining how TerpVault maps friendly YAML to Treaty/iFiction, IFID, IFDB, IFWiki, and IF Archive concepts.
+    - Updated README package examples to prefer the structured metadata layout.
+
 # v0.1.8
 
 ## 05/21/2026

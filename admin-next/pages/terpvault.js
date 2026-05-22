@@ -69,8 +69,8 @@ class TerpVaultPage extends HTMLElement {
       <div class="tv-admin">
         <section class="hero">
           <h1>TerpVault</h1>
-          <p>Curate playable interactive-fiction packages: story files, Inform-style cover art, small-cover thumbnails, screenshots, hints, walkthroughs, and bundled Parchment playback.</p>
-          <p class="meta">v0.1.5 introduces the Admin2 library hub scaffold. Full create/edit/upload actions are next.</p>
+          <p>Curate playable interactive-fiction packages: story files, standards-aware metadata, Inform-style cover art, screenshots, hints, walkthroughs, and bundled Parchment playback.</p>
+          <p class="meta">v0.1.9 adds Treaty/iFiction-aligned metadata display. Full create/edit/upload actions are next.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -149,7 +149,7 @@ class TerpVaultPage extends HTMLElement {
             <div class="tagline">${this._esc(game.tagline || '')}</div>
           </div>
           <div class="badges">
-            <span class="badge">${this._esc((game.format || 'zcode').toUpperCase())}</span>
+            <span class="badge">${this._esc(game.format_label || (game.format || 'zcode').toUpperCase())}</span>
             <span class="badge">${this._esc(game.status || 'draft')}</span>
             <span class="badge">${game.has_story_file ? 'story found' : 'missing story'}</span>
           </div>
@@ -161,6 +161,7 @@ class TerpVaultPage extends HTMLElement {
               <dt>Story file</dt><dd><code>${this._esc(game.story_file || '')}</code></dd>
               <dt>Author</dt><dd>${this._esc(game.author || '')}</dd>
               <dt>Year</dt><dd>${this._esc(game.year || '')}</dd>
+              <dt>IFIDs</dt><dd>${this._esc((game.ifids || []).join(', '))}</dd>
               <dt>Cover</dt><dd><code>${this._esc(game.cover || '')}</code></dd>
               <dt>Small cover</dt><dd><code>${this._esc(game.small_cover || game['small-cover'] || game.thumbnail || '')}</code></dd>
             </dl>

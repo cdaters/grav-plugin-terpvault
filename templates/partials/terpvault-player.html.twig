@@ -2,7 +2,7 @@
 <div class="terpvault-player-shell" data-terpvault-player data-game="{{ game.slug }}">
   <div class="terpvault-player-toolbar">
     <strong>{{ game.title }}</strong>
-    <span>{{ game.format|upper }}</span>
+    <span>{{ game.formatLabel }}</span>
     {% if config.player.allow_fullscreen %}
       <button type="button" data-terpvault-fullscreen>Fullscreen</button>
     {% endif %}
@@ -17,11 +17,11 @@
       allowfullscreen></iframe>
   {% else %}
     <div class="terpvault-alert">
-      This game package does not have a readable story file yet. Check <code>story_file</code> in <code>game.yaml</code>.
+      This game package does not have a readable story file yet. Check <code>resources.story_file</code> or <code>story_file</code> in <code>game.yaml</code>.
     </div>
   {% endif %}
 
   <div class="terpvault-save-note">
-    <strong>Save/restore:</strong> Most Z-machine games support <code>SAVE</code> and <code>RESTORE</code> commands. TerpVault’s named save-slot UI is planned for the next build.
+    <strong>Save/restore:</strong> Many interactive fiction works support <code>SAVE</code> and <code>RESTORE</code> commands or interpreter-managed saves. TerpVault’s named save-slot UI is planned for a future build.
   </div>
 </div>

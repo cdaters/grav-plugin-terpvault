@@ -501,7 +501,7 @@ class TerpVaultPlugin extends Plugin
     protected function supportedFormats(): array
     {
         return [
-            'zcode' => ['label' => 'Z-code / Z-machine', 'extensions' => ['z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb']],
+            'zcode' => ['label' => 'Z-code', 'extensions' => ['z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb']],
             'glulx' => ['label' => 'Glulx', 'extensions' => ['ulx', 'gblorb', 'glb', 'blorb']],
             'hugo' => ['label' => 'Hugo', 'extensions' => ['hex']],
             'tads' => ['label' => 'TADS 2 / TADS 3', 'extensions' => ['gam', 't3']],

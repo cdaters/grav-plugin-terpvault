@@ -7,12 +7,13 @@
 
     <header class="terpvault-game-hero">
       <div>
-        <p class="terpvault-kicker">{{ game.format|upper }}</p>
+        <p class="terpvault-kicker">{{ game.formatLabel }}</p>
         <h1>{{ game.title }}</h1>
         {% if game.tagline %}<p class="terpvault-tagline">{{ game.tagline }}</p>{% endif %}
         <p class="terpvault-meta">
-          {% if game.get('author') %}<span>By {{ game.get('author') }}</span>{% endif %}
-          {% if game.get('year') %}<span>{{ game.get('year') }}</span>{% endif %}
+          {% if game.author %}<span>By {{ game.author }}</span>{% endif %}
+          {% if game.year %}<span>{{ game.year }}</span>{% endif %}
+          {% if game.genre %}<span>{{ game.genre }}</span>{% endif %}
           <span>{{ game.status|capitalize }}</span>
         </p>
         <p><a class="terpvault-button" href="{{ game.url('play') }}">Play {{ game.title }}</a></p>
@@ -48,9 +49,9 @@
       </section>
     {% endif %}
 
-    {% set howto = game.markdownPath(game.get('how_to_play')) %}
-    {% set hints = game.markdownPath(game.get('hints')) %}
-    {% set walkthrough = game.markdownPath(game.get('walkthrough')) %}
+    {% set howto = game.markdownPath(game.resourceFile('how_to_play', 'how_to_play')) %}
+    {% set hints = game.markdownPath(game.resourceFile('hints', 'hints')) %}
+    {% set walkthrough = game.markdownPath(game.resourceFile('walkthrough', 'walkthrough')) %}
 
     {% if howto or hints or walkthrough %}
       <section class="terpvault-panel terpvault-accordions">
@@ -73,6 +74,29 @@
             {{ terpvault_render_markdown(walkthrough)|raw }}
           </details>
         {% endif %}
+      </section>
+    {% endif %}
+
+    {% set ifids = game.ifids %}
+    {% set catalog = game.catalog %}
+    {% set license = game.licenseInfo %}
+    {% set source = game.sourceInfo %}
+    {% if ifids|length or catalog or license or source %}
+      <section class="terpvault-panel terpvault-provenance">
+        <h2>Catalog & Provenance</h2>
+        <dl class="terpvault-definition-list">
+          {% if ifids|length %}
+            <dt>IFID</dt>
+            <dd>
+              {% for ifid in ifids %}<code>{{ ifid }}</code>{% if not loop.last %}<br>{% endif %}{% endfor %}
+            </dd>
+          {% endif %}
+          {% if catalog.ifdb.url %}<dt>IFDB</dt><dd><a href="{{ catalog.ifdb.url }}" rel="noopener">{{ catalog.ifdb.tuid|default(catalog.ifdb.url) }}</a></dd>{% endif %}
+          {% if catalog.ifwiki.url %}<dt>IFWiki</dt><dd><a href="{{ catalog.ifwiki.url }}" rel="noopener">{{ catalog.ifwiki.url }}</a></dd>{% endif %}
+          {% if catalog.ifarchive.url %}<dt>IF Archive</dt><dd><a href="{{ catalog.ifarchive.url }}" rel="noopener">{{ catalog.ifarchive.path|default(catalog.ifarchive.url) }}</a></dd>{% endif %}
+          {% if source.url %}<dt>Source</dt><dd><a href="{{ source.url }}" rel="noopener">{{ source.url }}</a>{% if source.retrieved %}<br><span>Retrieved {{ source.retrieved }}</span>{% endif %}</dd>{% endif %}
+          {% if license.name %}<dt>License</dt><dd>{% if license.url %}<a href="{{ license.url }}" rel="noopener">{{ license.name }}</a>{% else %}{{ license.name }}{% endif %}{% if license.notes %}<br><span>{{ license.notes }}</span>{% endif %}</dd>{% endif %}
+        </dl>
       </section>
     {% endif %}
   </article>

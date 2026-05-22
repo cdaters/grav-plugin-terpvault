@@ -4,7 +4,7 @@ TerpVault should ship with a safe original sample package, then offer optional s
 
 ## Recommended default bundle
 
-For a public GPM-ready plugin, ship only `sample-cave`, an original placeholder/demo package owned by the TerpVault project. For Craig's development branch, v0.1.5 also includes a user-provided `adventure` package so the player can be tested with a real Z-machine title.
+For a public GPM-ready plugin, ship only `sample-cave`, an original placeholder/demo package owned by the TerpVault project. For Craig's development branch, v0.1.5 also includes a user-provided `adventure` package so the player can be tested with a real playable title.
 
 ## Good candidates to package after license/provenance review
 

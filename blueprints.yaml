@@ -1,7 +1,7 @@
 name: TerpVault
 slug: terpvault
 type: plugin
-version: 0.1.8
+version: 0.1.9
 description: "Curate, present, and play classic interactive fiction story files in Grav."
 icon: book-open
 author:
@@ -9,7 +9,7 @@ author:
   email: craig@daters.net
 homepage: https://github.com/cdaters/grav-plugin-terpvault
 demo: https://retrorealm.org
-keywords: grav, plugin, interactive fiction, z-machine, zcode, parchment, frotz, retro, games
+keywords: grav, plugin, interactive fiction, parser fiction, zcode, glulx, tads, hugo, adrift, parchment, retro, games
 bugs: https://github.com/cdaters/grav-plugin-terpvault/issues
 license: MIT
 
