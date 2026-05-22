@@ -47,7 +47,7 @@ user/plugins/terpvault
 Then clear cache:
 
 ```bash
-bin/grav clear-cache
+bin/grav clearcache
 ```
 
 ## Configuration
@@ -83,7 +83,7 @@ player:
 
 ## Game package format
 
-Each game lives in its own folder:
+Each game lives in its own folder under `user/data/terpvault/games/{slug}`. The canonical package convention is documented in `docs/PACKAGE-CONVENTIONS.md`.
 
 ```text
 user/data/terpvault/games/
@@ -92,6 +92,7 @@ user/data/terpvault/games/
     advent.z5
     cover.jpg
     small-cover.jpg
+    metadata.iFiction.xml
     screenshots/
       01.png
     how-to-play.md
@@ -177,7 +178,54 @@ player:
   autosave: true
 ```
 
+Required files:
+
+- `game.yaml`
+- one playable story file such as `.z3`, `.z5`, `.z8`, `.ulx`, `.gblorb`, `.t3`, `.gam`, `.hex`, or `.taf`
+
+Recommended files:
+
+- `cover.jpg` or `cover.png`
+- `small-cover.jpg` or `small-cover.png`
+- `metadata.iFiction.xml`
+- `screenshots/`
+- `how-to-play.md`
+- `hints.md`
+- `walkthrough.md`
+
 Older flat fields such as `title`, `format`, `story_file`, `cover`, `small_cover`, `description`, `license`, and `source` remain supported as compatibility aliases.
+
+### Manual package import
+
+Until Admin2 import tools exist, install a package by copying its folder into the site data directory, clearing cache, and visiting the library:
+
+```bash
+mkdir -p user/data/terpvault/games
+cp -R /path/to/adventure user/data/terpvault/games/adventure
+bin/grav clearcache
+```
+
+Then visit:
+
+```text
+/if
+/if/adventure
+```
+
+Some local environments use `bin/grav clearcache` instead of `bin/grav clearcache`.
+
+Future import/export work is expected to use a `.terpvault.zip` package convention containing `game.yaml`, a playable story file, and package-local relative paths. TerpVault does not import or export those zip files yet.
+
+### Package creation checklist
+
+- Choose a stable URL-safe slug.
+- Add `game.yaml` and one playable story file.
+- Point `resources.story_file` at the playable file.
+- Add title, author, format, language, and description.
+- Add IFIDs, IFDB, IFWiki, and IF Archive references when known.
+- Add source, license, and redistribution notes before publishing broadly.
+- Add cover, small-cover, screenshots, how-to-play, hints, and walkthrough files when available.
+- Clear Grav cache and check `/if`, `/if/{slug}`, and `/if/{slug}/play`.
 
 ### Inform-friendly artwork naming
 
@@ -194,8 +242,6 @@ For compatibility, TerpVault also auto-detects common Inform-style filenames whe
 - `Small Cover.png`
 
 The older `thumbnail` field still works as an alias for `small_cover`, but new packages should use `small_cover`.
-
-
 
 ## Package validation
 
@@ -253,7 +299,8 @@ TerpVault's public CSS is scoped under `.terpvault` and exposes CSS variables fo
 
 ```css
 .terpvault {
-  --tv-accent: #775f36;
+  --tv-link-color: var(--pico-primary, currentColor);
+  --tv-button-bg: var(--pico-primary-background, var(--pico-primary, currentColor));
   --tv-radius: 8px;
   --tv-grid-min: 250px;
 }
@@ -274,7 +321,7 @@ To install it into a Grav site:
 ```bash
 mkdir -p user/data/terpvault/games
 cp -R user/plugins/terpvault/_demo/data/terpvault/games/adventure user/data/terpvault/games/
-php bin/grav cache
+bin/grav clearcache
 ```
 
 Then visit:

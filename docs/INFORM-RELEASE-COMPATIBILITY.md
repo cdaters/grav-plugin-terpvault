@@ -2,6 +2,8 @@
 
 TerpVault borrows vocabulary from Inform's releasing model where it makes sense for a Grav-hosted library.
 
+The canonical TerpVault package directory convention is documented in `docs/PACKAGE-CONVENTIONS.md`.
+
 ## Cover art
 
 Inform's documentation treats cover art as the display image used by interpreters, IFDB, browsing tools, and generated websites. It recommends JPEG or PNG, square album-like art, ideally 960×960, and no smaller than 120 pixels in either dimension.

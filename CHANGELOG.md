@@ -1,3 +1,17 @@
+# v0.1.18
+
+## 05/22/2026
+
+1. Documentation
+    - Added canonical TerpVault package conventions covering required files, recommended files, directory layout, and package creation checks.
+    - Documented the manual package import workflow for `user/data/terpvault/games/{slug}`.
+    - Documented how Inform release conventions, Treaty/iFiction metadata, IFIDs, IFDB, IFWiki, and IF Archive references map into `game.yaml`.
+    - Added a future `.terpvault.zip` package convention and Admin2 import/export roadmap note.
+
+2. Notes
+    - No runtime import/export code was added in this pass.
+    - Routing, Admin2/API integration, and Parchment/player behavior remain unchanged.
+
 # v0.1.17
 
 ## 05/21/2026

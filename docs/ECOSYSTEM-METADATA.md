@@ -2,6 +2,8 @@
 
 TerpVault uses a friendly `game.yaml` manifest because Grav site owners should be able to read and edit game packages without specialized tools. The manifest is intentionally aligned with the broader interactive fiction ecosystem so packages can later import/export standard metadata.
 
+See `docs/PACKAGE-CONVENTIONS.md` for the canonical TerpVault package folder structure, required files, manual import workflow, and future `.terpvault.zip` convention.
+
 ## Standards and reference systems
 
 - **Treaty of Babel / iFiction**: metadata vocabulary for identifying and describing interactive fiction works.

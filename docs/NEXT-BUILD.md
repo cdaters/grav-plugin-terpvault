@@ -31,6 +31,8 @@ Implement Admin2 package editor:
 7. Import `.zip` package action.
 8. Export package action.
 
+The import/export target should follow the package convention in `docs/PACKAGE-CONVENTIONS.md`: a future `.terpvault.zip` archive should contain `game.yaml`, one playable story file referenced by `resources.story_file`, package-local relative paths, and no platform-generated cruft.
+
 ## Parchment integration target
 
 - Choose whether to bundle a minimal Parchment build or require the site owner to install it.
@@ -48,4 +50,4 @@ Build the first editable Admin2 Library Manager on top of the v0.1.10 package va
 - edit `game.yaml` metadata
 - upload/replace story files and cover/small-cover art
 - edit package Markdown helpers
-- import/export package zip files
+- import/export `.terpvault.zip` package files
