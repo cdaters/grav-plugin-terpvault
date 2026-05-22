@@ -1,3 +1,11 @@
+
+# v0.1.11
+
+## 05/21/2026
+
+1. Fixed
+    - Move TerpVault virtual page installation from `onPagesInitialized` to `onPageInitialized` to avoid Grav 2/Admin2 `Cannot override frozen service "page"` errors in newer builds.
+
 # v0.1.10
 
 ## 05/21/2026

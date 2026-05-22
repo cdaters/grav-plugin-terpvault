@@ -51,7 +51,7 @@ class TerpVaultPlugin extends Plugin
             $events += [
                 'onTwigInitialized' => ['onTwigInitialized', 0],
                 'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
-                'onPagesInitialized' => ['onPagesInitialized', 0],
+                'onPageInitialized' => ['onPageInitialized', 0],
                 'onPageContentProcessed' => ['onPageContentProcessed', 0],
             ];
         }
@@ -90,8 +90,12 @@ class TerpVaultPlugin extends Plugin
 
     /**
      * Render virtual pages and safely serve package files/assets.
+     *
+     * Grav 2/Admin2 freezes the page service by onPagesInitialized in some
+     * environments, so TerpVault installs its virtual pages during
+     * onPageInitialized before the page service becomes immutable.
      */
-    public function onPagesInitialized(): void
+    public function onPageInitialized(): void
     {
         if (!$this->pluginConfig()['auto_routes']) {
             return;

@@ -195,7 +195,7 @@ The older `thumbnail` field still works as an alias for `small_cover`, but new p
 
 ## Package validation
 
-TerpVault v0.1.10 adds advisory package-health checks used by the Admin2 Library Hub and API responses. These checks do not block early package assembly, but they flag likely issues before a game is published broadly:
+TerpVault v0.1.11 adds advisory package-health checks used by the Admin2 Library Hub and API responses. These checks do not block early package assembly, but they flag likely issues before a game is published broadly:
 
 - missing or unreadable story file
 - missing IFID list
