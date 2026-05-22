@@ -34,3 +34,15 @@ Implement Admin2 package editor:
 - Document licenses for included interpreter pieces.
 - Add runtime check for `assets/vendor/parchment/index.html`.
 - Add Admin warning if Parchment is missing.
+
+
+## v0.2.0 target
+
+Build the first editable Admin2 Library Manager on top of the v0.1.10 package validation helpers:
+
+- list game packages
+- show warnings and release-readiness badges
+- edit `game.yaml` metadata
+- upload/replace story files and cover/small-cover art
+- edit package Markdown helpers
+- import/export package zip files

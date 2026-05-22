@@ -52,6 +52,12 @@ class TerpVaultPage extends HTMLElement {
         .tagline { opacity:.78; font-size:.9rem; }
         .badges { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:.35rem; }
         .badge { display:inline-flex; align-items:center; border:1px solid rgba(127,127,127,.35); border-radius:999px; padding:.12rem .5rem; font-size:.75rem; white-space:nowrap; }
+        .badge.warn { border-color: rgba(255,188,87,.65); background: rgba(255,188,87,.12); }
+        .badge.error { border-color: rgba(255,95,95,.75); background: rgba(255,95,95,.13); }
+        .badge.info { border-color: rgba(93,164,255,.6); background: rgba(93,164,255,.10); }
+        .warnings { display:grid; gap:.35rem; margin-top:.75rem; }
+        .warning { border:1px solid rgba(127,127,127,.22); border-radius:12px; padding:.45rem .55rem; background:rgba(127,127,127,.04); }
+        .warning strong { display:block; font-size:.86rem; }
         .body { border-top:1px solid rgba(127,127,127,.18); padding:.85rem; display:grid; grid-template-columns: minmax(0, 1.5fr) minmax(220px, .8fr); gap:1rem; }
         dl { display:grid; grid-template-columns: 110px minmax(0,1fr); gap:.35rem .7rem; margin:0; }
         dt { opacity:.68; }
@@ -70,7 +76,7 @@ class TerpVaultPage extends HTMLElement {
         <section class="hero">
           <h1>TerpVault</h1>
           <p>Curate playable interactive-fiction packages: story files, standards-aware metadata, Inform-style cover art, screenshots, hints, walkthroughs, and bundled Parchment playback.</p>
-          <p class="meta">v0.1.9 adds Treaty/iFiction-aligned metadata display. Full create/edit/upload actions are next.</p>
+          <p class="meta">v0.1.10 adds package validation helpers and warning badges. Full create/edit/upload actions are next.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -151,7 +157,8 @@ class TerpVaultPage extends HTMLElement {
           <div class="badges">
             <span class="badge">${this._esc(game.format_label || (game.format || 'zcode').toUpperCase())}</span>
             <span class="badge">${this._esc(game.status || 'draft')}</span>
-            <span class="badge">${game.has_story_file ? 'story found' : 'missing story'}</span>
+            <span class="badge ${game.has_story_file ? '' : 'error'}">${game.has_story_file ? 'story found' : 'missing story'}</span>
+            ${game.warning_count ? `<span class="badge warn">${game.warning_count} warning${game.warning_count === 1 ? '' : 's'}</span>` : `<span class="badge">healthy</span>`}
           </div>
         </summary>
         <div class="body">
@@ -169,6 +176,7 @@ class TerpVaultPage extends HTMLElement {
               ${urls.detail ? `<a class="button" href="${this._esc(urls.detail)}" target="_blank" rel="noopener">Details</a>` : ''}
               ${urls.play ? `<a class="button" href="${this._esc(urls.play)}" target="_blank" rel="noopener">Play</a>` : ''}
             </div>
+            ${this._warnings(game)}
           </div>
           <div class="meta">
             ${this._esc((game.description || '').replace(/\s+/g, ' ').slice(0, 360))}${(game.description || '').length > 360 ? '…' : ''}

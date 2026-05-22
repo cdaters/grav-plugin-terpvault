@@ -20,6 +20,8 @@ player:
   parchment_url: ''
   theme: retro-terminal
   allow_fullscreen: true
+  # button keeps Parchment's launch screen; autostart is reserved for future adapter support.
+  launch_mode: button
   allow_download_saves: true
   allow_upload_saves: true
   autosave: true
@@ -59,3 +61,9 @@ security:
 
 admin:
   enable_admin2_page: true
+
+validation:
+  warn_missing_ifid: true
+  warn_missing_license: true
+  warn_missing_source: true
+  warn_missing_help_files: true

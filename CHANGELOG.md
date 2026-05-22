@@ -1,3 +1,17 @@
+# v0.1.10
+
+## 05/21/2026
+
+1. New
+    - Added `GamePackage::warnings()`, `warningCount()`, `metadataSummary()`, and `catalogLinks()` helpers for Admin/API use.
+    - Added advisory package validation for missing story files, IFIDs, cover/small-cover art, source/provenance, license notes, and helper Markdown files.
+    - Added package warning badges and expandable warning details to the Admin2 Library Hub scaffold.
+    - Added a `player.launch_mode` configuration placeholder for future button/autostart behavior.
+
+2. Documentation
+    - Added `docs/PACKAGE-VALIDATION.md` for validation codes and severity meanings.
+    - Added `docs/ROUTING.md` documenting base-route-safe URL expectations and a grep check for hardcoded `/if` links.
+
 # v0.1.9
 
 ## 05/21/2026

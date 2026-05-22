@@ -19,7 +19,7 @@ This is a **v0.1.x foundation build**. It is intentionally repo-ready and readab
 - Provides a native shortcode-style embed:
   - `[terpvault game="adventure"]`
 - Bundles the Parchment 2025.1.14 single-file web build as the first engine adapter.
-- Adds an Admin2 library hub scaffold with collapsible package rows, format support, and runtime settings diagnostics.
+- Adds an Admin2 library hub scaffold with collapsible package rows, format support, package validation warnings, and runtime settings diagnostics.
 
 ## What it does not do yet
 
@@ -74,6 +74,7 @@ player:
   engine: parchment
   parchment_url: ''
   theme: retro-terminal
+  launch_mode: button
 ```
 
 ## Game package format
@@ -168,6 +169,7 @@ terpvault:
 player:
   engine: parchment
   theme: retro-terminal
+  launch_mode: button
   autosave: true
 ```
 
@@ -189,6 +191,20 @@ For compatibility, TerpVault also auto-detects common Inform-style filenames whe
 
 The older `thumbnail` field still works as an alias for `small_cover`, but new packages should use `small_cover`.
 
+
+
+## Package validation
+
+TerpVault v0.1.10 adds advisory package-health checks used by the Admin2 Library Hub and API responses. These checks do not block early package assembly, but they flag likely issues before a game is published broadly:
+
+- missing or unreadable story file
+- missing IFID list
+- missing cover or small-cover art
+- missing source/provenance links
+- missing license or redistribution notes
+- missing how-to-play, hints, or walkthrough helper files
+
+Validation results are exposed through `GamePackage::warnings()` and the `/terpvault/games` API response as `warnings`, `warning_count`, and `error_count`.
 
 ## Treaty of Babel / iFiction alignment
 

@@ -287,6 +287,156 @@ class GamePackage
         return (string) $this->get('resources.' . $key, $legacyKey !== '' ? $this->get($legacyKey, '') : '');
     }
 
+
+    /**
+     * Stable display/diagnostic summary for Admin and API consumers.
+     */
+    public function metadataSummary(): array
+    {
+        return [
+            'slug' => $this->slug,
+            'title' => $this->title(),
+            'author' => $this->author(),
+            'year' => $this->year(),
+            'genre' => $this->genre(),
+            'language' => $this->language(),
+            'status' => $this->status(),
+            'format' => $this->format(),
+            'format_label' => $this->formatLabel(),
+            'story_file' => $this->storyFile(),
+            'ifids' => $this->ifids(),
+        ];
+    }
+
+    /**
+     * Flatten known external catalog/provenance links for display.
+     */
+    public function catalogLinks(): array
+    {
+        $catalog = $this->catalog();
+        $source = $this->sourceInfo();
+        $license = $this->licenseInfo();
+
+        $links = [];
+        if (!empty($catalog['ifdb']['url'])) {
+            $links[] = ['key' => 'ifdb', 'label' => 'IFDB', 'url' => (string)$catalog['ifdb']['url'], 'value' => (string)($catalog['ifdb']['tuid'] ?? '')];
+        }
+        if (!empty($catalog['ifwiki']['url'])) {
+            $links[] = ['key' => 'ifwiki', 'label' => 'IFWiki', 'url' => (string)$catalog['ifwiki']['url'], 'value' => ''];
+        }
+        if (!empty($catalog['ifarchive']['url'])) {
+            $links[] = ['key' => 'ifarchive', 'label' => 'IF Archive', 'url' => (string)$catalog['ifarchive']['url'], 'value' => (string)($catalog['ifarchive']['path'] ?? '')];
+        }
+        if (!empty($catalog['babel']['url'])) {
+            $links[] = ['key' => 'babel', 'label' => 'Babel', 'url' => (string)$catalog['babel']['url'], 'value' => ''];
+        }
+        if (!empty($source['url'])) {
+            $links[] = ['key' => 'source', 'label' => 'Source', 'url' => (string)$source['url'], 'value' => (string)($source['retrieved'] ?? '')];
+        }
+        if (!empty($license['url'])) {
+            $links[] = ['key' => 'license', 'label' => 'License', 'url' => (string)$license['url'], 'value' => (string)($license['name'] ?? '')];
+        }
+
+        return $links;
+    }
+
+    /**
+     * Package health checks for Admin/UI diagnostics.
+     *
+     * These are intentionally advisory unless a missing story file prevents play.
+     * They help maintain provenance, ecosystem metadata, and Inform-style assets
+     * without blocking early package assembly.
+     */
+    public function warnings(): array
+    {
+        $warnings = [];
+        $add = static function (string $code, string $label, string $message, string $severity = 'warning') use (&$warnings): void {
+            $warnings[] = [
+                'code' => $code,
+                'label' => $label,
+                'message' => $message,
+                'severity' => $severity,
+            ];
+        };
+
+        if (trim($this->title()) === '' || $this->title() === $this->slug) {
+            $add('missing-title', 'Missing title', 'Add bibliographic.title so the package has a human-friendly title.');
+        }
+
+        if ($this->storyFile() === '') {
+            $add('missing-story-field', 'Missing story file', 'Set resources.story_file to the playable story file.', 'error');
+        } elseif (!$this->hasStoryFile()) {
+            $add('missing-story-file', 'Story file not found', 'The configured story file does not exist in this package folder.', 'error');
+        }
+
+        if (!count($this->ifids())) {
+            $add('missing-ifid', 'Missing IFID', 'Add one or more Treaty of Babel IFIDs when known.');
+        }
+
+        if (!$this->hasAnyAsset([
+            $this->get('resources.cover'),
+            $this->get('cover'),
+            $this->get('cover_art'),
+            'cover.jpg',
+            'cover.png',
+            'Cover.jpg',
+            'Cover.png',
+        ])) {
+            $add('missing-cover', 'Missing cover', 'Add resources.cover or a conventional cover.jpg / cover.png file.');
+        }
+
+        if (!$this->hasAnyAsset([
+            $this->get('resources.small_cover'),
+            $this->get('small_cover'),
+            $this->get('small-cover'),
+            $this->get('thumbnail'),
+            $this->get('thumbnail_file'),
+            'small-cover.jpg',
+            'small-cover.png',
+            'Small Cover.jpg',
+            'Small Cover.png',
+        ])) {
+            $add('missing-small-cover', 'Missing small cover', 'Add resources.small_cover or a conventional small-cover.jpg / small-cover.png file.');
+        }
+
+        $source = $this->sourceInfo();
+        if (empty($source['url']) && empty($this->catalog()['ifarchive']['url'])) {
+            $add('missing-source', 'Missing source', 'Add release.source.url or catalog.ifarchive.url for provenance.');
+        }
+
+        $license = $this->licenseInfo();
+        $licenseName = strtolower(trim((string)($license['name'] ?? '')));
+        if ($licenseName === '') {
+            $add('missing-license', 'Missing license', 'Add release.license information or redistribution notes.');
+        } elseif (strpos($licenseName, 'verify') !== false || strpos($licenseName, 'unknown') !== false) {
+            $add('license-review', 'License review', 'The license field indicates this package still needs redistribution review.');
+        }
+
+        if (!$this->markdownPath($this->resourceFile('how_to_play', 'how_to_play'))) {
+            $add('missing-how-to-play', 'Missing how-to-play', 'Add a how-to-play.md file for player onboarding.', 'info');
+        }
+        if (!$this->markdownPath($this->resourceFile('hints', 'hints'))) {
+            $add('missing-hints', 'Missing hints', 'Add hints.md for spoiler-safe player help.', 'info');
+        }
+        if (!$this->markdownPath($this->resourceFile('walkthrough', 'walkthrough'))) {
+            $add('missing-walkthrough', 'Missing walkthrough', 'Add walkthrough.md when a full solution is available.', 'info');
+        }
+
+        return $warnings;
+    }
+
+    public function warningCount(?string $severity = null): int
+    {
+        $warnings = $this->warnings();
+        if ($severity === null) {
+            return count($warnings);
+        }
+
+        return count(array_filter($warnings, static function (array $warning) use ($severity): bool {
+            return ($warning['severity'] ?? '') === $severity;
+        }));
+    }
+
     public function toArray(bool $includeUrls = true): array
     {
         $data = $this->meta;
@@ -304,6 +454,11 @@ class GamePackage
         $data['has_story_file'] = $this->hasStoryFile();
         $data['ifids'] = $this->ifids();
         $data['catalog'] = $this->catalog();
+        $data['metadata_summary'] = $this->metadataSummary();
+        $data['catalog_links'] = $this->catalogLinks();
+        $data['warnings'] = $this->warnings();
+        $data['warning_count'] = $this->warningCount();
+        $data['error_count'] = $this->warningCount('error');
 
         if ($includeUrls) {
             $smallCover = $this->smallCoverUrl();
@@ -321,6 +476,18 @@ class GamePackage
         }
 
         return $data;
+    }
+
+    private function hasAnyAsset(array $candidates): bool
+    {
+        foreach ($candidates as $candidate) {
+            $candidate = is_string($candidate) ? trim($candidate) : '';
+            if ($candidate !== '' && $this->assetPath($candidate)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function firstAssetUrl(array $candidates): ?string
