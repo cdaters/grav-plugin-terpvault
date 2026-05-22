@@ -280,7 +280,9 @@ The current page is intentionally a scaffold:
 
 The next implementation pass should add create/edit/import/upload actions.
 
-Public virtual routes and Admin2 API routes are intentionally separate. Frontend routes such as `/if`, `/if/{slug}`, `/if/{slug}/play`, and `/if/_story/{slug}/{filename}` are registered as virtual Grav pages or controlled file endpoints only for frontend requests. Admin2 routes such as `/api/v1/terpvault/games` are registered only during API requests and only when the Admin2 hub setting is enabled.
+Public virtual routes and Admin2 API routes are intentionally separate. Frontend routes such as `/if`, `/if/{slug}`, `/if/{slug}/play`, and `/if/_story/{slug}/{filename}` are registered as virtual Grav pages or controlled file endpoints only for frontend requests. Admin2 API endpoints remain disabled until they are implemented with a controller-style Grav 2/Admin2 integration.
+
+For subdirectory installs, TerpVault matches the browser URL after Grav's mount path is removed. For example, `/grav2-fullsite-skeleton/if/adventure` maps to the configured TerpVault route `/if/adventure`.
 
 ## Notes on game files and rights
 

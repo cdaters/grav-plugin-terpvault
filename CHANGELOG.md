@@ -8,6 +8,8 @@
     - Add request-context guards so TerpVault frontend routing cannot interfere with Admin/Admin2/API screens.
     - Register Admin2 sidebar/page/API hooks only when `admin.enable_admin2_page` is enabled and the request is in Admin2/API context.
     - Normalize subdirectory request paths before matching public routes, preserving installs such as `/grav2-fullsite-skeleton/if` and `/quark2/if`.
+    - Run frontend virtual page registration early during `onPagesInitialized` so Grav can resolve `/if` routes from the page collection before falling through to 404.
+    - Keep Admin2 API route registration disabled for now instead of passing Closure handlers to the API route collector.
 
 2. Changed
     - Keep the experimental Admin2 Library Hub scaffold disabled by default while the public TerpVault routes remain enabled.

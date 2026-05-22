@@ -43,7 +43,7 @@ class TerpVaultPlugin extends Plugin
                 'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
                 'onTwigInitialized' => ['onTwigInitialized', 0],
                 'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
-                'onPagesInitialized' => ['onPagesInitialized', 0],
+                'onPagesInitialized' => ['onPagesInitialized', 100],
                 'onPageContentProcessed' => ['onPageContentProcessed', 0],
             ];
         }
@@ -52,7 +52,6 @@ class TerpVaultPlugin extends Plugin
             $events += [
                 'onApiSidebarItems' => ['onApiSidebarItems', 0],
                 'onApiPluginPageInfo' => ['onApiPluginPageInfo', 0],
-                'onApiRegisterRoutes' => ['onApiRegisterRoutes', 0],
             ];
         }
 
@@ -98,6 +97,11 @@ class TerpVaultPlugin extends Plugin
      * Admin2/API integration routes are separate API endpoints and must not
      * participate in this flow. Keeping those paths separate avoids overriding
      * or touching Grav's active/frozen page service during Admin2 requests.
+     *
+     * Use onPagesInitialized, not onPageInitialized: Grav has loaded the page
+     * collection but has not resolved the active page yet. We add routeable
+     * virtual pages to the collection here and never assign $grav['page'], which
+     * avoids the frozen page service in Grav 2/Admin2.
      */
     public function onPagesInitialized(): void
     {
@@ -232,46 +236,13 @@ class TerpVaultPlugin extends Plugin
     }
 
     /**
-     * Admin2/API routes. Kept simple for now: read-only endpoints the custom
-     * Admin2 page can use without mutating files yet.
+     * Admin2/API routes are intentionally disabled until they are wired through
+     * a Grav 2/Admin2 controller-style integration. Do not pass Closure handlers
+     * to the API route collector.
      */
     public function onApiRegisterRoutes(Event $event): void
     {
-        if (!$this->admin2IntegrationEnabled() || !$this->isAdminApiRequest()) {
-            return;
-        }
-
-        $routes = $event['routes'] ?? null;
-        if (!$routes) {
-            return;
-        }
-
-        $routes->get('/terpvault/games', function () {
-            return [
-                'status' => 'success',
-                'games' => array_map(static function (GamePackage $game) {
-                    return $game->toArray();
-                }, $this->repository()->all(true)),
-            ];
-        });
-
-        $routes->get('/terpvault/games/{slug}', function ($slug) {
-            $game = $this->repository()->find((string) $slug, true);
-            if (!$game) {
-                return ['status' => 'error', 'message' => 'Game not found'];
-            }
-
-            return ['status' => 'success', 'game' => $game->toArray()];
-        });
-
-        $routes->get('/terpvault/status', function () {
-            return [
-                'status' => 'success',
-                'config' => $this->pluginConfig(),
-                'storage_path' => $this->repository()->basePath(),
-                'formats' => $this->supportedFormats(),
-            ];
-        });
+        return;
     }
 
     public function twigGames(bool $includeUnpublished = false): array
@@ -596,17 +567,20 @@ class TerpVaultPlugin extends Plugin
 
     protected function isAdminApiRequest(): bool
     {
-        $route = $this->normalizedUriValue((string)$this->grav['uri']->route());
-        $path = $this->normalizedUriValue((string)$this->grav['uri']->path());
         $adminRoute = '/' . trim((string)$this->config->get('plugins.admin.route', '/admin'), '/');
         $apiRoute = '/' . trim((string)$this->config->get('plugins.api.route', '/api'), '/');
+        $route = $this->normalizedUriValue((string)$this->grav['uri']->route(), $apiRoute);
+        $path = $this->normalizedUriValue((string)$this->grav['uri']->path(), $apiRoute);
+        $adminApiRoute = $adminRoute . '/api';
+        $adminRouteValue = $this->normalizedUriValue((string)$this->grav['uri']->route(), $adminApiRoute);
+        $adminPathValue = $this->normalizedUriValue((string)$this->grav['uri']->path(), $adminApiRoute);
 
         return $route === $apiRoute
             || strpos($route, $apiRoute . '/') === 0
             || $path === $apiRoute
             || strpos($path, $apiRoute . '/') === 0
-            || strpos($route, $adminRoute . '/api') === 0
-            || strpos($path, $adminRoute . '/api') === 0;
+            || strpos($adminRouteValue, $adminApiRoute) === 0
+            || strpos($adminPathValue, $adminApiRoute) === 0;
     }
 
     protected function isAdminRouteRequest(): bool
@@ -615,9 +589,9 @@ class TerpVaultPlugin extends Plugin
             return true;
         }
 
-        $route = $this->normalizedUriValue((string)$this->grav['uri']->route());
-        $path = $this->normalizedUriValue((string)$this->grav['uri']->path());
         $adminRoute = '/' . trim((string)$this->config->get('plugins.admin.route', '/admin'), '/');
+        $route = $this->normalizedUriValue((string)$this->grav['uri']->route(), $adminRoute);
+        $path = $this->normalizedUriValue((string)$this->grav['uri']->path(), $adminRoute);
 
         return $route === $adminRoute
             || strpos($route, $adminRoute . '/') === 0
@@ -627,23 +601,42 @@ class TerpVaultPlugin extends Plugin
 
     protected function currentFrontendRoute(): string
     {
-        $route = $this->normalizedUriValue((string)$this->grav['uri']->route());
+        $base = $this->baseRoute();
+        $route = $this->normalizedUriValue((string)$this->grav['uri']->route(), $base);
 
-        if ($route === '/' || strpos($route, $this->baseRoute()) !== 0) {
-            $route = $this->normalizedUriValue((string)$this->grav['uri']->path());
+        if ($route === '/' || strpos($route, $base) !== 0) {
+            $route = $this->normalizedUriValue((string)$this->grav['uri']->path(), $base);
         }
 
         return $route;
     }
 
-    protected function normalizedUriValue(string $value): string
+    protected function normalizedUriValue(string $value, string $routePrefix = ''): string
     {
         $value = '/' . trim($value, '/');
-        $baseUrl = rtrim((string)($this->grav['base_url'] ?? ''), '/');
+        $baseUrlCandidates = array_filter(array_unique([
+            rtrim((string)($this->grav['base_url'] ?? ''), '/'),
+            parse_url((string)$this->grav['uri']->rootUrl(false), PHP_URL_PATH) ?: '',
+            parse_url((string)$this->grav['uri']->rootUrl(true), PHP_URL_PATH) ?: '',
+        ]));
 
-        if ($baseUrl !== '' && ($value === $baseUrl || strpos($value, $baseUrl . '/') === 0)) {
-            $value = substr($value, strlen($baseUrl)) ?: '/';
-            $value = '/' . trim($value, '/');
+        foreach ($baseUrlCandidates as $baseUrl) {
+            $baseUrl = '/' . trim($baseUrl, '/');
+            if ($baseUrl !== '/' && ($value === $baseUrl || strpos($value, $baseUrl . '/') === 0)) {
+                $value = substr($value, strlen($baseUrl)) ?: '/';
+                $value = '/' . trim($value, '/');
+                break;
+            }
+        }
+
+        $routePrefix = '/' . trim($routePrefix, '/');
+        if ($routePrefix !== '/' && strpos($value, $routePrefix) !== 0) {
+            $position = strpos($value, $routePrefix . '/');
+            if ($position !== false) {
+                $value = substr($value, $position);
+            } elseif (substr($value, -strlen($routePrefix)) === $routePrefix) {
+                $value = $routePrefix;
+            }
         }
 
         return $value === '//' ? '/' : $value;

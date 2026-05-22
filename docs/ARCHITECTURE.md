@@ -51,7 +51,7 @@ Controlled endpoints:
 /if/_manifest
 ```
 
-Frontend virtual pages are added to Grav's page collection before page resolution. TerpVault does not replace `$grav['page']`; this is important in Grav 2/Admin2 because the active page service may already be frozen by the time Admin2/API requests are being handled.
+Frontend virtual pages are added to Grav's page collection during `onPagesInitialized`, with an early priority, before Grav resolves the active page. TerpVault does not replace `$grav['page']`; this is important in Grav 2/Admin2 because the active page service may already be frozen by the time later events run.
 
 ## Player adapter model
 
@@ -88,7 +88,7 @@ admin:
   enable_admin2_page: false
 ```
 
-When explicitly enabled, TerpVault registers Admin2 sidebar/page/API hooks only for Admin2/API requests. These routes live under the API plugin, such as `/api/v1/terpvault/games`, and are deliberately separate from the public virtual page routes under `/if`.
+When explicitly enabled, TerpVault registers only the Admin2 sidebar/page scaffold for Admin2/API requests. TerpVault API endpoints remain disabled until they are implemented with a controller-style Grav 2/Admin2 integration; they are deliberately separate from the public virtual page routes under `/if`.
 
 ## Save/restore plan
 
