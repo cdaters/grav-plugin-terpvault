@@ -12,6 +12,10 @@
 
     {% set games = terpvault.games|default([]) %}
     {% if games|length %}
+      <div class="terpvault-library-bar">
+        <span>{{ games|length }} {{ games|length == 1 ? 'package' : 'packages' }}</span>
+        <span>Playable formats vary by package</span>
+      </div>
       <div class="terpvault-grid">
         {% for game in games %}
           {% include 'partials/terpvault-card.html.twig' with { game: game } %}

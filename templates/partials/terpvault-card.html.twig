@@ -7,9 +7,13 @@
     {% endif %}
   </a>
   <div class="terpvault-card-body">
-    <p class="terpvault-kicker">{{ game.formatLabel }}</p>
+    <div class="terpvault-card-meta">
+      <span>{{ game.formatLabel }}</span>
+      {% if game.year %}<span>{{ game.year }}</span>{% endif %}
+    </div>
     <h2><a href="{{ game.url('detail') }}">{{ game.title }}</a></h2>
-    {% if game.tagline %}<p>{{ game.tagline }}</p>{% endif %}
+    {% if game.author %}<p class="terpvault-card-author">{{ game.author }}</p>{% endif %}
+    {% if game.tagline %}<p class="terpvault-card-tagline">{{ game.tagline }}</p>{% endif %}
     <p class="terpvault-card-actions">
       <a class="terpvault-button" href="{{ game.url('play') }}">Play</a>
       <a class="terpvault-link" href="{{ game.url('detail') }}">Details</a>

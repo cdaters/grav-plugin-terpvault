@@ -1,3 +1,23 @@
+# v0.1.15
+
+## 05/21/2026
+
+1. Improved
+    - Polished public library cards with denser package-style layout, tighter spacing, and better responsive grid behavior.
+    - Improved detail page hierarchy, cover treatment, screenshots, package help accordions, and Catalog & Provenance styling.
+    - Improved the play page and player shell spacing so the interpreter frame is the visual focus.
+    - Added public CSS variables for easier theme customization.
+    - Adjusted public component surfaces to inherit theme colors and remain readable in common dark-mode themes.
+    - Updated public button and link accent styling to prefer active theme variables instead of TerpVault-specific brown/gold defaults.
+    - Tightened primary button contrast in light themes and improved nested help-details padding.
+    - Increased primary button link selector specificity so anchor buttons keep reversed text in their default state.
+    - Kept primary button text white in dark themes as well as light themes.
+    - Improved TADS format labels by inferring TADS 2 / TADS 3 from story-file extensions when available.
+
+2. Notes
+    - Public routes and base-route-aware URL helpers remain unchanged.
+    - Admin2/API integration remains disabled by default and API route registration remains off.
+
 # v0.1.12
 
 ## 05/21/2026

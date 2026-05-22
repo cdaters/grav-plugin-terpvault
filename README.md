@@ -10,6 +10,7 @@ This is a **v0.1.x foundation build**. It is intentionally repo-ready and readab
 - Uses a per-game `game.yaml` metadata file.
 - Uses Inform-friendly naming ideas: `cover` for display/title/box art and `small_cover` for compact library card art.
 - Supports screenshots, how-to-play notes, hints, and walkthrough files.
+- Renders compact package cards, detail pages with help/provenance sections, and a focused play view.
 - Provides virtual frontend routes under `/if` by default:
   - `/if` library page
   - `/if/{slug}` game detail page
@@ -233,6 +234,22 @@ The bundled Parchment adapter can be used for these broad story families:
 | Hugo | `.hex` |
 | TADS 2 / TADS 3 | `.gam`, `.t3` |
 | ADRIFT 4 | `.taf` |
+
+Format labels are shown per package, based on package metadata and story-file extension where useful.
+
+## Public page theming
+
+TerpVault's public CSS is scoped under `.terpvault` and exposes CSS variables for quick theme adjustments:
+
+```css
+.terpvault {
+  --tv-accent: #775f36;
+  --tv-radius: 8px;
+  --tv-grid-min: 250px;
+}
+```
+
+The library cards are intentionally compact so a shelf of packages scans quickly instead of behaving like oversized poster tiles.
 
 ## Installing the Adventure starter package
 

@@ -1,8 +1,10 @@
 {% set player_url = terpvault_player_url(game) %}
 <div class="terpvault-player-shell" data-terpvault-player data-game="{{ game.slug }}">
   <div class="terpvault-player-toolbar">
-    <strong>{{ game.title }}</strong>
-    <span>{{ game.formatLabel }}</span>
+    <div>
+      <strong>{{ game.title }}</strong>
+      <span>{{ game.formatLabel }}</span>
+    </div>
     {% if config.player.allow_fullscreen %}
       <button type="button" data-terpvault-fullscreen>Fullscreen</button>
     {% endif %}

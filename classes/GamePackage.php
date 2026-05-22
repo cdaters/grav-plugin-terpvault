@@ -73,6 +73,14 @@ class GamePackage
 
     public function formatLabel(): string
     {
+        $storyExt = strtolower(pathinfo($this->storyFile(), PATHINFO_EXTENSION));
+        if ($storyExt === 't3') {
+            return 'TADS 3';
+        }
+        if ($storyExt === 'gam') {
+            return 'TADS 2';
+        }
+
         $labels = [
             'zcode' => 'Z-code',
             'z-machine' => 'Z-code',

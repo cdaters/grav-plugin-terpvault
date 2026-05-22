@@ -6,7 +6,7 @@
     <nav class="terpvault-breadcrumb"><a href="{{ terpvault.route }}">← Library</a></nav>
 
     <header class="terpvault-game-hero">
-      <div>
+      <div class="terpvault-game-heading">
         <p class="terpvault-kicker">{{ game.formatLabel }}</p>
         <h1>{{ game.title }}</h1>
         {% if game.tagline %}<p class="terpvault-tagline">{{ game.tagline }}</p>{% endif %}
@@ -16,11 +16,13 @@
           {% if game.genre %}<span>{{ game.genre }}</span>{% endif %}
           <span>{{ game.status|capitalize }}</span>
         </p>
-        <p><a class="terpvault-button" href="{{ game.url('play') }}">Play {{ game.title }}</a></p>
+        <p class="terpvault-hero-actions"><a class="terpvault-button" href="{{ game.url('play') }}">Play {{ game.title }}</a></p>
       </div>
 
       {% if game.coverUrl %}
-        <img class="terpvault-cover" src="{{ game.coverUrl }}" alt="{{ game.title }} cover art">
+        <a class="terpvault-cover-link" href="{{ game.url('play') }}" aria-label="Play {{ game.title }}">
+          <img class="terpvault-cover" src="{{ game.coverUrl }}" alt="{{ game.title }} cover art">
+        </a>
       {% endif %}
     </header>
 
@@ -31,7 +33,7 @@
     {% endif %}
 
     {% if game.description %}
-      <section class="terpvault-panel">
+      <section class="terpvault-panel terpvault-about">
         <h2>About this game</h2>
         {{ terpvault_markdown(game.description)|raw }}
       </section>
@@ -56,22 +58,29 @@
     {% if howto or hints or walkthrough %}
       <section class="terpvault-panel terpvault-accordions">
         <h2>Help & Reference</h2>
+        <p class="terpvault-section-note">Package-local notes for commands, hints, and solution paths.</p>
         {% if howto %}
           <details open>
             <summary>How to Play</summary>
-            {{ terpvault_render_markdown(howto)|raw }}
+            <div class="terpvault-detail-body">
+              {{ terpvault_render_markdown(howto)|raw }}
+            </div>
           </details>
         {% endif %}
         {% if hints %}
           <details>
             <summary>Hints</summary>
-            {{ terpvault_render_markdown(hints)|raw }}
+            <div class="terpvault-detail-body">
+              {{ terpvault_render_markdown(hints)|raw }}
+            </div>
           </details>
         {% endif %}
         {% if walkthrough %}
           <details>
             <summary>Walkthrough</summary>
-            {{ terpvault_render_markdown(walkthrough)|raw }}
+            <div class="terpvault-detail-body">
+              {{ terpvault_render_markdown(walkthrough)|raw }}
+            </div>
           </details>
         {% endif %}
       </section>
@@ -84,6 +93,7 @@
     {% if ifids|length or catalog or license or source %}
       <section class="terpvault-panel terpvault-provenance">
         <h2>Catalog & Provenance</h2>
+        <p class="terpvault-section-note">Identifiers, source references, and redistribution notes stored with this package.</p>
         <dl class="terpvault-definition-list">
           {% if ifids|length %}
             <dt>IFID</dt>
