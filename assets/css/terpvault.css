@@ -10,9 +10,10 @@
   --tv-text-soft: currentColor;
   --tv-muted-opacity: 0.78;
   --tv-soft-opacity: 0.88;
-  --tv-link-color: var(--pico-primary, var(--theme-accent, var(--accent, var(--color-accent, var(--primary-color, var(--link-color, var(--color-link, currentColor)))))));
-  --tv-button-bg: var(--pico-primary-background, var(--pico-primary, var(--theme-accent, var(--accent, var(--color-accent, var(--primary-color, var(--link-color, var(--color-link, currentColor))))))));
-  --tv-button-hover-bg: var(--pico-primary-hover-background, var(--tv-button-bg));
+  --tv-accent-fallback: #2457a6;
+  --tv-link-color: var(--pico-primary, var(--theme-accent, var(--accent, var(--color-accent, var(--primary-color, var(--link-color, var(--color-link, var(--tv-accent-fallback))))))));
+  --tv-button-bg: var(--pico-primary-background, var(--pico-primary, var(--theme-accent, var(--accent, var(--color-accent, var(--primary-color, var(--tv-accent-fallback)))))));
+  --tv-button-hover-bg: var(--pico-primary-hover-background, var(--pico-primary-hover, var(--theme-accent-hover, var(--accent-hover, var(--color-accent-hover, var(--tv-button-bg))))));
   --tv-button-color: #fff;
   --tv-button-border: var(--pico-primary-border, var(--tv-button-bg));
   --tv-radius: 8px;
