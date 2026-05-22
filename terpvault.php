@@ -366,11 +366,37 @@ class TerpVaultPlugin extends Plugin
                 if (method_exists($parser, 'setSafeMode')) {
                     $parser->setSafeMode(true);
                 }
-                return (string) $parser->text($markdown);
+
+                return $this->restoreAllowedPackageHtml((string) $parser->text($markdown));
             }
         }
 
         return $this->basicMarkdownToHtml($markdown);
+    }
+
+    /**
+     * Parsedown safe mode escapes all raw HTML, including harmless disclosure
+     * widgets. TerpVault package help files are local/admin-managed content, so
+     * allow a tiny whitelist for progressive hints while keeping everything else
+     * escaped.
+     */
+    protected function restoreAllowedPackageHtml(string $html): string
+    {
+        $replacements = [
+            '&lt;details&gt;' => '<details>',
+            '&lt;details open&gt;' => '<details open>',
+            '&lt;/details&gt;' => '</details>',
+        ];
+
+        $html = strtr($html, $replacements);
+
+        return preg_replace_callback(
+            '/&lt;summary&gt;(.*?)&lt;\/summary&gt;/is',
+            static function (array $matches): string {
+                return '<summary>' . $matches[1] . '</summary>';
+            },
+            $html
+        ) ?: $html;
     }
 
     /**

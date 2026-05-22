@@ -1,3 +1,11 @@
+# v0.1.8
+
+## 05/21/2026
+
+1. Bugfixes
+    - Restored a small whitelist of package-local HTML after Parsedown safe mode so `<details>` and `<summary>` blocks render as collapsible spoiler sections instead of visible text.
+    - Preserved Markdown safe-mode behavior for other raw HTML while allowing TerpVault hint/walkthrough disclosure widgets.
+
 # v0.1.6
 
 ## [0.1.7] - 2026-05-21
