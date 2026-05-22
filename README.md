@@ -19,7 +19,7 @@ This is a **v0.1.x foundation build**. It is intentionally repo-ready and readab
 - Provides a native shortcode-style embed:
   - `[terpvault game="adventure"]`
 - Bundles the Parchment 2025.1.14 single-file web build as the first engine adapter.
-- Adds an Admin2 library hub scaffold with collapsible package rows, format support, package validation warnings, and runtime settings diagnostics.
+- Includes an optional Admin2 library hub scaffold with collapsible package rows, format support, package validation warnings, and runtime settings diagnostics. It is disabled by default.
 
 ## What it does not do yet
 
@@ -69,6 +69,9 @@ Useful settings:
 enabled: true
 route: /if
 auto_routes: true
+
+admin:
+  enable_admin2_page: false
 
 player:
   engine: parchment
@@ -256,19 +259,28 @@ Then visit:
 
 ## Admin2 Library Hub
 
-When the API and Admin2 plugins are enabled, TerpVault registers a sidebar item at:
+The Admin2 Library Hub is an experimental read-only scaffold and is disabled by default. To test it, enable:
+
+```yaml
+admin:
+  enable_admin2_page: true
+```
+
+When that setting is enabled and the current request is an Admin2/API request, TerpVault registers a sidebar item at:
 
 ```text
 /plugin/terpvault
 ```
 
-The v0.1.5 page is intentionally a scaffold:
+The current page is intentionally a scaffold:
 
 - Library tab with collapsible game package rows.
 - Formats tab showing supported interpreter families.
 - Settings tab showing route/storage/player diagnostics.
 
 The next implementation pass should add create/edit/import/upload actions.
+
+Public virtual routes and Admin2 API routes are intentionally separate. Frontend routes such as `/if`, `/if/{slug}`, `/if/{slug}/play`, and `/if/_story/{slug}/{filename}` are registered as virtual Grav pages or controlled file endpoints only for frontend requests. Admin2 routes such as `/api/v1/terpvault/games` are registered only during API requests and only when the Admin2 hub setting is enabled.
 
 ## Notes on game files and rights
 

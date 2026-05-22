@@ -4,10 +4,12 @@
 
 - Confirm virtual pages render under `/if`.
 - Confirm package assets render through `/if/_asset/{slug}/{path}`.
-- Confirm story files stream through `/if/_file/{slug}`.
+- Confirm story files stream through `/if/_story/{slug}/{filename}`.
 - Confirm `[terpvault game="sample-cave"]` replacement works after page content processing.
-- Confirm Admin2 sidebar registration appears when API/Admin2 is installed.
+- Confirm Admin2 sidebar registration does not appear while `admin.enable_admin2_page` is false.
+- Confirm Admin2 sidebar registration appears when API/Admin2 is installed and `admin.enable_admin2_page` is true.
 - Confirm Admin2 page script loads and calls `/api/v1/terpvault/games`.
+- Confirm Admin2 dashboard/API requests do not trigger TerpVault frontend virtual-page registration.
 
 ## Likely first fixes
 

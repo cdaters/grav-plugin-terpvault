@@ -36,19 +36,11 @@ class TerpVaultPlugin extends Plugin
             return;
         }
 
-        // Register API/Admin2 hooks for both Admin2's SPA/API requests and
-        // classic admin contexts. API calls are not always considered `isAdmin()`
-        // by Grav's plugin helper, so limiting these hooks to isAdmin() can keep
-        // the custom sidebar item from appearing.
-        $events = [
-            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
-            'onApiSidebarItems' => ['onApiSidebarItems', 0],
-            'onApiPluginPageInfo' => ['onApiPluginPageInfo', 0],
-            'onApiRegisterRoutes' => ['onApiRegisterRoutes', 0],
-        ];
+        $events = [];
 
-        if (!$this->isAdmin()) {
+        if ($this->isFrontendRequest()) {
             $events += [
+                'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
                 'onTwigInitialized' => ['onTwigInitialized', 0],
                 'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
                 'onPagesInitialized' => ['onPagesInitialized', 0],
@@ -56,7 +48,17 @@ class TerpVaultPlugin extends Plugin
             ];
         }
 
-        $this->enable($events);
+        if ($this->admin2IntegrationEnabled() && $this->isAdminApiRequest()) {
+            $events += [
+                'onApiSidebarItems' => ['onApiSidebarItems', 0],
+                'onApiPluginPageInfo' => ['onApiPluginPageInfo', 0],
+                'onApiRegisterRoutes' => ['onApiRegisterRoutes', 0],
+            ];
+        }
+
+        if ($events) {
+            $this->enable($events);
+        }
     }
 
     public function onTwigTemplatePaths(): void
@@ -92,17 +94,18 @@ class TerpVaultPlugin extends Plugin
     /**
      * Render virtual pages and safely serve package files/assets.
      *
-     * Grav 2/Admin2 can freeze the page service before plugins attempt to
-     * replace it. TerpVault therefore registers virtual pages with Grav's
-     * page collection instead of overriding the active page service.
+     * Frontend virtual routes are Grav pages added before page resolution.
+     * Admin2/API integration routes are separate API endpoints and must not
+     * participate in this flow. Keeping those paths separate avoids overriding
+     * or touching Grav's active/frozen page service during Admin2 requests.
      */
     public function onPagesInitialized(): void
     {
-        if (!$this->pluginConfig()['auto_routes'] || $this->isAdminRequest()) {
+        if (!($this->pluginConfig()['auto_routes'] ?? true) || !$this->isFrontendRequest()) {
             return;
         }
 
-        $route = '/' . trim($this->grav['uri']->route(), '/');
+        $route = $this->currentFrontendRoute();
         $base = $this->baseRoute();
 
         if ($route === $base . '/_engine/parchment') {
@@ -187,7 +190,7 @@ class TerpVaultPlugin extends Plugin
 
     public function onApiSidebarItems(Event $event): void
     {
-        if (!$this->pluginConfig()['admin']['enable_admin2_page']) {
+        if (!$this->admin2IntegrationEnabled() || !$this->isAdminApiRequest()) {
             return;
         }
 
@@ -210,6 +213,10 @@ class TerpVaultPlugin extends Plugin
 
     public function onApiPluginPageInfo(Event $event): void
     {
+        if (!$this->admin2IntegrationEnabled() || !$this->isAdminApiRequest()) {
+            return;
+        }
+
         if (($event['plugin'] ?? null) !== 'terpvault') {
             return;
         }
@@ -230,6 +237,10 @@ class TerpVaultPlugin extends Plugin
      */
     public function onApiRegisterRoutes(Event $event): void
     {
+        if (!$this->admin2IntegrationEnabled() || !$this->isAdminApiRequest()) {
+            return;
+        }
+
         $routes = $event['routes'] ?? null;
         if (!$routes) {
             return;
@@ -530,7 +541,7 @@ class TerpVaultPlugin extends Plugin
 
     public function twigGameFromRoute(): ?GamePackage
     {
-        $route = '/' . trim((string)$this->grav['uri']->route(), '/');
+        $route = $this->currentFrontendRoute();
         $base = $this->baseRoute();
 
         if (preg_match('#^' . preg_quote($base, '#') . '/([^/]+)(?:/play)?$#', $route, $matches)) {
@@ -562,6 +573,11 @@ class TerpVaultPlugin extends Plugin
         return (bool)($this->pluginConfig()['library']['show_unpublished'] ?? false);
     }
 
+    protected function admin2IntegrationEnabled(): bool
+    {
+        return (bool)($this->pluginConfig()['admin']['enable_admin2_page'] ?? false);
+    }
+
     protected function addVirtualPage(string $file, string $route): void
     {
         $page = new Page();
@@ -573,20 +589,64 @@ class TerpVaultPlugin extends Plugin
         $this->grav['pages']->addPage($page, $route);
     }
 
-    protected function isAdminRequest(): bool
+    protected function isFrontendRequest(): bool
+    {
+        return !$this->isAdminRouteRequest() && !$this->isAdminApiRequest();
+    }
+
+    protected function isAdminApiRequest(): bool
+    {
+        $route = $this->normalizedUriValue((string)$this->grav['uri']->route());
+        $path = $this->normalizedUriValue((string)$this->grav['uri']->path());
+        $adminRoute = '/' . trim((string)$this->config->get('plugins.admin.route', '/admin'), '/');
+        $apiRoute = '/' . trim((string)$this->config->get('plugins.api.route', '/api'), '/');
+
+        return $route === $apiRoute
+            || strpos($route, $apiRoute . '/') === 0
+            || $path === $apiRoute
+            || strpos($path, $apiRoute . '/') === 0
+            || strpos($route, $adminRoute . '/api') === 0
+            || strpos($path, $adminRoute . '/api') === 0;
+    }
+
+    protected function isAdminRouteRequest(): bool
     {
         if ($this->isAdmin()) {
             return true;
         }
 
-        $route = '/' . trim((string)$this->grav['uri']->route(), '/');
-        $path = '/' . trim((string)$this->grav['uri']->path(), '/');
+        $route = $this->normalizedUriValue((string)$this->grav['uri']->route());
+        $path = $this->normalizedUriValue((string)$this->grav['uri']->path());
         $adminRoute = '/' . trim((string)$this->config->get('plugins.admin.route', '/admin'), '/');
 
         return $route === $adminRoute
             || strpos($route, $adminRoute . '/') === 0
             || $path === $adminRoute
             || strpos($path, $adminRoute . '/') === 0;
+    }
+
+    protected function currentFrontendRoute(): string
+    {
+        $route = $this->normalizedUriValue((string)$this->grav['uri']->route());
+
+        if ($route === '/' || strpos($route, $this->baseRoute()) !== 0) {
+            $route = $this->normalizedUriValue((string)$this->grav['uri']->path());
+        }
+
+        return $route;
+    }
+
+    protected function normalizedUriValue(string $value): string
+    {
+        $value = '/' . trim($value, '/');
+        $baseUrl = rtrim((string)($this->grav['base_url'] ?? ''), '/');
+
+        if ($baseUrl !== '' && ($value === $baseUrl || strpos($value, $baseUrl . '/') === 0)) {
+            $value = substr($value, strlen($baseUrl)) ?: '/';
+            $value = '/' . trim($value, '/');
+        }
+
+        return $value === '//' ? '/' : $value;
     }
 
     protected function serveStoryFile(string $slug): void

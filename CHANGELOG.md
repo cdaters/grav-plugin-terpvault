@@ -5,7 +5,12 @@
 1. Fixed
     - Stop overriding Grav's frozen `page` service for TerpVault virtual routes.
     - Register TerpVault library/detail/play pages with Grav's page collection instead of replacing `grav[page]`.
-    - Add extra admin-route guards so TerpVault frontend routing cannot interfere with Admin/Admin2 screens.
+    - Add request-context guards so TerpVault frontend routing cannot interfere with Admin/Admin2/API screens.
+    - Register Admin2 sidebar/page/API hooks only when `admin.enable_admin2_page` is enabled and the request is in Admin2/API context.
+    - Normalize subdirectory request paths before matching public routes, preserving installs such as `/grav2-fullsite-skeleton/if` and `/quark2/if`.
+
+2. Changed
+    - Keep the experimental Admin2 Library Hub scaffold disabled by default while the public TerpVault routes remain enabled.
 
 
 # v0.1.11

@@ -115,9 +115,10 @@ form:
 
     admin.enable_admin2_page:
       type: toggle
-      label: Enable Admin2 Library Page
-      highlight: 1
-      default: 1
+      label: Enable Admin2 Library Hub
+      help: Experimental Admin2/API scaffold. Leave disabled unless you are testing the read-only Admin2 library page.
+      highlight: 0
+      default: 0
       options:
         1: Yes
         0: No

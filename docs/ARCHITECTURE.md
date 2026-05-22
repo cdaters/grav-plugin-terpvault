@@ -45,10 +45,13 @@ Virtual pages:
 Controlled endpoints:
 
 ```text
-/if/_file/{slug}
+/if/_story/{slug}/{filename}
+/if/_file/{slug}              legacy compatibility endpoint
 /if/_asset/{slug}/{asset-path}
 /if/_manifest
 ```
+
+Frontend virtual pages are added to Grav's page collection before page resolution. TerpVault does not replace `$grav['page']`; this is important in Grav 2/Admin2 because the active page service may already be frozen by the time Admin2/API requests are being handled.
 
 ## Player adapter model
 
@@ -78,7 +81,14 @@ The Admin2 page is component-mode because TerpVault eventually needs a highly cu
 - validation panel
 - package preview
 
-For v0.1.5, the Admin2 page is a read-only library hub scaffold with collapsible package rows, format support, and settings diagnostics.
+For now, the Admin2 page is a read-only library hub scaffold with collapsible package rows, format support, and settings diagnostics. It is disabled by default with:
+
+```yaml
+admin:
+  enable_admin2_page: false
+```
+
+When explicitly enabled, TerpVault registers Admin2 sidebar/page/API hooks only for Admin2/API requests. These routes live under the API plugin, such as `/api/v1/terpvault/games`, and are deliberately separate from the public virtual page routes under `/if`.
 
 ## Save/restore plan
 

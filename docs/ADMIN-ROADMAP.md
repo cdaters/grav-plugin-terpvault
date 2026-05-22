@@ -2,7 +2,7 @@
 
 ## v0.1.5 scaffold
 
-- Register Admin2 sidebar item.
+- Register Admin2 sidebar item only when the experimental Admin2 hub setting is enabled.
 - Provide full-page component at `admin-next/pages/terpvault.js`.
 - Show collapsible library package rows.
 - Show supported interpreter formats.

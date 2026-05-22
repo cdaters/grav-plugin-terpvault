@@ -60,7 +60,9 @@ security:
     - txt
 
 admin:
-  enable_admin2_page: true
+  # Experimental Admin2 Library Hub/API scaffold. Disabled by default so public
+  # virtual routes cannot affect Admin2 dashboard/API request lifecycles.
+  enable_admin2_page: false
 
 validation:
   warn_missing_ifid: true
