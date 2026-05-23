@@ -262,6 +262,7 @@ class TerpVaultPlugin extends Plugin
         require_once __DIR__ . '/classes/Service/PackageMetadataService.php';
         require_once __DIR__ . '/classes/Service/PackageArchiveService.php';
         require_once __DIR__ . '/classes/Service/PackageCreationService.php';
+        require_once __DIR__ . '/classes/Service/PackageImportService.php';
         require_once __DIR__ . '/classes/Service/PackageMarkdownService.php';
         require_once __DIR__ . '/classes/Service/PackageMediaService.php';
         require_once __DIR__ . '/classes/Service/PackageStoryService.php';
@@ -274,6 +275,7 @@ class TerpVaultPlugin extends Plugin
 
         $controller = \Grav\Plugin\TerpVault\Controller\ApiController::class;
         $routes->post('/terpvault/packages', [$controller, 'createPackage']);
+        $routes->post('/terpvault/packages/import/inspect', [$controller, 'inspectImport']);
         $routes->get('/terpvault/packages/{slug}/export', [$controller, 'exportPackage']);
         $routes->get('/terpvault/packages/{slug}/metadata', [$controller, 'metadata']);
         $routes->patch('/terpvault/packages/{slug}/metadata', [$controller, 'updateMetadata']);

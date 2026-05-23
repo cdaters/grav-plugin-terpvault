@@ -178,9 +178,24 @@ Editable fields:
 - Add an Export button to each Admin2 package row.
 - Keep package import, import inspect, import commit, package delete, arbitrary file browsing, public routing, `metadata.iFiction.xml` editing, and player behavior out of scope.
 
+## v0.2.9 Import Inspect
+
+- Add inspect-only validation for uploaded `.terpvault.zip` packages from the opt-in Admin2 Library Manager.
+- Register a controller-style route only when `admin.enable_admin2_page` is enabled:
+  - `POST /terpvault/packages/import/inspect`
+- Stage the uploaded zip in temporary storage only; do not extract or move files into `user/data/terpvault/games`.
+- Ignore macOS and Windows cruft before top-level-folder analysis.
+- Require exactly one top-level package folder, `game.yaml`, and `resources.story_file`.
+- Validate zip entries for null bytes, URI schemes, absolute paths, empty normalized paths, `.` / `..` traversal segments, and package containment after stripping the top folder.
+- Validate story-file extension with the same allowlist used by Story File Manager Lite.
+- Validate referenced helper Markdown and media paths, reporting missing optional helper/media files as warnings.
+- Report candidate slug, YAML slug, top folder, title, author, story file, story extension, collision status, iFiction XML presence, ignored files, included files, fatal errors, and warnings.
+- Add an Admin2 Import Package panel that clearly states inspect-only behavior and omits commit/install controls.
+- Keep import commit/install, package creation from imports, package delete, arbitrary file browsing, public routing, and player behavior out of scope.
+
 ## Next build: package management UI
 
-- Import package zip with macOS cruft stripping.
+- Import package commit/install after successful inspection.
 
 ## Later
 

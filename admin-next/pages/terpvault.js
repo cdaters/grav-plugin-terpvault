@@ -16,6 +16,12 @@ class TerpVaultPage extends HTMLElement {
         error: '',
         success: ''
       },
+      importInspect: {
+        open: false,
+        saving: false,
+        error: '',
+        report: null
+      },
       export: {
         slug: '',
         saving: false,
@@ -269,7 +275,7 @@ class TerpVaultPage extends HTMLElement {
         <section class="hero">
           <h1>TerpVault Library Manager</h1>
           <p>Package inventory, package creation, metadata editing, helper Markdown editing, media management, screenshot ordering, and story-file replacement for installed TerpVault interactive-fiction packages.</p>
-          <p class="meta">v0.2.8 is opt-in. Package export is available for installed packages. Package delete, import, arbitrary file browsing, player settings editing, and <code>metadata.iFiction.xml</code> editing are not available.</p>
+          <p class="meta">v0.2.9 is opt-in. Package export and import inspection are available. Package delete, import install, arbitrary file browsing, player settings editing, and <code>metadata.iFiction.xml</code> editing are not available.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -320,9 +326,13 @@ class TerpVaultPage extends HTMLElement {
         <div class="empty">
           <h2>No game packages found</h2>
           <p>Create folders under <code>user/data/terpvault/games</code>, each with a <code>game.yaml</code>.</p>
-          <div class="actions"><button class="button primary" type="button" data-action="create-package">Create Package</button></div>
+          <div class="actions">
+            <button class="button primary" type="button" data-action="create-package">Create Package</button>
+            <button class="button" type="button" data-action="inspect-import">Inspect Import</button>
+          </div>
         </div>
         ${this.state.create.open ? this._createPackagePanel() : ''}
+        ${this.state.importInspect.open ? this._importInspectPanel() : ''}
       `;
       this._bindLibraryActions();
       return;
@@ -335,9 +345,12 @@ class TerpVaultPage extends HTMLElement {
         <div class="editor-head">
           <div>
             <strong>${games.length} package${games.length === 1 ? '' : 's'} found</strong>
-            <p class="meta">Source: ${this._esc(this.state.source)}. Package creation, editing, and export use the Admin2 API when available. Delete and import are intentionally unavailable.</p>
+            <p class="meta">Source: ${this._esc(this.state.source)}. Package creation, editing, export, and import inspection use the Admin2 API when available. Delete and import install are intentionally unavailable.</p>
           </div>
-          <button class="button primary" type="button" data-action="create-package">${this.state.create.open ? 'Creating Package' : 'Create Package'}</button>
+          <div class="actions" style="margin-top:0;">
+            <button class="button" type="button" data-action="inspect-import">${this.state.importInspect.open ? 'Inspecting Import' : 'Inspect Import'}</button>
+            <button class="button primary" type="button" data-action="create-package">${this.state.create.open ? 'Creating Package' : 'Create Package'}</button>
+          </div>
         </div>
         <div class="badges" style="justify-content:flex-start;margin-top:.5rem;">
           <span class="badge ${errors ? 'error' : 'ok'}">${errors} error${errors === 1 ? '' : 's'}</span>
@@ -345,6 +358,7 @@ class TerpVaultPage extends HTMLElement {
         </div>
       </div>
       ${this.state.create.open ? this._createPackagePanel() : ''}
+      ${this.state.importInspect.open ? this._importInspectPanel() : ''}
       ${games.map(game => this._gameRow(game)).join('')}
     `;
     this._bindLibraryActions();
@@ -558,6 +572,84 @@ class TerpVaultPage extends HTMLElement {
     `;
   }
 
+  _importInspectPanel() {
+    const state = this.state.importInspect || {};
+    return `
+      <section class="create-panel">
+        <div class="editor-head">
+          <div>
+            <h2>Inspect Import</h2>
+            <p class="meta">Inspect only. Import/install is not implemented yet. This checks a <code>.terpvault.zip</code> package without creating or moving package files.</p>
+          </div>
+          <button class="button" type="button" data-action="cancel-import-inspect">Close</button>
+        </div>
+        ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
+        <form data-import-inspect>
+          <div class="field">
+            <label>TerpVault package zip</label>
+            <input type="file" accept=".zip,.terpvault.zip,application/zip" ${state.saving ? 'disabled' : ''}>
+            <span class="meta">The archive is inspected in temporary storage only. Commit/install is intentionally unavailable in v0.2.9.</span>
+          </div>
+          <div class="form-actions">
+            <button class="button" type="button" data-action="cancel-import-inspect">Cancel</button>
+            <button class="button primary" type="submit" ${state.saving ? 'disabled' : ''}>${state.saving ? 'Inspecting...' : 'Inspect Package'}</button>
+          </div>
+        </form>
+        ${state.report ? this._importReport(state.report) : ''}
+      </section>
+    `;
+  }
+
+  _importReport(report) {
+    const fatal = Array.isArray(report.fatal_errors) ? report.fatal_errors : [];
+    const warnings = Array.isArray(report.warnings) ? report.warnings : [];
+    const ignored = Array.isArray(report.ignored_files) ? report.ignored_files : [];
+    const included = Array.isArray(report.included_files) ? report.included_files : [];
+    return `
+      <div class="box" style="margin-top:.85rem;">
+        <h3>Inspection Report</h3>
+        <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
+          <span class="badge ${report.ok ? 'ok' : 'error'}">${report.ok ? 'ok' : 'blocked'}</span>
+          <span class="badge ${report.has_collision ? 'warn' : 'ok'}">${report.has_collision ? 'slug collision' : 'no collision'}</span>
+          <span class="badge ${report.has_ifiction ? 'ok' : 'warn'}">${report.has_ifiction ? 'iFiction found' : 'no iFiction XML'}</span>
+        </div>
+        <dl>
+          <dt>Candidate slug</dt><dd><code>${this._esc(report.candidate_slug || '')}</code></dd>
+          <dt>YAML slug</dt><dd><code>${this._esc(report.yaml_slug || 'Not recorded')}</code></dd>
+          <dt>Top folder</dt><dd><code>${this._esc(report.top_folder || '')}</code></dd>
+          <dt>Title</dt><dd>${this._esc(report.title || 'Not recorded')}</dd>
+          <dt>Author</dt><dd>${this._esc(report.author || 'Not recorded')}</dd>
+          <dt>Story file</dt><dd><code>${this._esc(report.story_file || '')}</code></dd>
+          <dt>Story extension</dt><dd><code>${this._esc(report.story_extension || '')}</code></dd>
+          <dt>Destination</dt><dd>${report.destination_exists ? 'Package folder already exists.' : 'No existing package folder detected.'}</dd>
+        </dl>
+        <p class="meta">Inspect only. Import/install is not implemented yet, and no package files were created.</p>
+        ${this._reportList('Fatal errors', fatal, 'error')}
+        ${this._reportList('Warnings', warnings, 'warn')}
+        ${this._reportList('Ignored cruft', ignored)}
+        ${this._reportList('Included files', included)}
+      </div>
+    `;
+  }
+
+  _reportList(label, items, tone = '') {
+    if (!items.length) {
+      return `<div class="warnings"><div class="warning ${this._esc(tone)}"><strong>${this._esc(label)}</strong><span class="meta">None.</span></div></div>`;
+    }
+
+    return `
+      <div class="warnings">
+        <div class="warning ${this._esc(tone)}">
+          <strong>${this._esc(label)}</strong>
+          <ul>
+            ${items.slice(0, 40).map(item => `<li><code>${this._esc(item)}</code></li>`).join('')}
+            ${items.length > 40 ? `<li class="meta">${items.length - 40} more not shown.</li>` : ''}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
   _bindLibraryActions() {
     const root = this.shadowRoot.getElementById('library');
     if (!root) {
@@ -580,8 +672,20 @@ class TerpVaultPage extends HTMLElement {
       button.addEventListener('click', () => this._exportPackage(button.dataset.slug || ''));
     });
 
+    root.querySelectorAll('[data-action="inspect-import"]').forEach(button => {
+      button.addEventListener('click', () => this._openImportInspect());
+    });
+
+    root.querySelectorAll('[data-action="cancel-import-inspect"]').forEach(button => {
+      button.addEventListener('click', () => this._closeImportInspect());
+    });
+
     root.querySelectorAll('[data-action="cancel-create"]').forEach(button => {
       button.addEventListener('click', () => this._closeCreatePackage());
+    });
+
+    root.querySelectorAll('form[data-import-inspect]').forEach(form => {
+      form.addEventListener('submit', event => this._inspectImport(event));
     });
 
     root.querySelectorAll('form[data-create-package]').forEach(form => {
@@ -624,6 +728,45 @@ class TerpVaultPage extends HTMLElement {
 
   _closeCreatePackage() {
     this.state.create = { open: false, saving: false, error: '', success: '' };
+    this._renderLibrary();
+  }
+
+  _openImportInspect() {
+    this.state.importInspect = { open: true, saving: false, error: '', report: null };
+    this._renderLibrary();
+  }
+
+  _closeImportInspect() {
+    this.state.importInspect = { open: false, saving: false, error: '', report: null };
+    this._renderLibrary();
+  }
+
+  async _inspectImport(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const input = form.querySelector('input[type="file"]');
+    const file = input?.files?.[0];
+    if (!file) {
+      this.state.importInspect = { open: true, saving: false, error: 'Choose a .terpvault.zip package before inspecting.', report: null };
+      this._renderLibrary();
+      return;
+    }
+
+    const data = new FormData();
+    data.append('file', file);
+    this.state.importInspect = { open: true, saving: true, error: '', report: null };
+    this._renderLibrary();
+
+    try {
+      const report = await this._requestJson(this._importInspectApiUrl(), {
+        method: 'POST',
+        body: data
+      });
+      this.state.importInspect = { open: true, saving: false, error: '', report };
+    } catch (error) {
+      this.state.importInspect = { open: true, saving: false, error: error.message || String(error), report: null };
+    }
+
     this._renderLibrary();
   }
 
@@ -1621,6 +1764,10 @@ class TerpVaultPage extends HTMLElement {
 
   _exportApiUrl(slug) {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/export`;
+  }
+
+  _importInspectApiUrl() {
+    return `${this._apiBase()}/terpvault/packages/import/inspect`;
   }
 
   _markdownApiUrl(slug, type) {

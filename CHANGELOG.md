@@ -1,3 +1,18 @@
+# v0.2.9
+
+## 05/23/2026
+
+1. New
+    - Added import inspection for uploaded `.terpvault.zip` packages without installing them.
+    - Added controller-style `POST /terpvault/packages/import/inspect`.
+    - Added an Admin2 Inspect Import panel that reports candidate slug, title, story file, warnings, fatal errors, ignored cruft, included files, iFiction XML presence, and slug collision status.
+
+2. Safety
+    - Import inspection stages the uploaded zip in temporary storage only and never moves files into `user/data/terpvault/games`.
+    - Zip entries are validated for traversal, absolute paths, URI schemes, null bytes, package containment after the top folder is stripped, required `game.yaml`, required `resources.story_file`, and allowlisted story/media/helper references.
+    - macOS and Windows cruft is ignored before top-level package folder analysis.
+    - Import commit/install, package creation from imports, package delete, public routing, and player behavior remain out of scope.
+
 # v0.2.8
 
 ## 05/23/2026

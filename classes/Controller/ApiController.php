@@ -11,6 +11,7 @@ use Grav\Plugin\Api\Response\ApiResponse;
 use Grav\Framework\Psr7\Response;
 use Grav\Plugin\TerpVault\Service\PackageArchiveService;
 use Grav\Plugin\TerpVault\Service\PackageCreationService;
+use Grav\Plugin\TerpVault\Service\PackageImportService;
 use Grav\Plugin\TerpVault\Service\PackageMarkdownService;
 use Grav\Plugin\TerpVault\Service\PackageMediaService;
 use Grav\Plugin\TerpVault\Service\PackageMetadataService;
@@ -36,6 +37,11 @@ class ApiController extends AbstractApiController
     private function archiveService(): PackageArchiveService
     {
         return new PackageArchiveService();
+    }
+
+    private function importService(): PackageImportService
+    {
+        return new PackageImportService();
     }
 
     private function markdownService(): PackageMarkdownService
@@ -113,6 +119,23 @@ class ApiController extends AbstractApiController
                 'Cache-Control' => 'no-store, max-age=0',
                 'X-Content-Type-Options' => 'nosniff',
             ], $stream);
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function inspectImport(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $upload = $this->firstUploadedFile($request->getUploadedFiles());
+        if (!$upload) {
+            throw new ValidationException('No TerpVault package zip was uploaded.');
+        }
+
+        try {
+            return ApiResponse::create($this->importService()->inspect($upload));
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         } catch (RuntimeException $e) {
