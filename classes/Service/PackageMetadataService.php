@@ -318,11 +318,13 @@ class PackageMetadataService
 
             flock($lock, LOCK_UN);
             fclose($lock);
+            @unlink($lockPath);
 
             return $backup;
         } catch (\Throwable $e) {
             flock($lock, LOCK_UN);
             fclose($lock);
+            @unlink($lockPath);
             throw $e;
         }
     }

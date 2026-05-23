@@ -1,3 +1,18 @@
+# v0.2.7
+
+## 05/22/2026
+
+1. New
+    - Added a limited opt-in Admin2 Package Creation Wizard.
+    - Added controller-style `POST /terpvault/packages` for creating a new package folder with starter `game.yaml`, one initial story file, and starter helper Markdown files.
+    - Added an Admin2 Create Package panel that collects required package fields and uploads the initial story file.
+
+2. Safety
+    - Package creation rejects existing package folders and accepts only lowercase URL-safe slugs.
+    - Initial story uploads use the same story-file extension allowlist as Story File Manager Lite.
+    - Created files are limited to the new package folder, with best-effort cleanup if creation fails partway through.
+    - Package delete, import/export, arbitrary file browsing, `metadata.iFiction.xml`, and player behavior remain out of scope.
+
 # v0.2.6
 
 ## 05/22/2026

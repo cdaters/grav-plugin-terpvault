@@ -8,6 +8,7 @@ use Grav\Plugin\Api\Controllers\AbstractApiController;
 use Grav\Plugin\Api\Exceptions\ForbiddenException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
 use Grav\Plugin\Api\Response\ApiResponse;
+use Grav\Plugin\TerpVault\Service\PackageCreationService;
 use Grav\Plugin\TerpVault\Service\PackageMarkdownService;
 use Grav\Plugin\TerpVault\Service\PackageMediaService;
 use Grav\Plugin\TerpVault\Service\PackageMetadataService;
@@ -23,6 +24,11 @@ class ApiController extends AbstractApiController
     private function service(): PackageMetadataService
     {
         return new PackageMetadataService();
+    }
+
+    private function creationService(): PackageCreationService
+    {
+        return new PackageCreationService();
     }
 
     private function markdownService(): PackageMarkdownService
@@ -47,6 +53,25 @@ class ApiController extends AbstractApiController
 
         try {
             return ApiResponse::create($this->service()->metadata($slug));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function createPackage(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $body = $request->getParsedBody();
+        $fields = is_array($body) ? $body : [];
+        $upload = $this->firstUploadedFile($request->getUploadedFiles());
+        if (!$upload) {
+            throw new ValidationException('Initial story file is required.');
+        }
+
+        try {
+            return ApiResponse::create($this->creationService()->create($fields, $upload));
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         } catch (RuntimeException $e) {

@@ -10,6 +10,12 @@ class TerpVaultPage extends HTMLElement {
       source: 'loading',
       activeTab: localStorage.getItem('terpvault.admin.tab') || 'library',
       editingSlug: null,
+      create: {
+        open: false,
+        saving: false,
+        error: '',
+        success: ''
+      },
       editor: {
         slug: null,
         loading: false,
@@ -199,6 +205,18 @@ class TerpVaultPage extends HTMLElement {
         .field { display:grid; gap:.25rem; margin:.55rem 0; }
         .field label, .checkbox label { font-weight:600; font-size:.84rem; }
         input, textarea, select { width:100%; border:1px solid rgba(127,127,127,.35); border-radius:8px; padding:.48rem .55rem; background:rgba(127,127,127,.055); color:inherit; font:inherit; }
+        select option, select optgroup { background:var(--tv-admin-select-bg, Canvas); color:var(--tv-admin-select-color, CanvasText); }
+        :host-context(.dark) select option,
+        :host-context(.dark) select optgroup,
+        :host-context(.dark-mode) select option,
+        :host-context(.dark-mode) select optgroup,
+        :host-context([data-theme="dark"]) select option,
+        :host-context([data-theme="dark"]) select optgroup,
+        :host-context([data-bs-theme="dark"]) select option,
+        :host-context([data-bs-theme="dark"]) select optgroup {
+          --tv-admin-select-bg: var(--grav-bg, var(--admin-bg, #1f242c));
+          --tv-admin-select-color: var(--grav-text, var(--admin-text, #f4f6f8));
+        }
         textarea { min-height:6rem; resize:vertical; }
         textarea.short { min-height:4.2rem; }
         textarea.markdown { min-height:18rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.92rem; line-height:1.45; }
@@ -215,6 +233,8 @@ class TerpVaultPage extends HTMLElement {
         .helper-tabs { display:flex; flex-wrap:wrap; gap:.45rem; margin:.7rem 0; }
         .helper-tabs .button[aria-selected="true"] { border-color:rgba(93,164,255,.72); background:rgba(93,164,255,.18); }
         .story-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
+        .create-panel { border:1px solid rgba(93,164,255,.35); border-radius:12px; padding:1rem; margin:0 0 .85rem; background:rgba(93,164,255,.055); }
+        .create-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:.75rem; }
         .media-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .media-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:.75rem; margin:.75rem 0; }
         .media-card { border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.65rem; background:rgba(127,127,127,.035); }
@@ -242,8 +262,8 @@ class TerpVaultPage extends HTMLElement {
       <div class="tv-admin">
         <section class="hero">
           <h1>TerpVault Library Manager</h1>
-          <p>Package inventory and metadata editor for installed TerpVault interactive-fiction packages.</p>
-          <p class="meta">v0.2.2 is opt-in. Only existing <code>game.yaml</code> metadata fields are editable; upload, delete, import, export, package creation, story files, artwork, helper Markdown, and player settings remain read-only.</p>
+          <p>Package inventory, package creation, metadata editing, helper Markdown editing, media management, screenshot ordering, and story-file replacement for installed TerpVault interactive-fiction packages.</p>
+          <p class="meta">v0.2.7 is opt-in. Package delete, import, export, arbitrary file browsing, player settings editing, and <code>metadata.iFiction.xml</code> editing are not available.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -278,7 +298,7 @@ class TerpVaultPage extends HTMLElement {
       <div class="error">
         <h2>Package data unavailable</h2>
         <p>${this._esc(error?.message || 'The read-only package manifest could not be loaded.')}</p>
-        <p class="meta">The page uses embedded Admin2 data when available, otherwise it falls back to the public TerpVault manifest route. Metadata editing requires the v0.2.1 API routes.</p>
+        <p class="meta">The page uses embedded Admin2 data when available, otherwise it falls back to the public TerpVault manifest route. Editing and package creation require the opt-in Admin2 API routes.</p>
       </div>
     `;
     ['library', 'formats', 'settings'].forEach(id => {
@@ -294,9 +314,11 @@ class TerpVaultPage extends HTMLElement {
         <div class="empty">
           <h2>No game packages found</h2>
           <p>Create folders under <code>user/data/terpvault/games</code>, each with a <code>game.yaml</code>.</p>
-          <p class="meta">Package creation and import are future Admin2 work.</p>
+          <div class="actions"><button class="button primary" type="button" data-action="create-package">Create Package</button></div>
         </div>
+        ${this.state.create.open ? this._createPackagePanel() : ''}
       `;
+      this._bindLibraryActions();
       return;
     }
 
@@ -304,13 +326,19 @@ class TerpVaultPage extends HTMLElement {
     const warnings = games.reduce((sum, game) => sum + Number(game.warning_count || 0), 0);
     root.innerHTML = `
       <div class="box notice">
-        <strong>${games.length} package${games.length === 1 ? '' : 's'} found</strong>
-        <p class="meta">Source: ${this._esc(this.state.source)}. Metadata edits use the Admin2 API when available. Upload, delete, import, export, and package creation are intentionally unavailable.</p>
+        <div class="editor-head">
+          <div>
+            <strong>${games.length} package${games.length === 1 ? '' : 's'} found</strong>
+            <p class="meta">Source: ${this._esc(this.state.source)}. Package creation and editing use the Admin2 API when available. Delete, import, and export are intentionally unavailable.</p>
+          </div>
+          <button class="button primary" type="button" data-action="create-package">${this.state.create.open ? 'Creating Package' : 'Create Package'}</button>
+        </div>
         <div class="badges" style="justify-content:flex-start;margin-top:.5rem;">
           <span class="badge ${errors ? 'error' : 'ok'}">${errors} error${errors === 1 ? '' : 's'}</span>
           <span class="badge ${warnings ? 'warn' : 'ok'}">${warnings} warning${warnings === 1 ? '' : 's'}</span>
         </div>
       </div>
+      ${this.state.create.open ? this._createPackagePanel() : ''}
       ${games.map(game => this._gameRow(game)).join('')}
     `;
     this._bindLibraryActions();
@@ -457,6 +485,71 @@ class TerpVaultPage extends HTMLElement {
     `;
   }
 
+  _createPackagePanel() {
+    const state = this.state.create || {};
+    return `
+      <section class="create-panel">
+        <div class="editor-head">
+          <div>
+            <h2>Create Package</h2>
+            <p class="meta">Creates a new package folder, starter <code>game.yaml</code>, initial story file, and starter helper Markdown files. Cover art and screenshots can be added after creation.</p>
+          </div>
+          <button class="button" type="button" data-action="cancel-create">Close</button>
+        </div>
+        ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
+        ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
+        <form data-create-package>
+          <div class="create-grid">
+            ${this._createInput('Slug', 'slug', true)}
+            ${this._createInput('Title', 'title', true)}
+            ${this._createInput('Author', 'author')}
+            ${this._createInput('Headline', 'headline')}
+            ${this._createInput('First published', 'first_published')}
+            ${this._createInput('Genre', 'genre')}
+            ${this._createInput('Language', 'language', false, 'en')}
+            ${this._createSelect('Format', 'format', [['', 'Infer later'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2']])}
+            ${this._createSelect('Status', 'status', [['draft', 'Draft'], ['published', 'Published']])}
+            ${this._createInput('Tags', 'tags')}
+            ${this._createInput('License name', 'license_name')}
+            ${this._createInput('License URL', 'license_url')}
+            ${this._createInput('Source URL', 'source_url')}
+          </div>
+          ${this._createTextarea('Description', 'description')}
+          ${this._createTextarea('License notes', 'license_notes', 'short')}
+          ${this._createTextarea('Source notes', 'source_notes', 'short')}
+          <div class="field">
+            <label>Initial story file</label>
+            <input type="file" name="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.t3" required ${state.saving ? 'disabled' : ''}>
+            <span class="meta">Allowed: z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, t3.</span>
+          </div>
+          <div class="form-actions">
+            <button class="button" type="button" data-action="cancel-create">Cancel</button>
+            <button class="button primary" type="submit" ${state.saving ? 'disabled' : ''}>${state.saving ? 'Creating...' : 'Create Package'}</button>
+          </div>
+        </form>
+      </section>
+    `;
+  }
+
+  _createInput(label, name, required = false, value = '') {
+    return `<div class="field"><label>${this._esc(label)}</label><input type="text" name="${this._esc(name)}" value="${this._esc(value)}" ${required ? 'required' : ''}></div>`;
+  }
+
+  _createTextarea(label, name, className = '') {
+    return `<div class="field"><label>${this._esc(label)}</label><textarea class="${this._esc(className)}" name="${this._esc(name)}"></textarea></div>`;
+  }
+
+  _createSelect(label, name, options) {
+    return `
+      <div class="field">
+        <label>${this._esc(label)}</label>
+        <select name="${this._esc(name)}">
+          ${options.map(([value, text]) => `<option value="${this._esc(value)}">${this._esc(text)}</option>`).join('')}
+        </select>
+      </div>
+    `;
+  }
+
   _bindLibraryActions() {
     const root = this.shadowRoot.getElementById('library');
     if (!root) {
@@ -469,6 +562,18 @@ class TerpVaultPage extends HTMLElement {
 
     root.querySelectorAll('[data-action="cancel-edit"]').forEach(button => {
       button.addEventListener('click', () => this._closeEditor());
+    });
+
+    root.querySelectorAll('[data-action="create-package"]').forEach(button => {
+      button.addEventListener('click', () => this._openCreatePackage());
+    });
+
+    root.querySelectorAll('[data-action="cancel-create"]').forEach(button => {
+      button.addEventListener('click', () => this._closeCreatePackage());
+    });
+
+    root.querySelectorAll('form[data-create-package]').forEach(form => {
+      form.addEventListener('submit', event => this._createPackage(event));
     });
 
     root.querySelectorAll('[data-action="helper-doc"]').forEach(button => {
@@ -498,6 +603,64 @@ class TerpVaultPage extends HTMLElement {
     root.querySelectorAll('[data-action="screenshot-move"]').forEach(button => {
       button.addEventListener('click', () => this._moveScreenshot(button.dataset.slug || '', Number(button.dataset.index || -1), Number(button.dataset.direction || 0)));
     });
+  }
+
+  _openCreatePackage() {
+    this.state.create = { open: true, saving: false, error: '', success: '' };
+    this._renderLibrary();
+  }
+
+  _closeCreatePackage() {
+    this.state.create = { open: false, saving: false, error: '', success: '' };
+    this._renderLibrary();
+  }
+
+  async _createPackage(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    this.state.create = { open: true, saving: true, error: '', success: '' };
+    this._renderLibrary();
+
+    try {
+      const result = await this._requestJson(this._packagesApiUrl(), {
+        method: 'POST',
+        body: data
+      });
+      const slug = result.slug || data.get('slug');
+      this.state.create = { open: false, saving: false, error: '', success: '' };
+      await this._reloadManifest();
+      if (slug) {
+        localStorage.setItem(`terpvault.admin.open.${slug}`, '1');
+        this.state.editingSlug = slug;
+        this.state.editor = {
+          ...this.state.editor,
+          slug,
+          loading: false,
+          saving: false,
+          error: '',
+          success: 'Package created. Continue editing metadata, helper docs, media, or story file below.',
+          values: this._editableFromGame(this._findGame(slug) || {}),
+          readOnly: this._readOnlyFromGame(this._findGame(slug) || {}),
+          activeHelper: 'how-to-play',
+          helper: this._emptyHelperState('how-to-play'),
+          media: this._mediaFromGame(this._findGame(slug) || {}),
+          story: this._storyFromGame(this._findGame(slug) || {})
+        };
+        await this._loadHelperDoc(slug, 'how-to-play', false);
+        await this._loadStory(slug, false);
+        await this._loadMedia(slug, false);
+      }
+    } catch (error) {
+      this.state.create = {
+        open: true,
+        saving: false,
+        error: error.message || String(error),
+        success: ''
+      };
+    }
+
+    this._renderLibrary();
   }
 
   async _openEditor(slug) {
@@ -1380,6 +1543,10 @@ class TerpVaultPage extends HTMLElement {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/metadata`;
   }
 
+  _packagesApiUrl() {
+    return `${this._apiBase()}/terpvault/packages`;
+  }
+
   _markdownApiUrl(slug, type) {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/markdown/${encodeURIComponent(type)}`;
   }
@@ -1704,7 +1871,7 @@ class TerpVaultPage extends HTMLElement {
           <dt>Player</dt><dd><code>${this._esc(config.player_engine || 'parchment')}</code></dd>
           <dt>Show unpublished</dt><dd>${config.show_unpublished ? 'Yes' : 'No'}</dd>
         </dl>
-        <p class="meta">General plugin settings still live in Plugins -> TerpVault. This page can edit existing package metadata only; imports, exports, uploads, deletes, package creation, and player settings are planned for later versions.</p>
+        <p class="meta">General plugin settings still live in Plugins -> TerpVault. Delete, import, export, arbitrary file browsing, player settings editing, and metadata.iFiction.xml editing remain planned for later versions.</p>
       </div>
     `;
   }

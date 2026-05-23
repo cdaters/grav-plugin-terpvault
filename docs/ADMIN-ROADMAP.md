@@ -151,9 +151,23 @@ Editable fields:
 - Preserve unknown `game.yaml` fields when updating `resources.story_file`.
 - Keep package delete, package import/export, arbitrary file browsing, `metadata.iFiction.xml` editing, and player behavior out of scope.
 
+## v0.2.7 Package Creation Wizard
+
+- Add limited package creation to the opt-in Admin2 Library Manager.
+- Register a controller-style route only when `admin.enable_admin2_page` is enabled:
+  - `POST /terpvault/packages`
+- Create a new package folder under the configured TerpVault games directory.
+- Require a lowercase URL-safe slug, title, and one initial story file.
+- Reject existing package folders; do not overwrite packages.
+- Create a starter Treaty/iFiction-aligned `game.yaml`.
+- Store the uploaded initial story file in the new package folder using the story-file allowlist from v0.2.6.
+- Create starter `how-to-play.md`, `hints.md`, and `walkthrough.md` files.
+- Open the newly created package row in Admin2 after creation when the manifest refresh succeeds.
+- Keep cover/screenshot upload, deeper metadata editing, helper editing, and story replacement in the existing post-creation editor sections.
+- Keep package delete, package import/export, arbitrary file browsing, `metadata.iFiction.xml` editing, and player behavior out of scope.
+
 ## Next build: package management UI
 
-- Create new package folder.
 - Import package zip with macOS cruft stripping.
 - Export package zip.
 
