@@ -1,3 +1,16 @@
+# v0.3.2
+
+## 05/23/2026
+
+1. Changed
+    - Bumped plugin blueprint metadata version to `0.3.2`.
+    - Updated README and docs for v0.3.x early public-beta/foundation language, Admin2 package lifecycle, PHP ZipArchive setup, limitations, and import security notes.
+    - Tightened plugin metadata wording, keywords, and compatibility metadata to avoid stale v0.2.x and unverified Grav 1/API 1 claims.
+
+2. Notes
+    - No import/export behavior, backend routes, public frontend routing, player behavior, or package security behavior changed.
+    - TerpVault is still not claimed as GPM-ready.
+
 # v0.3.1
 
 ## 05/23/2026

@@ -216,13 +216,22 @@ Editable fields:
 - Soften stale collision indicators after a successful alternate-slug import.
 - Delay export object URL cleanup for browser download safety.
 
+## v0.3.2 Metadata and Documentation Consistency
+
+- Bump plugin blueprint metadata to `0.3.2`.
+- Align README and docs with v0.3.x early public-beta/foundation language.
+- Document PHP ZipArchive/`php-zip`, Admin2 Library Manager enablement, Admin2/API authentication, current package lifecycle, limitations, and import safety guarantees.
+- Clarify plugin metadata description, keywords, and compatibility posture without making unverified Grav 1/API 1 or GPM-readiness claims.
+- Keep import/export behavior, routing, player behavior, and security behavior unchanged.
+
 ## Next build: package management UI
 
-- Import polish and rollback/diagnostic hardening based on field testing.
+- Field-test the v0.3.x Admin2 package management workflow before adding new package-management capabilities.
+- Improve diagnostics or release packaging notes only when they are grounded in testing.
 
 ## Later
 
 - Server-side named saves for logged-in users.
 - iFiction/Treaty of Babel metadata import/export.
 - IFDB/source/provenance helper fields.
-- Classic Grav Admin compatibility page if maintaining Grav 1/Admin UX remains important.
+- Classic Grav Admin compatibility page only if Grav 1/Admin UX support is verified and becomes an explicit target.

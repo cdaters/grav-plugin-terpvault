@@ -60,8 +60,8 @@ security:
     - txt
 
 admin:
-  # Experimental read-only Admin2 Library Manager. Disabled by default so public
-  # virtual routes cannot affect Admin2 dashboard/API request lifecycles.
+  # Experimental Admin2 Library Manager. Disabled by default so public virtual
+  # routes stay separate from Admin2 dashboard/API request lifecycles.
   enable_admin2_page: false
 
 validation:

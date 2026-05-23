@@ -33,7 +33,7 @@ This development package also includes a cleaned user-provided Adventure starter
 
 The development `_demo` tree also includes `you-are-standing` and `grue` starter packages for multi-game library testing. They include real story files, generated placeholder art, curator-created helper notes, and package manifests with source/license notes. `you-are-standing` records only the generic Creative Commons license wording visible from IFDB; do not infer a specific CC variant without further source metadata. `grue` records Creative Commons Attribution-ShareAlike 4.0 International based on the author's GitHub README.
 
-For a public GPM-ready release, prefer shipping only the plugin and original `sample-cave` structure demo unless redistribution review is completed for every real IF starter package.
+Before any future GPM-ready release, prefer shipping only the plugin and original `sample-cave` structure demo unless redistribution review is completed for every real IF starter package.
 
 ## Starter libraries
 

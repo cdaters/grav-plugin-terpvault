@@ -4,7 +4,7 @@ TerpVault should ship with a safe original sample package, then offer optional s
 
 ## Recommended default bundle
 
-For a public GPM-ready plugin, ship only `sample-cave`, an original placeholder/demo package owned by the TerpVault project.
+Before any future GPM-ready plugin package, ship only `sample-cave`, an original placeholder/demo package owned by the TerpVault project.
 
 For Craig's development branch, the `_demo` tree also includes real starter packages so the player and library views can be tested with multiple playable titles. Each package should retain cautious source, license, and redistribution notes before broader public distribution.
 

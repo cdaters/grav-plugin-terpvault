@@ -148,16 +148,18 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 - `release.source.*`: where the package files came from and when they were retrieved.
 - `release.license.*`: license, rights, and redistribution notes.
 
-`metadata.iFiction.xml` is reserved for future import/export support. TerpVault does not parse or write that XML file yet.
+`metadata.iFiction.xml` is included in package zip export/import payloads when present. TerpVault does not parse, edit, or write that XML file yet.
 
 ## Manual import workflow
 
-Until Admin2 import tools exist, packages are installed manually:
+Manual folder installation remains available:
 
 1. Copy the package folder into `user/data/terpvault/games/{slug}`.
 2. Confirm `game.yaml` points `resources.story_file` at the playable story file in that same package.
 3. Clear Grav's cache.
 4. Visit the public library route, usually `/if`.
+
+Admin2 can also inspect a `.terpvault.zip` package and import it as a draft-only, non-featured package. Admin2 import does not overwrite existing package folders.
 
 Example:
 

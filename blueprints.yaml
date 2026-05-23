@@ -1,24 +1,25 @@
 name: TerpVault
 slug: terpvault
 type: plugin
-version: 0.2.0
-description: "Curate, present, and play classic interactive fiction story files in Grav."
+version: 0.3.2
+description: "Curate, manage, import/export, and play interactive fiction story packages in Grav."
 icon: book-open
 author:
   name: Craig Daters / RetroRealm
   email: craig@daters.net
 homepage: https://github.com/cdaters/grav-plugin-terpvault
 demo: https://retrorealm.org
-keywords: grav, plugin, interactive fiction, parser fiction, zcode, glulx, tads, hugo, adrift, parchment, retro, games
+keywords: grav, plugin, interactive fiction, parser fiction, zcode, glulx, tads, parchment, retro, games
 bugs: https://github.com/cdaters/grav-plugin-terpvault/issues
 license: MIT
 
 compatibility:
-  grav:
-    - 1.7
-    - 2.0
-  api:
-    - 1.0
+  grav: ['2.0']
+
+dependencies:
+  - { name: grav, version: '>=2.0.0-rc.2' }
+  - { name: admin2, version: '>=2.0.0-rc.8' }
+  - { name: api, version: '>=1.0.0-rc.8' }
 
 form:
   validation: loose
@@ -116,7 +117,7 @@ form:
     admin.enable_admin2_page:
       type: toggle
       label: Enable Admin2 Library Manager
-      help: Experimental read-only Admin2 page. Leave disabled unless you are testing the opt-in package inventory.
+      help: Experimental Admin2 Library Manager. Enables authenticated package create/edit/export/import workflows; leave disabled unless testing Admin2/API integration.
       highlight: 0
       default: 0
       options:

@@ -72,23 +72,25 @@ Future adapters could include:
 
 ## Admin2 model
 
-The Admin2 page is component-mode because TerpVault eventually needs a highly custom UI:
+The Admin2 page is component-mode because TerpVault needs a package-management UI that does not fit a standard settings form:
 
 - game package list
-- upload/import package
+- create/import/export package
 - metadata editor
 - media manager
 - validation panel
 - package preview
 
-For now, the Admin2 page is a read-only Library Manager scaffold with collapsible package rows, validation/provenance summaries, format support, and settings diagnostics. It is disabled by default with:
+The Admin2 Library Manager is still experimental and disabled by default with:
 
 ```yaml
 admin:
   enable_admin2_page: false
 ```
 
-When explicitly enabled, TerpVault registers only the Admin2 sidebar/page scaffold for Admin2/API requests. TerpVault API endpoints remain disabled until they are implemented with a controller-style Grav 2/Admin2 integration; they are deliberately separate from the public virtual page routes under `/if`.
+When explicitly enabled, TerpVault registers the Admin2 sidebar/page and controller-style Admin2/API package routes for Admin2/API requests. Current workflows cover package creation, metadata/helper/media/story edits, export, import inspection, and draft-only import commit. Package delete and overwrite/replace are not implemented.
+
+Admin2/API routes are deliberately separate from the public virtual page routes under `/if`, and write operations require authenticated Admin2/API access.
 
 ## Save/restore plan
 

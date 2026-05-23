@@ -1,6 +1,8 @@
-# TerpVault Next Build Checklist
+# TerpVault Next Build Notes
 
-## Critical validation after first install
+TerpVault is in a v0.3.x early public-beta foundation phase. Public routes and bundled Parchment playback are established, while the Admin2 Library Manager remains experimental, opt-in, and disabled by default.
+
+## Validation focus before the next code build
 
 - Confirm virtual pages render under `/if`.
 - Confirm virtual pages render under subdirectory installs such as `/grav2-fullsite-skeleton/if`.
@@ -8,44 +10,27 @@
 - Confirm story files stream through `/if/_story/{slug}/{filename}`.
 - Confirm `[terpvault game="sample-cave"]` replacement works after page content processing.
 - Confirm Admin2 sidebar registration does not appear while `admin.enable_admin2_page` is false.
-- Confirm Admin2 sidebar registration appears when API/Admin2 is installed and `admin.enable_admin2_page` is true.
-- Rebuild Admin2 API endpoints with a controller-style integration before adding mutating package workflows.
+- Confirm Admin2 sidebar registration appears only when Admin2/API is available and `admin.enable_admin2_page` is true.
+- Confirm Admin2 create, edit, export, import inspect, and draft-only import commit workflows still require authenticated Admin2/API access.
+- Confirm PHP ZipArchive/`php-zip` is present before testing `.terpvault.zip` export/import.
 - Confirm Admin2 dashboard/API requests do not trigger TerpVault frontend virtual-page registration.
 
-## Likely first fixes
+## Current package-management boundaries
 
-- Adjust virtual page creation if Grav 2 behaves differently from Grav 1.7.
-- Replace API route closure with a formal controller if Admin2/Slim response handling requires it.
-- Decide whether `show_unpublished` should depend on admin authentication for preview.
+- Package delete is not implemented.
+- Package overwrite/replace is not implemented.
+- Import overwrite is not implemented.
+- Arbitrary package file browsing is not implemented.
+- `metadata.iFiction.xml` editing is not implemented.
+- Named save slots and server-side saves are not implemented.
+- Public frontend routing and Parchment/player behavior should stay unchanged during Admin2 work.
 
-## Next development target
+## Candidate next work
 
-Implement Admin2 package editor:
+- Field-test the current v0.3.x Admin2 package lifecycle: create package, edit metadata, edit helper Markdown, manage media/screenshots, replace story file, export `.terpvault.zip`, inspect import, and import as draft.
+- Improve diagnostics or release packaging notes based on that testing.
+- Defer new package mutation features until the existing draft-only, non-overwriting workflow has more mileage.
 
-1. Game list with package status badges.
-2. Create package action.
-3. Edit `game.yaml` form.
-4. Upload story file.
-5. Upload/manage cover/splash/screenshots.
-6. Validate package action.
-7. Import `.zip` package action.
-8. Export package action.
+## Packaging posture
 
-The import/export target should follow the package convention in `docs/PACKAGE-CONVENTIONS.md`: a future `.terpvault.zip` archive should contain `game.yaml`, one playable story file referenced by `resources.story_file`, package-local relative paths, and no platform-generated cruft.
-
-## Parchment integration target
-
-- Choose whether to bundle a minimal Parchment build or require the site owner to install it.
-- Document licenses for included interpreter pieces.
-- Add runtime check for `assets/vendor/parchment/index.html`.
-- Add Admin warning if Parchment is missing.
-
-
-## v0.2.x target
-
-Build editable Admin2 Library Manager workflows on top of the v0.2.0 read-only package inventory:
-
-- edit `game.yaml` metadata
-- upload/replace story files and cover/small-cover art
-- edit package Markdown helpers
-- import/export `.terpvault.zip` package files
+TerpVault is not GPM-ready yet. Before any future GPM-ready package, keep real IF starter packages development-only unless redistribution review is complete for every story file, cover, helper document, and metadata source.

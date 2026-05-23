@@ -29,6 +29,6 @@ Ideally this returns no hardcoded frontend URLs.
 Public TerpVault routes and Admin2 integration routes are different systems:
 
 - Frontend virtual routes: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_story/{slug}/{filename}`, `/if/_asset/{slug}/{path}`.
-- Admin2/API routes: disabled for now; future endpoints must use a controller-style integration, not Closure handlers.
+- Admin2/API routes: registered only when `admin.enable_admin2_page` is true and the current request is an Admin2/API request. These endpoints use controller-style integration, not Closure handlers.
 
 Frontend routes are added to Grav's page collection during `onPagesInitialized` and must not override `$grav['page']`. Admin2/API requests are guarded out of frontend virtual routing.

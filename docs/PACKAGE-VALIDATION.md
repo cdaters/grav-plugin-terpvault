@@ -28,6 +28,6 @@ Missing IFIDs, source links, license names, redistribution notes, cover art, and
 
 The detail page can show advisory checks in a calm Package Notes section. Catalog & Provenance rows are rendered only when a value exists, so empty metadata fields do not create blank rows.
 
-## Future work
+## Admin2 use
 
-Validation should eventually power Admin2 editing workflows, package import checks, and release-readiness badges.
+Validation powers Admin2 package inventory/editing context and package import checks today. Future work can add richer release-readiness badges without turning advisory metadata gaps into fatal public errors.

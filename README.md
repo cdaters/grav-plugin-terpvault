@@ -2,7 +2,7 @@
 
 **TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a standards-aware shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, screenshots, hints, walkthroughs, and a bundled web player.
 
-This is a **v0.2.x foundation build**. It is intentionally repo-ready and readable, not a finished public 1.0.
+This is a **v0.3.x early public-beta foundation build**. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
 
 ## What it does now
 
@@ -26,9 +26,11 @@ This is a **v0.2.x foundation build**. It is intentionally repo-ready and readab
 
 - It does not provide package delete, overwrite, or replace.
 - It enables only the opt-in Admin2 package creation, export, draft-only import, and metadata/helper/media/story API for TerpVault packages; package delete and import overwrite/replace endpoints are not implemented.
+- It does not provide an arbitrary package file browser.
 - It does not yet provide named save slots or server-side save syncing.
-- It does not yet import/export iFiction XML automatically, but the package metadata model now maps toward Treaty of Babel/iFiction concepts.
+- It does not yet parse or edit iFiction XML, but the package metadata model now maps toward Treaty of Babel/iFiction concepts.
 - It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
+- It is not packaged or claimed as GPM-ready yet.
 
 ## Known limitations
 
@@ -102,6 +104,14 @@ player:
   theme: retro-terminal
   launch_mode: button
 ```
+
+## Requirements and setup notes
+
+- TerpVault's current development and Admin2 workflow target is Grav 2.
+- PHP's ZipArchive extension, commonly installed as `php-zip`, is required for `.terpvault.zip` export, import inspection, and draft-only import commit.
+- The Admin2 Library Manager is disabled by default. Enable it with `admin.enable_admin2_page: true` only when testing Admin2 package management workflows.
+- Admin2 write operations require authenticated Admin2/API access with `admin.super` or `api.super`.
+- Current Admin2 package lifecycle: create a package, edit metadata, edit helper Markdown, manage cover/small-cover media and screenshots, replace the story file, export `.terpvault.zip`, inspect an import, and import as a draft package.
 
 ## Game package format
 
@@ -219,7 +229,7 @@ Older flat fields such as `title`, `format`, `story_file`, `cover`, `small_cover
 
 ### Manual package import
 
-Until Admin2 import tools exist, install a package by copying its folder into the site data directory, clearing cache, and visiting the library:
+Manual package installation remains available by copying a package folder into the site data directory, clearing cache, and visiting the library:
 
 ```bash
 mkdir -p user/data/terpvault/games
@@ -235,6 +245,15 @@ Then visit:
 ```
 
 Admin2 export creates a `.terpvault.zip` package with one top-level `{slug}/` folder containing `game.yaml`, the playable story file, referenced package resources, `metadata.iFiction.xml` when present, and safe conventional helper/media files. Admin2 can inspect and import an uploaded `.terpvault.zip`, but imported packages are always installed as draft, forced to not featured, and existing package folders are never overwritten.
+
+### Import security notes
+
+- Import commit revalidates the uploaded archive server-side and does not trust a previous browser inspection response.
+- Imported packages are forced to `terpvault.status: draft` and `terpvault.featured: false`.
+- Import rejects destination slug collisions and does not overwrite existing package folders.
+- Import rejects path traversal, absolute paths, Windows absolute paths, URI-like paths, null bytes, and unsafe cruft-looking paths.
+- Import ignores safe platform cruft such as `__MACOSX/`, `.DS_Store`, AppleDouble `._*`, `Thumbs.db`, and `desktop.ini`.
+- Import stages files outside the package listing and moves the package into `games/{slug}` only after validation succeeds.
 
 ### Package creation checklist
 
@@ -368,14 +387,14 @@ Then visit:
 - Install into a clean Grav 2 site and run `bin/grav clearcache`.
 - Confirm `/if`, `/if/{slug}`, `/if/{slug}/play`, `/_story`, and `/_asset` routes work, including a subdirectory install.
 - Confirm Admin2 loads with `admin.enable_admin2_page: false`.
-- Confirm Admin2/API editing is described as opt-in metadata/helper/media-only work, not full package management.
+- Confirm Admin2/API package creation, export, draft-only import, metadata, helper, media, screenshot, and story-file workflows are still opt-in and authenticated.
 - Confirm Parchment launches and save/restore guidance still points to interpreter-native `SAVE` / `RESTORE`.
 - Confirm package manifests include source, license, and redistribution notes.
 - Confirm no `.DS_Store`, `__MACOSX`, AppleDouble `._*`, or temporary generated image source files are included.
 
-## Public GPM release contents
+## Future GPM packaging notes
 
-For a public GPM-ready package, ship the plugin, bundled Parchment notices, and the public-safe `sample-cave` structure demo only. Keep real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, and metadata source.
+Before any future GPM-ready package, ship the plugin, bundled Parchment notices, and the public-safe `sample-cave` structure demo only. Keep real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, and metadata source.
 
 ## Admin2 Library Manager
 
@@ -385,6 +404,8 @@ The Admin2 Library Manager is experimental and disabled by default. To test it, 
 admin:
   enable_admin2_page: true
 ```
+
+Admin2 package management requires authenticated Admin2/API access with `admin.super` or `api.super`.
 
 When that setting is enabled and the current request is an Admin2/API request, TerpVault registers a sidebar item at:
 

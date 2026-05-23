@@ -1,8 +1,8 @@
 # TerpVault Metadata and the IF Ecosystem
 
-TerpVault uses a friendly `game.yaml` manifest because Grav site owners should be able to read and edit game packages without specialized tools. The manifest is intentionally aligned with the broader interactive fiction ecosystem so packages can later import/export standard metadata.
+TerpVault uses a friendly `game.yaml` manifest because Grav site owners should be able to read and edit game packages without specialized tools. The manifest is intentionally aligned with the broader interactive fiction ecosystem so packages can later exchange metadata with other IF cataloging tools.
 
-See `docs/PACKAGE-CONVENTIONS.md` for the canonical TerpVault package folder structure, required files, manual import workflow, and future `.terpvault.zip` convention.
+See `docs/PACKAGE-CONVENTIONS.md` for the canonical TerpVault package folder structure, required files, manual import workflow, and current `.terpvault.zip` convention.
 
 ## Standards and reference systems
 
@@ -76,7 +76,7 @@ A package may include:
 metadata.iFiction.xml
 ```
 
-TerpVault does not parse this file yet. It is reserved for a future import/export pass so package metadata can move between TerpVault and IF cataloging tools.
+TerpVault includes this file in `.terpvault.zip` export/import payloads when present, but it does not parse, edit, or write the XML yet.
 
 ## Compatibility aliases
 
