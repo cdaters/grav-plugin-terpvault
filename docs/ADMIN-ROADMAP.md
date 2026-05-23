@@ -76,6 +76,22 @@ Editable fields:
 - `terpvault.featured`
 - `terpvault.tags`
 
+## v0.2.3 helper Markdown editor
+
+- Add package-local helper Markdown editing to the existing Admin2 package editor.
+- Register controller-style routes only when `admin.enable_admin2_page` is enabled:
+  - `GET /terpvault/packages/{slug}/markdown/{type}`
+  - `PATCH /terpvault/packages/{slug}/markdown/{type}`
+- Allow only these helper types:
+  - `how-to-play`
+  - `hints`
+  - `walkthrough`
+- Resolve helper paths from `resources.how_to_play`, `resources.hints`, and `resources.walkthrough`, with default filenames of `how-to-play.md`, `hints.md`, and `walkthrough.md`.
+- Keep helper editing as a plain textarea workflow for now; no rich Markdown editor.
+- Validate slug, type, package containment, traversal, and `.md` extension before reading or writing.
+- Create package-local timestamped backups before replacing existing helper Markdown files.
+- Keep story files, cover art, screenshots, `metadata.iFiction.xml`, player config, package creation, upload, delete, import, and export out of scope.
+
 ## Next build: package management UI
 
 - Create new package folder.

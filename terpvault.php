@@ -260,6 +260,7 @@ class TerpVaultPlugin extends Plugin
         }
 
         require_once __DIR__ . '/classes/Service/PackageMetadataService.php';
+        require_once __DIR__ . '/classes/Service/PackageMarkdownService.php';
         require_once __DIR__ . '/classes/Controller/ApiController.php';
 
         $routes = $event['routes'] ?? null;
@@ -270,6 +271,8 @@ class TerpVaultPlugin extends Plugin
         $controller = \Grav\Plugin\TerpVault\Controller\ApiController::class;
         $routes->get('/terpvault/packages/{slug}/metadata', [$controller, 'metadata']);
         $routes->patch('/terpvault/packages/{slug}/metadata', [$controller, 'updateMetadata']);
+        $routes->get('/terpvault/packages/{slug}/markdown/{type}', [$controller, 'markdown']);
+        $routes->patch('/terpvault/packages/{slug}/markdown/{type}', [$controller, 'updateMarkdown']);
     }
 
     public function twigGames(bool $includeUnpublished = false): array

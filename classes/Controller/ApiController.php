@@ -8,6 +8,7 @@ use Grav\Plugin\Api\Controllers\AbstractApiController;
 use Grav\Plugin\Api\Exceptions\ForbiddenException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
 use Grav\Plugin\Api\Response\ApiResponse;
+use Grav\Plugin\TerpVault\Service\PackageMarkdownService;
 use Grav\Plugin\TerpVault\Service\PackageMetadataService;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
@@ -19,6 +20,11 @@ class ApiController extends AbstractApiController
     private function service(): PackageMetadataService
     {
         return new PackageMetadataService();
+    }
+
+    private function markdownService(): PackageMarkdownService
+    {
+        return new PackageMarkdownService();
     }
 
     public function metadata(ServerRequestInterface $request): ResponseInterface
@@ -47,6 +53,45 @@ class ApiController extends AbstractApiController
 
         try {
             return ApiResponse::create($this->service()->updateMetadata($slug, $updates));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function markdown(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+        $type = (string) $this->getRouteParam($request, 'type');
+
+        try {
+            return ApiResponse::create($this->markdownService()->markdown($slug, $type));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function updateMarkdown(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+        $type = (string) $this->getRouteParam($request, 'type');
+        $body = $this->getRequestBody($request);
+        if (!is_array($body)) {
+            throw new ValidationException('Request body must be a JSON object.');
+        }
+
+        $content = $body['content'] ?? $body['markdown'] ?? null;
+        if (!is_scalar($content) && $content !== null) {
+            throw new ValidationException('Helper Markdown content must be text.');
+        }
+
+        try {
+            return ApiResponse::create($this->markdownService()->updateMarkdown($slug, $type, (string) ($content ?? '')));
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         } catch (RuntimeException $e) {

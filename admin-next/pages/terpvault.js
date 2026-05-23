@@ -17,7 +17,19 @@ class TerpVaultPage extends HTMLElement {
         error: '',
         success: '',
         values: null,
-        readOnly: null
+        readOnly: null,
+        activeHelper: 'how-to-play',
+        helper: {
+          type: 'how-to-play',
+          loading: false,
+          saving: false,
+          error: '',
+          success: '',
+          label: '',
+          path: '',
+          exists: false,
+          content: ''
+        }
       }
     };
     this._renderSkeleton();
@@ -172,6 +184,7 @@ class TerpVaultPage extends HTMLElement {
         input, textarea, select { width:100%; border:1px solid rgba(127,127,127,.35); border-radius:8px; padding:.48rem .55rem; background:rgba(127,127,127,.055); color:inherit; font:inherit; }
         textarea { min-height:6rem; resize:vertical; }
         textarea.short { min-height:4.2rem; }
+        textarea.markdown { min-height:18rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.92rem; line-height:1.45; }
         .checkbox { display:flex; gap:.5rem; align-items:center; margin:.7rem 0 .25rem; }
         .checkbox input { width:auto; }
         .readonly { display:grid; gap:.35rem; margin-top:.35rem; }
@@ -181,6 +194,9 @@ class TerpVaultPage extends HTMLElement {
         .message.error { border-color:rgba(255,95,95,.7); background:rgba(255,95,95,.1); }
         .message.success { border-color:rgba(79,190,124,.58); background:rgba(79,190,124,.1); }
         .form-actions { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; justify-content:flex-end; }
+        .helper-docs { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
+        .helper-tabs { display:flex; flex-wrap:wrap; gap:.45rem; margin:.7rem 0; }
+        .helper-tabs .button[aria-selected="true"] { border-color:rgba(93,164,255,.72); background:rgba(93,164,255,.18); }
         code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.9em; }
         .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:.8rem; }
         @media (max-width: 820px) {
@@ -425,8 +441,16 @@ class TerpVaultPage extends HTMLElement {
       button.addEventListener('click', () => this._closeEditor());
     });
 
+    root.querySelectorAll('[data-action="helper-doc"]').forEach(button => {
+      button.addEventListener('click', () => this._loadHelperDoc(button.dataset.slug || '', button.dataset.type || ''));
+    });
+
     root.querySelectorAll('form[data-editor-slug]').forEach(form => {
       form.addEventListener('submit', event => this._saveEditor(event));
+    });
+
+    root.querySelectorAll('form[data-helper-slug]').forEach(form => {
+      form.addEventListener('submit', event => this._saveHelperDoc(event));
     });
   }
 
@@ -444,7 +468,9 @@ class TerpVaultPage extends HTMLElement {
       error: '',
       success: '',
       values: this._editableFromGame(game || {}),
-      readOnly: this._readOnlyFromGame(game || {})
+      readOnly: this._readOnlyFromGame(game || {}),
+      activeHelper: 'how-to-play',
+      helper: this._emptyHelperState('how-to-play')
     };
     localStorage.setItem(`terpvault.admin.open.${slug}`, '1');
     this._renderLibrary();
@@ -465,6 +491,7 @@ class TerpVaultPage extends HTMLElement {
       };
     }
 
+    await this._loadHelperDoc(slug, this.state.editor.activeHelper, false);
     this._renderLibrary();
   }
 
@@ -477,7 +504,9 @@ class TerpVaultPage extends HTMLElement {
       error: '',
       success: '',
       values: null,
-      readOnly: null
+      readOnly: null,
+      activeHelper: 'how-to-play',
+      helper: this._emptyHelperState('how-to-play')
     };
     this._renderLibrary();
   }
@@ -539,6 +568,105 @@ class TerpVaultPage extends HTMLElement {
     }
   }
 
+  async _loadHelperDoc(slug, type, render = true) {
+    if (!slug || !this._helperTypes().includes(type)) {
+      return;
+    }
+
+    const current = this.state.editor.helper || this._emptyHelperState(type);
+    this.state.editor = {
+      ...this.state.editor,
+      activeHelper: type,
+      helper: {
+        ...this._emptyHelperState(type),
+        content: current.type === type ? current.content || '' : '',
+        loading: true
+      }
+    };
+
+    if (render) {
+      this._renderLibrary();
+    }
+
+    try {
+      const data = await this._requestJson(this._markdownApiUrl(slug, type), { method: 'GET' });
+      this.state.editor = {
+        ...this.state.editor,
+        activeHelper: type,
+        helper: this._helperFromApi(data, type)
+      };
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        activeHelper: type,
+        helper: {
+          ...this.state.editor.helper,
+          loading: false,
+          saving: false,
+          error: `Helper Markdown API unavailable: ${error.message || error}`
+        }
+      };
+    }
+
+    if (render) {
+      this._renderLibrary();
+    }
+  }
+
+  async _saveHelperDoc(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const slug = form.dataset.helperSlug || this.state.editingSlug;
+    const type = form.dataset.helperType || this.state.editor.activeHelper || 'how-to-play';
+    const content = form.querySelector('[data-helper-content]')?.value || '';
+
+    this.state.editor = {
+      ...this.state.editor,
+      activeHelper: type,
+      helper: {
+        ...(this.state.editor.helper || this._emptyHelperState(type)),
+        type,
+        saving: true,
+        error: '',
+        success: '',
+        content
+      }
+    };
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._markdownApiUrl(slug, type), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content })
+      });
+      const helper = this._helperFromApi(data, type);
+      this.state.editor = {
+        ...this.state.editor,
+        activeHelper: type,
+        helper: {
+          ...helper,
+          success: 'Helper Markdown saved. A package-local backup was created when an existing file was replaced.'
+        }
+      };
+      await this._reloadManifest();
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        activeHelper: type,
+        helper: {
+          ...(this.state.editor.helper || this._emptyHelperState(type)),
+          type,
+          saving: false,
+          error: error.message || String(error),
+          content
+        }
+      };
+    }
+
+    this._renderLibrary();
+  }
+
   _editorPanel(game) {
     const editor = this.state.editor || {};
     const values = editor.values || this._editableFromGame(game);
@@ -550,7 +678,7 @@ class TerpVaultPage extends HTMLElement {
         <div class="editor-head">
           <div>
             <h3>Edit Metadata</h3>
-            <p class="meta">Only whitelisted <code>game.yaml</code> metadata fields are writable. Package files, assets, helper Markdown, and player settings are display-only.</p>
+            <p class="meta">Only whitelisted <code>game.yaml</code> metadata fields and package-local helper Markdown files are writable. Story files, assets, package folder, and player settings are display-only.</p>
           </div>
           <button class="button" type="button" data-action="cancel-edit">Close</button>
         </div>
@@ -618,7 +746,47 @@ class TerpVaultPage extends HTMLElement {
             <button class="button primary" type="submit" ${editor.loading || editor.saving ? 'disabled' : ''}>${editor.saving ? 'Saving...' : 'Save Metadata'}</button>
           </div>
         </form>
+        ${this._helperDocsPanel(slug)}
       </div>
+    `;
+  }
+
+  _helperDocsPanel(slug) {
+    const editor = this.state.editor || {};
+    const helper = editor.helper || this._emptyHelperState(editor.activeHelper || 'how-to-play');
+    const active = editor.activeHelper || helper.type || 'how-to-play';
+    const labels = {
+      'how-to-play': 'How to Play',
+      hints: 'Hints',
+      walkthrough: 'Walkthrough'
+    };
+
+    return `
+      <section class="helper-docs">
+        <h3>Helper Docs</h3>
+        <p class="meta">Plain Markdown editor for package-local curator/helper content. This does not edit story files, artwork, iFiction XML, or player config.</p>
+        <div class="helper-tabs" role="tablist" aria-label="Helper Markdown files">
+          ${Object.entries(labels).map(([type, label]) => `
+            <button class="button" type="button" role="tab" aria-selected="${active === type ? 'true' : 'false'}" data-action="helper-doc" data-slug="${this._esc(slug)}" data-type="${this._esc(type)}">${this._esc(label)}</button>
+          `).join('')}
+        </div>
+        ${helper.loading ? '<div class="message">Loading helper Markdown...</div>' : ''}
+        ${helper.error ? `<div class="message error">${this._esc(helper.error)}</div>` : ''}
+        ${helper.success ? `<div class="message success">${this._esc(helper.success)}</div>` : ''}
+        <form data-helper-slug="${this._esc(slug)}" data-helper-type="${this._esc(active)}">
+          <div class="field">
+            <label>${this._esc(helper.label || labels[active] || 'Helper Markdown')}</label>
+            <textarea class="markdown" data-helper-content ${helper.loading || helper.saving ? 'disabled' : ''}>${this._esc(helper.content || '')}</textarea>
+            <span class="meta">
+              ${helper.path ? `<code>${this._esc(helper.path)}</code>` : 'Path is resolved from the package resource field or the default helper filename.'}
+              ${helper.exists ? '' : ' This helper file does not exist yet; saving will create the default package-local Markdown file.'}
+            </span>
+          </div>
+          <div class="form-actions">
+            <button class="button primary" type="submit" ${helper.loading || helper.saving ? 'disabled' : ''}>${helper.saving ? 'Saving...' : 'Save Helper Markdown'}</button>
+          </div>
+        </form>
+      </section>
     `;
   }
 
@@ -780,6 +948,10 @@ class TerpVaultPage extends HTMLElement {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/metadata`;
   }
 
+  _markdownApiUrl(slug, type) {
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/markdown/${encodeURIComponent(type)}`;
+  }
+
   _apiBase() {
     const explicit = [
       window.__TERPVAULT_API_BASE,
@@ -889,6 +1061,43 @@ class TerpVaultPage extends HTMLElement {
 
   _findGame(slug) {
     return (this.state.games || []).find(game => game.slug === slug);
+  }
+
+  _helperTypes() {
+    return ['how-to-play', 'hints', 'walkthrough'];
+  }
+
+  _emptyHelperState(type) {
+    const labels = {
+      'how-to-play': 'How to Play',
+      hints: 'Hints',
+      walkthrough: 'Walkthrough'
+    };
+
+    return {
+      type,
+      loading: false,
+      saving: false,
+      error: '',
+      success: '',
+      label: labels[type] || 'Helper Markdown',
+      path: '',
+      exists: false,
+      content: ''
+    };
+  }
+
+  _helperFromApi(data, fallbackType) {
+    const payload = this._unwrapApiResponse(data);
+    const type = payload.type || fallbackType;
+    return {
+      ...this._emptyHelperState(type),
+      type,
+      label: payload.label || this._emptyHelperState(type).label,
+      path: payload.relative_path || payload.path || '',
+      exists: Boolean(payload.exists),
+      content: payload.content || ''
+    };
   }
 
   _get(object, path) {

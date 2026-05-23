@@ -1,3 +1,17 @@
+# v0.2.3
+
+## 05/22/2026
+
+1. New
+    - Added opt-in Admin2/API editing for package-local helper Markdown files: `how-to-play.md`, `hints.md`, and `walkthrough.md`.
+    - Added controller-style `GET /terpvault/packages/{slug}/markdown/{type}` and `PATCH /terpvault/packages/{slug}/markdown/{type}` handlers for the allowlisted helper types.
+    - Added a plain textarea Helper Docs editor inside the existing Admin2 package editor.
+
+2. Safety
+    - Helper Markdown writes validate slug, helper type, package containment, Markdown extension, and path traversal before touching files.
+    - Existing helper Markdown files receive timestamped package-local backups before replacement and are written via same-directory temp files with atomic rename.
+    - Story files, covers, screenshots, `metadata.iFiction.xml`, player config, upload, delete, import, export, and package creation remain out of scope.
+
 # v0.2.2
 
 ## 05/22/2026
