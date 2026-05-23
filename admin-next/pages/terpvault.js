@@ -611,12 +611,17 @@ class TerpVaultPage extends HTMLElement {
     const warnings = Array.isArray(report.warnings) ? report.warnings : [];
     const ignored = Array.isArray(report.ignored_files) ? report.ignored_files : [];
     const included = Array.isArray(report.included_files) ? report.included_files : [];
+    const committedSlug = report.committed_slug || '';
+    const collisionLabel = committedSlug
+      ? `installed as ${committedSlug}`
+      : (report.has_collision ? 'slug collision' : 'no collision');
+    const collisionTone = committedSlug || !report.has_collision ? 'ok' : 'warn';
     return `
       <div class="box" style="margin-top:.85rem;">
         <h3>Inspection Report</h3>
         <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
           <span class="badge ${report.ok ? 'ok' : 'error'}">${report.ok ? 'ok' : 'blocked'}</span>
-          <span class="badge ${report.has_collision ? 'warn' : 'ok'}">${report.has_collision ? 'slug collision' : 'no collision'}</span>
+          <span class="badge ${collisionTone}">${this._esc(collisionLabel)}</span>
           <span class="badge ${report.has_ifiction ? 'ok' : 'warn'}">${report.has_ifiction ? 'iFiction found' : 'no iFiction XML'}</span>
         </div>
         <dl>
@@ -627,6 +632,7 @@ class TerpVaultPage extends HTMLElement {
           <dt>Author</dt><dd>${this._esc(report.author || 'Not recorded')}</dd>
           <dt>Story file</dt><dd><code>${this._esc(report.story_file || '')}</code></dd>
           <dt>Story extension</dt><dd><code>${this._esc(report.story_extension || '')}</code></dd>
+          ${committedSlug ? `<dt>Installed slug</dt><dd><code>${this._esc(committedSlug)}</code></dd>` : ''}
           <dt>Destination</dt><dd>${report.destination_exists ? 'Package folder already exists.' : 'No existing package folder detected.'}</dd>
         </dl>
         <p class="meta">Inspection does not create package files. Commit revalidates and installs as draft only.</p>
@@ -674,6 +680,26 @@ class TerpVaultPage extends HTMLElement {
         </div>
       </div>
     `;
+  }
+
+  _committedImportReport(report, slug) {
+    if (!report || typeof report !== 'object') {
+      return report;
+    }
+
+    const updated = {
+      ...report,
+      committed_slug: slug || report.committed_slug || '',
+      has_collision: false,
+      destination_exists: false
+    };
+    const warnings = Array.isArray(report.warnings) ? report.warnings.slice() : [];
+    if (report.has_collision || report.destination_exists) {
+      warnings.push(`Final import slug ${slug} was accepted; the original source slug collision did not overwrite an existing package.`);
+    }
+    updated.warnings = Array.from(new Set(warnings));
+
+    return updated;
   }
 
   _bindLibraryActions() {
@@ -857,7 +883,7 @@ class TerpVaultPage extends HTMLElement {
           loading: false,
           saving: false,
           error: '',
-          success: 'Package imported as draft. Review metadata, helper docs, media, and story file before publishing.',
+          success: 'Package imported as draft and not featured. Review metadata, helper docs, media, story file, license/provenance, and publish only when ready.',
           values: this._editableFromGame(game),
           readOnly: this._readOnlyFromGame(game),
           activeHelper: 'how-to-play',
@@ -871,8 +897,8 @@ class TerpVaultPage extends HTMLElement {
         saving: false,
         committing: false,
         error: '',
-        success: `Imported ${importedSlug} as a draft package.`,
-        report: result.report || this.state.importInspect.report,
+        success: `Imported ${importedSlug} as a draft package. Review metadata, helper docs, media, story file, license/provenance, and publish only when ready.`,
+        report: this._committedImportReport(result.report || this.state.importInspect.report, importedSlug),
         file: null,
         finalSlug: importedSlug
       };
@@ -1464,7 +1490,7 @@ class TerpVaultPage extends HTMLElement {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       this.state.export = { slug, saving: false, error: '', success: `Exported ${filename}.` };
     } catch (error) {

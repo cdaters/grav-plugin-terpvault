@@ -208,6 +208,14 @@ Editable fields:
 - Refresh the Admin2 package library after successful import and open the imported package row when practical.
 - Keep package delete, overwrite/replace, arbitrary file browsing, public routing, and player behavior out of scope.
 
+## v0.3.1 Import Polish
+
+- Force imported packages to `terpvault.featured: false` as well as `terpvault.status: draft`.
+- Normalize empty imported `identification.ifids`, `resources.screenshots`, and `terpvault.tags` values to empty arrays without rewriting non-empty values.
+- Make Admin2 import success messaging clearer about reviewing metadata, helper docs, media, story file, license/provenance, and publishing only when ready.
+- Soften stale collision indicators after a successful alternate-slug import.
+- Delay export object URL cleanup for browser download safety.
+
 ## Next build: package management UI
 
 - Import polish and rollback/diagnostic hardening based on field testing.

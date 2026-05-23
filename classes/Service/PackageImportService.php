@@ -434,6 +434,39 @@ class PackageImportService
             $metadata['terpvault'] = [];
         }
         $metadata['terpvault']['status'] = 'draft';
+        $metadata['terpvault']['featured'] = false;
+
+        $this->normalizeEmptyListField($metadata, ['identification', 'ifids']);
+        $this->normalizeEmptyListField($metadata, ['resources', 'screenshots']);
+        $this->normalizeEmptyListField($metadata, ['terpvault', 'tags']);
+    }
+
+    private function normalizeEmptyListField(array &$metadata, array $path): void
+    {
+        $target =& $metadata;
+        $last = array_pop($path);
+        foreach ($path as $segment) {
+            if (!array_key_exists($segment, $target)) {
+                return;
+            }
+            if (!is_array($target[$segment])) {
+                return;
+            }
+            $target =& $target[$segment];
+        }
+
+        if (!array_key_exists($last, $target)) {
+            return;
+        }
+
+        if ($target[$last] === null || $target[$last] === '') {
+            $target[$last] = [];
+            return;
+        }
+
+        if (is_array($target[$last]) && count($target[$last]) === 0) {
+            $target[$last] = [];
+        }
     }
 
     private function validateFinalSlug(string $slug): string

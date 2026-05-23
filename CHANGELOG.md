@@ -1,3 +1,17 @@
+# v0.3.1
+
+## 05/23/2026
+
+1. Improved
+    - Import commit now forces imported packages to `terpvault.featured: false` in addition to draft status.
+    - Empty imported list-like fields are normalized to `[]` for `identification.ifids`, `resources.screenshots`, and `terpvault.tags` when they are empty or null.
+    - Admin2 import success messaging now tells curators to review metadata, helper docs, media, story file, license/provenance, and publish only when ready.
+    - Export download object URLs are revoked after a short delay for broader browser safety.
+
+2. Safety
+    - Import remains draft-only and non-overwriting.
+    - Non-empty imported list-like metadata is preserved.
+
 # v0.3.0
 
 ## 05/23/2026

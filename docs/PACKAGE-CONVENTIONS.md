@@ -209,4 +209,4 @@ Export includes:
 
 Export excludes backups, lock files, temp files, hidden files/directories, macOS cruft such as `__MACOSX/` and `.DS_Store`, Windows cruft such as `Thumbs.db` and `desktop.ini`, and unrelated/unreferenced files.
 
-Admin2 import requires relative package paths only, rejects traversal and unsafe absolute/URI paths, ignores safe platform cruft, and shows a validation report before commit. Import commit always installs as a draft package, rewrites `id`, `slug`, and `terpvault.status`, and refuses to overwrite an existing package folder.
+Admin2 import requires relative package paths only, rejects traversal and unsafe absolute/URI paths, ignores safe platform cruft, and shows a validation report before commit. Import commit always installs as a draft, not-featured package, rewrites `id`, `slug`, `terpvault.status`, and `terpvault.featured`, and refuses to overwrite an existing package folder.
