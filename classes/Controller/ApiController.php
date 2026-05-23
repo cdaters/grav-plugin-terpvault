@@ -125,13 +125,38 @@ class ApiController extends AbstractApiController
         $this->requireAdminApiSuper($request);
         $slug = (string) $this->getRouteParam($request, 'slug');
         $type = (string) $this->getRouteParam($request, 'type');
+        $body = $request->getParsedBody();
+        $options = is_array($body) ? $body : [];
         $upload = $this->firstUploadedFile($request->getUploadedFiles());
         if (!$upload) {
             throw new ValidationException('No media file was uploaded.');
         }
 
         try {
-            return ApiResponse::create($this->mediaService()->upload($slug, $type, $upload));
+            return ApiResponse::create($this->mediaService()->upload($slug, $type, $upload, $options));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function updateScreenshots(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+        $body = $this->getRequestBody($request);
+        if (!is_array($body)) {
+            throw new ValidationException('Request body must be a JSON object.');
+        }
+
+        $screenshots = $body['screenshots'] ?? null;
+        if (!is_array($screenshots)) {
+            throw new ValidationException('screenshots must be an array.');
+        }
+
+        try {
+            return ApiResponse::create($this->mediaService()->updateScreenshots($slug, $screenshots));
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         } catch (RuntimeException $e) {

@@ -114,6 +114,18 @@ Editable fields:
 - Preserve unknown `game.yaml` fields when updating media resource paths.
 - Keep story-file upload, arbitrary file browsing, package delete, package import/export, `metadata.iFiction.xml` editing, and player config editing out of scope.
 
+## v0.2.5 screenshot list polish
+
+- Add screenshot list management to Media Manager Lite.
+- Register a controller-style route only when `admin.enable_admin2_page` is enabled:
+  - `PATCH /terpvault/packages/{slug}/media/screenshots`
+- Support reordering and removing screenshot entries from `resources.screenshots`.
+- Do not delete physical image files when removing a screenshot from the package list.
+- Accept only screenshot paths already present in `resources.screenshots` for reorder/remove operations.
+- Prevent duplicate screenshot entries when the same screenshot filename is uploaded again.
+- Allow replacing a registered screenshot file through the existing `POST /terpvault/packages/{slug}/media/screenshot` route with a replacement path or index.
+- Keep story-file upload, arbitrary file browsing, package delete, package import/export, `metadata.iFiction.xml` editing, and player config editing out of scope.
+
 ## Next build: package management UI
 
 - Create new package folder.

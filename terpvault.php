@@ -276,6 +276,7 @@ class TerpVaultPlugin extends Plugin
         $routes->patch('/terpvault/packages/{slug}/markdown/{type}', [$controller, 'updateMarkdown']);
         $routes->get('/terpvault/packages/{slug}/media', [$controller, 'media']);
         $routes->post('/terpvault/packages/{slug}/media/{type}', [$controller, 'uploadMedia']);
+        $routes->patch('/terpvault/packages/{slug}/media/screenshots', [$controller, 'updateScreenshots']);
     }
 
     public function twigGames(bool $includeUnpublished = false): array

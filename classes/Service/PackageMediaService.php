@@ -58,7 +58,7 @@ class PackageMediaService
         ];
     }
 
-    public function upload(string $slug, string $type, UploadedFileInterface $upload): array
+    public function upload(string $slug, string $type, UploadedFileInterface $upload, array $options = []): array
     {
         $type = trim($type);
         if (!in_array($type, self::TYPES, true)) {
@@ -72,7 +72,7 @@ class PackageMediaService
         $paths = $this->packagePaths($slug);
         $metadata = $this->loadYaml($paths['yaml']);
         $extension = $this->validateUpload($upload);
-        $relative = $this->targetRelativePath($type, $upload, $extension);
+        $relative = $this->targetRelativePath($type, $upload, $extension, $metadata, $options);
         $target = $this->resolvePackageFile($paths['package'], $relative);
         $backup = $this->writeUploadAtomically($upload, $target, $extension);
 
@@ -108,6 +108,39 @@ class PackageMediaService
         return $result;
     }
 
+    public function updateScreenshots(string $slug, array $screenshots): array
+    {
+        $paths = $this->packagePaths($slug);
+        $metadata = $this->loadYaml($paths['yaml']);
+        $current = $this->screenshotList($metadata);
+        $currentLookup = array_fill_keys($current, true);
+        $updatedScreenshots = [];
+
+        foreach ($screenshots as $path) {
+            $path = $this->normalizeRelativePath((string) $path);
+            if (!isset($currentLookup[$path])) {
+                throw new InvalidArgumentException('Screenshot entry is not currently registered: ' . $path);
+            }
+            $this->assertMediaExtension($path);
+            if (!in_array($path, $updatedScreenshots, true)) {
+                $updatedScreenshots[] = $path;
+            }
+        }
+
+        $updated = $metadata;
+        if (!isset($updated['resources']) || !is_array($updated['resources'])) {
+            $updated['resources'] = [];
+        }
+        $updated['resources']['screenshots'] = $updatedScreenshots;
+
+        $backup = $this->writeYamlAtomically($paths['yaml'], $updated);
+        $result = $this->media($paths['slug']);
+        $result['metadata_backup'] = $backup;
+        $result['updated'] = ['resources.screenshots'];
+
+        return $result;
+    }
+
     private function validateUpload(UploadedFileInterface $upload): string
     {
         $clientName = (string) $upload->getClientFilename();
@@ -128,7 +161,7 @@ class PackageMediaService
         return $extension;
     }
 
-    private function targetRelativePath(string $type, UploadedFileInterface $upload, string $extension): string
+    private function targetRelativePath(string $type, UploadedFileInterface $upload, string $extension, array $metadata, array $options): string
     {
         if ($type === 'cover') {
             return 'cover.' . $extension;
@@ -136,6 +169,19 @@ class PackageMediaService
 
         if ($type === 'small-cover') {
             return 'small-cover.' . $extension;
+        }
+
+        $replacePath = $this->replacementScreenshotPath($metadata, $options);
+        if ($replacePath !== '') {
+            $this->assertMediaExtension($replacePath);
+            $replaceExtension = strtolower(pathinfo($replacePath, PATHINFO_EXTENSION));
+            if ($replaceExtension === 'jpeg') {
+                $replaceExtension = 'jpg';
+            }
+            if ($replaceExtension !== $extension) {
+                throw new InvalidArgumentException('Replacement screenshot must use the same image extension as the existing screenshot entry.');
+            }
+            return $replacePath;
         }
 
         $name = strtolower(pathinfo((string) $upload->getClientFilename(), PATHINFO_FILENAME));
@@ -146,6 +192,47 @@ class PackageMediaService
         }
 
         return 'screenshots/' . $name . '.' . $extension;
+    }
+
+    private function replacementScreenshotPath(array $metadata, array $options): string
+    {
+        $screenshots = $this->screenshotList($metadata);
+        if (!$screenshots) {
+            return '';
+        }
+
+        if (isset($options['replace_path'])) {
+            $path = $this->normalizeRelativePath((string) $options['replace_path']);
+            if (!in_array($path, $screenshots, true)) {
+                throw new InvalidArgumentException('Replacement screenshot path is not registered in resources.screenshots.');
+            }
+            return $path;
+        }
+
+        if (isset($options['replace_index']) && $options['replace_index'] !== '') {
+            $index = filter_var($options['replace_index'], FILTER_VALIDATE_INT);
+            if ($index === false || !array_key_exists($index, $screenshots)) {
+                throw new InvalidArgumentException('Replacement screenshot index is not registered in resources.screenshots.');
+            }
+            return $screenshots[$index];
+        }
+
+        return '';
+    }
+
+    private function screenshotList(array $metadata): array
+    {
+        $resources = is_array($metadata['resources'] ?? null) ? $metadata['resources'] : [];
+        $screenshots = is_array($resources['screenshots'] ?? null) ? $resources['screenshots'] : [];
+        $normalized = [];
+        foreach ($screenshots as $path) {
+            $path = $this->normalizeRelativePath((string) $path);
+            if ($path !== '' && !in_array($path, $normalized, true)) {
+                $normalized[] = $path;
+            }
+        }
+
+        return $normalized;
     }
 
     private function writeUploadAtomically(UploadedFileInterface $upload, string $target, string $extension): string
@@ -265,25 +352,9 @@ class PackageMediaService
 
     private function resolvePackageFile(string $package, string $relative): string
     {
-        if (strpos($relative, "\0") !== false || preg_match('#^[a-z][a-z0-9+.-]*://#i', $relative)) {
-            throw new InvalidArgumentException('Invalid media path.');
-        }
+        $relative = $this->normalizeRelativePath($relative);
 
-        $relative = str_replace('\\', '/', $relative);
-        if ($relative === '' || $relative[0] === '/') {
-            throw new InvalidArgumentException('Invalid media path.');
-        }
-
-        $segments = array_filter(explode('/', $relative), static function (string $segment): bool {
-            return $segment !== '';
-        });
-        foreach ($segments as $segment) {
-            if ($segment === '.' || $segment === '..') {
-                throw new InvalidArgumentException('Media path cannot contain traversal segments.');
-            }
-        }
-
-        $file = $package . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $segments);
+        $file = $package . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
         $dir = dirname($file);
         if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
             throw new RuntimeException('Unable to create media directory.');
@@ -294,11 +365,39 @@ class PackageMediaService
             throw new InvalidArgumentException('Media path is outside the package directory.');
         }
 
-        if (!in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), array_keys(self::EXTENSIONS), true)) {
-            throw new InvalidArgumentException('Only jpg, jpeg, png, and webp images can be written.');
-        }
+        $this->assertMediaExtension($file);
 
         return $file;
+    }
+
+    private function normalizeRelativePath(string $relative): string
+    {
+        if (strpos($relative, "\0") !== false || preg_match('#^[a-z][a-z0-9+.-]*://#i', $relative)) {
+            throw new InvalidArgumentException('Invalid media path.');
+        }
+
+        $relative = str_replace('\\', '/', trim($relative));
+        if ($relative === '' || $relative[0] === '/') {
+            throw new InvalidArgumentException('Invalid media path.');
+        }
+
+        $segments = array_values(array_filter(explode('/', $relative), static function (string $segment): bool {
+            return $segment !== '';
+        }));
+        foreach ($segments as $segment) {
+            if ($segment === '.' || $segment === '..') {
+                throw new InvalidArgumentException('Media path cannot contain traversal segments.');
+            }
+        }
+
+        return implode('/', $segments);
+    }
+
+    private function assertMediaExtension(string $path): void
+    {
+        if (!in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), array_keys(self::EXTENSIONS), true)) {
+            throw new InvalidArgumentException('Only jpg, jpeg, png, and webp images can be written.');
+        }
     }
 
     private function isPathInside(string $path, string $base): bool

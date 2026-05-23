@@ -210,6 +210,10 @@ class TerpVaultPage extends HTMLElement {
         .media-card img { display:block; width:100%; aspect-ratio:16/10; object-fit:cover; border-radius:8px; border:1px solid rgba(127,127,127,.22); background:rgba(127,127,127,.12); margin-bottom:.45rem; }
         .media-card .placeholder { display:grid; place-items:center; width:100%; aspect-ratio:16/10; border-radius:8px; border:1px dashed rgba(127,127,127,.34); background:rgba(127,127,127,.06); margin-bottom:.45rem; }
         .media-uploads { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:.75rem; }
+        .screenshot-list { display:grid; gap:.55rem; margin:.75rem 0; }
+        .screenshot-row { border:1px solid rgba(127,127,127,.24); border-radius:10px; padding:.6rem; display:grid; grid-template-columns:96px minmax(0,1fr); gap:.65rem; align-items:start; background:rgba(127,127,127,.03); }
+        .screenshot-row img { width:96px; aspect-ratio:16/10; object-fit:cover; border-radius:8px; border:1px solid rgba(127,127,127,.22); background:rgba(127,127,127,.12); }
+        .screenshot-actions { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.45rem; }
         code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.9em; }
         .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:.8rem; }
         @media (max-width: 820px) {
@@ -220,6 +224,8 @@ class TerpVaultPage extends HTMLElement {
           dl { grid-template-columns: 1fr; }
           .editor-head { display:block; }
           .readonly div { grid-template-columns:1fr; }
+          .screenshot-row { grid-template-columns:1fr; }
+          .screenshot-row img { width:100%; }
         }
       </style>
       <div class="tv-admin">
@@ -468,6 +474,14 @@ class TerpVaultPage extends HTMLElement {
 
     root.querySelectorAll('form[data-media-slug]').forEach(form => {
       form.addEventListener('submit', event => this._uploadMedia(event));
+    });
+
+    root.querySelectorAll('[data-action="screenshot-remove"]').forEach(button => {
+      button.addEventListener('click', () => this._removeScreenshot(button.dataset.slug || '', Number(button.dataset.index || -1)));
+    });
+
+    root.querySelectorAll('[data-action="screenshot-move"]').forEach(button => {
+      button.addEventListener('click', () => this._moveScreenshot(button.dataset.slug || '', Number(button.dataset.index || -1), Number(button.dataset.direction || 0)));
     });
   }
 
@@ -733,6 +747,9 @@ class TerpVaultPage extends HTMLElement {
     const form = event.currentTarget;
     const slug = form.dataset.mediaSlug || this.state.editingSlug;
     const type = form.dataset.mediaType || '';
+    const replacePath = form.dataset.replacePath || '';
+    const replaceIndex = form.dataset.replaceIndex || '';
+    const savingKey = replaceIndex !== '' ? `screenshot-${replaceIndex}` : type;
     const input = form.querySelector('input[type="file"]');
     const file = input?.files?.[0];
     if (!file) {
@@ -750,12 +767,18 @@ class TerpVaultPage extends HTMLElement {
 
     const formData = new FormData();
     formData.append('file', file);
+    if (replacePath) {
+      formData.append('replace_path', replacePath);
+    }
+    if (replaceIndex !== '') {
+      formData.append('replace_index', replaceIndex);
+    }
 
     this.state.editor = {
       ...this.state.editor,
       media: {
         ...(this.state.editor.media || this._emptyMediaState()),
-        saving: type,
+        saving: savingKey,
         error: '',
         success: ''
       }
@@ -773,6 +796,69 @@ class TerpVaultPage extends HTMLElement {
         media: {
           ...media,
           success: 'Media uploaded and package metadata updated.'
+        }
+      };
+      await this._reloadManifest();
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        media: {
+          ...(this.state.editor.media || this._emptyMediaState()),
+          saving: '',
+          error: error.message || String(error)
+        }
+      };
+    }
+
+    this._renderLibrary();
+  }
+
+  async _removeScreenshot(slug, index) {
+    const screenshots = this._currentScreenshotPaths();
+    if (!slug || index < 0 || index >= screenshots.length) {
+      return;
+    }
+
+    screenshots.splice(index, 1);
+    await this._saveScreenshotList(slug, screenshots, 'Screenshot removed from package metadata. The image file was not deleted.');
+  }
+
+  async _moveScreenshot(slug, index, direction) {
+    const screenshots = this._currentScreenshotPaths();
+    const target = index + direction;
+    if (!slug || index < 0 || target < 0 || index >= screenshots.length || target >= screenshots.length) {
+      return;
+    }
+
+    const [item] = screenshots.splice(index, 1);
+    screenshots.splice(target, 0, item);
+    await this._saveScreenshotList(slug, screenshots, 'Screenshot order updated.');
+  }
+
+  async _saveScreenshotList(slug, screenshots, success) {
+    this.state.editor = {
+      ...this.state.editor,
+      media: {
+        ...(this.state.editor.media || this._emptyMediaState()),
+        saving: 'screenshots',
+        error: '',
+        success: ''
+      }
+    };
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._screenshotsApiUrl(slug), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ screenshots })
+      });
+      const media = this._mediaFromApi(data, this._findGame(slug) || {});
+      this.state.editor = {
+        ...this.state.editor,
+        media: {
+          ...media,
+          success
         }
       };
       await this._reloadManifest();
@@ -890,7 +976,11 @@ class TerpVaultPage extends HTMLElement {
         <div class="media-grid">
           ${this._mediaCard('Cover', urls.cover, media.resources?.cover || '')}
           ${this._mediaCard('Small Cover', urls.small_cover || urls.thumbnail, media.resources?.small_cover || '')}
-          ${screenshots.length ? screenshots.map((url, index) => this._mediaCard(`Screenshot ${index + 1}`, url, media.resources?.screenshots?.[index] || '')).join('') : this._mediaCard('Screenshots', '', 'None recorded')}
+        </div>
+        <div class="screenshot-list">
+          <strong>Screenshots</strong>
+          <p class="meta">Remove only updates <code>resources.screenshots</code>; it does not delete the underlying image file.</p>
+          ${screenshots.length ? screenshots.map((url, index) => this._screenshotRow(slug, url, media.resources?.screenshots?.[index] || '', index, screenshots.length, media.saving === 'screenshots' || media.saving === `screenshot-${index}`)).join('') : '<p class="meta">No screenshots recorded.</p>'}
         </div>
         <div class="media-uploads">
           ${this._mediaUploadForm(slug, 'cover', 'Replace cover', media.saving === 'cover')}
@@ -898,6 +988,24 @@ class TerpVaultPage extends HTMLElement {
           ${this._mediaUploadForm(slug, 'screenshot', 'Add screenshot', media.saving === 'screenshot')}
         </div>
       </section>
+    `;
+  }
+
+  _screenshotRow(slug, url, path, index, count, saving) {
+    return `
+      <div class="screenshot-row">
+        ${url ? `<img src="${this._esc(url)}" alt="">` : '<div class="placeholder"><span class="meta">No image</span></div>'}
+        <div>
+          <strong>Screenshot ${index + 1}</strong>
+          <p class="meta">${path ? `<code>${this._esc(path)}</code>` : 'Path not recorded'}</p>
+          <div class="screenshot-actions">
+            <button class="button" type="button" data-action="screenshot-move" data-slug="${this._esc(slug)}" data-index="${index}" data-direction="-1" ${index === 0 || saving ? 'disabled' : ''}>Move up</button>
+            <button class="button" type="button" data-action="screenshot-move" data-slug="${this._esc(slug)}" data-index="${index}" data-direction="1" ${index >= count - 1 || saving ? 'disabled' : ''}>Move down</button>
+            <button class="button" type="button" data-action="screenshot-remove" data-slug="${this._esc(slug)}" data-index="${index}" ${saving ? 'disabled' : ''}>Remove from package</button>
+          </div>
+          ${path ? this._mediaUploadForm(slug, 'screenshot', 'Replace this screenshot', saving, path, index) : ''}
+        </div>
+      </div>
     `;
   }
 
@@ -911,9 +1019,9 @@ class TerpVaultPage extends HTMLElement {
     `;
   }
 
-  _mediaUploadForm(slug, type, label, saving) {
+  _mediaUploadForm(slug, type, label, saving, replacePath = '', replaceIndex = '') {
     return `
-      <form data-media-slug="${this._esc(slug)}" data-media-type="${this._esc(type)}">
+      <form data-media-slug="${this._esc(slug)}" data-media-type="${this._esc(type)}" ${replacePath ? `data-replace-path="${this._esc(replacePath)}"` : ''} ${replaceIndex !== '' ? `data-replace-index="${this._esc(replaceIndex)}"` : ''}>
         <div class="field">
           <label>${this._esc(label)}</label>
           <input type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" ${saving ? 'disabled' : ''}>
@@ -1134,6 +1242,10 @@ class TerpVaultPage extends HTMLElement {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/media/${encodeURIComponent(type)}`;
   }
 
+  _screenshotsApiUrl(slug) {
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/media/screenshots`;
+  }
+
   _apiBase() {
     const explicit = [
       window.__TERPVAULT_API_BASE,
@@ -1318,6 +1430,11 @@ class TerpVaultPage extends HTMLElement {
         screenshots: Array.isArray(game.resources?.screenshots) ? game.resources.screenshots : []
       }
     };
+  }
+
+  _currentScreenshotPaths() {
+    const screenshots = this.state.editor?.media?.resources?.screenshots || [];
+    return Array.isArray(screenshots) ? screenshots.slice() : [];
   }
 
   _get(object, path) {

@@ -401,7 +401,7 @@ The current page provides package inventory plus metadata/helper/media editing:
 - Advisory validation warnings and Catalog & Provenance summaries where package metadata provides them.
 - Edit Metadata action for whitelisted existing `game.yaml` fields such as bibliographic details, IFIDs, catalog links, license/source notes, status, featured, and tags.
 - Helper Docs editor for package-local `how-to-play.md`, `hints.md`, and `walkthrough.md` content.
-- Media Manager Lite controls for replacing cover/small-cover art and adding screenshots with package-local `jpg`, `jpeg`, `png`, or `webp` files.
+- Media Manager Lite controls for replacing cover/small-cover art, adding screenshots, replacing registered screenshots, and reordering/removing screenshot entries with package-local `jpg`, `jpeg`, `png`, or `webp` files.
 
 Package creation, story-file upload, delete, import, export, arbitrary file browsing, `metadata.iFiction.xml` edits, and player settings edits are not implemented yet. Metadata saves use the controller-style Admin2 API route `/api/v1/terpvault/packages/{slug}/metadata`, helper Markdown saves use `/api/v1/terpvault/packages/{slug}/markdown/{type}`, and image uploads use `/api/v1/terpvault/packages/{slug}/media/{type}` when the Admin2 Library Manager is enabled.
 

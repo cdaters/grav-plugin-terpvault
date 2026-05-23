@@ -1,3 +1,18 @@
+# v0.2.5
+
+## 05/22/2026
+
+1. Improved
+    - Added screenshot ordering and remove-from-package controls to Admin2 Media Manager Lite.
+    - Added replacement upload controls for individual registered screenshots.
+    - Added `PATCH /terpvault/packages/{slug}/media/screenshots` for updating `resources.screenshots` without deleting image files.
+
+2. Safety
+    - Screenshot reorder/remove operations accept only paths already registered in `resources.screenshots`.
+    - Screenshot replacement accepts only an existing registered screenshot path or index and keeps replacement uploads package-local.
+    - Duplicate screenshot entries are prevented when the same screenshot filename is uploaded again.
+    - Physical screenshot deletion, arbitrary file browsing, story-file upload, package delete, import, and export remain out of scope.
+
 # v0.2.4
 
 ## 05/22/2026
