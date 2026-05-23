@@ -29,6 +29,13 @@ class TerpVaultPage extends HTMLElement {
           path: '',
           exists: false,
           content: ''
+        },
+        media: {
+          loading: false,
+          saving: '',
+          error: '',
+          success: '',
+          resources: null
         }
       }
     };
@@ -197,6 +204,12 @@ class TerpVaultPage extends HTMLElement {
         .helper-docs { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .helper-tabs { display:flex; flex-wrap:wrap; gap:.45rem; margin:.7rem 0; }
         .helper-tabs .button[aria-selected="true"] { border-color:rgba(93,164,255,.72); background:rgba(93,164,255,.18); }
+        .media-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
+        .media-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:.75rem; margin:.75rem 0; }
+        .media-card { border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.65rem; background:rgba(127,127,127,.035); }
+        .media-card img { display:block; width:100%; aspect-ratio:16/10; object-fit:cover; border-radius:8px; border:1px solid rgba(127,127,127,.22); background:rgba(127,127,127,.12); margin-bottom:.45rem; }
+        .media-card .placeholder { display:grid; place-items:center; width:100%; aspect-ratio:16/10; border-radius:8px; border:1px dashed rgba(127,127,127,.34); background:rgba(127,127,127,.06); margin-bottom:.45rem; }
+        .media-uploads { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:.75rem; }
         code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.9em; }
         .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:.8rem; }
         @media (max-width: 820px) {
@@ -452,6 +465,10 @@ class TerpVaultPage extends HTMLElement {
     root.querySelectorAll('form[data-helper-slug]').forEach(form => {
       form.addEventListener('submit', event => this._saveHelperDoc(event));
     });
+
+    root.querySelectorAll('form[data-media-slug]').forEach(form => {
+      form.addEventListener('submit', event => this._uploadMedia(event));
+    });
   }
 
   async _openEditor(slug) {
@@ -470,7 +487,8 @@ class TerpVaultPage extends HTMLElement {
       values: this._editableFromGame(game || {}),
       readOnly: this._readOnlyFromGame(game || {}),
       activeHelper: 'how-to-play',
-      helper: this._emptyHelperState('how-to-play')
+      helper: this._emptyHelperState('how-to-play'),
+      media: this._mediaFromGame(game || {})
     };
     localStorage.setItem(`terpvault.admin.open.${slug}`, '1');
     this._renderLibrary();
@@ -492,6 +510,7 @@ class TerpVaultPage extends HTMLElement {
     }
 
     await this._loadHelperDoc(slug, this.state.editor.activeHelper, false);
+    await this._loadMedia(slug, false);
     this._renderLibrary();
   }
 
@@ -506,7 +525,8 @@ class TerpVaultPage extends HTMLElement {
       values: null,
       readOnly: null,
       activeHelper: 'how-to-play',
-      helper: this._emptyHelperState('how-to-play')
+      helper: this._emptyHelperState('how-to-play'),
+      media: this._emptyMediaState()
     };
     this._renderLibrary();
   }
@@ -667,6 +687,109 @@ class TerpVaultPage extends HTMLElement {
     this._renderLibrary();
   }
 
+  async _loadMedia(slug, render = true) {
+    if (!slug) {
+      return;
+    }
+
+    this.state.editor = {
+      ...this.state.editor,
+      media: {
+        ...(this.state.editor.media || this._emptyMediaState()),
+        loading: true,
+        error: '',
+        success: ''
+      }
+    };
+
+    if (render) {
+      this._renderLibrary();
+    }
+
+    try {
+      const data = await this._requestJson(this._mediaApiUrl(slug), { method: 'GET' });
+      this.state.editor = {
+        ...this.state.editor,
+        media: this._mediaFromApi(data, this._findGame(slug) || {})
+      };
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        media: {
+          ...(this.state.editor.media || this._emptyMediaState()),
+          loading: false,
+          error: `Media API unavailable: ${error.message || error}`
+        }
+      };
+    }
+
+    if (render) {
+      this._renderLibrary();
+    }
+  }
+
+  async _uploadMedia(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const slug = form.dataset.mediaSlug || this.state.editingSlug;
+    const type = form.dataset.mediaType || '';
+    const input = form.querySelector('input[type="file"]');
+    const file = input?.files?.[0];
+    if (!file) {
+      this.state.editor = {
+        ...this.state.editor,
+        media: {
+          ...(this.state.editor.media || this._emptyMediaState()),
+          error: 'Choose an image file before uploading.',
+          success: ''
+        }
+      };
+      this._renderLibrary();
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.state.editor = {
+      ...this.state.editor,
+      media: {
+        ...(this.state.editor.media || this._emptyMediaState()),
+        saving: type,
+        error: '',
+        success: ''
+      }
+    };
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._mediaUploadApiUrl(slug, type), {
+        method: 'POST',
+        body: formData
+      });
+      const media = this._mediaFromApi(data, this._findGame(slug) || {});
+      this.state.editor = {
+        ...this.state.editor,
+        media: {
+          ...media,
+          success: 'Media uploaded and package metadata updated.'
+        }
+      };
+      await this._reloadManifest();
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        media: {
+          ...(this.state.editor.media || this._emptyMediaState()),
+          saving: '',
+          error: error.message || String(error)
+        }
+      };
+    }
+
+    this._renderLibrary();
+  }
+
   _editorPanel(game) {
     const editor = this.state.editor || {};
     const values = editor.values || this._editableFromGame(game);
@@ -746,8 +869,59 @@ class TerpVaultPage extends HTMLElement {
             <button class="button primary" type="submit" ${editor.loading || editor.saving ? 'disabled' : ''}>${editor.saving ? 'Saving...' : 'Save Metadata'}</button>
           </div>
         </form>
+        ${this._mediaPanel(game, slug)}
         ${this._helperDocsPanel(slug)}
       </div>
+    `;
+  }
+
+  _mediaPanel(game, slug) {
+    const media = this.state.editor.media || this._mediaFromGame(game);
+    const urls = game.urls || {};
+    const screenshots = Array.isArray(urls.screenshots) ? urls.screenshots : (Array.isArray(game.screenshots) ? game.screenshots : []);
+
+    return `
+      <section class="media-manager">
+        <h3>Media</h3>
+        <p class="meta">Media Manager Lite accepts package-local jpg, png, and webp images only. Story files, imports, exports, deletes, and arbitrary file management are not available.</p>
+        ${media.loading ? '<div class="message">Loading media inventory...</div>' : ''}
+        ${media.error ? `<div class="message error">${this._esc(media.error)}</div>` : ''}
+        ${media.success ? `<div class="message success">${this._esc(media.success)}</div>` : ''}
+        <div class="media-grid">
+          ${this._mediaCard('Cover', urls.cover, media.resources?.cover || '')}
+          ${this._mediaCard('Small Cover', urls.small_cover || urls.thumbnail, media.resources?.small_cover || '')}
+          ${screenshots.length ? screenshots.map((url, index) => this._mediaCard(`Screenshot ${index + 1}`, url, media.resources?.screenshots?.[index] || '')).join('') : this._mediaCard('Screenshots', '', 'None recorded')}
+        </div>
+        <div class="media-uploads">
+          ${this._mediaUploadForm(slug, 'cover', 'Replace cover', media.saving === 'cover')}
+          ${this._mediaUploadForm(slug, 'small-cover', 'Replace small cover', media.saving === 'small-cover')}
+          ${this._mediaUploadForm(slug, 'screenshot', 'Add screenshot', media.saving === 'screenshot')}
+        </div>
+      </section>
+    `;
+  }
+
+  _mediaCard(label, url, path) {
+    return `
+      <div class="media-card">
+        ${url ? `<img src="${this._esc(url)}" alt="">` : '<div class="placeholder"><span class="meta">No image</span></div>'}
+        <strong>${this._esc(label)}</strong>
+        <p class="meta">${path ? `<code>${this._esc(path)}</code>` : 'Not recorded'}</p>
+      </div>
+    `;
+  }
+
+  _mediaUploadForm(slug, type, label, saving) {
+    return `
+      <form data-media-slug="${this._esc(slug)}" data-media-type="${this._esc(type)}">
+        <div class="field">
+          <label>${this._esc(label)}</label>
+          <input type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" ${saving ? 'disabled' : ''}>
+        </div>
+        <div class="form-actions">
+          <button class="button primary" type="submit" ${saving ? 'disabled' : ''}>${saving ? 'Uploading...' : 'Upload'}</button>
+        </div>
+      </form>
     `;
   }
 
@@ -952,6 +1126,14 @@ class TerpVaultPage extends HTMLElement {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/markdown/${encodeURIComponent(type)}`;
   }
 
+  _mediaApiUrl(slug) {
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/media`;
+  }
+
+  _mediaUploadApiUrl(slug, type) {
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/media/${encodeURIComponent(type)}`;
+  }
+
   _apiBase() {
     const explicit = [
       window.__TERPVAULT_API_BASE,
@@ -1097,6 +1279,44 @@ class TerpVaultPage extends HTMLElement {
       path: payload.relative_path || payload.path || '',
       exists: Boolean(payload.exists),
       content: payload.content || ''
+    };
+  }
+
+  _emptyMediaState() {
+    return {
+      loading: false,
+      saving: '',
+      error: '',
+      success: '',
+      resources: {
+        cover: '',
+        small_cover: '',
+        screenshots: []
+      }
+    };
+  }
+
+  _mediaFromApi(data, fallbackGame) {
+    const payload = this._unwrapApiResponse(data);
+    const resources = payload.resources || {};
+    return {
+      ...this._emptyMediaState(),
+      resources: {
+        cover: resources.cover || fallbackGame.resources?.cover || fallbackGame.cover || '',
+        small_cover: resources.small_cover || fallbackGame.resources?.small_cover || fallbackGame.small_cover || '',
+        screenshots: Array.isArray(resources.screenshots) ? resources.screenshots : (fallbackGame.resources?.screenshots || [])
+      }
+    };
+  }
+
+  _mediaFromGame(game = {}) {
+    return {
+      ...this._emptyMediaState(),
+      resources: {
+        cover: game.resources?.cover || game.cover || '',
+        small_cover: game.resources?.small_cover || game.small_cover || '',
+        screenshots: Array.isArray(game.resources?.screenshots) ? game.resources.screenshots : []
+      }
     };
   }
 

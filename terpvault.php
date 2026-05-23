@@ -261,6 +261,7 @@ class TerpVaultPlugin extends Plugin
 
         require_once __DIR__ . '/classes/Service/PackageMetadataService.php';
         require_once __DIR__ . '/classes/Service/PackageMarkdownService.php';
+        require_once __DIR__ . '/classes/Service/PackageMediaService.php';
         require_once __DIR__ . '/classes/Controller/ApiController.php';
 
         $routes = $event['routes'] ?? null;
@@ -273,6 +274,8 @@ class TerpVaultPlugin extends Plugin
         $routes->patch('/terpvault/packages/{slug}/metadata', [$controller, 'updateMetadata']);
         $routes->get('/terpvault/packages/{slug}/markdown/{type}', [$controller, 'markdown']);
         $routes->patch('/terpvault/packages/{slug}/markdown/{type}', [$controller, 'updateMarkdown']);
+        $routes->get('/terpvault/packages/{slug}/media', [$controller, 'media']);
+        $routes->post('/terpvault/packages/{slug}/media/{type}', [$controller, 'uploadMedia']);
     }
 
     public function twigGames(bool $includeUnpublished = false): array

@@ -1,3 +1,19 @@
+# v0.2.4
+
+## 05/22/2026
+
+1. New
+    - Added a limited opt-in Admin2 Media Manager Lite for package cover art and screenshots.
+    - Added controller-style `GET /terpvault/packages/{slug}/media` and `POST /terpvault/packages/{slug}/media/{type}` handlers.
+    - Added Admin2 upload controls for replacing cover art, replacing small-cover art, and adding screenshots.
+
+2. Safety
+    - Media uploads are limited to package-local `jpg`, `jpeg`, `png`, and `webp` image files; SVG is intentionally not allowed.
+    - Cover and small-cover uploads normalize filenames to `cover.{ext}` and `small-cover.{ext}`.
+    - Screenshot uploads are stored under `screenshots/` and added to `resources.screenshots` after the file write succeeds.
+    - Existing replaced media files receive timestamped package-local backups, and `game.yaml` is updated with unknown fields preserved.
+    - Story files, arbitrary file browsing, package delete, package import/export, `metadata.iFiction.xml`, and player config remain out of scope.
+
 # v0.2.3
 
 ## 05/22/2026

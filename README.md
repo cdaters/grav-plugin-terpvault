@@ -20,20 +20,20 @@ This is a **v0.2.x foundation build**. It is intentionally repo-ready and readab
 - Provides a native shortcode-style embed:
   - `[terpvault game="adventure"]`
 - Bundles the Parchment 2025.1.14 single-file web build as the first engine adapter.
-- Includes an optional Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a metadata-only `game.yaml` editor, and helper Markdown editing for package-local how-to-play, hints, and walkthrough files. It is disabled by default.
+- Includes an optional Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a metadata-only `game.yaml` editor, helper Markdown editing, and limited package-local cover/screenshot image uploads. It is disabled by default.
 
 ## What it does not do yet
 
-- It does not yet provide full Admin2 create/upload/import/export forms.
-- It enables only the opt-in Admin2 metadata/helper API for existing package `game.yaml` and allowlisted helper Markdown files; package creation, upload, delete, import, and export endpoints are not implemented.
+- It does not yet provide full Admin2 create/import/export forms.
+- It enables only the opt-in Admin2 metadata/helper/media API for existing package `game.yaml`, allowlisted helper Markdown files, and package-local cover/screenshot images; package creation, story-file upload, delete, import, and export endpoints are not implemented.
 - It does not yet provide named save slots or server-side save syncing.
 - It does not yet import/export iFiction XML automatically, but the package metadata model now maps toward Treaty of Babel/iFiction concepts.
 - It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
 
 ## Known limitations
 
-- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory plus whitelisted `game.yaml` metadata edits and allowlisted helper Markdown edits.
-- Public virtual routes and Admin2 API routes are separate integration surfaces. The metadata API is registered only when the Admin2 Library Manager is enabled.
+- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory plus whitelisted `game.yaml` metadata edits, allowlisted helper Markdown edits, and limited cover/screenshot image uploads.
+- Public virtual routes and Admin2 API routes are separate integration surfaces. Admin2 API routes are registered only when the Admin2 Library Manager is enabled.
 - `.terpvault.zip` import/export is planned but not implemented.
 - Parchment save/restore is interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
 - The `_demo` tree includes development starter packages for testing. Real IF packages need license/provenance review before broad redistribution.
@@ -368,7 +368,7 @@ Then visit:
 - Install into a clean Grav 2 site and run `bin/grav clearcache`.
 - Confirm `/if`, `/if/{slug}`, `/if/{slug}/play`, `/_story`, and `/_asset` routes work, including a subdirectory install.
 - Confirm Admin2 loads with `admin.enable_admin2_page: false`.
-- Confirm Admin2/API editing is described as opt-in metadata/helper-only work, not full package management.
+- Confirm Admin2/API editing is described as opt-in metadata/helper/media-only work, not full package management.
 - Confirm Parchment launches and save/restore guidance still points to interpreter-native `SAVE` / `RESTORE`.
 - Confirm package manifests include source, license, and redistribution notes.
 - Confirm no `.DS_Store`, `__MACOSX`, AppleDouble `._*`, or temporary generated image source files are included.
@@ -392,7 +392,7 @@ When that setting is enabled and the current request is an Admin2/API request, T
 /plugin/terpvault
 ```
 
-The current page provides package inventory plus metadata/helper editing:
+The current page provides package inventory plus metadata/helper/media editing:
 
 - Library tab with collapsible game package rows and package health badges.
 - Formats tab showing supported interpreter families.
@@ -401,10 +401,11 @@ The current page provides package inventory plus metadata/helper editing:
 - Advisory validation warnings and Catalog & Provenance summaries where package metadata provides them.
 - Edit Metadata action for whitelisted existing `game.yaml` fields such as bibliographic details, IFIDs, catalog links, license/source notes, status, featured, and tags.
 - Helper Docs editor for package-local `how-to-play.md`, `hints.md`, and `walkthrough.md` content.
+- Media Manager Lite controls for replacing cover/small-cover art and adding screenshots with package-local `jpg`, `jpeg`, `png`, or `webp` files.
 
-Package creation, upload, delete, import, export, story-file edits, artwork edits, `metadata.iFiction.xml` edits, and player settings edits are not implemented yet. Metadata saves use the controller-style Admin2 API route `/api/v1/terpvault/packages/{slug}/metadata`, and helper Markdown saves use `/api/v1/terpvault/packages/{slug}/markdown/{type}` when the Admin2 Library Manager is enabled.
+Package creation, story-file upload, delete, import, export, arbitrary file browsing, `metadata.iFiction.xml` edits, and player settings edits are not implemented yet. Metadata saves use the controller-style Admin2 API route `/api/v1/terpvault/packages/{slug}/metadata`, helper Markdown saves use `/api/v1/terpvault/packages/{slug}/markdown/{type}`, and image uploads use `/api/v1/terpvault/packages/{slug}/media/{type}` when the Admin2 Library Manager is enabled.
 
-Public virtual routes and Admin2 API routes are intentionally separate. Frontend routes such as `/if`, `/if/{slug}`, `/if/{slug}/play`, and `/if/_story/{slug}/{filename}` are registered as virtual Grav pages or controlled file endpoints only for frontend requests. Admin2 metadata endpoints are controller-style API routes and are registered only when the experimental Admin2 Library Manager is enabled.
+Public virtual routes and Admin2 API routes are intentionally separate. Frontend routes such as `/if`, `/if/{slug}`, `/if/{slug}/play`, and `/if/_story/{slug}/{filename}` are registered as virtual Grav pages or controlled file endpoints only for frontend requests. Admin2 endpoints are controller-style API routes and are registered only when the experimental Admin2 Library Manager is enabled.
 
 For subdirectory installs, TerpVault matches the browser URL after Grav's mount path is removed. For example, `/grav2-fullsite-skeleton/if/adventure` maps to the configured TerpVault route `/if/adventure`.
 

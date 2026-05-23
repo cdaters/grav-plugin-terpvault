@@ -92,13 +92,32 @@ Editable fields:
 - Create package-local timestamped backups before replacing existing helper Markdown files.
 - Keep story files, cover art, screenshots, `metadata.iFiction.xml`, player config, package creation, upload, delete, import, and export out of scope.
 
+## v0.2.4 Media Manager Lite
+
+- Add limited package-local image management to the existing Admin2 package editor.
+- Register controller-style routes only when `admin.enable_admin2_page` is enabled:
+  - `GET /terpvault/packages/{slug}/media`
+  - `POST /terpvault/packages/{slug}/media/{type}`
+- Allow only these media types:
+  - `cover`
+  - `small-cover`
+  - `screenshot`
+- Allow only these image extensions:
+  - `jpg`
+  - `jpeg`
+  - `png`
+  - `webp`
+- Do not allow SVG in this milestone.
+- Normalize replacement cover filenames to `cover.{ext}` and `small-cover.{ext}`.
+- Store screenshots under `screenshots/` and add the package-local relative path to `resources.screenshots`.
+- Update `resources.cover`, `resources.small_cover`, or `resources.screenshots` only after the uploaded image file is written.
+- Preserve unknown `game.yaml` fields when updating media resource paths.
+- Keep story-file upload, arbitrary file browsing, package delete, package import/export, `metadata.iFiction.xml` editing, and player config editing out of scope.
+
 ## Next build: package management UI
 
 - Create new package folder.
 - Upload/replace story file.
-- Upload/replace cover and small-cover art.
-- Upload screenshots.
-- Edit `how-to-play.md`, `hints.md`, and `walkthrough.md`.
 - Import package zip with macOS cruft stripping.
 - Export package zip.
 
