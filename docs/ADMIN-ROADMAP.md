@@ -1,12 +1,17 @@
 # TerpVault Admin Roadmap
 
-## v0.1.5 scaffold
+## v0.2.0 read-only manager
 
 - Register Admin2 sidebar item only when the experimental Admin2 hub setting is enabled.
 - Provide full-page component at `admin-next/pages/terpvault.js`.
-- Show collapsible library package rows.
+- Keep `admin.enable_admin2_page: false` as the default.
+- Show collapsible library package rows with title, slug, format, status, story-file presence, warning/error counts, and validation notes.
+- Show source/license/provenance summaries when package metadata provides them.
+- Link to public Detail and Play routes.
 - Show supported interpreter formats.
 - Show settings/storage diagnostics.
+- Avoid Admin2 API endpoints until controller-style API integration is implemented.
+- Keep the page read-only: no editing, upload, delete, import, export, or file mutation.
 
 ## Next build: package management
 

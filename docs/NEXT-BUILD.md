@@ -9,7 +9,7 @@
 - Confirm `[terpvault game="sample-cave"]` replacement works after page content processing.
 - Confirm Admin2 sidebar registration does not appear while `admin.enable_admin2_page` is false.
 - Confirm Admin2 sidebar registration appears when API/Admin2 is installed and `admin.enable_admin2_page` is true.
-- Rebuild Admin2 API endpoints with a controller-style integration before wiring the Admin2 page script to package data.
+- Rebuild Admin2 API endpoints with a controller-style integration before adding mutating package workflows.
 - Confirm Admin2 dashboard/API requests do not trigger TerpVault frontend virtual-page registration.
 
 ## Likely first fixes
@@ -41,12 +41,10 @@ The import/export target should follow the package convention in `docs/PACKAGE-C
 - Add Admin warning if Parchment is missing.
 
 
-## v0.2.0 target
+## v0.2.x target
 
-Build the first editable Admin2 Library Manager on top of the v0.1.10 package validation helpers:
+Build editable Admin2 Library Manager workflows on top of the v0.2.0 read-only package inventory:
 
-- list game packages
-- show warnings and release-readiness badges
 - edit `game.yaml` metadata
 - upload/replace story files and cover/small-cover art
 - edit package Markdown helpers

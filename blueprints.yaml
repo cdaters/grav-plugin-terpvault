@@ -1,7 +1,7 @@
 name: TerpVault
 slug: terpvault
 type: plugin
-version: 0.1.9
+version: 0.2.0
 description: "Curate, present, and play classic interactive fiction story files in Grav."
 icon: book-open
 author:
@@ -115,8 +115,8 @@ form:
 
     admin.enable_admin2_page:
       type: toggle
-      label: Enable Admin2 Library Hub
-      help: Experimental Admin2/API scaffold. Leave disabled unless you are testing the read-only Admin2 library page.
+      label: Enable Admin2 Library Manager
+      help: Experimental read-only Admin2 page. Leave disabled unless you are testing the opt-in package inventory.
       highlight: 0
       default: 0
       options:

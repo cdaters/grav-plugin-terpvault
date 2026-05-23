@@ -1,3 +1,26 @@
+# v0.2.0
+
+## 05/22/2026
+
+1. New
+    - Added an opt-in, read-only Admin2 Library Manager page for installed TerpVault packages.
+    - The Admin2 page lists package title, slug, format, status, story-file presence, warning/error counts, advisory warnings, public Detail/Play links, and provenance/license summaries where available.
+    - Embedded read-only package data in the Admin2 page definition when Admin2 exposes it, with a fallback to the existing public read-only manifest route.
+
+2. Changed
+    - Removed Admin2 component calls to disabled TerpVault API endpoints so the opt-in page can load without fatal API route errors.
+    - Kept `admin.enable_admin2_page: false` as the default.
+    - Bumped the plugin blueprint version to `0.2.0`.
+
+3. Fixed
+    - Registered read-only Admin2 sidebar/page discovery events whenever `admin.enable_admin2_page` is enabled, instead of requiring early URI detection to identify the request as API.
+    - Removed an over-strict `admin.super` sidebar filter so Admin2 can decide page visibility for authenticated Admin2 users.
+
+4. Notes
+    - No editing, upload, delete, import, export, or file mutation workflows were added.
+    - No Admin2 API endpoints were enabled; controller-style API integration remains future work.
+    - Public routes and Parchment/player behavior remain unchanged.
+
 # v0.1.20
 
 ## 05/22/2026

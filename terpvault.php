@@ -14,9 +14,9 @@ require_once __DIR__ . '/classes/GameRepository.php';
 /**
  * TerpVault plugin.
  *
- * v0.1.x is a repo-ready foundation: package metadata, virtual library/detail/play
+ * v0.2.x is a repo-ready foundation: package metadata, virtual library/detail/play
  * pages, controlled file serving, Twig helpers, shortcode-style embedding, and
- * Admin2 page registration scaffolding.
+ * opt-in read-only Admin2 library inspection.
  */
 class TerpVaultPlugin extends Plugin
 {
@@ -48,7 +48,12 @@ class TerpVaultPlugin extends Plugin
             ];
         }
 
-        if ($this->admin2IntegrationEnabled() && $this->isAdminApiRequest()) {
+        // Admin2 discovers plugin pages through API events whose URI shape can
+        // vary by Admin2/API version. Once the explicit opt-in flag is enabled,
+        // subscribe to those read-only discovery events and let the event type
+        // provide the Admin2/API boundary. Frontend virtual routing is still
+        // guarded separately by isFrontendRequest().
+        if ($this->admin2IntegrationEnabled()) {
             $events += [
                 'onApiSidebarItems' => ['onApiSidebarItems', 0],
                 'onApiPluginPageInfo' => ['onApiPluginPageInfo', 0],
@@ -194,12 +199,7 @@ class TerpVaultPlugin extends Plugin
 
     public function onApiSidebarItems(Event $event): void
     {
-        if (!$this->admin2IntegrationEnabled() || !$this->isAdminApiRequest()) {
-            return;
-        }
-
-        $user = $event['user'] ?? null;
-        if ($user && method_exists($user, 'authorize') && !$user->authorize('admin.super')) {
+        if (!$this->admin2IntegrationEnabled()) {
             return;
         }
 
@@ -217,7 +217,7 @@ class TerpVaultPlugin extends Plugin
 
     public function onApiPluginPageInfo(Event $event): void
     {
-        if (!$this->admin2IntegrationEnabled() || !$this->isAdminApiRequest()) {
+        if (!$this->admin2IntegrationEnabled()) {
             return;
         }
 
@@ -232,6 +232,7 @@ class TerpVaultPlugin extends Plugin
             'icon' => 'fa-book-open',
             'page_type' => 'component',
             'actions' => [],
+            'data' => $this->admin2PageData(),
         ];
     }
 
@@ -493,6 +494,35 @@ class TerpVaultPlugin extends Plugin
             'hugo' => ['label' => 'Hugo', 'extensions' => ['hex']],
             'tads' => ['label' => 'TADS 2 / TADS 3', 'extensions' => ['gam', 't3']],
             'adrift' => ['label' => 'ADRIFT 4', 'extensions' => ['taf']],
+        ];
+    }
+
+    protected function admin2PageData(): array
+    {
+        $config = $this->pluginConfig();
+        $games = array_map(function (GamePackage $game): array {
+            $data = $game->toArray(true);
+            $data['advisory_warnings'] = $game->advisoryWarnings();
+            $data['provenance_rows'] = $game->provenanceRows();
+            return $data;
+        }, $this->repository()->all(true));
+
+        return [
+            'read_only' => true,
+            'version' => '0.2.0',
+            'manifest_url' => $this->publicRoute() . '/_manifest',
+            'route' => $this->publicRoute(),
+            'storage' => [
+                'games_path' => (string)($config['storage']['games_path'] ?? 'user://data/terpvault/games'),
+                'resolved_path' => $this->repository()->basePath(),
+            ],
+            'config' => [
+                'show_unpublished' => $this->showUnpublished(),
+                'admin2_enabled' => $this->admin2IntegrationEnabled(),
+                'player_engine' => (string)($config['player']['engine'] ?? 'parchment'),
+            ],
+            'formats' => $this->supportedFormats(),
+            'games' => $games,
         ];
     }
 
