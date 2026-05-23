@@ -13,7 +13,34 @@
 - Avoid Admin2 API endpoints until controller-style API integration is implemented.
 - Keep the page read-only: no editing, upload, delete, import, export, or file mutation.
 
-## Next build: package management
+## v0.2.1a metadata API
+
+- Register backend metadata API routes only when `admin.enable_admin2_page` is enabled.
+- Use controller method arrays, not Closure request handlers:
+  - `GET /terpvault/packages/{slug}/metadata`
+  - `PATCH /terpvault/packages/{slug}/metadata`
+- Restrict write permission to `admin.super` or `api.super` for the first backend milestone.
+- Edit only whitelisted `game.yaml` metadata fields.
+- Keep package slug/folder, story files, art paths, screenshots, helper Markdown paths, and player config read-only.
+- Preserve unknown YAML fields structurally by loading the whole manifest and merging only whitelisted paths.
+- Write `game.yaml` with a package-local lock, timestamped backup, same-directory temp file, and atomic rename.
+
+Manual DDEV/API test sketch:
+
+```bash
+curl -H "X-API-Token: $TOKEN" \
+  https://example.ddev.site/api/terpvault/packages/adventure/metadata
+
+curl -X PATCH \
+  -H "X-API-Token: $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"metadata":{"bibliographic":{"headline":"Updated from Admin2 API test"}}}' \
+  https://example.ddev.site/api/terpvault/packages/adventure/metadata
+```
+
+Adjust the API prefix if the local API plugin uses `/api/v1` or another configured route.
+
+## Next build: package management UI
 
 - Create new package folder.
 - Edit `game.yaml` fields.

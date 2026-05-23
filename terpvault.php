@@ -30,6 +30,22 @@ class TerpVaultPlugin extends Plugin
         ];
     }
 
+    public function autoload()
+    {
+        spl_autoload_register(static function (string $class): void {
+            $prefix = 'Grav\\Plugin\\TerpVault\\';
+            if (strpos($class, $prefix) !== 0) {
+                return;
+            }
+
+            $relative = substr($class, strlen($prefix));
+            $file = __DIR__ . '/classes/' . str_replace('\\', '/', $relative) . '.php';
+            if (is_file($file)) {
+                require_once $file;
+            }
+        });
+    }
+
     public function onPluginsInitialized(): void
     {
         if (!$this->config->get('plugins.terpvault.enabled')) {
@@ -48,13 +64,14 @@ class TerpVaultPlugin extends Plugin
             ];
         }
 
-        // Admin2 discovers plugin pages through API events whose URI shape can
-        // vary by Admin2/API version. Once the explicit opt-in flag is enabled,
-        // subscribe to those read-only discovery events and let the event type
-        // provide the Admin2/API boundary. Frontend virtual routing is still
-        // guarded separately by isFrontendRequest().
+        // Admin2 discovers plugin pages and API routes through events whose URI
+        // shape can vary by Admin2/API version. Once the explicit opt-in flag is
+        // enabled, subscribe to those Admin2/API events and let the event type
+        // provide the boundary. Frontend virtual routing is still guarded
+        // separately by isFrontendRequest().
         if ($this->admin2IntegrationEnabled()) {
             $events += [
+                'onApiRegisterRoutes' => ['onApiRegisterRoutes', 0],
                 'onApiSidebarItems' => ['onApiSidebarItems', 0],
                 'onApiPluginPageInfo' => ['onApiPluginPageInfo', 0],
             ];
@@ -236,14 +253,23 @@ class TerpVaultPlugin extends Plugin
         ];
     }
 
-    /**
-     * Admin2/API routes are intentionally disabled until they are wired through
-     * a Grav 2/Admin2 controller-style integration. Do not pass Closure handlers
-     * to the API route collector.
-     */
     public function onApiRegisterRoutes(Event $event): void
     {
-        return;
+        if (!$this->admin2IntegrationEnabled()) {
+            return;
+        }
+
+        require_once __DIR__ . '/classes/Service/PackageMetadataService.php';
+        require_once __DIR__ . '/classes/Controller/ApiController.php';
+
+        $routes = $event['routes'] ?? null;
+        if (!$routes) {
+            return;
+        }
+
+        $controller = \Grav\Plugin\TerpVault\Controller\ApiController::class;
+        $routes->get('/terpvault/packages/{slug}/metadata', [$controller, 'metadata']);
+        $routes->patch('/terpvault/packages/{slug}/metadata', [$controller, 'updateMetadata']);
     }
 
     public function twigGames(bool $includeUnpublished = false): array

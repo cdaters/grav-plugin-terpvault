@@ -1,3 +1,22 @@
+# v0.2.1a
+
+## 05/22/2026
+
+1. New
+    - Added backend-only Admin2/API metadata routes for existing package `game.yaml` files.
+    - Added controller-style `GET /terpvault/packages/{slug}/metadata` and `PATCH /terpvault/packages/{slug}/metadata` handlers.
+    - Added a package metadata service with strict slug validation, base-path containment checks, whitelisted metadata merging, timestamped backups, lock-file coordination, same-directory temp writes, and atomic rename.
+
+2. Security
+    - Metadata API routes are registered only when `admin.enable_admin2_page` is enabled.
+    - Metadata API access is limited to users with `admin.super` or `api.super`.
+    - Package slug/folder names, story files, cover art, screenshots, helper Markdown paths, player config, imports, exports, uploads, deletes, and package creation remain read-only/out of scope.
+
+3. Notes
+    - No Admin2 edit UI was added in this backend-only pass.
+    - No Closure request handlers were added to API route registration.
+    - Public routes and Parchment/player behavior remain unchanged.
+
 # v0.2.0
 
 ## 05/22/2026
