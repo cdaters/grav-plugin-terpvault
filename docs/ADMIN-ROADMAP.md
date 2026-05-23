@@ -126,10 +126,34 @@ Editable fields:
 - Allow replacing a registered screenshot file through the existing `POST /terpvault/packages/{slug}/media/screenshot` route with a replacement path or index.
 - Keep story-file upload, arbitrary file browsing, package delete, package import/export, `metadata.iFiction.xml` editing, and player config editing out of scope.
 
+## v0.2.6 Story File Manager Lite
+
+- Add limited package-local playable story-file replacement to the existing Admin2 package editor.
+- Register controller-style routes only when `admin.enable_admin2_page` is enabled:
+  - `GET /terpvault/packages/{slug}/story`
+  - `POST /terpvault/packages/{slug}/story`
+- Show current `resources.story_file`, existence, extension, and size.
+- Allow one uploaded story file with an allowlisted extension:
+  - `z3`
+  - `z4`
+  - `z5`
+  - `z6`
+  - `z7`
+  - `z8`
+  - `zblorb`
+  - `zlb`
+  - `ulx`
+  - `gblorb`
+  - `glb`
+  - `t3`
+- Normalize uploaded story filenames to safe lowercase package-local names.
+- Back up the existing registered story file when present before changing `resources.story_file`.
+- Preserve unknown `game.yaml` fields when updating `resources.story_file`.
+- Keep package delete, package import/export, arbitrary file browsing, `metadata.iFiction.xml` editing, and player behavior out of scope.
+
 ## Next build: package management UI
 
 - Create new package folder.
-- Upload/replace story file.
 - Import package zip with macOS cruft stripping.
 - Export package zip.
 

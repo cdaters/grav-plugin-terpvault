@@ -1,3 +1,20 @@
+# v0.2.6
+
+## 05/22/2026
+
+1. New
+    - Added a limited opt-in Admin2 Story File Manager Lite for existing packages.
+    - Added controller-style `GET /terpvault/packages/{slug}/story` and `POST /terpvault/packages/{slug}/story` handlers.
+    - Added an Admin2 Story File section showing current `resources.story_file`, existence, extension, and size.
+    - Added a single package-local story-file replacement upload control.
+
+2. Safety
+    - Story uploads are limited to `z3`, `z4`, `z5`, `z6`, `z7`, `z8`, `zblorb`, `zlb`, `ulx`, `gblorb`, `glb`, and `t3`.
+    - Uploaded story filenames are normalized to lowercase URL-safe package-local names.
+    - Existing registered story files are backed up when present before `resources.story_file` is changed.
+    - Story-file writes use same-directory temp files and atomic rename, then update only `resources.story_file` with unknown `game.yaml` fields preserved.
+    - Package delete, import/export, arbitrary file browsing, `metadata.iFiction.xml`, and player behavior remain out of scope.
+
 # v0.2.5
 
 ## 05/22/2026

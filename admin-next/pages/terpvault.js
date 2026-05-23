@@ -36,6 +36,16 @@ class TerpVaultPage extends HTMLElement {
           error: '',
           success: '',
           resources: null
+        },
+        story: {
+          loading: false,
+          saving: false,
+          error: '',
+          success: '',
+          story_file: '',
+          exists: false,
+          extension: '',
+          size: 0
         }
       }
     };
@@ -204,6 +214,7 @@ class TerpVaultPage extends HTMLElement {
         .helper-docs { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .helper-tabs { display:flex; flex-wrap:wrap; gap:.45rem; margin:.7rem 0; }
         .helper-tabs .button[aria-selected="true"] { border-color:rgba(93,164,255,.72); background:rgba(93,164,255,.18); }
+        .story-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .media-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .media-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:.75rem; margin:.75rem 0; }
         .media-card { border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.65rem; background:rgba(127,127,127,.035); }
@@ -476,6 +487,10 @@ class TerpVaultPage extends HTMLElement {
       form.addEventListener('submit', event => this._uploadMedia(event));
     });
 
+    root.querySelectorAll('form[data-story-slug]').forEach(form => {
+      form.addEventListener('submit', event => this._uploadStory(event));
+    });
+
     root.querySelectorAll('[data-action="screenshot-remove"]').forEach(button => {
       button.addEventListener('click', () => this._removeScreenshot(button.dataset.slug || '', Number(button.dataset.index || -1)));
     });
@@ -502,7 +517,8 @@ class TerpVaultPage extends HTMLElement {
       readOnly: this._readOnlyFromGame(game || {}),
       activeHelper: 'how-to-play',
       helper: this._emptyHelperState('how-to-play'),
-      media: this._mediaFromGame(game || {})
+      media: this._mediaFromGame(game || {}),
+      story: this._storyFromGame(game || {})
     };
     localStorage.setItem(`terpvault.admin.open.${slug}`, '1');
     this._renderLibrary();
@@ -524,6 +540,7 @@ class TerpVaultPage extends HTMLElement {
     }
 
     await this._loadHelperDoc(slug, this.state.editor.activeHelper, false);
+    await this._loadStory(slug, false);
     await this._loadMedia(slug, false);
     this._renderLibrary();
   }
@@ -540,7 +557,8 @@ class TerpVaultPage extends HTMLElement {
       readOnly: null,
       activeHelper: 'how-to-play',
       helper: this._emptyHelperState('how-to-play'),
-      media: this._emptyMediaState()
+      media: this._emptyMediaState(),
+      story: this._emptyStoryState()
     };
     this._renderLibrary();
   }
@@ -694,6 +712,107 @@ class TerpVaultPage extends HTMLElement {
           saving: false,
           error: error.message || String(error),
           content
+        }
+      };
+    }
+
+    this._renderLibrary();
+  }
+
+  async _loadStory(slug, render = true) {
+    if (!slug) {
+      return;
+    }
+
+    this.state.editor = {
+      ...this.state.editor,
+      story: {
+        ...(this.state.editor.story || this._emptyStoryState()),
+        loading: true,
+        error: '',
+        success: ''
+      }
+    };
+
+    if (render) {
+      this._renderLibrary();
+    }
+
+    try {
+      const data = await this._requestJson(this._storyApiUrl(slug), { method: 'GET' });
+      this.state.editor = {
+        ...this.state.editor,
+        story: this._storyFromApi(data, this._findGame(slug) || {})
+      };
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        story: {
+          ...(this.state.editor.story || this._emptyStoryState()),
+          loading: false,
+          error: `Story API unavailable: ${error.message || error}`
+        }
+      };
+    }
+
+    if (render) {
+      this._renderLibrary();
+    }
+  }
+
+  async _uploadStory(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const slug = form.dataset.storySlug || this.state.editingSlug;
+    const input = form.querySelector('input[type="file"]');
+    const file = input?.files?.[0];
+    if (!file) {
+      this.state.editor = {
+        ...this.state.editor,
+        story: {
+          ...(this.state.editor.story || this._emptyStoryState()),
+          error: 'Choose a story file before uploading.',
+          success: ''
+        }
+      };
+      this._renderLibrary();
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.state.editor = {
+      ...this.state.editor,
+      story: {
+        ...(this.state.editor.story || this._emptyStoryState()),
+        saving: true,
+        error: '',
+        success: ''
+      }
+    };
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._storyApiUrl(slug), {
+        method: 'POST',
+        body: formData
+      });
+      this.state.editor = {
+        ...this.state.editor,
+        story: {
+          ...this._storyFromApi(data, this._findGame(slug) || {}),
+          success: 'Story file uploaded and game.yaml updated. Existing story file data was backed up when present.'
+        }
+      };
+      await this._reloadManifest();
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        story: {
+          ...(this.state.editor.story || this._emptyStoryState()),
+          saving: false,
+          error: error.message || String(error)
         }
       };
     }
@@ -955,9 +1074,40 @@ class TerpVaultPage extends HTMLElement {
             <button class="button primary" type="submit" ${editor.loading || editor.saving ? 'disabled' : ''}>${editor.saving ? 'Saving...' : 'Save Metadata'}</button>
           </div>
         </form>
+        ${this._storyPanel(game, slug)}
         ${this._mediaPanel(game, slug)}
         ${this._helperDocsPanel(slug)}
       </div>
+    `;
+  }
+
+  _storyPanel(game, slug) {
+    const story = this.state.editor.story || this._storyFromGame(game);
+    const size = story.size ? this._formatBytes(story.size) : 'Unknown';
+    return `
+      <section class="story-manager">
+        <h3>Story File</h3>
+        <p class="meta">Replacing the story file may affect playability. The existing registered story file will be backed up when present.</p>
+        ${story.loading ? '<div class="message">Loading story file info...</div>' : ''}
+        ${story.error ? `<div class="message error">${this._esc(story.error)}</div>` : ''}
+        ${story.success ? `<div class="message success">${this._esc(story.success)}</div>` : ''}
+        <dl>
+          <dt>Path</dt><dd><code>${this._esc(story.story_file || 'Not recorded')}</code></dd>
+          <dt>Exists</dt><dd>${story.exists ? 'Yes' : 'No'}</dd>
+          <dt>Extension</dt><dd><code>${this._esc(story.extension || 'Unknown')}</code></dd>
+          <dt>Size</dt><dd>${this._esc(size)}</dd>
+        </dl>
+        <form data-story-slug="${this._esc(slug)}">
+          <div class="field">
+            <label>Replace Story File</label>
+            <input type="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.t3" ${story.loading || story.saving ? 'disabled' : ''}>
+            <span class="meta">Allowed: z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, t3. Archives, scripts, HTML, SVG, and arbitrary files are not accepted.</span>
+          </div>
+          <div class="form-actions">
+            <button class="button primary" type="submit" ${story.loading || story.saving ? 'disabled' : ''}>${story.saving ? 'Uploading...' : 'Upload Story File'}</button>
+          </div>
+        </form>
+      </section>
     `;
   }
 
@@ -1238,6 +1388,10 @@ class TerpVaultPage extends HTMLElement {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/media`;
   }
 
+  _storyApiUrl(slug) {
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/story`;
+  }
+
   _mediaUploadApiUrl(slug, type) {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/media/${encodeURIComponent(type)}`;
   }
@@ -1408,6 +1562,41 @@ class TerpVaultPage extends HTMLElement {
     };
   }
 
+  _emptyStoryState() {
+    return {
+      loading: false,
+      saving: false,
+      error: '',
+      success: '',
+      story_file: '',
+      exists: false,
+      extension: '',
+      size: 0
+    };
+  }
+
+  _storyFromApi(data, fallbackGame) {
+    const payload = this._unwrapApiResponse(data);
+    return {
+      ...this._emptyStoryState(),
+      story_file: payload.story_file || payload.relative_path || fallbackGame.story_file || '',
+      exists: Boolean(payload.exists),
+      extension: payload.extension || (fallbackGame.story_file ? String(fallbackGame.story_file).split('.').pop() : ''),
+      size: Number(payload.size || 0)
+    };
+  }
+
+  _storyFromGame(game = {}) {
+    const storyFile = game.story_file || game.resources?.story_file || '';
+    return {
+      ...this._emptyStoryState(),
+      story_file: storyFile,
+      exists: Boolean(game.has_story_file),
+      extension: storyFile ? String(storyFile).split('.').pop() : '',
+      size: 0
+    };
+  }
+
   _mediaFromApi(data, fallbackGame) {
     const payload = this._unwrapApiResponse(data);
     const resources = payload.resources || {};
@@ -1460,6 +1649,23 @@ class TerpVaultPage extends HTMLElement {
     }
 
     return value == null ? '' : String(value);
+  }
+
+  _formatBytes(value) {
+    const bytes = Number(value || 0);
+    if (!bytes) {
+      return '0 B';
+    }
+
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let size = bytes;
+    let unit = 0;
+    while (size >= 1024 && unit < units.length - 1) {
+      size /= 1024;
+      unit++;
+    }
+
+    return `${size.toFixed(unit === 0 ? 0 : 1)} ${units[unit]}`;
   }
 
   _renderFormats() {

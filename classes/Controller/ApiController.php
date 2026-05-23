@@ -11,6 +11,7 @@ use Grav\Plugin\Api\Response\ApiResponse;
 use Grav\Plugin\TerpVault\Service\PackageMarkdownService;
 use Grav\Plugin\TerpVault\Service\PackageMediaService;
 use Grav\Plugin\TerpVault\Service\PackageMetadataService;
+use Grav\Plugin\TerpVault\Service\PackageStoryService;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -32,6 +33,11 @@ class ApiController extends AbstractApiController
     private function mediaService(): PackageMediaService
     {
         return new PackageMediaService();
+    }
+
+    private function storyService(): PackageStoryService
+    {
+        return new PackageStoryService();
     }
 
     public function metadata(ServerRequestInterface $request): ResponseInterface
@@ -157,6 +163,38 @@ class ApiController extends AbstractApiController
 
         try {
             return ApiResponse::create($this->mediaService()->updateScreenshots($slug, $screenshots));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function story(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+
+        try {
+            return ApiResponse::create($this->storyService()->story($slug));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function uploadStory(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+        $upload = $this->firstUploadedFile($request->getUploadedFiles());
+        if (!$upload) {
+            throw new ValidationException('No story file was uploaded.');
+        }
+
+        try {
+            return ApiResponse::create($this->storyService()->upload($slug, $upload));
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         } catch (RuntimeException $e) {
