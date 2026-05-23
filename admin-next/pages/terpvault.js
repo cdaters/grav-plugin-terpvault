@@ -8,7 +8,17 @@ class TerpVaultPage extends HTMLElement {
       formats: {},
       status: null,
       source: 'loading',
-      activeTab: localStorage.getItem('terpvault.admin.tab') || 'library'
+      activeTab: localStorage.getItem('terpvault.admin.tab') || 'library',
+      editingSlug: null,
+      editor: {
+        slug: null,
+        loading: false,
+        saving: false,
+        error: '',
+        success: '',
+        values: null,
+        readOnly: null
+      }
     };
     this._renderSkeleton();
     this._load();
@@ -138,7 +148,9 @@ class TerpVaultPage extends HTMLElement {
         dt { opacity:.68; }
         dd { margin:0; overflow-wrap:anywhere; }
         .actions { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin-top:.8rem; }
-        a.button { display:inline-flex; border:1px solid rgba(127,127,127,.35); border-radius:999px; padding:.4rem .7rem; color:inherit; text-decoration:none; background:rgba(127,127,127,.08); }
+        .button { display:inline-flex; align-items:center; justify-content:center; border:1px solid rgba(127,127,127,.35); border-radius:999px; padding:.4rem .7rem; color:inherit; text-decoration:none; background:rgba(127,127,127,.08); font:inherit; line-height:1.2; cursor:pointer; }
+        .button.primary { border-color:rgba(93,164,255,.72); background:rgba(93,164,255,.18); }
+        .button:disabled { opacity:.58; cursor:not-allowed; }
         .warnings { display:grid; gap:.4rem; margin-top:.85rem; }
         .warning { border:1px solid rgba(127,127,127,.22); border-radius:10px; padding:.45rem .55rem; background:rgba(127,127,127,.04); }
         .warning.error { border-color: rgba(255,95,95,.7); }
@@ -148,6 +160,27 @@ class TerpVaultPage extends HTMLElement {
         .provenance-item { border:1px solid rgba(127,127,127,.2); border-radius:10px; padding:.55rem; }
         .provenance-item span { display:block; opacity:.68; font-size:.75rem; text-transform:uppercase; }
         .provenance-item a { color:inherit; overflow-wrap:anywhere; }
+        .editor { border-top:1px solid rgba(127,127,127,.18); padding:1rem; background:rgba(127,127,127,.035); }
+        .editor-head { display:flex; gap:.75rem; align-items:flex-start; justify-content:space-between; margin-bottom:.8rem; }
+        .editor-head h3 { margin:0 0 .15rem; }
+        .editor form { display:grid; gap:1rem; }
+        .fieldsets { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; }
+        fieldset { border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.8rem; margin:0; min-width:0; }
+        legend { padding:0 .25rem; font-weight:700; }
+        .field { display:grid; gap:.25rem; margin:.55rem 0; }
+        .field label, .checkbox label { font-weight:600; font-size:.84rem; }
+        input, textarea, select { width:100%; border:1px solid rgba(127,127,127,.35); border-radius:8px; padding:.48rem .55rem; background:rgba(127,127,127,.055); color:inherit; font:inherit; }
+        textarea { min-height:6rem; resize:vertical; }
+        textarea.short { min-height:4.2rem; }
+        .checkbox { display:flex; gap:.5rem; align-items:center; margin:.7rem 0 .25rem; }
+        .checkbox input { width:auto; }
+        .readonly { display:grid; gap:.35rem; margin-top:.35rem; }
+        .readonly div { display:grid; grid-template-columns:120px minmax(0,1fr); gap:.45rem; font-size:.86rem; }
+        .readonly span:first-child { opacity:.68; }
+        .message { border:1px solid rgba(127,127,127,.28); border-radius:10px; padding:.55rem .65rem; margin:.45rem 0; }
+        .message.error { border-color:rgba(255,95,95,.7); background:rgba(255,95,95,.1); }
+        .message.success { border-color:rgba(79,190,124,.58); background:rgba(79,190,124,.1); }
+        .form-actions { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; justify-content:flex-end; }
         code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.9em; }
         .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:.8rem; }
         @media (max-width: 820px) {
@@ -156,13 +189,15 @@ class TerpVaultPage extends HTMLElement {
           .badges { grid-column: 1 / -1; justify-content:flex-start; }
           .body { grid-template-columns: 1fr; }
           dl { grid-template-columns: 1fr; }
+          .editor-head { display:block; }
+          .readonly div { grid-template-columns:1fr; }
         }
       </style>
       <div class="tv-admin">
         <section class="hero">
           <h1>TerpVault Library Manager</h1>
-          <p>Read-only package inventory for installed TerpVault interactive-fiction packages.</p>
-          <p class="meta">v0.2.0 is opt-in and read-only. Editing, upload, delete, import, and export workflows are planned but not available yet.</p>
+          <p>Package inventory and metadata editor for installed TerpVault interactive-fiction packages.</p>
+          <p class="meta">v0.2.2 is opt-in. Only existing <code>game.yaml</code> metadata fields are editable; upload, delete, import, export, package creation, story files, artwork, helper Markdown, and player settings remain read-only.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -197,7 +232,7 @@ class TerpVaultPage extends HTMLElement {
       <div class="error">
         <h2>Package data unavailable</h2>
         <p>${this._esc(error?.message || 'The read-only package manifest could not be loaded.')}</p>
-        <p class="meta">No Admin2 API endpoint is registered in v0.2.0. The page uses embedded read-only data when Admin2 exposes it, otherwise it falls back to the public TerpVault manifest route.</p>
+        <p class="meta">The page uses embedded Admin2 data when available, otherwise it falls back to the public TerpVault manifest route. Metadata editing requires the v0.2.1 API routes.</p>
       </div>
     `;
     ['library', 'formats', 'settings'].forEach(id => {
@@ -213,7 +248,7 @@ class TerpVaultPage extends HTMLElement {
         <div class="empty">
           <h2>No game packages found</h2>
           <p>Create folders under <code>user/data/terpvault/games</code>, each with a <code>game.yaml</code>.</p>
-          <p class="meta">This page is read-only. Package creation and import are future Admin2 work.</p>
+          <p class="meta">Package creation and import are future Admin2 work.</p>
         </div>
       `;
       return;
@@ -224,7 +259,7 @@ class TerpVaultPage extends HTMLElement {
     root.innerHTML = `
       <div class="box notice">
         <strong>${games.length} package${games.length === 1 ? '' : 's'} found</strong>
-        <p class="meta">Read-only source: ${this._esc(this.state.source)}. Editing, upload, delete, import, and export are intentionally unavailable in v0.2.0.</p>
+        <p class="meta">Source: ${this._esc(this.state.source)}. Metadata edits use the Admin2 API when available. Upload, delete, import, export, and package creation are intentionally unavailable.</p>
         <div class="badges" style="justify-content:flex-start;margin-top:.5rem;">
           <span class="badge ${errors ? 'error' : 'ok'}">${errors} error${errors === 1 ? '' : 's'}</span>
           <span class="badge ${warnings ? 'warn' : 'ok'}">${warnings} warning${warnings === 1 ? '' : 's'}</span>
@@ -232,6 +267,7 @@ class TerpVaultPage extends HTMLElement {
       </div>
       ${games.map(game => this._gameRow(game)).join('')}
     `;
+    this._bindLibraryActions();
   }
 
   _gameRow(game) {
@@ -271,6 +307,7 @@ class TerpVaultPage extends HTMLElement {
           <div>
             ${this._metadata(game)}
             <div class="actions">
+              <button class="button primary" type="button" data-action="edit" data-slug="${this._esc(slug)}">${this.state.editingSlug === slug ? 'Edit Open' : 'Edit Metadata'}</button>
               ${urls.detail ? `<a class="button" href="${this._esc(urls.detail)}" target="_blank" rel="noopener">Public Detail</a>` : ''}
               ${urls.play ? `<a class="button" href="${this._esc(urls.play)}" target="_blank" rel="noopener">Public Play</a>` : ''}
               ${urls.story ? `<a class="button" href="${this._esc(urls.story)}" target="_blank" rel="noopener">Story File</a>` : ''}
@@ -282,6 +319,7 @@ class TerpVaultPage extends HTMLElement {
             ${this._provenance(game)}
           </div>
         </div>
+        ${this.state.editingSlug === slug ? this._editorPanel(game) : ''}
       </details>
     `;
   }
@@ -373,6 +411,511 @@ class TerpVaultPage extends HTMLElement {
     `;
   }
 
+  _bindLibraryActions() {
+    const root = this.shadowRoot.getElementById('library');
+    if (!root) {
+      return;
+    }
+
+    root.querySelectorAll('[data-action="edit"]').forEach(button => {
+      button.addEventListener('click', () => this._openEditor(button.dataset.slug || ''));
+    });
+
+    root.querySelectorAll('[data-action="cancel-edit"]').forEach(button => {
+      button.addEventListener('click', () => this._closeEditor());
+    });
+
+    root.querySelectorAll('form[data-editor-slug]').forEach(form => {
+      form.addEventListener('submit', event => this._saveEditor(event));
+    });
+  }
+
+  async _openEditor(slug) {
+    if (!slug) {
+      return;
+    }
+
+    const game = this._findGame(slug);
+    this.state.editingSlug = slug;
+    this.state.editor = {
+      slug,
+      loading: true,
+      saving: false,
+      error: '',
+      success: '',
+      values: this._editableFromGame(game || {}),
+      readOnly: this._readOnlyFromGame(game || {})
+    };
+    localStorage.setItem(`terpvault.admin.open.${slug}`, '1');
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._metadataApiUrl(slug), { method: 'GET' });
+      this.state.editor = {
+        ...this.state.editor,
+        loading: false,
+        values: this._editableFromApi(data, game || {}),
+        readOnly: this._readOnlyFromApi(data, game || {})
+      };
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        loading: false,
+        error: `Metadata API unavailable: ${error.message || error}`
+      };
+    }
+
+    this._renderLibrary();
+  }
+
+  _closeEditor() {
+    this.state.editingSlug = null;
+    this.state.editor = {
+      slug: null,
+      loading: false,
+      saving: false,
+      error: '',
+      success: '',
+      values: null,
+      readOnly: null
+    };
+    this._renderLibrary();
+  }
+
+  async _saveEditor(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const slug = form.dataset.editorSlug || this.state.editingSlug;
+    const metadata = this._collectEditorValues(form);
+
+    this.state.editor = {
+      ...this.state.editor,
+      slug,
+      saving: true,
+      error: '',
+      success: '',
+      values: metadata
+    };
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._metadataApiUrl(slug), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ metadata })
+      });
+      this.state.editor = {
+        ...this.state.editor,
+        saving: false,
+        success: 'Metadata saved. A package-local backup was created before writing.',
+        values: this._editableFromApi(data, this._findGame(slug) || {}),
+        readOnly: this._readOnlyFromApi(data, this._findGame(slug) || {})
+      };
+      await this._reloadManifest();
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        saving: false,
+        error: error.message || String(error),
+        values: metadata
+      };
+    }
+
+    this._renderLibrary();
+  }
+
+  async _reloadManifest() {
+    try {
+      const data = await this._requestJson(this._manifestUrl(), { method: 'GET' });
+      this.state.games = Array.isArray(data.games) ? data.games : [];
+      this.state.formats = data.formats || this._fallbackFormats();
+      this.state.status = data;
+      this.state.source = 'public read-only manifest';
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        error: this.state.editor.error || `Saved, but the package manifest could not be refreshed: ${error.message || error}`
+      };
+    }
+  }
+
+  _editorPanel(game) {
+    const editor = this.state.editor || {};
+    const values = editor.values || this._editableFromGame(game);
+    const readOnly = editor.readOnly || this._readOnlyFromGame(game);
+    const slug = editor.slug || game.slug || '';
+
+    return `
+      <div class="editor">
+        <div class="editor-head">
+          <div>
+            <h3>Edit Metadata</h3>
+            <p class="meta">Only whitelisted <code>game.yaml</code> metadata fields are writable. Package files, assets, helper Markdown, and player settings are display-only.</p>
+          </div>
+          <button class="button" type="button" data-action="cancel-edit">Close</button>
+        </div>
+        ${editor.loading ? '<div class="message">Loading editable metadata from the Admin2 API...</div>' : ''}
+        ${editor.error ? `<div class="message error">${this._esc(editor.error)}</div>` : ''}
+        ${editor.success ? `<div class="message success">${this._esc(editor.success)}</div>` : ''}
+        <form data-editor-slug="${this._esc(slug)}">
+          <div class="fieldsets">
+            <fieldset>
+              <legend>Bibliographic</legend>
+              ${this._input('Title', 'bibliographic.title', values)}
+              ${this._input('Author', 'bibliographic.author', values)}
+              ${this._input('Headline', 'bibliographic.headline', values)}
+              ${this._input('First published', 'bibliographic.first_published', values)}
+              ${this._input('Genre', 'bibliographic.genre', values)}
+              ${this._input('Language', 'bibliographic.language', values)}
+              ${this._textarea('Description', 'bibliographic.description', values)}
+            </fieldset>
+            <fieldset>
+              <legend>Identification</legend>
+              ${this._select('Format', 'identification.format', values, [
+                ['', 'Unspecified'],
+                ['zcode', 'Z-code'],
+                ['glulx', 'Glulx'],
+                ['tads2', 'TADS 2'],
+                ['tads3', 'TADS 3'],
+                ['hugo', 'Hugo'],
+                ['adrift', 'ADRIFT']
+              ])}
+              ${this._textarea('IFIDs', 'identification.ifids', values, 'short', 'One IFID per line, or comma-separated.')}
+            </fieldset>
+            <fieldset>
+              <legend>Catalog</legend>
+              ${this._input('IFDB TUID', 'catalog.ifdb.tuid', values)}
+              ${this._input('IFDB URL', 'catalog.ifdb.url', values)}
+              ${this._input('IFWiki URL', 'catalog.ifwiki.url', values)}
+              ${this._input('IF Archive path', 'catalog.ifarchive.path', values)}
+              ${this._input('IF Archive URL', 'catalog.ifarchive.url', values)}
+            </fieldset>
+            <fieldset>
+              <legend>Release & Provenance</legend>
+              ${this._input('License name', 'release.license.name', values)}
+              ${this._input('License URL', 'release.license.url', values)}
+              ${this._textarea('License notes', 'release.license.notes', values, 'short')}
+              ${this._input('Source URL', 'release.source.url', values)}
+              ${this._input('Source retrieved', 'release.source.retrieved', values)}
+              ${this._textarea('Source notes', 'release.source.notes', values, 'short')}
+            </fieldset>
+            <fieldset>
+              <legend>TerpVault</legend>
+              ${this._select('Status', 'terpvault.status', values, [['draft', 'Draft'], ['published', 'Published']])}
+              <div class="checkbox">
+                <input id="tv-featured-${this._esc(slug)}" type="checkbox" name="terpvault.featured" ${this._get(values, 'terpvault.featured') ? 'checked' : ''}>
+                <label for="tv-featured-${this._esc(slug)}">Featured</label>
+              </div>
+              ${this._textarea('Tags', 'terpvault.tags', values, 'short', 'One tag per line, or comma-separated.')}
+            </fieldset>
+            <fieldset>
+              <legend>Read-only package files</legend>
+              ${this._readOnlyList(readOnly)}
+            </fieldset>
+          </div>
+          <div class="form-actions">
+            <button class="button" type="button" data-action="cancel-edit">Cancel</button>
+            <button class="button primary" type="submit" ${editor.loading || editor.saving ? 'disabled' : ''}>${editor.saving ? 'Saving...' : 'Save Metadata'}</button>
+          </div>
+        </form>
+      </div>
+    `;
+  }
+
+  _input(label, path, values) {
+    return `
+      <div class="field">
+        <label>${this._esc(label)}</label>
+        <input type="text" name="${this._esc(path)}" value="${this._esc(this._get(values, path) || '')}">
+      </div>
+    `;
+  }
+
+  _textarea(label, path, values, className = '', help = '') {
+    const value = this._asText(this._get(values, path));
+    return `
+      <div class="field">
+        <label>${this._esc(label)}</label>
+        <textarea class="${this._esc(className)}" name="${this._esc(path)}">${this._esc(value)}</textarea>
+        ${help ? `<span class="meta">${this._esc(help)}</span>` : ''}
+      </div>
+    `;
+  }
+
+  _select(label, path, values, options) {
+    const value = String(this._get(values, path) || '');
+    return `
+      <div class="field">
+        <label>${this._esc(label)}</label>
+        <select name="${this._esc(path)}">
+          ${options.map(([optionValue, optionLabel]) => `<option value="${this._esc(optionValue)}" ${value === optionValue ? 'selected' : ''}>${this._esc(optionLabel)}</option>`).join('')}
+        </select>
+      </div>
+    `;
+  }
+
+  _readOnlyList(readOnly) {
+    const rows = [
+      ['Slug', readOnly.slug],
+      ['Story file', readOnly.story_file],
+      ['Cover', readOnly.cover],
+      ['Small cover', readOnly.small_cover],
+      ['Screenshots', this._asText(readOnly.screenshots)],
+      ['How-to-play', readOnly.how_to_play],
+      ['Hints', readOnly.hints],
+      ['Walkthrough', readOnly.walkthrough],
+      ['Player', readOnly.player]
+    ].filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== '');
+
+    if (!rows.length) {
+      return '<p class="meta">No read-only package file paths were exposed by the manifest.</p>';
+    }
+
+    return `<div class="readonly">${rows.map(([label, value]) => `<div><span>${this._esc(label)}</span><code>${this._esc(value)}</code></div>`).join('')}</div>`;
+  }
+
+  _collectEditorValues(form) {
+    const metadata = {};
+    new FormData(form).forEach((value, path) => {
+      this._set(metadata, path, String(value));
+    });
+
+    this._set(metadata, 'terpvault.featured', form.querySelector('[name="terpvault.featured"]')?.checked || false);
+    return metadata;
+  }
+
+  _editableFromApi(data, fallbackGame) {
+    const payload = this._unwrapApiResponse(data);
+    const editable = payload.editable || {};
+    if (Object.keys(editable).length) {
+      return editable;
+    }
+
+    return this._editableFromGame(fallbackGame);
+  }
+
+  _editableFromGame(game = {}) {
+    const license = game.release?.license || game.license || {};
+    const source = game.release?.source || game.source || {};
+    return {
+      bibliographic: {
+        title: game.bibliographic?.title || game.title || '',
+        author: game.bibliographic?.author || game.author || '',
+        headline: game.bibliographic?.headline || game.tagline || '',
+        first_published: game.bibliographic?.first_published || game.year || '',
+        genre: game.bibliographic?.genre || game.genre || '',
+        language: game.bibliographic?.language || game.language || '',
+        description: game.bibliographic?.description || game.description || ''
+      },
+      identification: {
+        format: game.identification?.format || game.format || '',
+        ifids: game.identification?.ifids || game.ifids || []
+      },
+      catalog: {
+        ifdb: {
+          tuid: game.catalog?.ifdb?.tuid || '',
+          url: game.catalog?.ifdb?.url || ''
+        },
+        ifwiki: {
+          url: game.catalog?.ifwiki?.url || ''
+        },
+        ifarchive: {
+          path: game.catalog?.ifarchive?.path || '',
+          url: game.catalog?.ifarchive?.url || ''
+        }
+      },
+      release: {
+        license: {
+          name: license.name || '',
+          url: license.url || '',
+          notes: license.notes || ''
+        },
+        source: {
+          url: source.url || '',
+          retrieved: source.retrieved || '',
+          notes: source.notes || ''
+        }
+      },
+      terpvault: {
+        status: game.terpvault?.status || game.status || 'draft',
+        featured: Boolean(game.terpvault?.featured || game.featured),
+        tags: game.terpvault?.tags || game.tags || []
+      }
+    };
+  }
+
+  _readOnlyFromApi(data, fallbackGame) {
+    const payload = this._unwrapApiResponse(data);
+    const metadata = payload.metadata || {};
+    const resources = metadata.resources || {};
+    return {
+      ...this._readOnlyFromGame(fallbackGame),
+      slug: payload.slug || fallbackGame.slug || '',
+      story_file: resources.story_file || fallbackGame.story_file || '',
+      cover: resources.cover || fallbackGame.cover || '',
+      small_cover: resources.small_cover || fallbackGame.small_cover || '',
+      screenshots: resources.screenshots || fallbackGame.screenshots || [],
+      how_to_play: resources.how_to_play || fallbackGame.how_to_play || '',
+      hints: resources.hints || fallbackGame.hints || '',
+      walkthrough: resources.walkthrough || fallbackGame.walkthrough || '',
+      player: metadata.player?.engine || fallbackGame.player_engine || fallbackGame.player || ''
+    };
+  }
+
+  _readOnlyFromGame(game = {}) {
+    return {
+      slug: game.slug || '',
+      story_file: game.story_file || game.resources?.story_file || '',
+      cover: game.cover || game.resources?.cover || '',
+      small_cover: game.small_cover || game.resources?.small_cover || '',
+      screenshots: game.screenshots || game.resources?.screenshots || [],
+      how_to_play: game.how_to_play || game.resources?.how_to_play || '',
+      hints: game.hints || game.resources?.hints || '',
+      walkthrough: game.walkthrough || game.resources?.walkthrough || '',
+      player: game.player_engine || game.player?.engine || ''
+    };
+  }
+
+  _metadataApiUrl(slug) {
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/metadata`;
+  }
+
+  _apiBase() {
+    const explicit = [
+      window.__TERPVAULT_API_BASE,
+      window.__GRAV_API_BASE,
+      window.__GRAV_API_URL,
+      window.GravAdmin?.config?.api_url,
+      window.GravAdmin?.config?.api_base
+    ].find(Boolean);
+    const versionPrefix = [
+      window.__GRAV_API_VERSION_PREFIX,
+      window.GravAdmin?.config?.api_version_prefix,
+      window.GravAdmin?.config?.api?.version_prefix
+    ].find(Boolean);
+
+    if (explicit) {
+      const base = this._withApiVersion(String(explicit).replace(/\/+$/g, ''), versionPrefix);
+      if (/^https?:\/\//i.test(base)) {
+        return base;
+      }
+      return `${this._siteBase()}/${base.replace(/^\/+|\/+$/g, '')}`.replace(/([^:]\/)\/+/g, '$1').replace(/\/+$/g, '');
+    }
+
+    const prefix = [
+      window.__GRAV_API_PREFIX,
+      window.GravAdmin?.config?.api_prefix,
+      window.GravAdmin?.config?.api?.prefix
+    ].find(Boolean) || '/api/v1';
+    const normalizedPrefix = this._withApiVersion(String(prefix), versionPrefix);
+
+    if (/^https?:\/\//i.test(normalizedPrefix)) {
+      return normalizedPrefix.replace(/\/+$/g, '');
+    }
+
+    return `${this._siteBase()}/${normalizedPrefix.replace(/^\/+|\/+$/g, '')}`.replace(/([^:]\/)\/+/g, '$1').replace(/\/+$/g, '');
+  }
+
+  _withApiVersion(base, versionPrefix) {
+    if (!versionPrefix) {
+      return base;
+    }
+
+    const version = String(versionPrefix).replace(/^\/+|\/+$/g, '');
+    if (!version || new RegExp(`/${version}$`).test(base)) {
+      return base;
+    }
+
+    return `${base.replace(/\/+$/g, '')}/${version}`;
+  }
+
+  async _requestJson(url, options = {}) {
+    const headers = {
+      Accept: 'application/json',
+      ...this._apiAuthHeaders(),
+      ...(options.headers || {})
+    };
+
+    const response = await fetch(url, {
+      credentials: 'include',
+      ...options,
+      headers
+    });
+    const text = await response.text();
+    const json = text ? this._parseJson(text) : {};
+    if (!response.ok) {
+      const payload = this._unwrapApiResponse(json);
+      throw new Error(payload.message || payload.error || text || `HTTP ${response.status}`);
+    }
+
+    return this._unwrapApiResponse(json);
+  }
+
+  _apiAuthHeaders() {
+    const headers = {};
+    const token = window.__GRAV_API_TOKEN || window.GravAdmin?.config?.api_token || window.GravAdmin?.config?.token;
+    if (token) {
+      headers['X-API-Token'] = token;
+    }
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('grav_admin_auth') || '{}');
+      if (stored?.access_token && !headers['X-API-Token']) {
+        headers['X-API-Token'] = stored.access_token;
+      }
+      if (stored?.environment) {
+        headers['X-Grav-Environment'] = stored.environment;
+      }
+    } catch (e) {}
+
+    return headers;
+  }
+
+  _unwrapApiResponse(data) {
+    if (data && typeof data === 'object' && data.data && typeof data.data === 'object') {
+      return data.data;
+    }
+
+    return data || {};
+  }
+
+  _parseJson(text) {
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      return { message: text };
+    }
+  }
+
+  _findGame(slug) {
+    return (this.state.games || []).find(game => game.slug === slug);
+  }
+
+  _get(object, path) {
+    return String(path).split('.').reduce((value, key) => (value && value[key] !== undefined ? value[key] : ''), object || {});
+  }
+
+  _set(object, path, value) {
+    const keys = String(path).split('.');
+    let target = object;
+    keys.forEach((key, index) => {
+      if (index === keys.length - 1) {
+        target[key] = value;
+        return;
+      }
+      target[key] = target[key] && typeof target[key] === 'object' ? target[key] : {};
+      target = target[key];
+    });
+  }
+
+  _asText(value) {
+    if (Array.isArray(value)) {
+      return value.join('\n');
+    }
+
+    return value == null ? '' : String(value);
+  }
+
   _renderFormats() {
     const root = this.shadowRoot.getElementById('formats');
     const formats = this.state.formats || this._fallbackFormats();
@@ -386,7 +929,7 @@ class TerpVaultPage extends HTMLElement {
         `).join('')}
       </div>
       <div class="box" style="margin-top:.8rem;">
-        <strong>Read-only in v0.2.0</strong>
+        <strong>Format support is read-only</strong>
         <p class="meta">Format support is inferred from package metadata and story-file extensions. Upload and conversion workflows are future work.</p>
       </div>
     `;
@@ -409,7 +952,7 @@ class TerpVaultPage extends HTMLElement {
           <dt>Player</dt><dd><code>${this._esc(config.player_engine || 'parchment')}</code></dd>
           <dt>Show unpublished</dt><dd>${config.show_unpublished ? 'Yes' : 'No'}</dd>
         </dl>
-        <p class="meta">General plugin settings still live in Plugins -> TerpVault. Admin2 editing, imports, exports, uploads, and deletes are planned for later versions.</p>
+        <p class="meta">General plugin settings still live in Plugins -> TerpVault. This page can edit existing package metadata only; imports, exports, uploads, deletes, package creation, and player settings are planned for later versions.</p>
       </div>
     `;
   }

@@ -1,3 +1,17 @@
+# v0.2.2
+
+## 05/22/2026
+
+1. New
+    - Added the first opt-in Admin2 metadata editor UI for existing TerpVault package `game.yaml` manifests.
+    - Added per-package Edit Metadata actions that load the v0.2.1 metadata API, show whitelisted editable fields, and PATCH updates back to `/api/v1/terpvault/packages/{slug}/metadata`.
+    - Added read-only display for package slug, story file, cover art, screenshots, helper Markdown paths, and player settings inside the editor.
+
+2. Safety
+    - The editor preserves unsaved form values when API saves fail.
+    - Upload, delete, import, export, package creation, story-file edits, artwork edits, helper Markdown edits, and player settings remain out of scope.
+    - Public routing and Parchment/player behavior remain unchanged.
+
 # v0.2.1a
 
 ## 05/22/2026

@@ -40,10 +40,45 @@ curl -X PATCH \
 
 Adjust the API prefix if the local API plugin uses `/api/v1` or another configured route.
 
+## v0.2.2 metadata editor UI
+
+- Add per-package Edit Metadata actions to the opt-in Admin2 Library Manager.
+- Load editable package metadata from `GET /api/v1/terpvault/packages/{slug}/metadata`.
+- Save only whitelisted `game.yaml` fields with `PATCH /api/v1/terpvault/packages/{slug}/metadata`.
+- Keep slug/folder, story-file paths, artwork paths, screenshots, helper Markdown paths, and player settings display-only.
+- Preserve unsaved form values when a save fails.
+- Refresh the read-only manifest after a successful save when the public manifest endpoint is available.
+- Keep Admin2 Library Manager disabled by default until the workflow has broader field testing.
+
+Editable fields:
+
+- `bibliographic.title`
+- `bibliographic.author`
+- `bibliographic.headline`
+- `bibliographic.first_published`
+- `bibliographic.genre`
+- `bibliographic.language`
+- `bibliographic.description`
+- `identification.format`
+- `identification.ifids`
+- `catalog.ifdb.tuid`
+- `catalog.ifdb.url`
+- `catalog.ifwiki.url`
+- `catalog.ifarchive.path`
+- `catalog.ifarchive.url`
+- `release.license.name`
+- `release.license.url`
+- `release.license.notes`
+- `release.source.url`
+- `release.source.retrieved`
+- `release.source.notes`
+- `terpvault.status`
+- `terpvault.featured`
+- `terpvault.tags`
+
 ## Next build: package management UI
 
 - Create new package folder.
-- Edit `game.yaml` fields.
 - Upload/replace story file.
 - Upload/replace cover and small-cover art.
 - Upload screenshots.
