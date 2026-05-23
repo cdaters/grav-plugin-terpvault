@@ -143,6 +143,26 @@ class ApiController extends AbstractApiController
         }
     }
 
+    public function commitImport(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $body = $request->getParsedBody();
+        $fields = is_array($body) ? $body : [];
+        $slug = (string)($fields['slug'] ?? '');
+        $upload = $this->firstUploadedFile($request->getUploadedFiles());
+        if (!$upload) {
+            throw new ValidationException('No TerpVault package zip was uploaded.');
+        }
+
+        try {
+            return ApiResponse::create($this->importService()->commit($upload, $slug));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
     public function updateMetadata(ServerRequestInterface $request): ResponseInterface
     {
         $this->requireAdminApiSuper($request);

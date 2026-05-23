@@ -19,8 +19,12 @@ class TerpVaultPage extends HTMLElement {
       importInspect: {
         open: false,
         saving: false,
+        committing: false,
         error: '',
-        report: null
+        success: '',
+        report: null,
+        file: null,
+        finalSlug: ''
       },
       export: {
         slug: '',
@@ -275,7 +279,7 @@ class TerpVaultPage extends HTMLElement {
         <section class="hero">
           <h1>TerpVault Library Manager</h1>
           <p>Package inventory, package creation, metadata editing, helper Markdown editing, media management, screenshot ordering, and story-file replacement for installed TerpVault interactive-fiction packages.</p>
-          <p class="meta">v0.2.9 is opt-in. Package export and import inspection are available. Package delete, import install, arbitrary file browsing, player settings editing, and <code>metadata.iFiction.xml</code> editing are not available.</p>
+          <p class="meta">v0.3.0 is opt-in. Package export, import inspection, and draft-only import install are available. Package delete, overwrite, arbitrary file browsing, player settings editing, and <code>metadata.iFiction.xml</code> editing are not available.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -345,7 +349,7 @@ class TerpVaultPage extends HTMLElement {
         <div class="editor-head">
           <div>
             <strong>${games.length} package${games.length === 1 ? '' : 's'} found</strong>
-            <p class="meta">Source: ${this._esc(this.state.source)}. Package creation, editing, export, and import inspection use the Admin2 API when available. Delete and import install are intentionally unavailable.</p>
+            <p class="meta">Source: ${this._esc(this.state.source)}. Package creation, editing, export, import inspection, and draft-only import install use the Admin2 API when available. Delete and overwrite are intentionally unavailable.</p>
           </div>
           <div class="actions" style="margin-top:0;">
             <button class="button" type="button" data-action="inspect-import">${this.state.importInspect.open ? 'Inspecting Import' : 'Inspect Import'}</button>
@@ -579,16 +583,17 @@ class TerpVaultPage extends HTMLElement {
         <div class="editor-head">
           <div>
             <h2>Inspect Import</h2>
-            <p class="meta">Inspect only. Import/install is not implemented yet. This checks a <code>.terpvault.zip</code> package without creating or moving package files.</p>
+            <p class="meta">Inspect a <code>.terpvault.zip</code> package before installing it. Commit always installs as draft, rejects collisions, and never overwrites existing packages.</p>
           </div>
           <button class="button" type="button" data-action="cancel-import-inspect">Close</button>
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
+        ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
         <form data-import-inspect>
           <div class="field">
             <label>TerpVault package zip</label>
             <input type="file" accept=".zip,.terpvault.zip,application/zip" ${state.saving ? 'disabled' : ''}>
-            <span class="meta">The archive is inspected in temporary storage only. Commit/install is intentionally unavailable in v0.2.9.</span>
+            <span class="meta">Inspection runs first. Commit revalidates the same uploaded zip server-side before installing.</span>
           </div>
           <div class="form-actions">
             <button class="button" type="button" data-action="cancel-import-inspect">Cancel</button>
@@ -596,6 +601,7 @@ class TerpVaultPage extends HTMLElement {
           </div>
         </form>
         ${state.report ? this._importReport(state.report) : ''}
+        ${state.report && state.report.ok ? this._importCommitPanel(state) : ''}
       </section>
     `;
   }
@@ -623,12 +629,32 @@ class TerpVaultPage extends HTMLElement {
           <dt>Story extension</dt><dd><code>${this._esc(report.story_extension || '')}</code></dd>
           <dt>Destination</dt><dd>${report.destination_exists ? 'Package folder already exists.' : 'No existing package folder detected.'}</dd>
         </dl>
-        <p class="meta">Inspect only. Import/install is not implemented yet, and no package files were created.</p>
+        <p class="meta">Inspection does not create package files. Commit revalidates and installs as draft only.</p>
         ${this._reportList('Fatal errors', fatal, 'error')}
         ${this._reportList('Warnings', warnings, 'warn')}
         ${this._reportList('Ignored cruft', ignored)}
         ${this._reportList('Included files', included)}
       </div>
+    `;
+  }
+
+  _importCommitPanel(state) {
+    const report = state.report || {};
+    const collision = Boolean(report.has_collision || report.destination_exists);
+    return `
+      <form data-import-commit style="margin-top:.85rem;">
+        <div class="message ${collision ? 'error' : ''}">
+          Imported packages are always installed as <strong>draft</strong>. Existing package folders are never overwritten.
+        </div>
+        <div class="field">
+          <label>Final import slug</label>
+          <input type="text" name="slug" value="${this._esc(state.finalSlug || report.candidate_slug || '')}" required ${state.committing ? 'disabled' : ''}>
+          <span class="meta">${collision ? 'The inspected slug already exists. Choose a different slug before committing.' : 'The installed package folder and game.yaml slug/id will use this value.'}</span>
+        </div>
+        <div class="form-actions">
+          <button class="button primary" type="submit" ${state.committing || !state.file ? 'disabled' : ''}>${state.committing ? 'Importing...' : 'Commit Import as Draft'}</button>
+        </div>
+      </form>
     `;
   }
 
@@ -688,6 +714,10 @@ class TerpVaultPage extends HTMLElement {
       form.addEventListener('submit', event => this._inspectImport(event));
     });
 
+    root.querySelectorAll('form[data-import-commit]').forEach(form => {
+      form.addEventListener('submit', event => this._commitImport(event));
+    });
+
     root.querySelectorAll('form[data-create-package]').forEach(form => {
       form.addEventListener('submit', event => this._createPackage(event));
     });
@@ -732,12 +762,12 @@ class TerpVaultPage extends HTMLElement {
   }
 
   _openImportInspect() {
-    this.state.importInspect = { open: true, saving: false, error: '', report: null };
+    this.state.importInspect = { open: true, saving: false, committing: false, error: '', success: '', report: null, file: null, finalSlug: '' };
     this._renderLibrary();
   }
 
   _closeImportInspect() {
-    this.state.importInspect = { open: false, saving: false, error: '', report: null };
+    this.state.importInspect = { open: false, saving: false, committing: false, error: '', success: '', report: null, file: null, finalSlug: '' };
     this._renderLibrary();
   }
 
@@ -747,14 +777,14 @@ class TerpVaultPage extends HTMLElement {
     const input = form.querySelector('input[type="file"]');
     const file = input?.files?.[0];
     if (!file) {
-      this.state.importInspect = { open: true, saving: false, error: 'Choose a .terpvault.zip package before inspecting.', report: null };
+      this.state.importInspect = { open: true, saving: false, committing: false, error: 'Choose a .terpvault.zip package before inspecting.', success: '', report: null, file: null, finalSlug: '' };
       this._renderLibrary();
       return;
     }
 
     const data = new FormData();
     data.append('file', file);
-    this.state.importInspect = { open: true, saving: true, error: '', report: null };
+    this.state.importInspect = { open: true, saving: true, committing: false, error: '', success: '', report: null, file, finalSlug: '' };
     this._renderLibrary();
 
     try {
@@ -762,9 +792,97 @@ class TerpVaultPage extends HTMLElement {
         method: 'POST',
         body: data
       });
-      this.state.importInspect = { open: true, saving: false, error: '', report };
+      this.state.importInspect = { open: true, saving: false, committing: false, error: '', success: '', report, file, finalSlug: report.candidate_slug || '' };
     } catch (error) {
-      this.state.importInspect = { open: true, saving: false, error: error.message || String(error), report: null };
+      this.state.importInspect = { open: true, saving: false, committing: false, error: error.message || String(error), success: '', report: null, file, finalSlug: '' };
+    }
+
+    this._renderLibrary();
+  }
+
+  async _commitImport(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const file = this.state.importInspect.file;
+    const slug = String(new FormData(form).get('slug') || '').trim();
+    if (!file) {
+      this.state.importInspect = {
+        ...this.state.importInspect,
+        committing: false,
+        error: 'Inspect a .terpvault.zip package before committing import.',
+        success: ''
+      };
+      this._renderLibrary();
+      return;
+    }
+
+    const data = new FormData();
+    data.append('file', file);
+    data.append('slug', slug);
+    this.state.importInspect = {
+      ...this.state.importInspect,
+      committing: true,
+      error: '',
+      success: '',
+      finalSlug: slug
+    };
+    this._renderLibrary();
+
+    try {
+      const result = await this._requestJson(this._importCommitApiUrl(), {
+        method: 'POST',
+        body: data
+      });
+
+      if (result.ok === false) {
+        this.state.importInspect = {
+          ...this.state.importInspect,
+          committing: false,
+          error: 'Import validation failed during commit.',
+          report: result.report || this.state.importInspect.report
+        };
+        this._renderLibrary();
+        return;
+      }
+
+      const importedSlug = result.slug || slug;
+      await this._reloadManifest();
+      if (importedSlug) {
+        localStorage.setItem(`terpvault.admin.open.${importedSlug}`, '1');
+        this.state.editingSlug = importedSlug;
+        const game = this._findGame(importedSlug) || {};
+        this.state.editor = {
+          ...this.state.editor,
+          slug: importedSlug,
+          loading: false,
+          saving: false,
+          error: '',
+          success: 'Package imported as draft. Review metadata, helper docs, media, and story file before publishing.',
+          values: this._editableFromGame(game),
+          readOnly: this._readOnlyFromGame(game),
+          activeHelper: 'how-to-play',
+          helper: this._emptyHelperState('how-to-play'),
+          media: this._mediaFromGame(game),
+          story: this._storyFromGame(game)
+        };
+      }
+      this.state.importInspect = {
+        open: true,
+        saving: false,
+        committing: false,
+        error: '',
+        success: `Imported ${importedSlug} as a draft package.`,
+        report: result.report || this.state.importInspect.report,
+        file: null,
+        finalSlug: importedSlug
+      };
+    } catch (error) {
+      this.state.importInspect = {
+        ...this.state.importInspect,
+        committing: false,
+        error: error.message || String(error),
+        success: ''
+      };
     }
 
     this._renderLibrary();
@@ -1768,6 +1886,10 @@ class TerpVaultPage extends HTMLElement {
 
   _importInspectApiUrl() {
     return `${this._apiBase()}/terpvault/packages/import/inspect`;
+  }
+
+  _importCommitApiUrl() {
+    return `${this._apiBase()}/terpvault/packages/import`;
   }
 
   _markdownApiUrl(slug, type) {

@@ -276,6 +276,7 @@ class TerpVaultPlugin extends Plugin
         $controller = \Grav\Plugin\TerpVault\Controller\ApiController::class;
         $routes->post('/terpvault/packages', [$controller, 'createPackage']);
         $routes->post('/terpvault/packages/import/inspect', [$controller, 'inspectImport']);
+        $routes->post('/terpvault/packages/import', [$controller, 'commitImport']);
         $routes->get('/terpvault/packages/{slug}/export', [$controller, 'exportPackage']);
         $routes->get('/terpvault/packages/{slug}/metadata', [$controller, 'metadata']);
         $routes->patch('/terpvault/packages/{slug}/metadata', [$controller, 'updateMetadata']);

@@ -1,3 +1,19 @@
+# v0.3.0
+
+## 05/23/2026
+
+1. New
+    - Added safe Admin2 import commit/install for validated `.terpvault.zip` packages.
+    - Added controller-style `POST /terpvault/packages/import`.
+    - Extended the Admin2 Inspect Import panel with a final slug field and Commit Import as Draft action after a clean inspection.
+
+2. Safety
+    - Import commit reopens and revalidates the uploaded zip server-side; it does not trust the browser's previous inspection response.
+    - Imported packages are staged in temporary storage first, then installed into the configured games directory only after full validation succeeds.
+    - Final import slugs are required, validated, and rejected on destination collision; existing package folders are never overwritten.
+    - Imported `game.yaml` is rewritten with `id`, `slug`, and `terpvault.status: draft` while preserving unknown fields where practical.
+    - Package delete, overwrite/replace, public routing, and player behavior remain out of scope.
+
 # v0.2.9
 
 ## 05/23/2026

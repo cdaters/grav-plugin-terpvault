@@ -86,7 +86,108 @@ class PackageImportService
         }
     }
 
-    private function inspectZip(ZipArchive $zip, array &$report): void
+    public function commit(UploadedFileInterface $upload, string $finalSlug): array
+    {
+        $finalSlug = $this->validateFinalSlug($finalSlug);
+        $report = $this->emptyReport();
+        if (!class_exists(ZipArchive::class)) {
+            throw new RuntimeException('PHP ZipArchive is required to import TerpVault packages.');
+        }
+
+        $base = $this->basePath();
+        $stage = $this->commitStageDirectory($base);
+
+        try {
+            if ($upload->getError() !== UPLOAD_ERR_OK) {
+                throw new InvalidArgumentException('Uploaded package zip is not available.');
+            }
+
+            $clientName = (string) $upload->getClientFilename();
+            if (!$this->looksLikeTerpVaultZip($clientName)) {
+                throw new InvalidArgumentException('Uploaded file must use a .terpvault.zip filename.');
+            }
+
+            $destination = $base . DIRECTORY_SEPARATOR . $finalSlug;
+            if (file_exists($destination)) {
+                throw new InvalidArgumentException('Package folder already exists: ' . $finalSlug);
+            }
+
+            $zipPath = $stage . DIRECTORY_SEPARATOR . 'package.terpvault.zip';
+            $this->writeUpload($upload, $zipPath);
+
+            $zip = new ZipArchive();
+            if ($zip->open($zipPath) !== true) {
+                throw new InvalidArgumentException('Uploaded file is not a readable zip archive.');
+            }
+
+            try {
+                $analysis = $this->inspectZip($zip, $report);
+                $report = $this->finalizeReport($report);
+                if (!$report['ok']) {
+                    return [
+                        'ok' => false,
+                        'slug' => $finalSlug,
+                        'fatal_errors' => $report['fatal_errors'],
+                        'warnings' => $report['warnings'],
+                        'report' => $report,
+                    ];
+                }
+
+                if (file_exists($destination)) {
+                    throw new InvalidArgumentException('Package folder already exists: ' . $finalSlug);
+                }
+
+                $packageStage = $stage . DIRECTORY_SEPARATOR . $finalSlug;
+                if (!mkdir($packageStage, 0775, true) && !is_dir($packageStage)) {
+                    throw new RuntimeException('Unable to create import package staging directory.');
+                }
+
+                $this->extractPackageFiles($zip, $analysis['entry_map'], $packageStage);
+                $metadata = $analysis['metadata'];
+                $this->forceDraftMetadata($metadata, $finalSlug);
+                $this->writeTextAtomically($packageStage . DIRECTORY_SEPARATOR . 'game.yaml', $this->dumpYaml($metadata));
+
+                $packageReal = realpath($packageStage);
+                $stageReal = realpath($stage);
+                if ($packageReal === false || $stageReal === false || !$this->isPathInside($packageReal, $stageReal)) {
+                    throw new RuntimeException('Imported package staging path is invalid.');
+                }
+
+                $destinationParent = dirname($destination);
+                $destinationParentReal = realpath($destinationParent);
+                if ($destinationParentReal === false || $destinationParentReal !== $base) {
+                    throw new RuntimeException('Import destination is outside the games directory.');
+                }
+
+                if (!rename($packageStage, $destination)) {
+                    throw new RuntimeException('Unable to move imported package into the games directory.');
+                }
+
+                $destinationReal = realpath($destination);
+                if ($destinationReal === false || !$this->isPathInside($destinationReal, $base)) {
+                    if (is_dir($destination)) {
+                        $this->removeDirectory($destination);
+                    }
+                    throw new RuntimeException('Imported package destination is outside the games directory.');
+                }
+
+                return [
+                    'ok' => true,
+                    'slug' => $finalSlug,
+                    'package_path' => $destinationReal,
+                    'metadata' => $metadata,
+                    'report' => $report,
+                    'draft_forced' => true,
+                ];
+            } finally {
+                $zip->close();
+            }
+        } finally {
+            $this->removeDirectory($stage);
+        }
+    }
+
+    private function inspectZip(ZipArchive $zip, array &$report): array
     {
         $topFolders = [];
         $packageFiles = [];
@@ -138,7 +239,7 @@ class PackageImportService
             $report['fatal_errors'][] = count($folders) === 0
                 ? 'Archive does not contain a top-level package folder.'
                 : 'Archive must contain exactly one top-level package folder.';
-            return;
+            return ['entry_map' => $entryMap, 'metadata' => []];
         }
 
         sort($report['ignored_files']);
@@ -148,28 +249,33 @@ class PackageImportService
 
         if (!isset($entryMap['game.yaml'])) {
             $report['fatal_errors'][] = 'Package game.yaml is required.';
-            return;
+            return ['entry_map' => $entryMap, 'metadata' => []];
         }
 
         $yamlText = $zip->getFromName($entryMap['game.yaml']);
         if (!is_string($yamlText)) {
             $report['fatal_errors'][] = 'Unable to read package game.yaml.';
-            return;
+            return ['entry_map' => $entryMap, 'metadata' => []];
         }
 
         try {
             $metadata = Yaml::parse($yamlText) ?: [];
         } catch (\Throwable $e) {
             $report['fatal_errors'][] = 'Unable to parse package game.yaml: ' . $e->getMessage();
-            return;
+            return ['entry_map' => $entryMap, 'metadata' => []];
         }
 
         if (!is_array($metadata)) {
             $report['fatal_errors'][] = 'Invalid game.yaml structure.';
-            return;
+            return ['entry_map' => $entryMap, 'metadata' => []];
         }
 
         $this->inspectMetadata($metadata, $packageFiles, $report);
+
+        return [
+            'entry_map' => $entryMap,
+            'metadata' => $metadata,
+        ];
     }
 
     private function inspectMetadata(array $metadata, array $packageFiles, array &$report): void
@@ -278,6 +384,76 @@ class PackageImportService
         }
     }
 
+    private function extractPackageFiles(ZipArchive $zip, array $entryMap, string $packageStage): void
+    {
+        foreach ($entryMap as $relative => $zipEntry) {
+            if ($relative === 'game.yaml') {
+                continue;
+            }
+
+            $target = $this->resolveStagedPackageFile($packageStage, $relative);
+            $dir = dirname($target);
+            if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+                throw new RuntimeException('Unable to create import staging directory.');
+            }
+
+            $contents = $zip->getFromName($zipEntry);
+            if (!is_string($contents)) {
+                throw new RuntimeException('Unable to read zip entry during import: ' . $zipEntry);
+            }
+
+            if (file_put_contents($target, $contents) === false) {
+                throw new RuntimeException('Unable to write imported package file: ' . $relative);
+            }
+        }
+    }
+
+    private function resolveStagedPackageFile(string $packageStage, string $relative): string
+    {
+        $relative = $this->normalizePackagePath($relative, 'Package file path');
+        $target = $packageStage . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+        $dir = dirname($target);
+        if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Unable to create import staging directory.');
+        }
+
+        $dirReal = realpath($dir);
+        $stageReal = realpath($packageStage);
+        if ($dirReal === false || $stageReal === false || !$this->isPathInside($dirReal, $stageReal)) {
+            throw new InvalidArgumentException('Package file path is outside the import staging directory.');
+        }
+
+        return $target;
+    }
+
+    private function forceDraftMetadata(array &$metadata, string $finalSlug): void
+    {
+        $metadata['id'] = $finalSlug;
+        $metadata['slug'] = $finalSlug;
+        if (!isset($metadata['terpvault']) || !is_array($metadata['terpvault'])) {
+            $metadata['terpvault'] = [];
+        }
+        $metadata['terpvault']['status'] = 'draft';
+    }
+
+    private function validateFinalSlug(string $slug): string
+    {
+        if (strpos($slug, "\0") !== false || preg_match('#^[a-z][a-z0-9+.-]*://#i', $slug)) {
+            throw new InvalidArgumentException('Invalid final import slug.');
+        }
+
+        $slug = trim($slug);
+        if ($slug === '' || $slug[0] === '/' || preg_match('/^[A-Za-z]:[\/\\\\]/', $slug) || strpos($slug, '/') !== false || strpos($slug, '\\') !== false) {
+            throw new InvalidArgumentException('Invalid final import slug.');
+        }
+
+        if (!preg_match('/^[a-z0-9][a-z0-9_-]*$/', $slug)) {
+            throw new InvalidArgumentException('Invalid final import slug.');
+        }
+
+        return $slug;
+    }
+
     private function candidateSlug(string $topFolder, string $yamlSlug): string
     {
         $topFolder = trim($topFolder);
@@ -306,6 +482,20 @@ class PackageImportService
 
         $destinationReal = realpath($destination);
         return $destinationReal !== false && $this->isPathInside($destinationReal, $base);
+    }
+
+    private function basePath(): string
+    {
+        if ($this->basePath === '' || !is_dir($this->basePath)) {
+            throw new RuntimeException('TerpVault games directory is not available.');
+        }
+
+        $base = realpath($this->basePath);
+        if ($base === false) {
+            throw new RuntimeException('Unable to resolve TerpVault games directory.');
+        }
+
+        return $base;
     }
 
     private function normalizeZipEntry(string $path): string
@@ -374,6 +564,37 @@ class PackageImportService
         }
     }
 
+    private function writeTextAtomically(string $target, string $content): void
+    {
+        $dir = dirname($target);
+        if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Unable to create import staging directory.');
+        }
+
+        $temp = $dir . DIRECTORY_SEPARATOR . '.' . basename($target) . '.tmp-' . bin2hex(random_bytes(8));
+        if (file_put_contents($temp, $content) === false) {
+            throw new RuntimeException('Unable to write imported package metadata.');
+        }
+
+        if (!rename($temp, $target)) {
+            @unlink($temp);
+            throw new RuntimeException('Unable to replace imported package metadata.');
+        }
+    }
+
+    private function dumpYaml(array $data): string
+    {
+        if (method_exists(Yaml::class, 'dump')) {
+            return rtrim((string) Yaml::dump($data, 10, 2)) . "\n";
+        }
+
+        if (class_exists('\Symfony\Component\Yaml\Yaml')) {
+            return rtrim((string) \Symfony\Component\Yaml\Yaml::dump($data, 10, 2)) . "\n";
+        }
+
+        throw new RuntimeException('YAML dumping is not available.');
+    }
+
     private function stageDirectory(): string
     {
         $base = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'terpvault-import-' . bin2hex(random_bytes(8));
@@ -382,6 +603,38 @@ class PackageImportService
         }
 
         return $base;
+    }
+
+    private function commitStageDirectory(string $gamesBase): string
+    {
+        $gamesBase = rtrim($gamesBase, DIRECTORY_SEPARATOR);
+        $storageRoot = dirname($gamesBase);
+        $storageRootReal = realpath($storageRoot);
+        if ($storageRootReal === false) {
+            throw new RuntimeException('Unable to resolve TerpVault storage directory.');
+        }
+
+        $stagingRoot = $storageRootReal . DIRECTORY_SEPARATOR . '.import-staging';
+        if (!is_dir($stagingRoot) && !mkdir($stagingRoot, 0775, true) && !is_dir($stagingRoot)) {
+            throw new RuntimeException('Unable to create import staging root.');
+        }
+
+        $stagingRootReal = realpath($stagingRoot);
+        if ($stagingRootReal === false || !$this->isPathInside($stagingRootReal, $storageRootReal)) {
+            throw new RuntimeException('Import staging root is outside the TerpVault storage directory.');
+        }
+
+        $stage = $stagingRootReal . DIRECTORY_SEPARATOR . 'import-' . bin2hex(random_bytes(8));
+        if (!mkdir($stage, 0775, true) && !is_dir($stage)) {
+            throw new RuntimeException('Unable to create import staging directory.');
+        }
+
+        $stageReal = realpath($stage);
+        if ($stageReal === false || !$this->isPathInside($stageReal, $stagingRootReal)) {
+            throw new RuntimeException('Import staging directory is outside the staging root.');
+        }
+
+        return $stageReal;
     }
 
     private function removeDirectory(string $dir): void

@@ -20,21 +20,21 @@ This is a **v0.2.x foundation build**. It is intentionally repo-ready and readab
 - Provides a native shortcode-style embed:
   - `[terpvault game="adventure"]`
 - Bundles the Parchment 2025.1.14 single-file web build as the first engine adapter.
-- Includes an optional Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a limited package creation wizard, package export, import inspection, a metadata-only `game.yaml` editor, helper Markdown editing, limited package-local cover/screenshot image uploads, and limited story-file replacement. It is disabled by default.
+- Includes an optional Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a limited package creation wizard, package export, draft-only package import, a metadata-only `game.yaml` editor, helper Markdown editing, limited package-local cover/screenshot image uploads, and limited story-file replacement. It is disabled by default.
 
 ## What it does not do yet
 
-- It does not yet provide Admin2 package import commit/install.
-- It enables only the opt-in Admin2 package creation, export, import inspection, and metadata/helper/media/story API for TerpVault packages; package delete and import commit/install endpoints are not implemented.
+- It does not provide package delete, overwrite, or replace.
+- It enables only the opt-in Admin2 package creation, export, draft-only import, and metadata/helper/media/story API for TerpVault packages; package delete and import overwrite/replace endpoints are not implemented.
 - It does not yet provide named save slots or server-side save syncing.
 - It does not yet import/export iFiction XML automatically, but the package metadata model now maps toward Treaty of Babel/iFiction concepts.
 - It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
 
 ## Known limitations
 
-- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory, package export, import inspection, whitelisted `game.yaml` metadata edits, allowlisted helper Markdown edits, limited cover/screenshot image uploads, and limited story-file replacement.
+- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory, package export, draft-only import, whitelisted `game.yaml` metadata edits, allowlisted helper Markdown edits, limited cover/screenshot image uploads, and limited story-file replacement.
 - Public virtual routes and Admin2 API routes are separate integration surfaces. Admin2 API routes are registered only when the Admin2 Library Manager is enabled.
-- `.terpvault.zip` export and import inspection are available through Admin2. Import commit/install is planned but not implemented.
+- `.terpvault.zip` export and draft-only import are available through Admin2. Import overwrite/replace is not implemented.
 - Parchment save/restore is interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
 - The `_demo` tree includes development starter packages for testing. Real IF packages need license/provenance review before broad redistribution.
 - `sample-cave` is the public-safe original structure demo, but its placeholder `game.z5` is not a playable story file.
@@ -234,7 +234,7 @@ Then visit:
 /if/adventure
 ```
 
-Admin2 export creates a `.terpvault.zip` package with one top-level `{slug}/` folder containing `game.yaml`, the playable story file, referenced package resources, `metadata.iFiction.xml` when present, and safe conventional helper/media files. Admin2 can inspect an uploaded `.terpvault.zip` and report validation results, ignored cruft, included files, and slug collisions, but import commit/install is not implemented yet.
+Admin2 export creates a `.terpvault.zip` package with one top-level `{slug}/` folder containing `game.yaml`, the playable story file, referenced package resources, `metadata.iFiction.xml` when present, and safe conventional helper/media files. Admin2 can inspect and import an uploaded `.terpvault.zip`, but imported packages are always installed as draft and existing package folders are never overwritten.
 
 ### Package creation checklist
 
@@ -405,9 +405,9 @@ The current page provides package inventory plus metadata/helper/media/story edi
 - Media Manager Lite controls for replacing cover/small-cover art, adding screenshots, replacing registered screenshots, and reordering/removing screenshot entries with package-local `jpg`, `jpeg`, `png`, or `webp` files.
 - Story File Manager Lite controls for replacing the package-local playable story file with allowlisted IF story formats.
 - Export action for downloading a single installed package as `{slug}.terpvault.zip`.
-- Import Inspect panel for validating a `.terpvault.zip` package without installing it.
+- Import panel for validating a `.terpvault.zip` package and committing it as a draft package after server-side revalidation.
 
-Package delete, import commit/install, arbitrary file browsing, `metadata.iFiction.xml` edits, and player settings edits are not implemented yet. Package creation uses `/api/v1/terpvault/packages`, package export uses `/api/v1/terpvault/packages/{slug}/export`, import inspection uses `/api/v1/terpvault/packages/import/inspect`, metadata saves use `/api/v1/terpvault/packages/{slug}/metadata`, helper Markdown saves use `/api/v1/terpvault/packages/{slug}/markdown/{type}`, image uploads use `/api/v1/terpvault/packages/{slug}/media/{type}`, and story replacement uses `/api/v1/terpvault/packages/{slug}/story` when the Admin2 Library Manager is enabled.
+Package delete, import overwrite/replace, arbitrary file browsing, `metadata.iFiction.xml` edits, and player settings edits are not implemented yet. Package creation uses `/api/v1/terpvault/packages`, package export uses `/api/v1/terpvault/packages/{slug}/export`, import inspection uses `/api/v1/terpvault/packages/import/inspect`, import commit uses `/api/v1/terpvault/packages/import`, metadata saves use `/api/v1/terpvault/packages/{slug}/metadata`, helper Markdown saves use `/api/v1/terpvault/packages/{slug}/markdown/{type}`, image uploads use `/api/v1/terpvault/packages/{slug}/media/{type}`, and story replacement uses `/api/v1/terpvault/packages/{slug}/story` when the Admin2 Library Manager is enabled.
 
 Public virtual routes and Admin2 API routes are intentionally separate. Frontend routes such as `/if`, `/if/{slug}`, `/if/{slug}/play`, and `/if/_story/{slug}/{filename}` are registered as virtual Grav pages or controlled file endpoints only for frontend requests. Admin2 endpoints are controller-style API routes and are registered only when the experimental Admin2 Library Manager is enabled.
 

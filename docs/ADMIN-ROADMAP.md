@@ -193,9 +193,24 @@ Editable fields:
 - Add an Admin2 Import Package panel that clearly states inspect-only behavior and omits commit/install controls.
 - Keep import commit/install, package creation from imports, package delete, arbitrary file browsing, public routing, and player behavior out of scope.
 
+## v0.3.0 Import Commit
+
+- Add draft-only import commit for uploaded `.terpvault.zip` packages after inspection.
+- Register a controller-style route only when `admin.enable_admin2_page` is enabled:
+  - `POST /terpvault/packages/import`
+- Require multipart `file` and final `slug` fields.
+- Reopen and revalidate the uploaded zip server-side during commit; do not trust a browser inspection response.
+- Require a safe final slug and reject destination collisions.
+- Extract only into temporary staging first, never directly into `user/data/terpvault/games`.
+- Ignore safe cruft, but keep unsafe cruft-looking paths fatal.
+- Rewrite staged `game.yaml` with `id`, `slug`, and `terpvault.status: draft`.
+- Move the normalized staged package folder into `games/{slug}` only after validation and metadata rewrite succeed.
+- Refresh the Admin2 package library after successful import and open the imported package row when practical.
+- Keep package delete, overwrite/replace, arbitrary file browsing, public routing, and player behavior out of scope.
+
 ## Next build: package management UI
 
-- Import package commit/install after successful inspection.
+- Import polish and rollback/diagnostic hardening based on field testing.
 
 ## Later
 
