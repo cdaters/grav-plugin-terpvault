@@ -1,3 +1,18 @@
+# v0.2.8
+
+## 05/23/2026
+
+1. New
+    - Added authenticated Admin2 package export for a single TerpVault package.
+    - Added controller-style `GET /terpvault/packages/{slug}/export` for downloading `{slug}.terpvault.zip`.
+    - Added an Admin2 Export action on each package row.
+
+2. Safety
+    - Exports use one top-level zip folder named after the package slug.
+    - Export contents are limited to `game.yaml`, referenced package resources, `metadata.iFiction.xml` when present, and safe conventional cover/screenshot/helper files.
+    - Backup, lock, temp, hidden cruft, macOS metadata, Windows metadata, unrelated files, traversal paths, absolute paths, URI paths, and files outside the package directory are excluded or rejected.
+    - Package import, import inspect, import commit, package delete, public routing, and player behavior remain out of scope.
+
 # v0.2.7
 
 ## 05/22/2026

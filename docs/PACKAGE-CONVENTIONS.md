@@ -182,16 +182,31 @@ bin/grav clearcache
 - Add how-to-play, hints, and walkthrough Markdown when useful.
 - Clear Grav cache and check `/if`, `/if/{slug}`, and `/if/{slug}/play`.
 
-## Future `.terpvault.zip` packages
+## `.terpvault.zip` packages
 
-TerpVault does not import or export package zip files yet. The planned convention is a `.terpvault.zip` archive containing either the package directory or the package contents at the archive root.
+Admin2 export creates a `.terpvault.zip` archive containing exactly one top-level folder named after the package slug.
 
-Future import/export should require:
+```text
+adventure/
+  game.yaml
+  advent.z5
+  cover.jpg
+  small-cover.jpg
+  metadata.iFiction.xml
+  screenshots/01.png
+  how-to-play.md
+  hints.md
+  walkthrough.md
+```
+
+Export includes:
 
 - `game.yaml`.
 - One playable story file referenced by `resources.story_file`.
-- No platform cruft such as `__MACOSX/` or `.DS_Store`.
-- Relative package paths only.
-- A validation report before a package is published.
+- Referenced cover, small-cover, screenshot, how-to-play, hints, and walkthrough files.
+- `metadata.iFiction.xml` when present.
+- Safe conventional cover, small-cover, screenshot, and helper Markdown filenames when present.
 
-The Admin2 roadmap is to add package create/edit/import/export actions on top of the existing package validation model, without changing the public folder convention.
+Export excludes backups, lock files, temp files, hidden files/directories, macOS cruft such as `__MACOSX/` and `.DS_Store`, Windows cruft such as `Thumbs.db` and `desktop.ini`, and unrelated/unreferenced files.
+
+Admin2 import is not implemented yet. Future import should require relative package paths only, reject traversal, strip platform cruft, and show a validation report before anything is installed or published.

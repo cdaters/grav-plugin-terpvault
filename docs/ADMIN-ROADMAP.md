@@ -166,10 +166,21 @@ Editable fields:
 - Keep cover/screenshot upload, deeper metadata editing, helper editing, and story replacement in the existing post-creation editor sections.
 - Keep package delete, package import/export, arbitrary file browsing, `metadata.iFiction.xml` editing, and player behavior out of scope.
 
+## v0.2.8 Package Export
+
+- Add authenticated export for one installed package from the opt-in Admin2 Library Manager.
+- Register a controller-style route only when `admin.enable_admin2_page` is enabled:
+  - `GET /terpvault/packages/{slug}/export`
+- Create a canonical `{slug}.terpvault.zip` archive with exactly one top-level `{slug}/` folder.
+- Include `game.yaml`, `resources.story_file`, referenced cover/small-cover/screenshots/helper Markdown files, `metadata.iFiction.xml` when present, and safe conventional cover/screenshot/helper files.
+- Exclude backups, lock files, temp files, hidden files/directories, macOS cruft, Windows cruft, and unrelated/unreferenced files.
+- Validate slug, package base-path containment, package-local relative paths, traversal segments, absolute paths, URI paths, null bytes, and source-file containment before adding files to the archive.
+- Add an Export button to each Admin2 package row.
+- Keep package import, import inspect, import commit, package delete, arbitrary file browsing, public routing, `metadata.iFiction.xml` editing, and player behavior out of scope.
+
 ## Next build: package management UI
 
 - Import package zip with macOS cruft stripping.
-- Export package zip.
 
 ## Later
 

@@ -16,6 +16,12 @@ class TerpVaultPage extends HTMLElement {
         error: '',
         success: ''
       },
+      export: {
+        slug: '',
+        saving: false,
+        error: '',
+        success: ''
+      },
       editor: {
         slug: null,
         loading: false,
@@ -263,7 +269,7 @@ class TerpVaultPage extends HTMLElement {
         <section class="hero">
           <h1>TerpVault Library Manager</h1>
           <p>Package inventory, package creation, metadata editing, helper Markdown editing, media management, screenshot ordering, and story-file replacement for installed TerpVault interactive-fiction packages.</p>
-          <p class="meta">v0.2.7 is opt-in. Package delete, import, export, arbitrary file browsing, player settings editing, and <code>metadata.iFiction.xml</code> editing are not available.</p>
+          <p class="meta">v0.2.8 is opt-in. Package export is available for installed packages. Package delete, import, arbitrary file browsing, player settings editing, and <code>metadata.iFiction.xml</code> editing are not available.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -329,7 +335,7 @@ class TerpVaultPage extends HTMLElement {
         <div class="editor-head">
           <div>
             <strong>${games.length} package${games.length === 1 ? '' : 's'} found</strong>
-            <p class="meta">Source: ${this._esc(this.state.source)}. Package creation and editing use the Admin2 API when available. Delete, import, and export are intentionally unavailable.</p>
+            <p class="meta">Source: ${this._esc(this.state.source)}. Package creation, editing, and export use the Admin2 API when available. Delete and import are intentionally unavailable.</p>
           </div>
           <button class="button primary" type="button" data-action="create-package">${this.state.create.open ? 'Creating Package' : 'Create Package'}</button>
         </div>
@@ -385,7 +391,9 @@ class TerpVaultPage extends HTMLElement {
               ${urls.detail ? `<a class="button" href="${this._esc(urls.detail)}" target="_blank" rel="noopener">Public Detail</a>` : ''}
               ${urls.play ? `<a class="button" href="${this._esc(urls.play)}" target="_blank" rel="noopener">Public Play</a>` : ''}
               ${urls.story ? `<a class="button" href="${this._esc(urls.story)}" target="_blank" rel="noopener">Story File</a>` : ''}
+              <button class="button" type="button" data-action="export" data-slug="${this._esc(slug)}" ${this.state.export.saving && this.state.export.slug === slug ? 'disabled' : ''}>${this.state.export.saving && this.state.export.slug === slug ? 'Exporting...' : 'Export'}</button>
             </div>
+            ${this._exportMessage(slug)}
             ${this._warnings(game)}
           </div>
           <div class="side">
@@ -566,6 +574,10 @@ class TerpVaultPage extends HTMLElement {
 
     root.querySelectorAll('[data-action="create-package"]').forEach(button => {
       button.addEventListener('click', () => this._openCreatePackage());
+    });
+
+    root.querySelectorAll('[data-action="export"]').forEach(button => {
+      button.addEventListener('click', () => this._exportPackage(button.dataset.slug || ''));
     });
 
     root.querySelectorAll('[data-action="cancel-create"]').forEach(button => {
@@ -1158,6 +1170,66 @@ class TerpVaultPage extends HTMLElement {
     this._renderLibrary();
   }
 
+  async _exportPackage(slug) {
+    if (!slug) {
+      return;
+    }
+
+    this.state.export = { slug, saving: true, error: '', success: '' };
+    this._renderLibrary();
+
+    try {
+      const response = await fetch(this._exportApiUrl(slug), {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/zip',
+          ...this._apiAuthHeaders()
+        }
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        const payload = this._unwrapApiResponse(this._parseJson(text));
+        throw new Error(payload.message || payload.error || text || `HTTP ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const filename = this._downloadFilename(response.headers.get('Content-Disposition'), `${slug}.terpvault.zip`);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      this.state.export = { slug, saving: false, error: '', success: `Exported ${filename}.` };
+    } catch (error) {
+      this.state.export = { slug, saving: false, error: error.message || String(error), success: '' };
+    }
+
+    this._renderLibrary();
+  }
+
+  _exportMessage(slug) {
+    const state = this.state.export || {};
+    if (state.slug !== slug) {
+      return '';
+    }
+
+    if (state.error) {
+      return `<div class="message error">${this._esc(state.error)}</div>`;
+    }
+
+    if (state.success) {
+      return `<div class="message success">${this._esc(state.success)}</div>`;
+    }
+
+    return '';
+  }
+
   _editorPanel(game) {
     const editor = this.state.editor || {};
     const values = editor.values || this._editableFromGame(game);
@@ -1282,7 +1354,7 @@ class TerpVaultPage extends HTMLElement {
     return `
       <section class="media-manager">
         <h3>Media</h3>
-        <p class="meta">Media Manager Lite accepts package-local jpg, png, and webp images only. Story files, imports, exports, deletes, and arbitrary file management are not available.</p>
+        <p class="meta">Media Manager Lite accepts package-local jpg, png, and webp images only. Story files, imports, deletes, and arbitrary file management are not available here.</p>
         ${media.loading ? '<div class="message">Loading media inventory...</div>' : ''}
         ${media.error ? `<div class="message error">${this._esc(media.error)}</div>` : ''}
         ${media.success ? `<div class="message success">${this._esc(media.success)}</div>` : ''}
@@ -1547,6 +1619,10 @@ class TerpVaultPage extends HTMLElement {
     return `${this._apiBase()}/terpvault/packages`;
   }
 
+  _exportApiUrl(slug) {
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/export`;
+  }
+
   _markdownApiUrl(slug, type) {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/markdown/${encodeURIComponent(type)}`;
   }
@@ -1672,6 +1748,23 @@ class TerpVaultPage extends HTMLElement {
     } catch (e) {
       return { message: text };
     }
+  }
+
+  _downloadFilename(disposition, fallback) {
+    const value = disposition || '';
+    const utf8 = value.match(/filename\*=UTF-8''([^;]+)/i);
+    if (utf8) {
+      try {
+        return decodeURIComponent(utf8[1].replace(/"/g, ''));
+      } catch (e) {}
+    }
+
+    const plain = value.match(/filename="?([^";]+)"?/i);
+    if (plain) {
+      return plain[1];
+    }
+
+    return fallback;
   }
 
   _findGame(slug) {

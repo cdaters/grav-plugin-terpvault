@@ -8,6 +8,8 @@ use Grav\Plugin\Api\Controllers\AbstractApiController;
 use Grav\Plugin\Api\Exceptions\ForbiddenException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
 use Grav\Plugin\Api\Response\ApiResponse;
+use Grav\Framework\Psr7\Response;
+use Grav\Plugin\TerpVault\Service\PackageArchiveService;
 use Grav\Plugin\TerpVault\Service\PackageCreationService;
 use Grav\Plugin\TerpVault\Service\PackageMarkdownService;
 use Grav\Plugin\TerpVault\Service\PackageMediaService;
@@ -29,6 +31,11 @@ class ApiController extends AbstractApiController
     private function creationService(): PackageCreationService
     {
         return new PackageCreationService();
+    }
+
+    private function archiveService(): PackageArchiveService
+    {
+        return new PackageArchiveService();
     }
 
     private function markdownService(): PackageMarkdownService
@@ -72,6 +79,40 @@ class ApiController extends AbstractApiController
 
         try {
             return ApiResponse::create($this->creationService()->create($fields, $upload));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function exportPackage(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+
+        try {
+            $export = $this->archiveService()->export($slug);
+            $path = (string) $export['path'];
+            $filename = str_replace(['"', "\r", "\n"], '', (string) $export['filename']);
+            $stream = fopen($path, 'rb');
+            if ($stream === false) {
+                throw new RuntimeException('Unable to read package export zip.');
+            }
+
+            register_shutdown_function(static function () use ($path): void {
+                if (is_file($path)) {
+                    @unlink($path);
+                }
+            });
+
+            return new Response(200, [
+                'Content-Type' => 'application/zip',
+                'Content-Length' => (string) $export['size'],
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'no-store, max-age=0',
+                'X-Content-Type-Options' => 'nosniff',
+            ], $stream);
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         } catch (RuntimeException $e) {
