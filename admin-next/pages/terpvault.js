@@ -303,7 +303,7 @@ class TerpVaultPage extends HTMLElement {
   }
 
   _summary(game) {
-    const description = String(game.description || '').replace(/\s+/g, ' ').trim();
+    const description = this._plainTextPreview(game.description || '');
     if (!description) {
       return '<div class="box"><h3>Summary</h3><p class="meta">No description recorded.</p></div>';
     }
@@ -422,6 +422,20 @@ class TerpVaultPage extends HTMLElement {
       tads: { label: 'TADS 2 / TADS 3', extensions: ['gam', 't3'] },
       adrift: { label: 'ADRIFT 4', extensions: ['taf'] }
     };
+  }
+
+  _plainTextPreview(value) {
+    return String(value || '')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/(\*\*|__)(.*?)\1/g, '$2')
+      .replace(/(\*|_)(.*?)\1/g, '$2')
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/^>\s?/gm, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   _esc(value) {
