@@ -265,8 +265,9 @@ The first v0.4.0 implementation pass adds package-local hero and feelies foundat
 ### Metadata enrichment roadmap
 
 - Keep enrichment preview-based and non-destructive.
-- Start with local `metadata.iFiction.xml` parsing because it is package-local and reviewable.
+- Local `metadata.iFiction.xml` preview exists because it is package-local and reviewable.
 - Show proposed `game.yaml` changes before applying them.
+- Add explicit curator-controlled apply/import from iFiction preview in a later pass.
 - Prefer merge previews that identify source, confidence, and target field.
 - After iFiction XML, explore IFDB lookup by IFID/TUID, then IFWiki and IF Archive enrichment.
 - Treat remote catalog lookups as curator aids, not authoritative replacements for license/provenance review.

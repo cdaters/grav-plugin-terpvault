@@ -1,3 +1,16 @@
+# v0.4.1
+
+## Unreleased
+
+1. New
+    - Added authenticated Admin2 preview for package-local `metadata.iFiction.xml`.
+    - Added a safe local iFiction XML parser that extracts a conservative subset of title, author, bibliographic, IFID, and format fields for review.
+
+2. Safety
+    - iFiction parsing is local-only, rejects DOCTYPE declarations, uses non-network XML parsing, and does not fetch external DTDs or remote resources.
+    - Preview does not write `game.yaml`; curator-controlled apply/import remains future work.
+    - No IFDB, IFWiki, IF Archive, Vaultwright, arbitrary scraping, package delete, overwrite, or remote lookup behavior was added.
+
 # v0.4.0
 
 ## 05/24/2026

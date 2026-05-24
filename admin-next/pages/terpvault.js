@@ -68,6 +68,11 @@ class TerpVaultPage extends HTMLElement {
           exists: false,
           extension: '',
           size: 0
+        },
+        ifiction: {
+          loading: false,
+          error: '',
+          report: null
         }
       }
     };
@@ -752,6 +757,10 @@ class TerpVaultPage extends HTMLElement {
       button.addEventListener('click', () => this._loadHelperDoc(button.dataset.slug || '', button.dataset.type || ''));
     });
 
+    root.querySelectorAll('[data-action="preview-ifiction"]').forEach(button => {
+      button.addEventListener('click', () => this._previewIFiction(button.dataset.slug || ''));
+    });
+
     root.querySelectorAll('form[data-editor-slug]').forEach(form => {
       form.addEventListener('submit', event => this._saveEditor(event));
     });
@@ -980,7 +989,8 @@ class TerpVaultPage extends HTMLElement {
       activeHelper: 'how-to-play',
       helper: this._emptyHelperState('how-to-play'),
       media: this._mediaFromGame(game || {}),
-      story: this._storyFromGame(game || {})
+      story: this._storyFromGame(game || {}),
+      ifiction: this._emptyIFictionState()
     };
     localStorage.setItem(`terpvault.admin.open.${slug}`, '1');
     this._renderLibrary();
@@ -1020,7 +1030,8 @@ class TerpVaultPage extends HTMLElement {
       activeHelper: 'how-to-play',
       helper: this._emptyHelperState('how-to-play'),
       media: this._emptyMediaState(),
-      story: this._emptyStoryState()
+      story: this._emptyStoryState(),
+      ifiction: this._emptyIFictionState()
     };
     this._renderLibrary();
   }
@@ -1323,6 +1334,45 @@ class TerpVaultPage extends HTMLElement {
     }
   }
 
+  async _previewIFiction(slug) {
+    if (!slug) {
+      return;
+    }
+
+    this.state.editor = {
+      ...this.state.editor,
+      ifiction: {
+        loading: true,
+        error: '',
+        report: null
+      }
+    };
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._ifictionPreviewApiUrl(slug), { method: 'GET' });
+      this.state.editor = {
+        ...this.state.editor,
+        ifiction: {
+          loading: false,
+          error: '',
+          report: this._unwrapApiResponse(data)
+        }
+      };
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        ifiction: {
+          loading: false,
+          error: error.message || String(error),
+          report: null
+        }
+      };
+    }
+
+    this._renderLibrary();
+  }
+
   async _uploadMedia(event) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -1596,6 +1646,7 @@ class TerpVaultPage extends HTMLElement {
             <button class="button primary" type="submit" ${editor.loading || editor.saving ? 'disabled' : ''}>${editor.saving ? 'Saving...' : 'Save Metadata'}</button>
           </div>
         </form>
+        ${this._ifictionPreviewPanel(slug)}
         ${this._storyPanel(game, slug)}
         ${this._mediaPanel(game, slug)}
         ${this._helperDocsPanel(slug)}
@@ -1630,6 +1681,41 @@ class TerpVaultPage extends HTMLElement {
           </div>
         </form>
       </section>
+    `;
+  }
+
+  _ifictionPreviewPanel(slug) {
+    const ifiction = this.state.editor.ifiction || this._emptyIFictionState();
+    const report = ifiction.report || null;
+    const fields = Array.isArray(report?.fields) ? report.fields : [];
+
+    return `
+      <section class="story-manager">
+        <h3>iFiction Metadata</h3>
+        <p class="meta">Preview-only parser for package-local <code>metadata.iFiction.xml</code>. It does not fetch remote resources and does not write <code>game.yaml</code>.</p>
+        ${ifiction.loading ? '<div class="message">Parsing local metadata.iFiction.xml...</div>' : ''}
+        ${ifiction.error ? `<div class="message error">${this._esc(ifiction.error)}</div>` : ''}
+        ${report && report.errors?.length ? `<div class="message error">${report.errors.map(error => this._esc(error)).join('<br>')}</div>` : ''}
+        ${report && report.ok ? '<div class="message success">Local iFiction metadata parsed for preview. Review values before manually applying any changes.</div>' : ''}
+        <div class="form-actions">
+          <button class="button" type="button" data-action="preview-ifiction" data-slug="${this._esc(slug)}" ${ifiction.loading ? 'disabled' : ''}>${ifiction.loading ? 'Previewing...' : 'Preview iFiction Metadata'}</button>
+        </div>
+        ${fields.length ? this._ifictionFieldTable(fields) : (report ? '<p class="meta">No supported preview fields are available.</p>' : '')}
+      </section>
+    `;
+  }
+
+  _ifictionFieldTable(fields) {
+    return `
+      <div class="readonly">
+        ${fields.map(field => `
+          <div>
+            <span>${this._esc(field.label || field.path || '')}${field.would_change ? '' : ' (same)'}</span>
+            <code>Current: ${this._esc(this._asText(field.current) || 'Empty')}</code>
+            <code>XML: ${this._esc(this._asText(field.xml) || 'Empty')}</code>
+          </div>
+        `).join('')}
+      </div>
     `;
   }
 
@@ -1910,6 +1996,10 @@ class TerpVaultPage extends HTMLElement {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/metadata`;
   }
 
+  _ifictionPreviewApiUrl(slug) {
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/metadata/ifiction`;
+  }
+
   _packagesApiUrl() {
     return `${this._apiBase()}/terpvault/packages`;
   }
@@ -2122,6 +2212,14 @@ class TerpVaultPage extends HTMLElement {
         small_cover: '',
         screenshots: []
       }
+    };
+  }
+
+  _emptyIFictionState() {
+    return {
+      loading: false,
+      error: '',
+      report: null
     };
   }
 

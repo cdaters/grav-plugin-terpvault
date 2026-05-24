@@ -11,6 +11,7 @@ use Grav\Plugin\Api\Response\ApiResponse;
 use Grav\Framework\Psr7\Response;
 use Grav\Plugin\TerpVault\Service\PackageArchiveService;
 use Grav\Plugin\TerpVault\Service\PackageCreationService;
+use Grav\Plugin\TerpVault\Service\PackageIFictionService;
 use Grav\Plugin\TerpVault\Service\PackageImportService;
 use Grav\Plugin\TerpVault\Service\PackageMarkdownService;
 use Grav\Plugin\TerpVault\Service\PackageMediaService;
@@ -42,6 +43,11 @@ class ApiController extends AbstractApiController
     private function importService(): PackageImportService
     {
         return new PackageImportService();
+    }
+
+    private function ifictionService(): PackageIFictionService
+    {
+        return new PackageIFictionService();
     }
 
     private function markdownService(): PackageMarkdownService
@@ -175,6 +181,20 @@ class ApiController extends AbstractApiController
 
         try {
             return ApiResponse::create($this->service()->updateMetadata($slug, $updates));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function previewIFiction(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+
+        try {
+            return ApiResponse::create($this->ifictionService()->preview($slug));
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         } catch (RuntimeException $e) {

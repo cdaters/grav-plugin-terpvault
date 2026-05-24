@@ -262,6 +262,7 @@ class TerpVaultPlugin extends Plugin
         require_once __DIR__ . '/classes/Service/PackageMetadataService.php';
         require_once __DIR__ . '/classes/Service/PackageArchiveService.php';
         require_once __DIR__ . '/classes/Service/PackageCreationService.php';
+        require_once __DIR__ . '/classes/Service/PackageIFictionService.php';
         require_once __DIR__ . '/classes/Service/PackageImportService.php';
         require_once __DIR__ . '/classes/Service/PackageMarkdownService.php';
         require_once __DIR__ . '/classes/Service/PackageMediaService.php';
@@ -279,6 +280,7 @@ class TerpVaultPlugin extends Plugin
         $routes->post('/terpvault/packages/import', [$controller, 'commitImport']);
         $routes->get('/terpvault/packages/{slug}/export', [$controller, 'exportPackage']);
         $routes->get('/terpvault/packages/{slug}/metadata', [$controller, 'metadata']);
+        $routes->get('/terpvault/packages/{slug}/metadata/ifiction', [$controller, 'previewIFiction']);
         $routes->patch('/terpvault/packages/{slug}/metadata', [$controller, 'updateMetadata']);
         $routes->get('/terpvault/packages/{slug}/markdown/{type}', [$controller, 'markdown']);
         $routes->patch('/terpvault/packages/{slug}/markdown/{type}', [$controller, 'updateMarkdown']);

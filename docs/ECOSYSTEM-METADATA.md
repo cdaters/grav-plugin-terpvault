@@ -76,7 +76,9 @@ A package may include:
 metadata.iFiction.xml
 ```
 
-TerpVault includes this file in `.terpvault.zip` export/import payloads when present, but it does not parse, edit, or write the XML yet.
+TerpVault includes this file in `.terpvault.zip` export/import payloads when present. Admin2 can preview a conservative subset of local iFiction XML fields, including title, author, description/headline, publication date, genre, language, IFIDs, and format/system where available. Preview is local-only and does not write `game.yaml`.
+
+Curator-controlled import/apply from the preview remains future work.
 
 ## Compatibility aliases
 
