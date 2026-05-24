@@ -533,7 +533,7 @@ class TerpVaultPage extends HTMLElement {
             ${this._createInput('First published', 'first_published')}
             ${this._createInput('Genre', 'genre')}
             ${this._createInput('Language', 'language', false, 'en')}
-            ${this._createSelect('Format', 'format', [['', 'Infer later'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2']])}
+            ${this._createSelect('Format', 'format', [['', 'Infer later'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['adrift', 'ADRIFT']])}
             ${this._createSelect('Status', 'status', [['draft', 'Draft'], ['published', 'Published']])}
             ${this._createInput('Tags', 'tags')}
             ${this._createInput('License name', 'license_name')}
@@ -545,8 +545,8 @@ class TerpVaultPage extends HTMLElement {
           ${this._createTextarea('Source notes', 'source_notes', 'short')}
           <div class="field">
             <label>Initial story file</label>
-            <input type="file" name="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.t3" required ${state.saving ? 'disabled' : ''}>
-            <span class="meta">Allowed: z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, t3.</span>
+            <input type="file" name="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.gam,.t3,.taf" required ${state.saving ? 'disabled' : ''}>
+            <span class="meta">Allowed: z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, gam, t3, taf.</span>
           </div>
           <div class="form-actions">
             <button class="button" type="button" data-action="cancel-create">Cancel</button>
@@ -1622,8 +1622,8 @@ class TerpVaultPage extends HTMLElement {
         <form data-story-slug="${this._esc(slug)}">
           <div class="field">
             <label>Replace Story File</label>
-            <input type="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.t3" ${story.loading || story.saving ? 'disabled' : ''}>
-            <span class="meta">Allowed: z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, t3. Archives, scripts, HTML, SVG, and arbitrary files are not accepted.</span>
+            <input type="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.gam,.t3,.taf" ${story.loading || story.saving ? 'disabled' : ''}>
+            <span class="meta">Allowed: z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, gam, t3, taf. Archives, scripts, HTML, SVG, and arbitrary files are not accepted.</span>
           </div>
           <div class="form-actions">
             <button class="button primary" type="submit" ${story.loading || story.saving ? 'disabled' : ''}>${story.saving ? 'Uploading...' : 'Upload Story File'}</button>

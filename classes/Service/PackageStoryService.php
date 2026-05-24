@@ -14,7 +14,7 @@ class PackageStoryService
 {
     private const EXTENSIONS = [
         'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb', 'zlb',
-        'ulx', 'gblorb', 'glb', 't3',
+        'ulx', 'gblorb', 'glb', 'gam', 't3', 'taf',
     ];
 
     /** @var Grav */
