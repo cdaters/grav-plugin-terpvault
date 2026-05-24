@@ -4,7 +4,8 @@
   {% set game = terpvault_current_game %}
   <article class="terpvault terpvault-play-page">
     <nav class="terpvault-breadcrumb"><a href="{{ game.url('detail') }}">← {{ game.title }}</a></nav>
-    <header class="terpvault-play-header">
+    {% set hero_style = game.heroStyle %}
+    <header class="terpvault-play-header{% if hero_style %} terpvault-play-header-with-image{% endif %}"{% if hero_style %} style="{{ hero_style }}"{% endif %}>
       <div>
         <p class="terpvault-kicker">{{ game.formatLabel }}</p>
         <h1>{{ game.title }}</h1>

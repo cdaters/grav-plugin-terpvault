@@ -5,7 +5,8 @@
   <article class="terpvault terpvault-detail">
     <nav class="terpvault-breadcrumb"><a href="{{ terpvault.route }}">← Library</a></nav>
 
-    <header class="terpvault-game-hero">
+    {% set hero_style = game.heroStyle %}
+    <header class="terpvault-game-hero{% if hero_style %} terpvault-game-hero-with-image{% endif %}"{% if hero_style %} style="{{ hero_style }}"{% endif %}>
       <div class="terpvault-game-heading">
         <p class="terpvault-kicker">{{ game.formatLabel }}</p>
         <h1>{{ game.title }}</h1>
@@ -83,6 +84,26 @@
             </div>
           </details>
         {% endif %}
+      </section>
+    {% endif %}
+
+    {% set feelies = game.feelies %}
+    {% if feelies|length %}
+      <section class="terpvault-panel terpvault-feelies">
+        <h2>Extras & Feelies</h2>
+        <p class="terpvault-section-note">Package-local supplemental files such as manuals, maps, clue sheets, audio, and other extras.</p>
+        <div class="terpvault-feelies-list">
+          {% for item in feelies %}
+            <a class="terpvault-feelie" href="{{ item.url }}" rel="noopener">
+              <span>
+                <strong>{{ item.title }}</strong>
+                {% if item.description %}<small>{{ item.description }}</small>{% endif %}
+                <code>{{ item.path }}</code>
+              </span>
+              <em>{{ item.type ?: item.extension }}</em>
+            </a>
+          {% endfor %}
+        </div>
       </section>
     {% endif %}
 

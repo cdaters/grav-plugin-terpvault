@@ -12,13 +12,14 @@ use RuntimeException;
 
 class PackageMediaService
 {
-    private const TYPES = ['cover', 'small-cover', 'screenshot'];
+    private const TYPES = ['cover', 'small-cover', 'hero', 'screenshot'];
 
     private const EXTENSIONS = [
         'jpg' => 'image/jpeg',
         'jpeg' => 'image/jpeg',
         'png' => 'image/png',
         'webp' => 'image/webp',
+        'gif' => 'image/gif',
     ];
 
     /** @var Grav */
@@ -51,6 +52,7 @@ class PackageMediaService
             'resources' => [
                 'cover' => (string)($resources['cover'] ?? ''),
                 'small_cover' => (string)($resources['small_cover'] ?? ''),
+                'hero' => $this->resourcePath($resources['hero'] ?? ''),
                 'screenshots' => array_values(array_filter(array_map('strval', is_array($resources['screenshots'] ?? null) ? $resources['screenshots'] : []))),
             ],
             'allowed_types' => self::TYPES,
@@ -85,6 +87,12 @@ class PackageMediaService
             $updated['resources']['cover'] = $relative;
         } elseif ($type === 'small-cover') {
             $updated['resources']['small_cover'] = $relative;
+        } elseif ($type === 'hero') {
+            if (is_array($updated['resources']['hero'] ?? null)) {
+                $updated['resources']['hero']['path'] = $relative;
+            } else {
+                $updated['resources']['hero'] = $relative;
+            }
         } else {
             $screenshots = $updated['resources']['screenshots'] ?? [];
             if (!is_array($screenshots)) {
@@ -150,7 +158,7 @@ class PackageMediaService
         }
 
         if (!array_key_exists($extension, self::EXTENSIONS)) {
-            throw new InvalidArgumentException('Only jpg, jpeg, png, and webp images can be uploaded.');
+            throw new InvalidArgumentException('Only jpg, jpeg, png, webp, and gif images can be uploaded.');
         }
 
         $clientType = strtolower((string) $upload->getClientMediaType());
@@ -169,6 +177,10 @@ class PackageMediaService
 
         if ($type === 'small-cover') {
             return 'small-cover.' . $extension;
+        }
+
+        if ($type === 'hero') {
+            return 'hero.' . $extension;
         }
 
         $replacePath = $this->replacementScreenshotPath($metadata, $options);
@@ -396,8 +408,17 @@ class PackageMediaService
     private function assertMediaExtension(string $path): void
     {
         if (!in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), array_keys(self::EXTENSIONS), true)) {
-            throw new InvalidArgumentException('Only jpg, jpeg, png, and webp images can be written.');
+            throw new InvalidArgumentException('Only jpg, jpeg, png, webp, and gif images can be written.');
         }
+    }
+
+    private function resourcePath($value): string
+    {
+        if (is_array($value)) {
+            return trim((string)($value['path'] ?? ''));
+        }
+
+        return is_string($value) ? trim($value) : '';
     }
 
     private function isPathInside(string $path, string $base): bool

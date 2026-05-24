@@ -1,3 +1,18 @@
+# v0.4.0
+
+## Unreleased
+
+1. New
+    - Added optional `resources.hero` support for package-local public detail/play presentation images.
+    - Added public rendering for manifest-declared `resources.feelies` supplemental files.
+    - Added Admin2 Media Manager Lite support for replacing package-local hero images through the existing media upload route.
+    - Added export/import inspect support for hero images and feelies/extras resource paths.
+
+2. Safety
+    - Hero and feelies paths are treated as package-local resources and validated against traversal, absolute paths, URI-like paths, and unsupported extensions.
+    - Existing `resources.cover` and `resources.small_cover` semantics remain unchanged.
+    - No IFDB, IFWiki, IF Archive, or `metadata.iFiction.xml` metadata enrichment is implemented yet.
+
 # v0.3.4 Planning
 
 ## 05/24/2026

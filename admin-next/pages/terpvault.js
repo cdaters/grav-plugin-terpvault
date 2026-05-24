@@ -1641,13 +1641,14 @@ class TerpVaultPage extends HTMLElement {
     return `
       <section class="media-manager">
         <h3>Media</h3>
-        <p class="meta">Media Manager Lite accepts package-local jpg, png, and webp images only. Story files, imports, deletes, and arbitrary file management are not available here.</p>
+        <p class="meta">Media Manager Lite accepts package-local jpg, png, webp, and gif images only. Feelies/extras are read from <code>resources.feelies</code> for now; arbitrary file management is not available here.</p>
         ${media.loading ? '<div class="message">Loading media inventory...</div>' : ''}
         ${media.error ? `<div class="message error">${this._esc(media.error)}</div>` : ''}
         ${media.success ? `<div class="message success">${this._esc(media.success)}</div>` : ''}
         <div class="media-grid">
           ${this._mediaCard('Cover', urls.cover, media.resources?.cover || '')}
           ${this._mediaCard('Small Cover', urls.small_cover || urls.thumbnail, media.resources?.small_cover || '')}
+          ${this._mediaCard('Hero', urls.hero, media.resources?.hero || '')}
         </div>
         <div class="screenshot-list">
           <strong>Screenshots</strong>
@@ -1657,6 +1658,7 @@ class TerpVaultPage extends HTMLElement {
         <div class="media-uploads">
           ${this._mediaUploadForm(slug, 'cover', 'Replace cover', media.saving === 'cover')}
           ${this._mediaUploadForm(slug, 'small-cover', 'Replace small cover', media.saving === 'small-cover')}
+          ${this._mediaUploadForm(slug, 'hero', 'Replace hero', media.saving === 'hero')}
           ${this._mediaUploadForm(slug, 'screenshot', 'Add screenshot', media.saving === 'screenshot')}
         </div>
       </section>
@@ -1696,7 +1698,7 @@ class TerpVaultPage extends HTMLElement {
       <form data-media-slug="${this._esc(slug)}" data-media-type="${this._esc(type)}" ${replacePath ? `data-replace-path="${this._esc(replacePath)}"` : ''} ${replaceIndex !== '' ? `data-replace-index="${this._esc(replaceIndex)}"` : ''}>
         <div class="field">
           <label>${this._esc(label)}</label>
-          <input type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" ${saving ? 'disabled' : ''}>
+          <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif" ${saving ? 'disabled' : ''}>
         </div>
         <div class="form-actions">
           <button class="button primary" type="submit" ${saving ? 'disabled' : ''}>${saving ? 'Uploading...' : 'Upload'}</button>
@@ -1782,7 +1784,9 @@ class TerpVaultPage extends HTMLElement {
       ['Story file', readOnly.story_file],
       ['Cover', readOnly.cover],
       ['Small cover', readOnly.small_cover],
+      ['Hero', readOnly.hero],
       ['Screenshots', this._asText(readOnly.screenshots)],
+      ['Feelies', this._asText(readOnly.feelies)],
       ['How-to-play', readOnly.how_to_play],
       ['Hints', readOnly.hints],
       ['Walkthrough', readOnly.walkthrough],
@@ -1876,7 +1880,9 @@ class TerpVaultPage extends HTMLElement {
       story_file: resources.story_file || fallbackGame.story_file || '',
       cover: resources.cover || fallbackGame.cover || '',
       small_cover: resources.small_cover || fallbackGame.small_cover || '',
+      hero: this._resourcePath(resources.hero) || this._resourcePath(fallbackGame.resources?.hero) || fallbackGame.hero || '',
       screenshots: resources.screenshots || fallbackGame.screenshots || [],
+      feelies: resources.feelies || fallbackGame.resources?.feelies || fallbackGame.feelies || [],
       how_to_play: resources.how_to_play || fallbackGame.how_to_play || '',
       hints: resources.hints || fallbackGame.hints || '',
       walkthrough: resources.walkthrough || fallbackGame.walkthrough || '',
@@ -1890,7 +1896,9 @@ class TerpVaultPage extends HTMLElement {
       story_file: game.story_file || game.resources?.story_file || '',
       cover: game.cover || game.resources?.cover || '',
       small_cover: game.small_cover || game.resources?.small_cover || '',
+      hero: this._resourcePath(game.resources?.hero) || game.hero || '',
       screenshots: game.screenshots || game.resources?.screenshots || [],
+      feelies: game.feelies || game.resources?.feelies || [],
       how_to_play: game.how_to_play || game.resources?.how_to_play || '',
       hints: game.hints || game.resources?.hints || '',
       walkthrough: game.walkthrough || game.resources?.walkthrough || '',
@@ -2160,6 +2168,7 @@ class TerpVaultPage extends HTMLElement {
       resources: {
         cover: resources.cover || fallbackGame.resources?.cover || fallbackGame.cover || '',
         small_cover: resources.small_cover || fallbackGame.resources?.small_cover || fallbackGame.small_cover || '',
+        hero: this._resourcePath(resources.hero) || this._resourcePath(fallbackGame.resources?.hero) || fallbackGame.hero || '',
         screenshots: Array.isArray(resources.screenshots) ? resources.screenshots : (fallbackGame.resources?.screenshots || [])
       }
     };
@@ -2171,6 +2180,7 @@ class TerpVaultPage extends HTMLElement {
       resources: {
         cover: game.resources?.cover || game.cover || '',
         small_cover: game.resources?.small_cover || game.small_cover || '',
+        hero: this._resourcePath(game.resources?.hero) || game.hero || '',
         screenshots: Array.isArray(game.resources?.screenshots) ? game.resources.screenshots : []
       }
     };
@@ -2179,6 +2189,19 @@ class TerpVaultPage extends HTMLElement {
   _currentScreenshotPaths() {
     const screenshots = this.state.editor?.media?.resources?.screenshots || [];
     return Array.isArray(screenshots) ? screenshots.slice() : [];
+  }
+
+  _resourcePath(value) {
+    if (!value) {
+      return '';
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (typeof value === 'object' && value.path) {
+      return String(value.path);
+    }
+    return '';
   }
 
   _get(object, path) {
@@ -2200,7 +2223,13 @@ class TerpVaultPage extends HTMLElement {
 
   _asText(value) {
     if (Array.isArray(value)) {
-      return value.join('\n');
+      return value.map((item) => {
+        if (item && typeof item === 'object') {
+          const title = item.title ? `${item.title}: ` : '';
+          return `${title}${item.path || ''}`.trim();
+        }
+        return String(item);
+      }).filter(Boolean).join('\n');
     }
 
     return value == null ? '' : String(value);

@@ -55,19 +55,17 @@ Controlled endpoints:
 
 Frontend virtual pages are added to Grav's page collection during `onPagesInitialized`, with an early priority, before Grav resolves the active page. TerpVault does not replace `$grav['page']`; this is important in Grav 2/Admin2 because the active page service may already be frozen by the time later events run.
 
-## Proposed v0.4.0 presentation model
+## v0.4.0 presentation model
 
-This section is planning only and does not describe implemented behavior yet.
-
-TerpVault should keep package artwork roles separate:
+TerpVault keeps package artwork roles separate:
 
 - `cover`: package/display/title/box art and the primary detail-page identity image.
 - `small_cover`: compact catalog image for cards and dense browsing.
 - `hero`: optional wide visual background or header image for public detail/play presentation.
 
-Hero rendering should remain optional and conservative. Detail/play pages can support focal positioning, overlay tone, gradient direction, and overlay color so curators can keep text legible without editing the source image. The player surface should remain stable and readable even when a hero image is present.
+Hero rendering is optional and conservative. Detail/play pages support focal positioning, overlay tone, gradient direction, and overlay color so curators can keep text legible without editing the source image. The player surface remains stable and readable when a hero image is present.
 
-Feelies/extras should be manifest-declared supplemental files, not arbitrary directory browsing. Public rendering can group files by type, such as documents, maps/images, audio, and other downloads. Files should remain package-local and served only through controlled TerpVault routes when implemented.
+Feelies/extras are manifest-declared supplemental files, not arbitrary directory browsing. Public rendering exposes them as package-local links through controlled TerpVault asset routes.
 
 ## Player adapter model
 

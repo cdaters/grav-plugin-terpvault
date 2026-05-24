@@ -17,17 +17,26 @@ class PackageArchiveService
         'cover.jpeg',
         'cover.png',
         'cover.webp',
+        'cover.gif',
+        'hero.jpg',
+        'hero.jpeg',
+        'hero.png',
+        'hero.webp',
+        'hero.gif',
         'small-cover.jpg',
         'small-cover.jpeg',
         'small-cover.png',
         'small-cover.webp',
+        'small-cover.gif',
         'how-to-play.md',
         'hints.md',
         'walkthrough.md',
         'metadata.iFiction.xml',
     ];
 
-    private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+    private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+
+    private const FEELIE_EXTENSIONS = ['pdf', 'txt', 'md', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp3', 'ogg', 'wav', 'm4a'];
 
     /** @var Grav */
     private $grav;
@@ -109,11 +118,24 @@ class PackageArchiveService
             }
         }
 
+        $hero = $this->resourcePath($resources['hero'] ?? '');
+        if ($hero !== '') {
+            $this->addFile($files, $package, $hero, false, self::IMAGE_EXTENSIONS);
+        }
+
         $screenshots = is_array($resources['screenshots'] ?? null) ? $resources['screenshots'] : [];
         foreach ($screenshots as $screenshot) {
             $relative = (string) $screenshot;
             if ($relative !== '') {
                 $this->addFile($files, $package, $relative);
+            }
+        }
+
+        $feelies = is_array($resources['feelies'] ?? null) ? $resources['feelies'] : [];
+        foreach ($feelies as $feelie) {
+            $relative = $this->resourcePath($feelie);
+            if ($relative !== '') {
+                $this->addFile($files, $package, $relative, false, self::FEELIE_EXTENSIONS);
             }
         }
 
@@ -135,7 +157,29 @@ class PackageArchiveService
             }
         }
 
+        $feeliesDir = $package . DIRECTORY_SEPARATOR . 'feelies';
+        if (is_dir($feeliesDir)) {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($feeliesDir, \FilesystemIterator::SKIP_DOTS)) as $fileinfo) {
+                if (!$fileinfo->isFile()) {
+                    continue;
+                }
+                $relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($fileinfo->getPathname(), strlen($package) + 1));
+                if ($this->allowedExtension($relative, self::FEELIE_EXTENSIONS)) {
+                    $this->addFile($files, $package, $relative, false, self::FEELIE_EXTENSIONS);
+                }
+            }
+        }
+
         return $files;
+    }
+
+    private function resourcePath($value): string
+    {
+        if (is_array($value)) {
+            return trim((string)($value['path'] ?? ''));
+        }
+
+        return is_string($value) ? trim($value) : '';
     }
 
     private function addFile(array &$files, string $package, string $relative, bool $required = false, array $allowedExtensions = []): void

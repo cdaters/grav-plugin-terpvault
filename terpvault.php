@@ -751,12 +751,22 @@ class TerpVaultPlugin extends Plugin
         }
 
         $path = $game->assetPath($asset);
-        if (!$path || !$this->repository()->allowedAssetExtension($path)) {
+        if (!$path || (!$this->repository()->allowedAssetExtension($path) && !$this->isDeclaredFeelieAsset($game, $asset))) {
             $this->serveStatus(404, 'Asset not found');
         }
 
         $mime = $this->mimeType($path);
         $this->serveFile($path, $mime);
+    }
+
+    protected function isDeclaredFeelieAsset(GamePackage $game, string $asset): bool
+    {
+        $ext = strtolower(pathinfo($asset, PATHINFO_EXTENSION));
+        if (!in_array($ext, ['pdf', 'mp3', 'ogg', 'wav', 'm4a'], true)) {
+            return false;
+        }
+
+        return $game->declaredFeeliePath($asset);
     }
 
     protected function serveFile(string $path, string $mime, ?string $filename = null): void
@@ -822,6 +832,11 @@ class TerpVaultPlugin extends Plugin
             'svg' => 'image/svg+xml',
             'md' => 'text/markdown; charset=utf-8',
             'txt' => 'text/plain; charset=utf-8',
+            'pdf' => 'application/pdf',
+            'mp3' => 'audio/mpeg',
+            'ogg' => 'audio/ogg',
+            'wav' => 'audio/wav',
+            'm4a' => 'audio/mp4',
         ];
 
         return $map[$ext] ?? 'application/octet-stream';

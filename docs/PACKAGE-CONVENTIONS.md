@@ -55,13 +55,13 @@ These files make a package easier to browse, verify, and play:
 
 - `cover.jpg` or `cover.png`: display/title/box art for the detail page.
 - `small-cover.jpg` or `small-cover.png`: compact art for library cards.
-- `hero.jpg` or `hero.png`: proposed optional wide presentation art for future public detail/play page backgrounds.
+- `hero.jpg` or `hero.png`: optional wide presentation art for public detail/play page backgrounds.
 - `metadata.iFiction.xml`: original or exported iFiction metadata.
 - `screenshots/`: screenshots such as `screenshots/01.png`.
 - `how-to-play.md`: basic commands, parser conventions, or accessibility notes.
 - `hints.md`: spoiler-safe hint sections, ideally using Markdown headings or `<details>` blocks.
 - `walkthrough.md`: a solution or route through the work.
-- `feelies/`: proposed optional package-local supplemental files such as manuals, maps, clue sheets, newsletters, audio, and other extras.
+- `feelies/`: optional package-local supplemental files such as manuals, maps, clue sheets, newsletters, audio, and other extras.
 
 ## Preferred manifest shape
 
@@ -89,7 +89,6 @@ resources:
   story_file: advent.z5
   cover: cover.jpg
   small_cover: small-cover.jpg
-  # Proposed for v0.4.0; not implemented yet.
   hero:
     path: hero.jpg
     focal_position: center center
@@ -101,7 +100,6 @@ resources:
   how_to_play: how-to-play.md
   hints: hints.md
   walkthrough: walkthrough.md
-  # Proposed for v0.4.0; not implemented yet.
   feelies:
     - path: feelies/manual.pdf
       title: Original Manual
@@ -142,9 +140,9 @@ player:
   launch_mode: button
 ```
 
-## Proposed v0.4.0 presentation resources
+## Presentation resources
 
-The fields in this section are proposed planning notes, not implemented behavior.
+The fields in this section are optional. Existing packages without hero art or feelies continue to work.
 
 ### Cover, small-cover, and hero responsibilities
 
@@ -152,7 +150,7 @@ The fields in this section are proposed planning notes, not implemented behavior
 - `resources.small_cover`: compact catalog art for library cards and dense package lists.
 - `resources.hero`: optional wide atmospheric image for public detail/play backgrounds or large headers. It should not replace cover art or be required for package validity.
 
-Proposed `resources.hero` shape:
+Preferred `resources.hero` shape:
 
 ```yaml
 resources:
@@ -164,14 +162,14 @@ resources:
     overlay_color: '#000000'
 ```
 
-`resources.hero` may also be accepted as a simple string path in a future implementation:
+`resources.hero` may also be a simple string path:
 
 ```yaml
 resources:
   hero: hero.jpg
 ```
 
-Proposed hero options:
+Hero options:
 
 - `path`: package-local image path.
 - `focal_position`: CSS-like image focal point, such as `center center`, `top center`, or `35% 45%`.
@@ -179,13 +177,13 @@ Proposed hero options:
 - `gradient_direction`: overlay direction, such as `to bottom`, `to top`, `to right`, `to left`, or `radial`.
 - `overlay_color`: optional color value for site-specific overlay tone.
 
-Proposed hero image extensions: `jpg`, `jpeg`, `png`, and `webp`. SVG should not be part of the first hero pass unless the rendering and sanitization story is explicit.
+Hero image extensions: `jpg`, `jpeg`, `png`, `webp`, and `gif`. SVG is not accepted for hero images.
 
 ### Feelies and extras
 
-`resources.feelies` is proposed for package-local supplemental files. The intent is to represent curated extras, not to expose a general file browser.
+`resources.feelies` is for package-local supplemental files. The intent is to represent curated extras, not to expose a general file browser.
 
-Proposed shape:
+Preferred shape:
 
 ```yaml
 resources:
@@ -205,20 +203,20 @@ resources:
       type: audio
 ```
 
-Proposed item fields:
+Item fields:
 
 - `path`: required package-local file path.
 - `title`: curator-facing/public label.
 - `type`: optional grouping hint, such as `manual`, `map`, `clues`, `newsletter`, `image`, `audio`, or `other`.
 - `description`: optional short note.
 
-Proposed allowed extensions:
+Allowed extensions:
 
 - Documents: `pdf`, `txt`, `md`
-- Images/maps: `jpg`, `jpeg`, `png`, `webp`, `gif`, `svg`
+- Images/maps: `jpg`, `jpeg`, `png`, `webp`, `gif`
 - Audio: `mp3`, `ogg`, `wav`, `m4a`
 
-Archives and executable-like files should stay out of the first public rendering pass. Future import/export support should continue rejecting traversal, absolute paths, URI-like paths, unsafe cruft-looking paths, and unrelated files.
+Archives and executable-like files are not accepted for feelies. Import/export continues to reject traversal, absolute paths, URI-like paths, unsafe cruft-looking paths, and unrelated files.
 
 ## Inform release mapping
 
@@ -274,9 +272,11 @@ bin/grav clearcache
 - Add title, author, year/date, language, and description.
 - Add IFIDs when known.
 - Add cover and small-cover artwork when redistribution rights allow it.
+- Add hero artwork when a wide page background improves presentation.
 - Use clearly labeled generated placeholder art when original cover rights are unclear.
 - Add source, license, and redistribution notes before publishing broadly.
 - Add IFDB, IFWiki, and IF Archive links when known.
+- Add feelies/extras such as manuals, maps, clue sheets, and audio when rights allow it.
 - Add how-to-play, hints, and walkthrough Markdown when useful.
 - Clear Grav cache and check `/if`, `/if/{slug}`, and `/if/{slug}/play`.
 
@@ -290,8 +290,10 @@ adventure/
   advent.z5
   cover.jpg
   small-cover.jpg
+  hero.jpg
   metadata.iFiction.xml
   screenshots/01.png
+  feelies/manual.pdf
   how-to-play.md
   hints.md
   walkthrough.md
@@ -301,9 +303,9 @@ Export includes:
 
 - `game.yaml`.
 - One playable story file referenced by `resources.story_file`.
-- Referenced cover, small-cover, screenshot, how-to-play, hints, and walkthrough files.
+- Referenced cover, small-cover, hero, screenshot, feelies, how-to-play, hints, and walkthrough files.
 - `metadata.iFiction.xml` when present.
-- Safe conventional cover, small-cover, screenshot, and helper Markdown filenames when present.
+- Safe conventional cover, small-cover, hero, screenshot, feelies, and helper Markdown filenames when present.
 
 Export excludes backups, lock files, temp files, hidden files/directories, macOS cruft such as `__MACOSX/` and `.DS_Store`, Windows cruft such as `Thumbs.db` and `desktop.ini`, and unrelated/unreferenced files.
 

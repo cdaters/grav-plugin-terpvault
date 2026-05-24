@@ -6,6 +6,10 @@ namespace Grav\Plugin\TerpVault;
  */
 class GamePackage
 {
+    private const HERO_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+
+    private const FEELIE_EXTENSIONS = ['pdf', 'txt', 'md', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp3', 'ogg', 'wav', 'm4a'];
+
     /** @var string */
     public $slug;
 
@@ -108,7 +112,7 @@ class GamePackage
         }
 
         $path = $this->safePath($file);
-        return is_file($path) ? $path : null;
+        return $path !== null && is_file($path) ? $path : null;
     }
 
     public function hasStoryFile(): bool
@@ -123,7 +127,7 @@ class GamePackage
         }
 
         $path = $this->safePath($relative);
-        return is_file($path) ? $path : null;
+        return $path !== null && is_file($path) ? $path : null;
     }
 
     public function markdownPath(?string $relative): ?string
@@ -133,7 +137,7 @@ class GamePackage
         }
 
         $path = $this->safePath($relative);
-        return is_file($path) ? $path : null;
+        return $path !== null && is_file($path) ? $path : null;
     }
 
     public function url(string $type = 'detail'): string
@@ -210,6 +214,42 @@ class GamePackage
     }
 
     /**
+     * Optional wide presentation image for public detail/play pages.
+     *
+     * This is intentionally separate from cover and small_cover artwork.
+     */
+    public function heroUrl(): ?string
+    {
+        return $this->firstAssetUrl([
+            $this->resourcePathValue($this->get('resources.hero')),
+            $this->get('hero'),
+            'hero.jpg',
+            'hero.jpeg',
+            'hero.png',
+            'hero.webp',
+            'hero.gif',
+        ], self::HERO_EXTENSIONS);
+    }
+
+    public function heroStyle(): string
+    {
+        $url = $this->heroUrl();
+        if (!$url) {
+            return '';
+        }
+
+        $hero = $this->get('resources.hero', []);
+        $hero = is_array($hero) ? $hero : [];
+        $position = $this->cssKeywordValue((string)($hero['focal_position'] ?? 'center center'), 'center center');
+        $overlay = $this->overlayColor((string)($hero['overlay_color'] ?? ''), (string)($hero['overlay_tone'] ?? 'dark'));
+        $gradient = $this->heroGradient((string)($hero['gradient_direction'] ?? 'to bottom'), $overlay);
+
+        return '--tv-hero-image: url("' . str_replace(['\\', '"'], ['/', '%22'], $url) . '");'
+            . '--tv-hero-position: ' . $position . ';'
+            . '--tv-hero-gradient: ' . $gradient . ';';
+    }
+
+    /**
      * Optional legacy/extra wide splash art. New packages should usually use cover.
      */
     public function splashUrl(): ?string
@@ -220,6 +260,76 @@ class GamePackage
             $this->get('title_image'),
             $this->get('hero'),
         ]);
+    }
+
+    public function feelies(): array
+    {
+        $feelies = $this->get('resources.feelies', []);
+        if (!is_array($feelies)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($feelies as $item) {
+            $data = is_array($item) ? $item : ['path' => (string) $item];
+            $path = $this->resourcePathValue($data);
+            if ($path === '') {
+                continue;
+            }
+            $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+            if (!in_array($extension, self::FEELIE_EXTENSIONS, true)) {
+                continue;
+            }
+
+            $url = $this->assetUrl($path);
+            if (!$url) {
+                continue;
+            }
+
+            $title = trim((string)($data['title'] ?? ''));
+            if ($title === '') {
+                $title = basename(str_replace('\\', '/', $path));
+            }
+
+            $items[] = [
+                'title' => $title,
+                'path' => $path,
+                'url' => $url,
+                'type' => trim((string)($data['type'] ?? $data['category'] ?? '')),
+                'description' => trim((string)($data['description'] ?? '')),
+                'extension' => $extension,
+            ];
+        }
+
+        return $items;
+    }
+
+    public function declaredFeeliePath(string $relative): bool
+    {
+        $relative = $this->normalizeRelativePath($relative);
+        if ($relative === '') {
+            return false;
+        }
+
+        $extension = strtolower(pathinfo($relative, PATHINFO_EXTENSION));
+        if (!in_array($extension, self::FEELIE_EXTENSIONS, true)) {
+            return false;
+        }
+
+        $feelies = $this->get('resources.feelies', []);
+        if (!is_array($feelies)) {
+            return false;
+        }
+
+        foreach ($feelies as $item) {
+            $data = is_array($item) ? $item : ['path' => (string) $item];
+            $path = $this->normalizeRelativePath($this->resourcePathValue($data));
+            if ($path !== '' && $path === $relative) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function screenshots(): array
@@ -538,9 +648,11 @@ class GamePackage
                 'small_cover' => $smallCover,
                 'thumbnail' => $smallCover,
                 'cover' => $this->coverUrl(),
+                'hero' => $this->heroUrl(),
                 'splash' => $this->splashUrl(),
                 'screenshots' => $this->screenshots(),
             ];
+            $data['feelies'] = $this->feelies();
         }
 
         return $data;
@@ -558,11 +670,14 @@ class GamePackage
         return false;
     }
 
-    private function firstAssetUrl(array $candidates): ?string
+    private function firstAssetUrl(array $candidates, array $allowedExtensions = []): ?string
     {
         foreach ($candidates as $candidate) {
             $candidate = is_string($candidate) ? trim($candidate) : '';
             if ($candidate === '') {
+                continue;
+            }
+            if ($allowedExtensions && !in_array(strtolower(pathinfo($candidate, PATHINFO_EXTENSION)), $allowedExtensions, true)) {
                 continue;
             }
 
@@ -575,9 +690,93 @@ class GamePackage
         return null;
     }
 
-    private function safePath(string $relative): string
+    private function resourcePathValue($value): string
     {
-        $relative = ltrim(str_replace(['\\', '../', '..\\'], ['/', '', ''], $relative), '/');
-        return $this->path . DIRECTORY_SEPARATOR . $relative;
+        if (is_array($value)) {
+            return trim((string)($value['path'] ?? ''));
+        }
+
+        return is_string($value) ? trim($value) : '';
+    }
+
+    private function cssKeywordValue(string $value, string $fallback): string
+    {
+        $value = trim($value);
+        if ($value === '' || !preg_match('/^[a-z0-9% ._-]+$/i', $value)) {
+            return $fallback;
+        }
+
+        return $value;
+    }
+
+    private function heroGradient(string $direction, array $overlay): string
+    {
+        $direction = strtolower(trim($direction));
+        if ($direction === 'radial') {
+            return 'radial-gradient(circle, ' . $overlay['start'] . ', ' . $overlay['end'] . ')';
+        }
+
+        $allowed = ['to bottom', 'to top', 'to right', 'to left'];
+        if (!in_array($direction, $allowed, true) && !preg_match('/^-?\d{1,3}(\.\d+)?deg$/', $direction)) {
+            $direction = 'to bottom';
+        }
+
+        return 'linear-gradient(' . $direction . ', ' . $overlay['start'] . ', ' . $overlay['end'] . ')';
+    }
+
+    private function overlayColor(string $color, string $tone): array
+    {
+        $color = trim($color);
+        if ($color === '' || !preg_match('/^#[0-9a-f]{3}([0-9a-f]{3})?$/i', $color)) {
+            $palette = [
+                'light' => ['start' => 'rgba(255,255,255,.78)', 'end' => 'rgba(255,255,255,.46)'],
+                'warm' => ['start' => 'rgba(42,27,14,.68)', 'end' => 'rgba(42,27,14,.38)'],
+                'cool' => ['start' => 'rgba(10,25,44,.70)', 'end' => 'rgba(10,25,44,.40)'],
+                'none' => ['start' => 'rgba(0,0,0,0)', 'end' => 'rgba(0,0,0,0)'],
+                'dark' => ['start' => 'rgba(0,0,0,.72)', 'end' => 'rgba(0,0,0,.36)'],
+            ];
+
+            return $palette[$tone] ?? $palette['dark'];
+        }
+
+        if (strlen($color) === 4) {
+            $color = '#' . $color[1] . $color[1] . $color[2] . $color[2] . $color[3] . $color[3];
+        }
+
+        return ['start' => $color . 'cc', 'end' => $color . '66'];
+    }
+
+    private function safePath(string $relative): ?string
+    {
+        $relative = $this->normalizeRelativePath($relative);
+        if ($relative === '') {
+            return null;
+        }
+
+        return $this->path . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+    }
+
+    private function normalizeRelativePath(string $relative): string
+    {
+        if (strpos($relative, "\0") !== false || preg_match('#^[a-z][a-z0-9+.-]*://#i', $relative)) {
+            return '';
+        }
+
+        $relative = str_replace('\\', '/', trim($relative));
+        if ($relative === '' || $relative[0] === '/' || preg_match('/^[A-Za-z]:\//', $relative)) {
+            return '';
+        }
+
+        $segments = array_values(array_filter(explode('/', $relative), static function (string $segment): bool {
+            return $segment !== '';
+        }));
+
+        foreach ($segments as $segment) {
+            if ($segment === '.' || $segment === '..') {
+                return '';
+            }
+        }
+
+        return implode('/', $segments);
     }
 }

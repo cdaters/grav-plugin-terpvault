@@ -1,15 +1,16 @@
 # TerpVault Plugin
 
-**TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a standards-aware shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, screenshots, hints, walkthroughs, and a bundled web player.
+**TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a standards-aware shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, optional hero art, screenshots, feelies/extras, hints, walkthroughs, and a bundled web player.
 
-This is a **v0.3.x early public-beta foundation build**. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
+This is a **v0.4.0 development build** on the early public-beta foundation. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
 
 ## What it does now
 
 - Reads game package folders from `user/data/terpvault/games`.
 - Uses a per-game `game.yaml` metadata file.
 - Uses Inform-friendly naming ideas: `cover` for display/title/box art and `small_cover` for compact library card art.
-- Supports screenshots, how-to-play notes, hints, and walkthrough files.
+- Supports optional `resources.hero` art for public detail/play presentation without replacing cover art.
+- Supports screenshots, feelies/extras, how-to-play notes, hints, and walkthrough files.
 - Renders compact package cards, detail pages with help/provenance sections, and a focused play view.
 - Provides virtual frontend routes under `/if` by default:
   - `/if` library page
@@ -20,7 +21,7 @@ This is a **v0.3.x early public-beta foundation build**. It is intentionally rep
 - Provides a native shortcode-style embed:
   - `[terpvault game="adventure"]`
 - Bundles the Parchment 2025.1.14 single-file web build as the first engine adapter.
-- Includes an optional Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a limited package creation wizard, package export, draft-only package import, a metadata-only `game.yaml` editor, helper Markdown editing, limited package-local cover/screenshot image uploads, and limited story-file replacement. It is disabled by default.
+- Includes an optional Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a limited package creation wizard, package export, draft-only package import, a metadata-only `game.yaml` editor, helper Markdown editing, limited package-local cover/small-cover/hero/screenshot image uploads, and limited story-file replacement. It is disabled by default.
 
 ## What it does not do yet
 
@@ -34,7 +35,7 @@ This is a **v0.3.x early public-beta foundation build**. It is intentionally rep
 
 ## Known limitations
 
-- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory, package export, draft-only import, whitelisted `game.yaml` metadata edits, allowlisted helper Markdown edits, limited cover/screenshot image uploads, and limited story-file replacement.
+- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory, package export, draft-only import, whitelisted `game.yaml` metadata edits, allowlisted helper Markdown edits, limited cover/small-cover/hero/screenshot image uploads, and limited story-file replacement. Feelies are manifest-rendered and read-only in Admin2 for now.
 - Public virtual routes and Admin2 API routes are separate integration surfaces. Admin2 API routes are registered only when the Admin2 Library Manager is enabled.
 - `.terpvault.zip` export and draft-only import are available through Admin2. Import overwrite/replace is not implemented.
 - Parchment save/restore is interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
@@ -172,8 +173,18 @@ resources:
   story_file: advent.z5
   cover: cover.jpg
   small_cover: small-cover.jpg
+  hero:
+    path: hero.jpg
+    focal_position: center center
+    overlay_tone: dark
+    gradient_direction: to bottom
   screenshots:
     - screenshots/01.png
+  feelies:
+    - title: Original Manual
+      path: feelies/manual.pdf
+      type: manual
+      description: Package-local supplemental document.
   how_to_play: how-to-play.md
   hints: hints.md
   walkthrough: walkthrough.md
@@ -219,8 +230,10 @@ Recommended files:
 
 - `cover.jpg` or `cover.png`
 - `small-cover.jpg` or `small-cover.png`
+- `hero.jpg` or `hero.png`
 - `metadata.iFiction.xml`
 - `screenshots/`
+- `feelies/`
 - `how-to-play.md`
 - `hints.md`
 - `walkthrough.md`
@@ -244,7 +257,7 @@ Then visit:
 /if/adventure
 ```
 
-Admin2 export creates a `.terpvault.zip` package with one top-level `{slug}/` folder containing `game.yaml`, the playable story file, referenced package resources, `metadata.iFiction.xml` when present, and safe conventional helper/media files. Admin2 can inspect and import an uploaded `.terpvault.zip`, but imported packages are always installed as draft, forced to not featured, and existing package folders are never overwritten.
+Admin2 export creates a `.terpvault.zip` package with one top-level `{slug}/` folder containing `game.yaml`, the playable story file, referenced package resources, hero art, feelies/extras, `metadata.iFiction.xml` when present, and safe conventional helper/media files. Admin2 can inspect and import an uploaded `.terpvault.zip`, but imported packages are always installed as draft, forced to not featured, and existing package folders are never overwritten.
 
 ### Import security notes
 
@@ -264,6 +277,7 @@ Admin2 export creates a `.terpvault.zip` package with one top-level `{slug}/` fo
 - Add IFIDs, IFDB, IFWiki, and IF Archive references when known.
 - Add source, license, and redistribution notes before publishing broadly.
 - Add cover, small-cover, screenshots, how-to-play, hints, and walkthrough files when available.
+- Add optional hero art and feelies/extras when useful and redistribution rights allow it.
 - Clear Grav cache and check `/if`, `/if/{slug}`, and `/if/{slug}/play`.
 
 ### Inform-friendly artwork naming
@@ -301,7 +315,7 @@ TerpVault keeps a human-friendly `game.yaml` manifest, but its structure now map
 - `identification.ifids` stores one or more IFIDs.
 - `identification.format` stores the interpreter/story-file family.
 - `bibliographic.*` stores title, author, headline, first publication date, genre, language, and description.
-- `resources.*` stores the local story file, cover art, small-cover art, screenshots, and Markdown helper files.
+- `resources.*` stores the local story file, cover art, small-cover art, optional hero art, screenshots, feelies/extras, and Markdown helper files.
 - `catalog.ifdb`, `catalog.ifwiki`, and `catalog.ifarchive` store public catalog/reference links.
 - `release.license` and `release.source` store rights, redistribution, and provenance notes.
 
@@ -423,7 +437,7 @@ The current page provides package inventory plus metadata/helper/media/story edi
 - Create Package wizard for a new folder, starter `game.yaml`, starter helper Markdown, and one initial story file.
 - Edit Metadata action for whitelisted existing `game.yaml` fields such as bibliographic details, IFIDs, catalog links, license/source notes, status, featured, and tags.
 - Helper Docs editor for package-local `how-to-play.md`, `hints.md`, and `walkthrough.md` content.
-- Media Manager Lite controls for replacing cover/small-cover art, adding screenshots, replacing registered screenshots, and reordering/removing screenshot entries with package-local `jpg`, `jpeg`, `png`, or `webp` files.
+- Media Manager Lite controls for replacing cover/small-cover/hero art, adding screenshots, replacing registered screenshots, and reordering/removing screenshot entries with package-local `jpg`, `jpeg`, `png`, `webp`, or `gif` files. Feelies/extras are rendered from `resources.feelies` but are read-only in Admin2 for now.
 - Story File Manager Lite controls for replacing the package-local playable story file with allowlisted IF story formats.
 - Export action for downloading a single installed package as `{slug}.terpvault.zip`.
 - Import panel for validating a `.terpvault.zip` package and committing it as a draft package after server-side revalidation.

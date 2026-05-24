@@ -18,7 +18,9 @@ class PackageImportService
         'ulx', 'gblorb', 'glb', 'gam', 't3', 'taf',
     ];
 
-    private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+    private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+
+    private const FEELIE_EXTENSIONS = ['pdf', 'txt', 'md', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp3', 'ogg', 'wav', 'm4a'];
 
     /** @var Grav */
     private $grav;
@@ -344,9 +346,26 @@ class PackageImportService
             $this->inspectMediaReference($relative, 'resources.' . $key, $packageFiles, $report);
         }
 
+        $hero = $this->resourcePath($resources['hero'] ?? '');
+        if ($hero !== '') {
+            $this->inspectMediaReference($hero, 'resources.hero', $packageFiles, $report);
+        }
+
         $screenshots = is_array($resources['screenshots'] ?? null) ? $resources['screenshots'] : [];
         foreach ($screenshots as $screenshot) {
             $this->inspectMediaReference((string) $screenshot, 'resources.screenshots', $packageFiles, $report);
+        }
+
+        $feelies = is_array($resources['feelies'] ?? null) ? $resources['feelies'] : [];
+        $feelieCount = 0;
+        foreach ($feelies as $feelie) {
+            $relative = $this->resourcePath($feelie);
+            if ($relative === '') {
+                $report['warnings'][] = 'resources.feelies contains an item without a path.';
+                continue;
+            }
+            $feelieCount++;
+            $this->inspectFeelieReference($relative, $packageFiles, $report);
         }
 
         if (!$report['has_ifiction']) {
@@ -360,8 +379,18 @@ class PackageImportService
             'author' => $report['author'],
             'story_file' => $report['story_file'],
             'story_extension' => $report['story_extension'],
+            'feelies_count' => $feelieCount,
             'file_count' => count($report['included_files']),
         ];
+    }
+
+    private function resourcePath($value): string
+    {
+        if (is_array($value)) {
+            return trim((string)($value['path'] ?? ''));
+        }
+
+        return is_string($value) ? trim($value) : '';
     }
 
     private function inspectMediaReference(string $relative, string $field, array $packageFiles, array &$report): void
@@ -373,11 +402,27 @@ class PackageImportService
         try {
             $relative = $this->normalizePackagePath($relative, 'Media path');
             if (!in_array(strtolower(pathinfo($relative, PATHINFO_EXTENSION)), self::IMAGE_EXTENSIONS, true)) {
-                $report['fatal_errors'][] = $field . ' must reference a jpg, jpeg, png, or webp file.';
+                $report['fatal_errors'][] = $field . ' must reference a jpg, jpeg, png, webp, or gif file.';
                 return;
             }
             if (!isset($packageFiles[$relative])) {
                 $report['warnings'][] = 'Referenced media file is missing: ' . $relative;
+            }
+        } catch (InvalidArgumentException $e) {
+            $report['fatal_errors'][] = $e->getMessage();
+        }
+    }
+
+    private function inspectFeelieReference(string $relative, array $packageFiles, array &$report): void
+    {
+        try {
+            $relative = $this->normalizePackagePath($relative, 'Feelie path');
+            if (!in_array(strtolower(pathinfo($relative, PATHINFO_EXTENSION)), self::FEELIE_EXTENSIONS, true)) {
+                $report['fatal_errors'][] = 'resources.feelies must reference pdf, txt, md, image, or audio files.';
+                return;
+            }
+            if (!isset($packageFiles[$relative])) {
+                $report['warnings'][] = 'Referenced feelie file is missing: ' . $relative;
             }
         } catch (InvalidArgumentException $e) {
             $report['fatal_errors'][] = $e->getMessage();

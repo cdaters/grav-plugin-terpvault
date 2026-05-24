@@ -359,6 +359,26 @@ html.light .terpvault,
   background: linear-gradient(135deg, var(--tv-surface), transparent);
 }
 
+.terpvault-game-hero-with-image,
+.terpvault-play-header-with-image {
+  background-image:
+    var(--tv-hero-gradient, linear-gradient(to bottom, rgba(0, 0, 0, .72), rgba(0, 0, 0, .36))),
+    var(--tv-hero-image);
+  background-size: cover;
+  background-position: var(--tv-hero-position, center center);
+  color: #fff;
+  overflow: hidden;
+}
+
+.terpvault-game-hero-with-image .terpvault-meta,
+.terpvault-game-hero-with-image .terpvault-kicker,
+.terpvault-game-hero-with-image .terpvault-tagline,
+.terpvault-play-header-with-image .terpvault-kicker,
+.terpvault-play-header-with-image p {
+  color: rgba(255, 255, 255, .88);
+  opacity: 1;
+}
+
 .terpvault-game-heading { min-width: 0; }
 .terpvault-hero-actions { margin: 1rem 0 0; }
 
@@ -452,6 +472,57 @@ html.light .terpvault,
 .terpvault-detail-body summary {
   margin: 0 -.75rem;
   padding: .65rem .75rem;
+}
+
+.terpvault-feelies-list {
+  display: grid;
+  gap: .65rem;
+}
+
+.terpvault-feelie {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .8rem .9rem;
+  border: 1px solid var(--tv-border);
+  border-radius: var(--tv-radius-sm);
+  background: var(--tv-surface-inset);
+  color: inherit;
+  text-decoration: none;
+}
+
+.terpvault-feelie:hover,
+.terpvault-feelie:focus {
+  border-color: var(--tv-border-strong);
+  background: var(--tv-surface);
+}
+
+.terpvault-feelie span {
+  display: grid;
+  gap: .2rem;
+  min-width: 0;
+}
+
+.terpvault-feelie small {
+  color: var(--tv-text-muted);
+}
+
+.terpvault-feelie code {
+  width: fit-content;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.terpvault-feelie em {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  padding: .12rem .45rem;
+  border-radius: 999px;
+  background: var(--tv-surface-strong);
+  color: var(--tv-text-muted);
+  font-size: .78rem;
+  font-style: normal;
+  text-transform: uppercase;
 }
 
 .terpvault-provenance {

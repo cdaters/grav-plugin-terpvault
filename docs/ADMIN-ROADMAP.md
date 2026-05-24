@@ -224,9 +224,9 @@ Editable fields:
 - Clarify plugin metadata description, keywords, and compatibility posture without making unverified Grav 1/API 1 or GPM-readiness claims.
 - Keep import/export behavior, routing, player behavior, and security behavior unchanged.
 
-## v0.4.0 Planning: Hero Images, Feelies, and Metadata Enrichment
+## v0.4.0 Hero Images, Feelies, and Metadata Enrichment Foundation
 
-This section is planning only. These items are not implemented yet.
+The first v0.4.0 implementation pass adds package-local hero and feelies foundations. Metadata enrichment remains planned.
 
 ### Public package presentation
 
@@ -234,7 +234,7 @@ This section is planning only. These items are not implemented yet.
 - Keep `resources.cover` as the conventional package/display/title/box-art image.
 - Keep `resources.small_cover` as the compact catalog/library-card image.
 - Treat `resources.hero` as an atmospheric wide image for page backgrounds or large visual headers, not as a replacement for cover art.
-- Proposed hero presentation options:
+- Hero presentation options:
   - `focal_position`: CSS-like focal point such as `center center`, `top center`, or `35% 45%`.
   - `overlay_tone`: restrained presets such as `light`, `dark`, `warm`, `cool`, or `none`.
   - `gradient_direction`: `to bottom`, `to top`, `to right`, `to left`, or `radial`.
@@ -246,20 +246,21 @@ This section is planning only. These items are not implemented yet.
 
 - Add optional `resources.feelies` for package-local supplemental files: maps, manuals, letters, newsletters, clue sheets, PDFs, images, audio, and other curated extras.
 - Render public feelies/extras as a clearly labeled supplemental section on the detail page.
-- Consider grouped rendering by type: documents, maps/images, audio, and other downloads.
-- Keep all feelies package-local and served through controlled asset/file routes when implemented.
-- Proposed initial allowed extensions:
+- Keep all feelies package-local and served through controlled asset routes.
+- Initial allowed extensions:
   - Documents: `pdf`, `txt`, `md`
-  - Images/maps: `jpg`, `jpeg`, `png`, `webp`, `gif`, `svg`
+  - Images/maps: `jpg`, `jpeg`, `png`, `webp`, `gif`
   - Audio: `mp3`, `ogg`, `wav`, `m4a`
-  - Archives should stay out of the first public rendering pass unless a stronger safety story is designed.
+  - Archives stay out of the first public rendering pass.
 
 ### Admin2 sequencing
 
-- Implement public read/render support first only after the schema is settled.
-- Add Admin2 hero management after public rendering exists.
+- Public read/render support exists for hero and feelies.
+- Admin2 hero management uses the existing Media Manager Lite upload route.
 - Add Admin2 feelies/extras management later, with allowlisted uploads and package-local path validation.
 - Do not turn feelies into arbitrary file browsing; expose only manifest-declared supplemental files.
+- Future Admin2 UX should include lightweight contextual help for users unfamiliar with interactive fiction terminology and TerpVault package conventions. This may use hoverable question-mark/help icons, subtle inline help notes, or a compact glossary/help panel for jargon-heavy fields and concepts such as IFID, iFiction, IFDB, IFWiki, IF Archive, TUID, cover, small cover, hero image, feelies, story file formats, catalog identifiers, import/export, and player settings. Keep help unobtrusive for experienced users.
+- Future Admin2/Plugin Configuration should consider an Advanced File Type Policy area under Plugins > TerpVault > Configure, possibly using collapsible sections for story files, cover/small-cover/hero images, screenshots, helper docs, feelies/extras, and public asset-serving rules. This should be guardrailed rather than a raw freeform extension list, and should distinguish file types allowed inside packages, file types allowed for import/export validation, and file types allowed to be served publicly through TerpVault routes. The UI should explain that some extensions may be safe as package contents but unsafe as public same-origin browser links; SVG feelies should remain excluded unless a future safe sanitization or forced-download strategy is designed.
 
 ### Metadata enrichment roadmap
 
