@@ -1,7 +1,7 @@
 name: TerpVault
 slug: terpvault
 type: plugin
-version: 0.3.2
+version: 0.4.0
 description: "Curate, manage, import/export, and play interactive fiction story packages in Grav."
 icon: book-open
 author:
@@ -14,7 +14,8 @@ bugs: https://github.com/cdaters/grav-plugin-terpvault/issues
 license: MIT
 
 compatibility:
-  grav: ['2.0']
+  grav:
+    - '2.0'
 
 dependencies:
   - { name: grav, version: '>=2.0.0-rc.2' }

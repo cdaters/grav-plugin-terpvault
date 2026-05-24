@@ -2,7 +2,7 @@
 
 **TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a standards-aware shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, optional hero art, screenshots, feelies/extras, hints, walkthroughs, and a bundled web player.
 
-This is a **v0.4.0 development build** on the early public-beta foundation. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
+This is a **v0.4.0 early public-beta release** on the TerpVault foundation. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
 
 ## What it does now
 
@@ -399,7 +399,7 @@ Then visit:
 - Run `git diff --check`.
 - Run PHP lint where PHP is available.
 - Install into a clean Grav 2 site and run `bin/grav clearcache`.
-- Confirm `/if`, `/if/{slug}`, `/if/{slug}/play`, `/_story`, and `/_asset` routes work, including a subdirectory install.
+- Confirm `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_story/{slug}/{filename}`, and `/if/_asset/{slug}/{path}` routes work, including a subdirectory install.
 - Confirm Admin2 loads with `admin.enable_admin2_page: false`.
 - Confirm Admin2/API package creation, export, draft-only import, metadata, helper, media, screenshot, and story-file workflows are still opt-in and authenticated.
 - Confirm Parchment launches and save/restore guidance still points to interpreter-native `SAVE` / `RESTORE`.

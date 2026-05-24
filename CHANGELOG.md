@@ -1,6 +1,6 @@
 # v0.4.0
 
-## Unreleased
+## 05/24/2026
 
 1. New
     - Added optional `resources.hero` support for package-local public detail/play presentation images.
@@ -13,7 +13,7 @@
     - Existing `resources.cover` and `resources.small_cover` semantics remain unchanged.
     - No IFDB, IFWiki, IF Archive, or `metadata.iFiction.xml` metadata enrichment is implemented yet.
 
-# v0.3.4 Planning
+# v0.3.4
 
 ## 05/24/2026
 
