@@ -1,4 +1,4 @@
-# v0.4.0 Planning
+# v0.3.4 Planning
 
 ## 05/24/2026
 
