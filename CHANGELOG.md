@@ -1,3 +1,15 @@
+# v0.4.0 Planning
+
+## 05/24/2026
+
+1. Planning
+    - Added proposed docs for optional `resources.hero` package presentation metadata.
+    - Added proposed docs for optional `resources.feelies` supplemental package files.
+    - Added roadmap notes for preview-based metadata enrichment from `metadata.iFiction.xml`, then IFDB, IFWiki, and IF Archive.
+
+2. Notes
+    - Planning only; no runtime behavior, routes, import/export behavior, security behavior, or plugin metadata changed.
+
 # v0.3.2
 
 ## 05/23/2026

@@ -224,14 +224,62 @@ Editable fields:
 - Clarify plugin metadata description, keywords, and compatibility posture without making unverified Grav 1/API 1 or GPM-readiness claims.
 - Keep import/export behavior, routing, player behavior, and security behavior unchanged.
 
-## Next build: package management UI
+## v0.4.0 Planning: Hero Images, Feelies, and Metadata Enrichment
+
+This section is planning only. These items are not implemented yet.
+
+### Public package presentation
+
+- Add optional `resources.hero` support for public detail/play presentation.
+- Keep `resources.cover` as the conventional package/display/title/box-art image.
+- Keep `resources.small_cover` as the compact catalog/library-card image.
+- Treat `resources.hero` as an atmospheric wide image for page backgrounds or large visual headers, not as a replacement for cover art.
+- Proposed hero presentation options:
+  - `focal_position`: CSS-like focal point such as `center center`, `top center`, or `35% 45%`.
+  - `overlay_tone`: restrained presets such as `light`, `dark`, `warm`, `cool`, or `none`.
+  - `gradient_direction`: `to bottom`, `to top`, `to right`, `to left`, or `radial`.
+  - `overlay_color`: optional hex/rgb color for site-specific tone matching.
+- Public detail pages can use the hero image as a wide header/background while preserving readable metadata and provenance sections.
+- Public play pages can optionally use the hero image around the player shell, but the player iframe and controls must remain readable and stable.
+
+### Feelies and extras
+
+- Add optional `resources.feelies` for package-local supplemental files: maps, manuals, letters, newsletters, clue sheets, PDFs, images, audio, and other curated extras.
+- Render public feelies/extras as a clearly labeled supplemental section on the detail page.
+- Consider grouped rendering by type: documents, maps/images, audio, and other downloads.
+- Keep all feelies package-local and served through controlled asset/file routes when implemented.
+- Proposed initial allowed extensions:
+  - Documents: `pdf`, `txt`, `md`
+  - Images/maps: `jpg`, `jpeg`, `png`, `webp`, `gif`, `svg`
+  - Audio: `mp3`, `ogg`, `wav`, `m4a`
+  - Archives should stay out of the first public rendering pass unless a stronger safety story is designed.
+
+### Admin2 sequencing
+
+- Implement public read/render support first only after the schema is settled.
+- Add Admin2 hero management after public rendering exists.
+- Add Admin2 feelies/extras management later, with allowlisted uploads and package-local path validation.
+- Do not turn feelies into arbitrary file browsing; expose only manifest-declared supplemental files.
+
+### Metadata enrichment roadmap
+
+- Keep enrichment preview-based and non-destructive.
+- Start with local `metadata.iFiction.xml` parsing because it is package-local and reviewable.
+- Show proposed `game.yaml` changes before applying them.
+- Prefer merge previews that identify source, confidence, and target field.
+- After iFiction XML, explore IFDB lookup by IFID/TUID, then IFWiki and IF Archive enrichment.
+- Treat remote catalog lookups as curator aids, not authoritative replacements for license/provenance review.
+
+## Next build: package presentation planning
 
 - Field-test the v0.3.x Admin2 package management workflow before adding new package-management capabilities.
 - Improve diagnostics or release packaging notes only when they are grounded in testing.
+- Decide whether v0.4.0 should ship public hero/feelies rendering first, or keep the release as schema/documentation groundwork before UI work.
 
 ## Later
 
 - Server-side named saves for logged-in users.
-- iFiction/Treaty of Babel metadata import/export.
-- IFDB/source/provenance helper fields.
+- Admin2 management for hero images and feelies/extras.
+- Preview-based iFiction/Treaty of Babel metadata enrichment.
+- Preview-based IFDB, IFWiki, and IF Archive enrichment.
 - Classic Grav Admin compatibility page only if Grav 1/Admin UX support is verified and becomes an explicit target.

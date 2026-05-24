@@ -9,11 +9,13 @@ A package can contain:
 - the story file (`.z3`, `.z5`, `.z8`, `.zblorb`, `.ulx`, `.gblorb`)
 - `game.yaml` metadata
 - cover art
-- splash art
+- small-cover catalog art
+- proposed hero art
 - screenshots
 - how-to-play notes
 - hints
 - walkthroughs
+- proposed feelies/extras
 - license/provenance notes
 
 ## Storage model
@@ -52,6 +54,20 @@ Controlled endpoints:
 ```
 
 Frontend virtual pages are added to Grav's page collection during `onPagesInitialized`, with an early priority, before Grav resolves the active page. TerpVault does not replace `$grav['page']`; this is important in Grav 2/Admin2 because the active page service may already be frozen by the time later events run.
+
+## Proposed v0.4.0 presentation model
+
+This section is planning only and does not describe implemented behavior yet.
+
+TerpVault should keep package artwork roles separate:
+
+- `cover`: package/display/title/box art and the primary detail-page identity image.
+- `small_cover`: compact catalog image for cards and dense browsing.
+- `hero`: optional wide visual background or header image for public detail/play presentation.
+
+Hero rendering should remain optional and conservative. Detail/play pages can support focal positioning, overlay tone, gradient direction, and overlay color so curators can keep text legible without editing the source image. The player surface should remain stable and readable even when a hero image is present.
+
+Feelies/extras should be manifest-declared supplemental files, not arbitrary directory browsing. Public rendering can group files by type, such as documents, maps/images, audio, and other downloads. Files should remain package-local and served only through controlled TerpVault routes when implemented.
 
 ## Player adapter model
 
@@ -115,7 +131,9 @@ Phase 3:
 TerpVault's `game.yaml` should remain friendly and Grav-like. Later, add optional support for:
 
 - IFID
-- iFiction XML
-- Treaty of Babel metadata import/export
-- IFDB/source URL fields
+- preview-based iFiction XML metadata enrichment
+- preview-based Treaty of Babel metadata import/export
+- preview-based IFDB, IFWiki, and IF Archive lookup
 - license/provenance checks
+
+Metadata enrichment should be non-destructive. The first pass should parse local `metadata.iFiction.xml`, show proposed `game.yaml` changes, and let a curator decide what to apply. Remote catalog enrichment should come later and should not replace rights/provenance review.

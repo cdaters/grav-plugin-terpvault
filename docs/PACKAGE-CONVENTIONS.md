@@ -55,11 +55,13 @@ These files make a package easier to browse, verify, and play:
 
 - `cover.jpg` or `cover.png`: display/title/box art for the detail page.
 - `small-cover.jpg` or `small-cover.png`: compact art for library cards.
+- `hero.jpg` or `hero.png`: proposed optional wide presentation art for future public detail/play page backgrounds.
 - `metadata.iFiction.xml`: original or exported iFiction metadata.
 - `screenshots/`: screenshots such as `screenshots/01.png`.
 - `how-to-play.md`: basic commands, parser conventions, or accessibility notes.
 - `hints.md`: spoiler-safe hint sections, ideally using Markdown headings or `<details>` blocks.
 - `walkthrough.md`: a solution or route through the work.
+- `feelies/`: proposed optional package-local supplemental files such as manuals, maps, clue sheets, newsletters, audio, and other extras.
 
 ## Preferred manifest shape
 
@@ -87,11 +89,27 @@ resources:
   story_file: advent.z5
   cover: cover.jpg
   small_cover: small-cover.jpg
+  # Proposed for v0.4.0; not implemented yet.
+  hero:
+    path: hero.jpg
+    focal_position: center center
+    overlay_tone: dark
+    gradient_direction: to bottom
+    overlay_color: '#000000'
   screenshots:
     - screenshots/01.png
   how_to_play: how-to-play.md
   hints: hints.md
   walkthrough: walkthrough.md
+  # Proposed for v0.4.0; not implemented yet.
+  feelies:
+    - path: feelies/manual.pdf
+      title: Original Manual
+      type: manual
+      description: Player manual for package review.
+    - path: feelies/map.png
+      title: Map
+      type: map
 
 catalog:
   ifdb:
@@ -123,6 +141,84 @@ player:
   theme: retro-terminal
   launch_mode: button
 ```
+
+## Proposed v0.4.0 presentation resources
+
+The fields in this section are proposed planning notes, not implemented behavior.
+
+### Cover, small-cover, and hero responsibilities
+
+- `resources.cover`: package/display/title/box art. This remains the main artwork for the public detail page and package identity.
+- `resources.small_cover`: compact catalog art for library cards and dense package lists.
+- `resources.hero`: optional wide atmospheric image for public detail/play backgrounds or large headers. It should not replace cover art or be required for package validity.
+
+Proposed `resources.hero` shape:
+
+```yaml
+resources:
+  hero:
+    path: hero.jpg
+    focal_position: center center
+    overlay_tone: dark
+    gradient_direction: to bottom
+    overlay_color: '#000000'
+```
+
+`resources.hero` may also be accepted as a simple string path in a future implementation:
+
+```yaml
+resources:
+  hero: hero.jpg
+```
+
+Proposed hero options:
+
+- `path`: package-local image path.
+- `focal_position`: CSS-like image focal point, such as `center center`, `top center`, or `35% 45%`.
+- `overlay_tone`: preset readability treatment, such as `light`, `dark`, `warm`, `cool`, or `none`.
+- `gradient_direction`: overlay direction, such as `to bottom`, `to top`, `to right`, `to left`, or `radial`.
+- `overlay_color`: optional color value for site-specific overlay tone.
+
+Proposed hero image extensions: `jpg`, `jpeg`, `png`, and `webp`. SVG should not be part of the first hero pass unless the rendering and sanitization story is explicit.
+
+### Feelies and extras
+
+`resources.feelies` is proposed for package-local supplemental files. The intent is to represent curated extras, not to expose a general file browser.
+
+Proposed shape:
+
+```yaml
+resources:
+  feelies:
+    - path: feelies/manual.pdf
+      title: Original Manual
+      type: manual
+      description: Player manual.
+    - path: feelies/clue-sheet.pdf
+      title: Clue Sheet
+      type: clues
+    - path: feelies/map.png
+      title: Map
+      type: map
+    - path: feelies/theme.mp3
+      title: Theme Audio
+      type: audio
+```
+
+Proposed item fields:
+
+- `path`: required package-local file path.
+- `title`: curator-facing/public label.
+- `type`: optional grouping hint, such as `manual`, `map`, `clues`, `newsletter`, `image`, `audio`, or `other`.
+- `description`: optional short note.
+
+Proposed allowed extensions:
+
+- Documents: `pdf`, `txt`, `md`
+- Images/maps: `jpg`, `jpeg`, `png`, `webp`, `gif`, `svg`
+- Audio: `mp3`, `ogg`, `wav`, `m4a`
+
+Archives and executable-like files should stay out of the first public rendering pass. Future import/export support should continue rejecting traversal, absolute paths, URI-like paths, unsafe cruft-looking paths, and unrelated files.
 
 ## Inform release mapping
 
