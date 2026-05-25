@@ -9,7 +9,7 @@
 - Admin2 routes should continue to use controller-style API integration rather than ad hoc request handlers.
 - Current write workflows are scoped to specific package-management actions; TerpVault should not expose an arbitrary package file browser.
 - Admin2/API write permissions should remain conservative unless a future release defines a more granular permission model.
-- v0.4.2 development has started as a narrow Admin2 UX polish pass for contextual help and actionable media cards.
+- v0.4.2 development folds the local iFiction preview work together with a narrow Admin2 UX polish pass for contextual help and actionable media cards.
 
 ## Shipped milestones
 
@@ -51,13 +51,16 @@
 - Excluded archive files from the first public feelies rendering pass.
 - Kept SVG feelies excluded unless a future safe sanitization or forced-download strategy is designed.
 
-### v0.4.1 local iFiction preview
+### v0.4.2 local iFiction preview and Admin2 UX polish
 
 - Added authenticated Admin2 preview of package-local `metadata.iFiction.xml`.
 - Added a safe local XML parser for the preview route.
 - Added a preview table showing the current `game.yaml` value alongside the XML value.
 - Kept the workflow preview-only: no apply/import yet.
 - Kept remote lookup out of scope.
+- Added contextual Admin2 guidance for curator-facing terminology and expected field content.
+- Added actionable Cover, Small Cover, and Hero media tiles with a focused safe-action panel.
+- Refreshed and cache-busted media previews after upload or replacement.
 
 ## Active roadmap
 

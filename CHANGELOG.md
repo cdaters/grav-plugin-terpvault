@@ -3,26 +3,17 @@
 ## Unreleased
 
 1. Changed
+    - Added authenticated Admin2 preview for package-local `metadata.iFiction.xml`.
+    - Added a safe local iFiction XML parser that extracts a conservative subset of title, author, bibliographic, IFID, and format fields for review.
     - Added lightweight contextual Admin2 help for package status, metadata fields, IFIDs, iFiction preview, catalog references, media roles, helper docs, story replacement, import/export, provenance, and read-only diagnostics.
     - Turned Cover, Small Cover, and Hero previews into actionable Admin2 media asset tiles with a focused management panel.
     - Styled contextual Admin2 help as dimmed italic text and refreshed/cache-busted media previews after upload or replacement.
 
 2. Safety
+    - iFiction parsing is local-only, rejects DOCTYPE declarations, uses non-network XML parsing, and does not fetch external DTDs or remote resources.
+    - iFiction preview does not write `game.yaml`; curator-controlled apply/import remains future work.
     - Media asset tiles reuse the existing allowlisted upload route and support safe actions only: view the current asset, replace it, show the manifest path, and explain the asset role.
     - No package delete, physical file delete, manifest clear-reference action, iFiction apply/import, remote lookup, package overwrite, or GPM release behavior was added.
-
-# v0.4.1
-
-## Unreleased
-
-1. New
-    - Added authenticated Admin2 preview for package-local `metadata.iFiction.xml`.
-    - Added a safe local iFiction XML parser that extracts a conservative subset of title, author, bibliographic, IFID, and format fields for review.
-
-2. Safety
-    - iFiction parsing is local-only, rejects DOCTYPE declarations, uses non-network XML parsing, and does not fetch external DTDs or remote resources.
-    - Preview does not write `game.yaml`; curator-controlled apply/import remains future work.
-    - No IFDB, IFWiki, IF Archive, Vaultwright, arbitrary scraping, package delete, overwrite, or remote lookup behavior was added.
 
 # v0.4.0
 
