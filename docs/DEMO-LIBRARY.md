@@ -8,6 +8,8 @@ _demo/data/terpvault/games/
 
 The starter library should feel finished and distribution-ready, not like placeholder test data. Demo packages must be useful for real first-run evaluation while remaining conservative about licensing, provenance, and redistribution rights.
 
+Use `docs/DEMO-CANDIDATES.md` as the working verification worksheet for individual candidate packages before any package is bundled.
+
 ## Goals
 
 - Provide a first-run starter library for new TerpVault installs.
