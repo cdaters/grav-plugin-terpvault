@@ -7,10 +7,39 @@
 - Frotz smoke testing has passed.
 - DDEV-only TerpVault/Parchment browser playback has passed.
 - DDEV-only export/import smoke testing has passed.
+- A DDEV-only package shell has been created and manually inspected.
 - The package is not yet approved for bundled demo.
 - Actual `_demo` package creation is still pending.
 
 This is a planning document only. Do not create package contents, copy story files, add art, or bundle generated packages from this plan until a later explicit packaging pass.
+
+## DDEV-only package shell status
+
+Verification date: 2026-05-25.
+
+A local package assembly draft exists only in the DDEV test site:
+
+- Package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i`.
+- Files present: `game.yaml`, `provenance.md`, `LICENSE-upstream.txt`, `how-to-play.md`, `hints.md`, `walkthrough.md`, and `zork1.z3`.
+- Art, screenshots, and feelies are still pending.
+- `terpvault.status` is published only for local DDEV route testing. Final demo installer status remains undecided.
+
+Route/checksum results:
+
+- Detail page `https://grav20.ddev.site/if/zork-i` returned `200`.
+- Play page `https://grav20.ddev.site/if/zork-i/play` returned `200`.
+- Story route `https://grav20.ddev.site/if/_story/zork-i/zork1.z3` returned `200`, 86928 bytes.
+- Story route bytes matched the selected source-built artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+
+Manual browser inspection result:
+
+- Detail page loads.
+- Play page loads.
+- Parchment launches.
+- The game responds to `look` and `inventory`.
+- Helper docs appear and render.
+
+The DDEV shell is suitable for local review and package polish. It does not approve Zork I for bundled demo inclusion.
 
 ## Proposed package identity
 
@@ -192,6 +221,7 @@ Record these facts in package-local `provenance.md` and preserve upstream licens
 - Confirm import commit creates a draft package.
 - Confirm imported package story checksum matches.
 - Update candidate docs with final package verification results.
+- Confirm final package polish after original art, screenshots, and feelies are added.
 - Only after all checks pass, decide whether to copy into `_demo`.
 
 ## Open questions
@@ -201,3 +231,4 @@ Record these facts in package-local `provenance.md` and preserve upstream licens
 - Whether to include source-build logs or only `provenance.md`.
 - Whether Zork I alone should ship first before Zork III.
 - Final naming, copyright, and attribution wording.
+- Final art, screenshot, and feelies scope.

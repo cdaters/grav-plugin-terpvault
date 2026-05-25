@@ -6,9 +6,10 @@
 - Upstream repo verified on 2026-05-24.
 - License/provenance reviewed from observed repository files only.
 - Source build verified on 2026-05-25.
-- Requires package verification.
+- DDEV-only package shell created and manually inspected on 2026-05-25.
+- Requires final package verification after art, screenshots, feelies, and final polish are complete.
 - Requires original package assets and helper docs.
-- Next state: package/provenance/playback verification needed.
+- Next state: art/screenshots/feelies planning and final package polish.
 
 Zork I must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -266,15 +267,56 @@ Imported draft route check:
 - Story route `https://grav20.ddev.site/if/_story/zork-i-import-test/zork1.z3` returned `404`.
 - This is expected for a draft-forced imported package while public TerpVault routes hide unpublished packages.
 
+## DDEV-only package shell
+
+Verification date: 2026-05-25.
+
+Local package path:
+
+- `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i`.
+
+Files present in the DDEV-only package shell:
+
+- `game.yaml`.
+- `provenance.md`.
+- `LICENSE-upstream.txt`.
+- `how-to-play.md`.
+- `hints.md`.
+- `walkthrough.md`.
+- `zork1.z3`.
+
+Package scope:
+
+- This package shell exists only in the local DDEV test site.
+- It intentionally does not include cover art, small-cover art, hero art, screenshots, or feelies yet.
+- No DDEV package contents, story files, generated artifacts, images, screenshots, or generated packages were added to the TerpVault plugin repo.
+- `terpvault.status` is published only for local DDEV route testing. Final demo installer status remains undecided.
+
+Route/checksum results:
+
+- Detail page `https://grav20.ddev.site/if/zork-i` returned `200`.
+- Play page `https://grav20.ddev.site/if/zork-i/play` returned `200`.
+- Story route `https://grav20.ddev.site/if/_story/zork-i/zork1.z3` returned `200`, 86928 bytes.
+- Story route bytes matched the selected source-built artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+
+Manual browser inspection result:
+
+- Detail page loads.
+- Play page loads.
+- Parchment launches.
+- The game responds to `look` and `inventory`.
+- Helper docs appear and render.
+
+This confirms the DDEV-only package shell is usable for local package review. It does not approve Zork I for bundled demo inclusion.
+
 ## Remaining blockers
 
-- Package metadata is not complete.
-- Package-local provenance notes are not complete.
-- Package-ready TerpVault/Parchment testing is pending beyond the DDEV-only local browser playback check.
-- Package export/import smoke testing is pending.
+- Final package metadata is not complete.
+- Final package-local provenance notes are not complete.
+- DDEV-only shell playback has passed, but final package verification is still pending after art, screenshots, feelies, and final polish.
 - Original package art is not created.
 - Screenshots are not created.
-- Helper docs are not created.
+- Helper docs exist only as DDEV-only draft package content and still need final review/polish.
 - Feelies are not created.
 - Redistribution/package basis for the exact generated story artifact still needs to be recorded in package-local notes before bundling.
 - Package export/import smoke testing has passed only for DDEV-only temporary packages; a final package export/import test remains pending once real package metadata/assets/docs exist.
@@ -282,7 +324,7 @@ Imported draft route check:
 
 ## Recommended next action
 
-Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) as the docs-only plan for turning Zork I from verified candidate into a finished TerpVault demo package. Keep Zork I candidate-only and proceed with package assembly only after the package metadata, package-local provenance notes, original art plan, screenshot plan, helper docs, and feelies are ready. Do not create `_demo` package contents yet.
+Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) as the docs-only plan for turning Zork I from verified candidate into a finished TerpVault demo package. The local DDEV-only package shell has passed basic route, checksum, and manual browser inspection, but Zork I remains candidate-only. Next, plan and add original art, screenshots, feelies, and final package polish in DDEV before any `_demo` package decision. Do not create `_demo` package contents yet.
 
 Packaging recommendation:
 
