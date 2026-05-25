@@ -179,6 +179,52 @@ Playback/bootstrap findings:
 - Manual browser playback URL: `https://grav20.ddev.site/if/zork-iii-test/play`.
 - Manual browser result: Parchment loaded, showed the game banner, and accepted/responded to `look` and `inventory`.
 
+## Export/import smoke test
+
+Verification date: 2026-05-25.
+
+Temporary DDEV-only source package:
+
+- Package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii-test`.
+- Story file: `zork3.z3`.
+- Story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+
+Export result:
+
+- Export was performed through the existing TerpVault package archive service inside the DDEV site because unauthenticated API curl returned `401`.
+- Scratch export path inside DDEV container: `/tmp/zork-iii-test.terpvault.zip`.
+- Export size: 61855 bytes.
+- Zip contents:
+  - `zork-iii-test/`
+  - `zork-iii-test/game.yaml`
+  - `zork-iii-test/zork3.z3`
+- No `.DS_Store`, `__MACOSX`, AppleDouble, or other macOS cruft entries were present.
+
+Import inspect result:
+
+- Import inspect was performed through the existing TerpVault package import service inside the DDEV site.
+- Result: ok.
+- Metadata read: title `Zork III Local Test`, candidate slug `zork-iii-test`, story file `zork3.z3`.
+- Fatal errors: none.
+- Warnings: existing source slug collision, missing `metadata.iFiction.xml`, and draft-forcing note. These are expected for this temporary candidate/test package.
+
+Import commit result:
+
+- Import commit was performed only after confirming `zork-iii-import-test` did not already exist.
+- Imported temporary slug: `zork-iii-import-test`.
+- Imported package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii-import-test`.
+- Import result: ok.
+- Import was forced to draft status.
+- Imported story SHA-256 matched the source temporary package story SHA-256.
+
+Imported draft route check:
+
+- Grav cache was cleared after import.
+- Detail route `https://grav20.ddev.site/if/zork-iii-import-test` returned `404`.
+- Play route `https://grav20.ddev.site/if/zork-iii-import-test/play` returned `404`.
+- Story route `https://grav20.ddev.site/if/_story/zork-iii-import-test/zork3.z3` returned `404`.
+- This is expected for a draft-forced imported package while public TerpVault routes hide unpublished packages.
+
 ## Packaging recommendation
 
 - Keep Zork III candidate-only.
@@ -197,6 +243,7 @@ Playback/bootstrap findings:
 - Verify full TerpVault/Parchment browser playback behavior.
 - Create package metadata and package-local provenance notes.
 - Create original package art, screenshots, helper docs, maps, and feelies.
+- Package export/import smoke testing has passed only for DDEV-only temporary packages; a final package export/import test remains pending once real package metadata/assets/docs exist.
 - Run package export/import smoke tests once a package exists.
 
 ## Recommended next action
