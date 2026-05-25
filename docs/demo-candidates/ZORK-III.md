@@ -143,7 +143,7 @@ Result:
 - Upstream prebuilt `COMPILED/zork3.z3` and `zork3.zip` file identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
 - Upstream prebuilt `COMPILED/zork3.z3` and `zork3.zip` SHA-256: `b637a242865d059890184164ce8dec28554cc80901dcbf26c740b2d1ed0d4eb8`.
 - Comparison with upstream `COMPILED/zork3.z3`: neither source-built historical-header artifact matched the upstream prebuilt checksum.
-- TerpVault/Parchment playback testing: pending.
+- TerpVault/Parchment local browser playback test: passed on 2026-05-25 for the DDEV-only `zork-iii-test` package.
 
 ## Frotz smoke test
 
@@ -152,6 +152,33 @@ Result:
 - Commands used: `look`, `inventory`, `quit`, `y`.
 - Result: both artifacts launched, accepted commands, displayed game output, and responded to quit confirmation successfully.
 
+## TerpVault/Parchment local playback test
+
+Verification date: 2026-05-25.
+
+Temporary DDEV-only package:
+
+- Package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii-test`.
+- Story file in temporary package: `zork3.z3`.
+- Source-built artifact copied into DDEV package: `/tmp/terpvault-zork3-build/zork3-release25-serial860811.z3`.
+- Source-built artifact SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- DDEV copy was not added to the TerpVault plugin repo.
+
+Routes tested:
+
+- Detail page: `https://grav20.ddev.site/if/zork-iii-test` returned `200 text/html; charset=utf-8`.
+- Play page: `https://grav20.ddev.site/if/zork-iii-test/play` returned `200 text/html; charset=utf-8`.
+- Story route: `https://grav20.ddev.site/if/_story/zork-iii-test/zork3.z3` returned `200 application/octet-stream`, 87858 bytes.
+- Bundled Parchment route: `https://grav20.ddev.site/if/_engine/parchment` returned `200 text/html; charset=utf-8`.
+
+Playback/bootstrap findings:
+
+- The play page rendered an iframe pointing at `/if/_engine/parchment`.
+- The iframe `story` payload referenced `https://grav20.ddev.site/if/_story/zork-iii-test/zork3.z3`, format `zcode`, and title `Zork III Local Test`.
+- The downloaded story route bytes matched the selected source-built artifact checksum.
+- Manual browser playback URL: `https://grav20.ddev.site/if/zork-iii-test/play`.
+- Manual browser result: Parchment loaded, showed the game banner, and accepted/responded to `look` and `inventory`.
+
 ## Packaging recommendation
 
 - Keep Zork III candidate-only.
@@ -159,7 +186,7 @@ Result:
 - Do not create `_demo` package contents yet.
 - Recommended eventual package artifact is probably the source-built `zork3-release25-serial860811.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
 - Do not bundle `zork3.zip` or `COMPILED/zork3.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
-- Do not mark Zork III package-ready until package metadata, provenance notes, TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, maps, and feelies are complete.
+- Do not mark Zork III package-ready until package metadata, provenance notes, full TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, maps, and feelies are complete.
 - Do not use commercial packaging, manual, map, ad, logo, trade-dress, or scan assets.
 - Use Craig-created art, screenshots, helper docs, maps, and feelies later.
 
@@ -167,7 +194,7 @@ Result:
 
 - Decide whether the source-built `zork3-release25-serial860811.z3`, source provenance, or some combination is appropriate for the package.
 - Record selected artifact filename, file identification, checksum, and redistribution basis in package-local provenance notes.
-- Verify TerpVault/Parchment playback behavior.
+- Verify full TerpVault/Parchment browser playback behavior.
 - Create package metadata and package-local provenance notes.
 - Create original package art, screenshots, helper docs, maps, and feelies.
 - Run package export/import smoke tests once a package exists.

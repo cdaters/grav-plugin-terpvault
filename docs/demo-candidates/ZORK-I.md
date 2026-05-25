@@ -191,20 +191,47 @@ Result:
 - Upstream prebuilt `COMPILED/zork1.z3` and `zork1.zip` SHA-256: `37084966477dff679282de42974b2077156b1bd68fad92a65d4ea94d8eb64d79`.
 - Comparison with upstream `COMPILED/zork1.z3`: neither source-built historical-header artifact matched the upstream prebuilt checksum.
 - Interpreter smoke test: passed in Frotz for both source-built historical-header variants.
-- TerpVault/Parchment playback testing: pending.
+- TerpVault/Parchment local browser playback test: passed on 2026-05-25 for the DDEV-only `zork-i-test` package.
+
+## TerpVault/Parchment local playback test
+
+Verification date: 2026-05-25.
+
+Temporary DDEV-only package:
+
+- Package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i-test`.
+- Story file in temporary package: `zork1.z3`.
+- Source-built artifact copied into DDEV package: `/tmp/terpvault-zork1-build/zork1-release119-serial880429.z3`.
+- Source-built artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- DDEV copy was not added to the TerpVault plugin repo.
+
+Routes tested:
+
+- Detail page: `https://grav20.ddev.site/if/zork-i-test` returned `200 text/html; charset=utf-8`.
+- Play page: `https://grav20.ddev.site/if/zork-i-test/play` returned `200 text/html; charset=utf-8`.
+- Story route: `https://grav20.ddev.site/if/_story/zork-i-test/zork1.z3` returned `200 application/octet-stream`, 86928 bytes.
+- Bundled Parchment route: `https://grav20.ddev.site/if/_engine/parchment` returned `200 text/html; charset=utf-8`.
+
+Playback/bootstrap findings:
+
+- The play page rendered an iframe pointing at `/if/_engine/parchment`.
+- The iframe `story` payload referenced `https://grav20.ddev.site/if/_story/zork-i-test/zork1.z3`, format `zcode`, and title `Zork I Local Test`.
+- The downloaded story route bytes matched the selected source-built artifact checksum.
+- Manual browser playback URL: `https://grav20.ddev.site/if/zork-i-test/play`.
+- Manual browser result: Parchment loaded, showed the game banner, and accepted/responded to `look` and `inventory`.
 
 ## Remaining blockers
 
 - Package metadata is not complete.
 - Package-local provenance notes are not complete.
-- TerpVault/Parchment playback testing is pending.
+- Package-ready TerpVault/Parchment testing is pending beyond the DDEV-only local browser playback check.
 - Package export/import smoke testing is pending.
 - Original package art is not created.
 - Screenshots are not created.
 - Helper docs are not created.
 - Feelies are not created.
 - Redistribution/package basis for the exact generated story artifact still needs to be recorded in package-local notes before bundling.
-- Keep Zork I candidate-only until package metadata, provenance notes, TerpVault/Parchment playback, export/import behavior, original art, screenshots, helper docs, and feelies are complete.
+- Keep Zork I candidate-only until package metadata, provenance notes, full TerpVault/Parchment playback, export/import behavior, original art, screenshots, helper docs, and feelies are complete.
 
 ## Recommended next action
 
@@ -216,13 +243,13 @@ Packaging recommendation:
 - Do not create `_demo` package contents yet.
 - Recommended eventual package artifact is probably the source-built `zork1-release119-serial880429.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
 - Do not bundle `zork1.zip` or `COMPILED/zork1.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
-- Do not mark Zork I package-ready until package metadata, provenance notes, TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, and feelies are complete.
+- Do not mark Zork I package-ready until package metadata, provenance notes, full TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, and feelies are complete.
 - If packaging proceeds later, include upstream MIT license text and package-local provenance notes, and use only Craig-created art/helper docs unless other assets have separately verified redistribution rights.
 
 Remaining blockers:
 
 - Decide whether the source-built `zork1-release119-serial880429.z3`, source provenance, or some combination is appropriate for the package.
-- Verify IFID/format and TerpVault/Parchment playback behavior.
+- Verify IFID/format and full TerpVault/Parchment browser playback behavior.
 - Create original package assets and helper docs only after packaging basis is resolved.
 - Run package export/import smoke tests once a package exists.
 
