@@ -61,6 +61,101 @@ Available files/artifacts summary:
 - `COMPILED/zork1.z3` and `zork1.zip` have identical SHA-256: `37084966477dff679282de42974b2077156b1bd68fad92a65d4ea94d8eb64d79`.
 - Treat the prebuilt artifacts cautiously. The README states `.ZIP` files in some Infocom source repositories were present at final spin-down and the means to create them is currently lost; this pass did not establish that either prebuilt artifact is package-ready for TerpVault.
 
+## Build tooling verification
+
+Verification date: 2026-05-24.
+
+This pass checked local tooling and the likely ZILF/ZAPF upstream path only. No tool installation was performed, no source/tool repository was cloned into TerpVault, and no Zork I build artifacts were created or copied into this repository.
+
+Exact local tooling command used:
+
+```sh
+for c in dotnet zilf zapf Zilf Zapf ZILF ZAPF mono frotz dfrotz zoom gargoyle parchment; do
+  if command -v "$c" >/dev/null 2>&1; then
+    printf '%s: %s\n' "$c" "$(command -v "$c")"
+  else
+    printf '%s: not found\n' "$c"
+  fi
+done
+```
+
+## Tooling discovered
+
+Local tools in `PATH`:
+
+- `dotnet`: not found.
+- `zilf`: not found.
+- `zapf`: not found.
+- `Zilf`: not found.
+- `Zapf`: not found.
+- `ZILF`: not found.
+- `ZAPF`: not found.
+- `mono`: not found.
+- `frotz`: not found.
+- `dfrotz`: not found.
+- `zoom`: not found.
+- `gargoyle`: not found.
+- `parchment`: not found.
+
+Likely ZILF/ZAPF upstream:
+
+- Main project/repository: `https://foss.heptapod.net/zilf/zilf`.
+- GitHub mirror observed: `https://github.com/taradinoc/zilf`.
+- Project summary: ZILF is a ZIL compiler/tool suite; ZAPF is the included Z-machine assembler used after ZILF compilation.
+- License observed from the GitHub mirror: GPL-3.0 for the project, with README notes also referring to separate ZILF library/runtime license terms for relevant surrounding code.
+- Current release observed from the GitHub mirror/IFWiki search results: ZILF 1.8, dated 2026-04-08.
+- Build requirement observed from the upstream README: .NET 10 SDK.
+- Upstream build command observed: `dotnet build Zilf.sln`.
+- Upstream test command observed: `dotnet test Zilf.sln`.
+- Typical installed usage observed: `zilf mygame.zil`, which should produce a story file such as `mygame.z3`; ZAPF is part of the installed/compiler toolchain path.
+
+## Build attempt
+
+Build from source was not attempted in this pass.
+
+Reason:
+
+- `dotnet` is not installed or not available in `PATH`.
+- ZILF/ZAPF executables are not installed or not available in `PATH`.
+- No system packages were installed because this pass was documentation/tooling verification only and package installation requires explicit approval.
+
+Scratch paths reserved for a later practical build pass:
+
+- ZILF/ZAPF tooling checkout/build: `/tmp/terpvault-zilf-verification`.
+- Zork I source/build checkout: `/tmp/terpvault-zork1-build`.
+
+Planned build verification commands for a later pass, after prerequisites are installed in a scratch or user-local tooling path:
+
+```sh
+git clone https://github.com/historicalsource/zork1.git /tmp/terpvault-zork1-build
+cd /tmp/terpvault-zork1-build
+git checkout 97b7b3d68c075dd9af7da499c3e9690ada3471fd
+zilf zork1.zil
+```
+
+The exact ZILF/ZAPF invocation may need adjustment after inspecting installed ZILF 1.8 behavior and any Zork I-specific warnings/errors.
+
+## Artifact result
+
+- Generated artifact filename: none.
+- Generated artifact SHA-256: none.
+- Comparison with upstream `COMPILED/zork1.z3`: not performed.
+- Interpreter smoke test: not performed.
+- TerpVault/Parchment playback testing: pending.
+
+## Remaining blockers
+
+- Install or otherwise provide a verified .NET 10 SDK outside the TerpVault repo.
+- Install or build ZILF/ZAPF outside the TerpVault repo, preferably in a scratch or user-local tooling path.
+- Re-run the Zork I source build at commit `97b7b3d68c075dd9af7da499c3e9690ada3471fd`.
+- Record the exact build command, output filename, generated artifact SHA-256, and whether it matches or differs from upstream `COMPILED/zork1.z3`.
+- Install or provide a Z-machine interpreter such as Frotz, or verify browser playback through TerpVault/Parchment, before claiming runtime smoke-test coverage.
+- Keep Zork I candidate-only until build output, redistribution basis, TerpVault playback, package metadata, provenance notes, and package export/import behavior are verified.
+
+## Recommended next action
+
+Install/verify the .NET 10 SDK and ZILF/ZAPF outside the TerpVault repo, using a scratch or user-local tooling path. Then re-run a build verification pass from a fresh scratch checkout of `https://github.com/historicalsource/zork1.git` at commit `97b7b3d68c075dd9af7da499c3e9690ada3471fd`, record the artifact checksum and comparison against `COMPILED/zork1.z3`, and only then decide whether a TerpVault demo package path is appropriate.
+
 Packaging recommendation:
 
 - Keep Zork I as candidate-only.
