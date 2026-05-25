@@ -185,6 +185,8 @@ Record these facts in package-local `provenance.md` and preserve upstream licens
 
 ## Art plan
 
+See [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) for the detailed docs-only asset requirements and creation workflow.
+
 - `cover.jpg`: Craig-created original art.
 - `small-cover.jpg`: Craig-created square or thumbnail-friendly crop.
 - `hero.jpg`: Craig-created wide detail/play-page visual.
@@ -199,6 +201,8 @@ Record these facts in package-local `provenance.md` and preserve upstream licens
 - Do not copy Invisiclues, manuals, commercial hint books, online walkthroughs, or catalog prose unless explicitly licensed for redistribution.
 
 ## Feelies plan
+
+See [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) for optional feelies scope, legal guardrails, and acceptance checks.
 
 - Optional original map, for example `feelies/map.jpg` or `feelies/map.pdf`.
 - Optional adventurer notes, for example `feelies/adventurer-notes.pdf`.
