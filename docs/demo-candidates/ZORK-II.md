@@ -6,10 +6,11 @@
 - Upstream repo verified on 2026-05-25.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
-- Source build did not produce a playable artifact.
+- Unmodified source build failed; scratch-only compatibility patch produced a playable artifact.
+- Frotz smoke test passed for scratch-patched source-built historical-header variants.
 - Not approved for bundled demo.
 - Requires package verification, TerpVault/Parchment playback verification, original package assets, helper docs, screenshots, and provenance notes.
-- Next state: source-build issue investigation needed.
+- Next state: package/provenance/playback verification needed after deciding how to handle the scratch-only source compatibility patch.
 
 Zork II must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -87,7 +88,7 @@ y
 
 ## Build attempt
 
-Source build was attempted in scratch only.
+Unmodified source build was reproduced in scratch only.
 
 Command:
 
@@ -108,21 +109,107 @@ Result:
 ```
 
 - The failed build modified or generated scratch-only ZAP-side files including `zork2.zap`, `zork2_data.zap`, and `zork2_str.zap`.
-- Historical release/serial reassembly was not attempted because the natural source build did not complete successfully and did not produce a playable source-built artifact.
+
+Source context around `2ACTIONS.zil:1551-1560`:
+
+```zil
+<ROUTINE DREARY-ROOM-FCN (RARG)
+    #DECL ((RARG) <OR FIX FALSE>)
+    <COND (<EQUAL? .RARG ,M-LOOK>
+       <TELL
+"This is a small and rather dreary room, eerily illuminated by a red glow
+emanating from a crack in one wall. The light falls upon a dusty wooden table
+in the center of the room. ">
+       <P-DOOR "south" ,LID-2 ,KEYHOLE-2>
+       <RTRUE>)>
+          (T <PCHECK> <RFALSE>)>
+```
+
+Likely cause, stated conservatively:
+
+- The first `COND` branch in `DREARY-ROOM-FCN` appears to close the surrounding `COND` too early with `<RTRUE>)>`.
+- That leaves `(T <PCHECK> <RFALSE>)` outside the `COND`, where ZILF treats it as a bare list expression and reports `expressions of type 'LIST' cannot be compiled`.
+- The adjacent `TINY-ROOM-FCN` uses the same two-branch room-function pattern but keeps the second branch inside the `COND`.
+
+Scratch-only compatibility patch tested:
+
+```diff
+diff --git a/2actions.zil b/2actions.zil
+index bec062c..1dc1de8 100644
+--- a/2actions.zil
++++ b/2actions.zil
+@@ -1556,8 +1556,8 @@ an exit down a precarious climb. ">
+ emanating from a crack in one wall. The light falls upon a dusty wooden table
+ in the center of the room. ">
+        <P-DOOR "south" ,LID-2 ,KEYHOLE-2>
+-       <RTRUE>)>
+-          (T <PCHECK> <RFALSE>)>
++       <RTRUE>)
++          (T <PCHECK> <RFALSE>)>>
+```
+
+Build command after scratch-only patch:
+
+```sh
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf zork2.zil
+```
+
+Result after scratch-only patch:
+
+- Built successfully with ZILF 1.8 / ZAPF 1.8.
+- Output banner: `Renovated ZORK II: The Wizard of Frobozz`.
+- Warnings: `26 warnings (26 suppressed)`.
+- Output: `zork2.z3`, 92412 bytes.
+- File identification: `Infocom (Z-machine 3, Release 0, Serial 260525)`.
+- SHA-256: `eef62c11d56350feb62907090f2fd901e39a826a7d60f81450f7b3e31646598e`.
+
+Historical release/serial reassembly command:
+
+```sh
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf zork2.zap zork2-release63-serial860811.z3 -r 63 -s 860811
+```
+
+Result:
+
+- Built successfully.
+- Output: `zork2-release63-serial860811.z3`, 92412 bytes.
+- File identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
+- SHA-256: `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- Frotz smoke test: passed.
+
+Historical release/serial no-creator reassembly command:
+
+```sh
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf zork2.zap zork2-release63-serial860811-nocreator.z3 -r 63 -s 860811 -N
+```
+
+Result:
+
+- Built successfully.
+- Output: `zork2-release63-serial860811-nocreator.z3`, 92412 bytes.
+- File identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
+- SHA-256: `f6843b07941792589eebfd54bcd640b327812f85ac46b688f6c530c8feb72911`.
+- Frotz smoke test: passed.
 
 ## Artifact result
 
-- Generated playable artifact filename: none.
-- Generated playable artifact SHA-256: none.
-- Comparison with upstream `COMPILED/zork2.z3`: not performed for source-built artifacts.
+- Generated artifact filename after scratch-only patch: `zork2.z3`.
+- Generated artifact SHA-256 after scratch-only patch: `eef62c11d56350feb62907090f2fd901e39a826a7d60f81450f7b3e31646598e`.
+- Historical-header artifact filename after scratch-only patch: `zork2-release63-serial860811.z3`.
+- Historical-header artifact SHA-256 after scratch-only patch: `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- Historical-header no-creator artifact filename after scratch-only patch: `zork2-release63-serial860811-nocreator.z3`.
+- Historical-header no-creator artifact SHA-256 after scratch-only patch: `f6843b07941792589eebfd54bcd640b327812f85ac46b688f6c530c8feb72911`.
+- Comparison with upstream `COMPILED/zork2.z3`: neither scratch-patched source-built historical-header artifact matched the upstream prebuilt checksum.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` file identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
 - TerpVault/Parchment playback testing: pending.
 
 ## Frotz smoke test
 
-- Not performed.
-- Reason: no source-built playable artifact was produced.
+- Scratch-patched source-built historical-header artifact tested: `zork2-release63-serial860811.z3`.
+- Scratch-patched source-built historical-header no-creator artifact tested: `zork2-release63-serial860811-nocreator.z3`.
+- Commands used: `look`, `inventory`, `quit`, `y`.
+- Result: both artifacts launched, accepted commands, displayed game output, and responded to quit confirmation successfully.
 
 ## Packaging recommendation
 
@@ -130,20 +217,20 @@ Result:
 - Not approved for bundled demo.
 - Do not create `_demo` package contents yet.
 - Do not bundle `zork2.zip` or `COMPILED/zork2.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
-- Prefer a source-built artifact only if the ZILF/ZAPF build issue is resolved and playback is verified.
+- Prefer a source-built artifact only if the scratch-only compatibility patch is accepted, recorded in package-local provenance, and TerpVault/Parchment playback is verified.
 - Do not use commercial packaging, manual, map, ad, logo, trade-dress, or scan assets.
 - Use Craig-created art, screenshots, helper docs, maps, and feelies later.
 
 ## Remaining blockers
 
-- Resolve or document the ZILF source-build error in `2ACTIONS.zil`.
-- Produce a successful source-built playable artifact, or make and document an explicit later decision to use a prebuilt artifact.
+- Decide whether to carry the scratch-only `DREARY-ROOM-FCN` compatibility patch into any future source-build provenance.
+- Produce a successful source-built playable artifact from a documented build source, or make and document an explicit later decision to use a prebuilt artifact.
 - Record selected artifact filename, file identification, checksum, and redistribution basis.
-- Verify Frotz and TerpVault/Parchment playback for the selected artifact.
+- Verify TerpVault/Parchment playback for the selected artifact.
 - Create package metadata and package-local provenance notes.
 - Create original package art, screenshots, helper docs, maps, and feelies.
 - Run package export/import smoke tests once a package exists.
 
 ## Recommended next action
 
-Investigate the ZILF build failure in scratch or upstream context without changing the TerpVault repo. Keep Zork II candidate-only until a successful source build or a documented explicit prebuilt-artifact decision exists, then verify playback before any package assembly.
+Review the scratch-only `DREARY-ROOM-FCN` bracket fix as a source compatibility patch candidate, preferably against upstream history or ZILF maintainers before treating it as a packaging input. Keep Zork II candidate-only until the selected artifact and patch/provenance basis are documented and TerpVault/Parchment playback is verified.
