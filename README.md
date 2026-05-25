@@ -2,7 +2,7 @@
 
 **TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a standards-aware shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, optional hero art, screenshots, feelies/extras, hints, walkthroughs, and a bundled web player.
 
-This is a **v0.4.3 early public-beta release** on the TerpVault foundation, with v0.4.4 development underway. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
+This is a **v0.4.4 early public-beta release** on the TerpVault foundation. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
 
 ## What it does now
 

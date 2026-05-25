@@ -1,6 +1,6 @@
 # v0.4.4
 
-## Unreleased
+## 05/25/2026
 
 1. Changed
     - Started Admin2 Feelies / Extras management for curated package-local `resources.feelies` entries.

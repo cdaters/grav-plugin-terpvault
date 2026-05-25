@@ -9,7 +9,7 @@
 - Admin2 routes should continue to use controller-style API integration rather than ad hoc request handlers.
 - Current write workflows are scoped to specific package-management actions; TerpVault should not expose an arbitrary package file browser.
 - Admin2/API write permissions should remain conservative unless a future release defines a more granular permission model.
-- v0.4.4 development starts narrow Admin2 feelies/extras management for curated `resources.feelies` entries without physical delete behavior.
+- v0.4.4 includes narrow Admin2 feelies/extras management for curated `resources.feelies` entries without physical delete behavior.
 
 ## Shipped milestones
 

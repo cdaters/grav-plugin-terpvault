@@ -244,7 +244,7 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 - `release.source.*`: where the package files came from and when they were retrieved.
 - `release.license.*`: license, rights, and redistribution notes.
 
-`metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can preview a conservative subset of local iFiction XML fields, but TerpVault does not edit that XML file or apply/import XML values into `game.yaml` yet.
+`metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can preview a conservative subset of local iFiction XML fields and apply explicitly selected supported fields into `game.yaml`. TerpVault does not edit the XML file.
 
 ## Manual import workflow
 
