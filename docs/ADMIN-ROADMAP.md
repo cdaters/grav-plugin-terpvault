@@ -136,6 +136,11 @@
 - Keep generated packages reviewable before installation or publication.
 - Reuse import/export validation rules rather than bypassing package safety checks.
 
+### Curated demo/starter library
+
+- Use `docs/DEMO-LIBRARY.md` as the planning/spec reference for legally clean bundled demo packages and any future Admin2 Install Demo Packages workflow.
+- Keep demo package installation distinct from arbitrary file browsing and reuse package validation/import-style safety checks.
+
 ### Named saves/server-side saves
 
 - Add server-side named saves for logged-in users in a later player-focused milestone.
