@@ -282,7 +282,7 @@ Imported draft route check:
 
 ## Recommended next action
 
-Keep Zork I candidate-only and proceed with package-planning work only after the package metadata, package-local provenance notes, TerpVault/Parchment playback test plan, export/import smoke test plan, original art plan, screenshot plan, helper docs, and feelies are ready. Do not create `_demo` package contents yet.
+Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) as the docs-only plan for turning Zork I from verified candidate into a finished TerpVault demo package. Keep Zork I candidate-only and proceed with package assembly only after the package metadata, package-local provenance notes, original art plan, screenshot plan, helper docs, and feelies are ready. Do not create `_demo` package contents yet.
 
 Packaging recommendation:
 
