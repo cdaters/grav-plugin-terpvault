@@ -319,7 +319,7 @@ TerpVault keeps a human-friendly `game.yaml` manifest, but its structure now map
 - `catalog.ifdb`, `catalog.ifwiki`, and `catalog.ifarchive` store public catalog/reference links.
 - `release.license` and `release.source` store rights, redistribution, and provenance notes.
 
-A package may also include an optional `metadata.iFiction.xml` file. TerpVault includes that file in package exports when present and can preview a conservative local subset in Admin2, but it does not apply/import XML values into `game.yaml` yet.
+A package may also include an optional `metadata.iFiction.xml` file. TerpVault includes that file in package exports when present, can preview a conservative local subset in Admin2, and can apply explicitly selected supported fields into `game.yaml` without remote lookup.
 
 ## Supported interpreter formats
 

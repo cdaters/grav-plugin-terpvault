@@ -1,6 +1,6 @@
 # v0.4.3
 
-## Unreleased
+## 05/25/2026
 
 1. Changed
     - Added authenticated Admin2/API apply for selected fields from package-local `metadata.iFiction.xml`.
