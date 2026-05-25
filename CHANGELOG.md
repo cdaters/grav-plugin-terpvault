@@ -1,3 +1,17 @@
+# v0.4.4
+
+## Unreleased
+
+1. Changed
+    - Started Admin2 Feelies / Extras management for curated package-local `resources.feelies` entries.
+    - Added authenticated Admin2/API listing, metadata updates, add/remove/reorder manifest saves, and controlled feelie uploads.
+    - The Admin2 panel shows title, path, type, description, and a public/open link when a manifest-declared feelie is valid and available.
+
+2. Safety
+    - Feelie paths must remain package-local and reject traversal, absolute paths, URI-like paths, hidden/system paths, unsafe extensions, and SVG.
+    - Removing a feelie removes only the `resources.feelies` manifest entry; physical file deletion is not implemented.
+    - No arbitrary package file browser, unauthenticated routes, remote lookup, package delete, or public asset-serving rule changes were added.
+
 # v0.4.3
 
 ## 05/25/2026

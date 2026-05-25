@@ -11,6 +11,7 @@ use Grav\Plugin\Api\Response\ApiResponse;
 use Grav\Framework\Psr7\Response;
 use Grav\Plugin\TerpVault\Service\PackageArchiveService;
 use Grav\Plugin\TerpVault\Service\PackageCreationService;
+use Grav\Plugin\TerpVault\Service\PackageFeeliesService;
 use Grav\Plugin\TerpVault\Service\PackageIFictionService;
 use Grav\Plugin\TerpVault\Service\PackageImportService;
 use Grav\Plugin\TerpVault\Service\PackageMarkdownService;
@@ -58,6 +59,11 @@ class ApiController extends AbstractApiController
     private function mediaService(): PackageMediaService
     {
         return new PackageMediaService();
+    }
+
+    private function feeliesService(): PackageFeeliesService
+    {
+        return new PackageFeeliesService();
     }
 
     private function storyService(): PackageStoryService
@@ -315,6 +321,63 @@ class ApiController extends AbstractApiController
 
         try {
             return ApiResponse::create($this->mediaService()->updateScreenshots($slug, $screenshots));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function feelies(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+
+        try {
+            return ApiResponse::create($this->feeliesService()->feelies($slug));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function updateFeelies(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+        $body = $this->getRequestBody($request);
+        if (!is_array($body)) {
+            throw new ValidationException('Request body must be a JSON object.');
+        }
+
+        $feelies = $body['feelies'] ?? null;
+        if (!is_array($feelies)) {
+            throw new ValidationException('feelies must be an array.');
+        }
+
+        try {
+            return ApiResponse::create($this->feeliesService()->updateFeelies($slug, $feelies));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function uploadFeelie(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+        $body = $request->getParsedBody();
+        $fields = is_array($body) ? $body : [];
+        $upload = $this->firstUploadedFile($request->getUploadedFiles());
+        if (!$upload) {
+            throw new ValidationException('No feelie file was uploaded.');
+        }
+
+        try {
+            return ApiResponse::create($this->feeliesService()->upload($slug, $upload, $fields));
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         } catch (RuntimeException $e) {

@@ -60,6 +60,13 @@ class TerpVaultPage extends HTMLElement {
           success: '',
           resources: null
         },
+        feelies: {
+          loading: false,
+          saving: '',
+          error: '',
+          success: '',
+          items: []
+        },
         story: {
           loading: false,
           saving: false,
@@ -293,6 +300,14 @@ class TerpVaultPage extends HTMLElement {
         .screenshot-row { border:1px solid rgba(127,127,127,.24); border-radius:10px; padding:.6rem; display:grid; grid-template-columns:96px minmax(0,1fr); gap:.65rem; align-items:start; background:rgba(127,127,127,.03); }
         .screenshot-row img { width:96px; aspect-ratio:16/10; object-fit:cover; border-radius:8px; border:1px solid rgba(127,127,127,.22); background:rgba(127,127,127,.12); }
         .screenshot-actions { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.45rem; }
+        .feelies-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
+        .feelie-list { display:grid; gap:.65rem; margin:.75rem 0; }
+        .feelie-row { border:1px solid rgba(127,127,127,.24); border-radius:10px; padding:.7rem; background:rgba(127,127,127,.03); display:grid; gap:.6rem; }
+        .feelie-row.invalid { border-color:rgba(255,95,95,.7); background:rgba(255,95,95,.08); }
+        .feelie-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:.55rem; }
+        .feelie-grid .wide { grid-column:1 / -1; }
+        .feelie-actions { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; justify-content:space-between; }
+        .feelie-actions .left, .feelie-actions .right { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; }
         code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.9em; }
         .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:.8rem; }
         @media (max-width: 820px) {
@@ -310,6 +325,8 @@ class TerpVaultPage extends HTMLElement {
           .media-focus { grid-template-columns:1fr; }
           .screenshot-row { grid-template-columns:1fr; }
           .screenshot-row img { width:100%; }
+          .feelie-grid { grid-template-columns:1fr; }
+          .feelie-grid .wide { grid-column:auto; }
         }
       </style>
       <div class="tv-admin">
@@ -813,6 +830,14 @@ class TerpVaultPage extends HTMLElement {
       form.addEventListener('submit', event => this._uploadMedia(event));
     });
 
+    root.querySelectorAll('form[data-feelies-slug]').forEach(form => {
+      form.addEventListener('submit', event => this._saveFeelies(event));
+    });
+
+    root.querySelectorAll('form[data-feelie-upload-slug]').forEach(form => {
+      form.addEventListener('submit', event => this._uploadFeelie(event));
+    });
+
     root.querySelectorAll('form[data-story-slug]').forEach(form => {
       form.addEventListener('submit', event => this._uploadStory(event));
     });
@@ -823,6 +848,18 @@ class TerpVaultPage extends HTMLElement {
 
     root.querySelectorAll('[data-action="screenshot-move"]').forEach(button => {
       button.addEventListener('click', () => this._moveScreenshot(button.dataset.slug || '', Number(button.dataset.index || -1), Number(button.dataset.direction || 0)));
+    });
+
+    root.querySelectorAll('[data-action="feelie-add"]').forEach(button => {
+      button.addEventListener('click', () => this._addFeelie());
+    });
+
+    root.querySelectorAll('[data-action="feelie-remove"]').forEach(button => {
+      button.addEventListener('click', () => this._removeFeelie(Number(button.dataset.index || -1)));
+    });
+
+    root.querySelectorAll('[data-action="feelie-move"]').forEach(button => {
+      button.addEventListener('click', () => this._moveFeelie(Number(button.dataset.index || -1), Number(button.dataset.direction || 0)));
     });
   }
 
@@ -939,6 +976,7 @@ class TerpVaultPage extends HTMLElement {
           selectedMediaType: 'cover',
           helper: this._emptyHelperState('how-to-play'),
           media: this._mediaFromGame(game),
+          feelies: this._feeliesFromGame(game),
           story: this._storyFromGame(game),
           ifiction: this._emptyIFictionState()
         };
@@ -996,12 +1034,14 @@ class TerpVaultPage extends HTMLElement {
           selectedMediaType: 'cover',
           helper: this._emptyHelperState('how-to-play'),
           media: this._mediaFromGame(this._findGame(slug) || {}),
+          feelies: this._feeliesFromGame(this._findGame(slug) || {}),
           story: this._storyFromGame(this._findGame(slug) || {}),
           ifiction: this._emptyIFictionState()
         };
         await this._loadHelperDoc(slug, 'how-to-play', false);
         await this._loadStory(slug, false);
         await this._loadMedia(slug, false);
+        await this._loadFeelies(slug, false);
       }
     } catch (error) {
       this.state.create = {
@@ -1034,6 +1074,7 @@ class TerpVaultPage extends HTMLElement {
       selectedMediaType: 'cover',
       helper: this._emptyHelperState('how-to-play'),
       media: this._mediaFromGame(game || {}),
+      feelies: this._feeliesFromGame(game || {}),
       story: this._storyFromGame(game || {}),
       ifiction: this._emptyIFictionState()
     };
@@ -1059,6 +1100,7 @@ class TerpVaultPage extends HTMLElement {
     await this._loadHelperDoc(slug, this.state.editor.activeHelper, false);
     await this._loadStory(slug, false);
     await this._loadMedia(slug, false);
+    await this._loadFeelies(slug, false);
     this._renderLibrary();
   }
 
@@ -1076,6 +1118,7 @@ class TerpVaultPage extends HTMLElement {
       selectedMediaType: 'cover',
       helper: this._emptyHelperState('how-to-play'),
       media: this._emptyMediaState(),
+      feelies: this._emptyFeeliesState(),
       story: this._emptyStoryState(),
       ifiction: this._emptyIFictionState()
     };
@@ -1651,6 +1694,224 @@ class TerpVaultPage extends HTMLElement {
     }
   }
 
+  async _loadFeelies(slug, render = true) {
+    if (!slug) {
+      return;
+    }
+
+    this.state.editor = {
+      ...this.state.editor,
+      feelies: {
+        ...(this.state.editor.feelies || this._emptyFeeliesState()),
+        loading: true,
+        error: '',
+        success: ''
+      }
+    };
+
+    if (render) {
+      this._renderLibrary();
+    }
+
+    try {
+      const data = await this._requestJson(this._feeliesApiUrl(slug), { method: 'GET' });
+      this.state.editor = {
+        ...this.state.editor,
+        feelies: this._feeliesFromApi(data, this._findGame(slug) || {})
+      };
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        feelies: {
+          ...(this.state.editor.feelies || this._emptyFeeliesState()),
+          loading: false,
+          error: `Feelies API unavailable: ${error.message || error}`
+        }
+      };
+    }
+
+    if (render) {
+      this._renderLibrary();
+    }
+  }
+
+  async _saveFeelies(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const slug = form.dataset.feeliesSlug || this.state.editingSlug;
+    const feelies = this._collectFeelies(form);
+
+    this.state.editor = {
+      ...this.state.editor,
+      feelies: {
+        ...(this.state.editor.feelies || this._emptyFeeliesState()),
+        items: feelies,
+        saving: 'manifest',
+        error: '',
+        success: ''
+      }
+    };
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._feeliesApiUrl(slug), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feelies })
+      });
+      const fallback = this._feeliesFromApi(data, this._findGame(slug) || {});
+      await this._reloadManifest();
+      const refreshed = await this._refreshFeelies(slug, fallback);
+      this.state.editor = {
+        ...this.state.editor,
+        feelies: {
+          ...refreshed,
+          success: 'Feelies manifest saved. No physical files were deleted.'
+        }
+      };
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        feelies: {
+          ...(this.state.editor.feelies || this._emptyFeeliesState()),
+          items: feelies,
+          saving: '',
+          error: error.message || String(error)
+        }
+      };
+    }
+
+    this._renderLibrary();
+  }
+
+  async _uploadFeelie(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const slug = form.dataset.feelieUploadSlug || this.state.editingSlug;
+    const input = form.querySelector('input[type="file"]');
+    const file = input?.files?.[0];
+    if (!file) {
+      this.state.editor = {
+        ...this.state.editor,
+        feelies: {
+          ...(this.state.editor.feelies || this._emptyFeeliesState()),
+          error: 'Choose a feelie file before uploading.',
+          success: ''
+        }
+      };
+      this._renderLibrary();
+      return;
+    }
+
+    const data = new FormData(form);
+    data.set('file', file);
+    this.state.editor = {
+      ...this.state.editor,
+      feelies: {
+        ...(this.state.editor.feelies || this._emptyFeeliesState()),
+        saving: 'upload',
+        error: '',
+        success: ''
+      }
+    };
+    this._renderLibrary();
+
+    try {
+      const response = await this._requestJson(this._feeliesApiUrl(slug), {
+        method: 'POST',
+        body: data
+      });
+      const fallback = this._feeliesFromApi(response, this._findGame(slug) || {});
+      await this._reloadManifest();
+      const refreshed = await this._refreshFeelies(slug, fallback);
+      this.state.editor = {
+        ...this.state.editor,
+        feelies: {
+          ...refreshed,
+          success: 'Feelie uploaded and added to resources.feelies.'
+        }
+      };
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        feelies: {
+          ...(this.state.editor.feelies || this._emptyFeeliesState()),
+          saving: '',
+          error: error.message || String(error)
+        }
+      };
+    }
+
+    this._renderLibrary();
+  }
+
+  async _refreshFeelies(slug, fallbackFeelies) {
+    try {
+      const data = await this._requestJson(this._feeliesApiUrl(slug), { method: 'GET' });
+      return this._feeliesFromApi(data, this._findGame(slug) || {});
+    } catch (error) {
+      return {
+        ...(fallbackFeelies || this._emptyFeeliesState()),
+        error: `Feelies changed, but inventory refresh failed: ${error.message || error}`
+      };
+    }
+  }
+
+  _addFeelie() {
+    const feelies = this._currentFeelieItems();
+    feelies.push({ title: '', path: '', type: '', description: '', exists: false, url: '', valid: true, error: '' });
+    this.state.editor = {
+      ...this.state.editor,
+      feelies: {
+        ...(this.state.editor.feelies || this._emptyFeeliesState()),
+        items: feelies,
+        success: '',
+        error: ''
+      }
+    };
+    this._renderLibrary();
+  }
+
+  _removeFeelie(index) {
+    const feelies = this._currentFeelieItems();
+    if (index < 0 || index >= feelies.length) {
+      return;
+    }
+
+    feelies.splice(index, 1);
+    this.state.editor = {
+      ...this.state.editor,
+      feelies: {
+        ...(this.state.editor.feelies || this._emptyFeeliesState()),
+        items: feelies,
+        success: 'Feelie removed from the pending manifest list only. Save to update game.yaml; the physical file is not deleted.',
+        error: ''
+      }
+    };
+    this._renderLibrary();
+  }
+
+  _moveFeelie(index, direction) {
+    const feelies = this._currentFeelieItems();
+    const target = index + direction;
+    if (index < 0 || target < 0 || index >= feelies.length || target >= feelies.length) {
+      return;
+    }
+
+    const [item] = feelies.splice(index, 1);
+    feelies.splice(target, 0, item);
+    this.state.editor = {
+      ...this.state.editor,
+      feelies: {
+        ...(this.state.editor.feelies || this._emptyFeeliesState()),
+        items: feelies,
+        success: '',
+        error: ''
+      }
+    };
+    this._renderLibrary();
+  }
+
   async _exportPackage(slug) {
     if (!slug) {
       return;
@@ -1800,6 +2061,7 @@ class TerpVaultPage extends HTMLElement {
         ${this._ifictionPreviewPanel(slug)}
         ${this._storyPanel(game, slug)}
         ${this._mediaPanel(game, slug)}
+        ${this._feeliesPanel(game, slug)}
         ${this._helperDocsPanel(slug)}
       </div>
     `;
@@ -1921,7 +2183,7 @@ class TerpVaultPage extends HTMLElement {
     return `
       <section class="media-manager">
         <h3>Media</h3>
-        <p class="meta">Media Manager Lite accepts package-local jpg, png, webp, and gif images only. Feelies/extras are read from <code>resources.feelies</code> for now; arbitrary file management is not available here.</p>
+        <p class="meta">Media Manager Lite accepts package-local jpg, png, webp, and gif images only. Feelies/extras are managed in their own curated section below; arbitrary file management is not available here.</p>
         ${media.loading ? '<div class="message">Loading media inventory...</div>' : ''}
         ${media.error ? `<div class="message error">${this._esc(media.error)}</div>` : ''}
         ${media.success ? `<div class="message success">${this._esc(media.success)}</div>` : ''}
@@ -2045,6 +2307,91 @@ class TerpVaultPage extends HTMLElement {
     `;
   }
 
+  _feeliesPanel(game, slug) {
+    const state = this.state.editor.feelies || this._feeliesFromGame(game);
+    const items = Array.isArray(state.items) ? state.items : [];
+    const saving = Boolean(state.loading || state.saving);
+
+    return `
+      <section class="feelies-manager">
+        <h3>Feelies / Extras</h3>
+        <p class="meta">Feelies are curated extras such as manuals, maps, clue sheets, images, audio, or other supplemental package-local files. This manages only <code>resources.feelies</code>; it is not a package file browser.</p>
+        <p class="meta">Removing a feelie from the manifest does not delete the physical file.</p>
+        ${state.loading ? '<div class="message">Loading feelies inventory...</div>' : ''}
+        ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
+        ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
+        <form data-feelies-slug="${this._esc(slug)}">
+          <div class="feelie-list">
+            ${items.length ? items.map((item, index) => this._feelieRow(slug, item, index, items.length, saving)).join('') : '<p class="meta">No feelies recorded.</p>'}
+          </div>
+          <div class="form-actions">
+            <button class="button" type="button" data-action="feelie-add" ${saving ? 'disabled' : ''}>Add Feelie</button>
+            <button class="button primary" type="submit" ${saving ? 'disabled' : ''}>${state.saving === 'manifest' ? 'Saving...' : 'Save Feelies Manifest'}</button>
+          </div>
+        </form>
+        <form data-feelie-upload-slug="${this._esc(slug)}" style="margin-top:.85rem;">
+          <div class="fieldsets">
+            <fieldset>
+              <legend>Upload Feelie</legend>
+              <p class="meta">Uploads are stored under <code>feelies/</code> and added to <code>resources.feelies</code>. Allowed: pdf, txt, md, jpg, jpeg, png, webp, gif, mp3, ogg, wav, m4a. SVG is excluded.</p>
+              <div class="field">
+                <label>File</label>
+                <input type="file" name="file" accept=".pdf,.txt,.md,.jpg,.jpeg,.png,.webp,.gif,.mp3,.ogg,.wav,.m4a,application/pdf,text/plain,text/markdown,image/jpeg,image/png,image/webp,image/gif,audio/mpeg,audio/ogg,audio/wav,audio/mp4" ${saving ? 'disabled' : ''}>
+              </div>
+              ${this._createInput('Title', 'title')}
+              ${this._createInput('Type', 'type')}
+              ${this._createTextarea('Description', 'description', 'short')}
+              <div class="form-actions">
+                <button class="button primary" type="submit" ${saving ? 'disabled' : ''}>${state.saving === 'upload' ? 'Uploading...' : 'Upload Feelie'}</button>
+              </div>
+            </fieldset>
+          </div>
+        </form>
+      </section>
+    `;
+  }
+
+  _feelieRow(slug, item, index, count, saving) {
+    const valid = item.valid !== false;
+    const exists = Boolean(item.exists);
+    return `
+      <div class="feelie-row ${valid ? '' : 'invalid'}">
+        <div class="feelie-actions">
+          <div class="left">
+            <strong>Feelie ${index + 1}</strong>
+            <span class="badge ${valid && exists ? 'ok' : 'warn'}">${valid ? (exists ? 'file found' : 'missing file') : 'invalid path'}</span>
+          </div>
+          <div class="right">
+            ${item.url ? `<a class="button" href="${this._esc(item.url)}" target="_blank" rel="noopener">Open</a>` : ''}
+            <button class="button" type="button" data-action="feelie-move" data-index="${index}" data-direction="-1" ${index === 0 || saving ? 'disabled' : ''}>Move up</button>
+            <button class="button" type="button" data-action="feelie-move" data-index="${index}" data-direction="1" ${index >= count - 1 || saving ? 'disabled' : ''}>Move down</button>
+            <button class="button" type="button" data-action="feelie-remove" data-index="${index}" ${saving ? 'disabled' : ''}>Remove from manifest</button>
+          </div>
+        </div>
+        ${item.error ? `<div class="message error">${this._esc(item.error)}</div>` : ''}
+        <div class="feelie-grid">
+          <div class="field">
+            <label>Title</label>
+            <input type="text" name="feelies[${index}][title]" value="${this._esc(item.title || '')}" ${saving ? 'disabled' : ''}>
+          </div>
+          <div class="field">
+            <label>Type</label>
+            <input type="text" name="feelies[${index}][type]" value="${this._esc(item.type || '')}" ${saving ? 'disabled' : ''}>
+          </div>
+          <div class="field wide">
+            <label>Path</label>
+            <input type="text" name="feelies[${index}][path]" value="${this._esc(item.path || '')}" placeholder="feelies/manual.pdf" ${saving ? 'disabled' : ''}>
+            <span class="meta">Package-local allowlisted paths only. Traversal, absolute paths, URI-like paths, hidden/system paths, and SVG are rejected.</span>
+          </div>
+          <div class="field wide">
+            <label>Description</label>
+            <textarea class="short" name="feelies[${index}][description]" ${saving ? 'disabled' : ''}>${this._esc(item.description || '')}</textarea>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   _help(key) {
     const text = this._helpText(key);
     return text ? `<p class="help section-help">${this._esc(text)}</p>` : '';
@@ -2078,7 +2425,7 @@ class TerpVaultPage extends HTMLElement {
       status: 'Draft keeps a package out of normal public listings unless your site is configured to show unpublished content.',
       featured: 'Marks a package for featured placement where a theme or template uses that signal.',
       tags: 'One tag per line, or comma-separated.',
-      readonly_files: 'Package-local paths currently managed by dedicated tools or read from game.yaml. Feelies are curated extras such as manuals, maps, clue sheets, images, or audio and are read-only here for now.'
+      readonly_files: 'Package-local paths currently managed by dedicated tools or read from game.yaml. Feelies are managed below as curated manifest entries, not through arbitrary package browsing.'
     };
 
     return messages[key] || '';
@@ -2187,6 +2534,25 @@ class TerpVaultPage extends HTMLElement {
 
     this._set(metadata, 'terpvault.featured', form.querySelector('[name="terpvault.featured"]')?.checked || false);
     return metadata;
+  }
+
+  _collectFeelies(form) {
+    const rows = [];
+    new FormData(form).forEach((value, name) => {
+      const match = String(name).match(/^feelies\[(\d+)\]\[(title|path|type|description)\]$/);
+      if (!match) {
+        return;
+      }
+
+      const index = Number(match[1]);
+      const key = match[2];
+      if (!rows[index]) {
+        rows[index] = { title: '', path: '', type: '', description: '' };
+      }
+      rows[index][key] = String(value).trim();
+    });
+
+    return rows.filter(item => item && (item.title || item.path || item.type || item.description));
   }
 
   _editableFromApi(data, fallbackGame) {
@@ -2340,6 +2706,10 @@ class TerpVaultPage extends HTMLElement {
 
   _screenshotsApiUrl(slug) {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/media/screenshots`;
+  }
+
+  _feeliesApiUrl(slug) {
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/feelies`;
   }
 
   _apiBase() {
@@ -2592,6 +2962,70 @@ class TerpVaultPage extends HTMLElement {
         screenshots: Array.isArray(game.resources?.screenshots) ? game.resources.screenshots : []
       }
     };
+  }
+
+  _emptyFeeliesState() {
+    return {
+      loading: false,
+      saving: '',
+      error: '',
+      success: '',
+      items: []
+    };
+  }
+
+  _feeliesFromApi(data, fallbackGame) {
+    const payload = this._unwrapApiResponse(data);
+    return {
+      ...this._emptyFeeliesState(),
+      items: Array.isArray(payload.feelies) ? payload.feelies.map(item => this._normalizeFeelieItem(item)) : this._feeliesFromGame(fallbackGame).items
+    };
+  }
+
+  _feeliesFromGame(game = {}) {
+    const publicFeelies = Array.isArray(game.feelies) ? game.feelies : [];
+    const manifestFeelies = Array.isArray(game.resources?.feelies) ? game.resources.feelies : [];
+    const source = manifestFeelies.length ? manifestFeelies : publicFeelies;
+
+    return {
+      ...this._emptyFeeliesState(),
+      items: source.map((item, index) => {
+        const data = typeof item === 'string' ? { path: item } : (item || {});
+        const publicItem = publicFeelies.find(feelie => feelie.path === data.path) || {};
+        return this._normalizeFeelieItem({
+          index,
+          title: data.title || publicItem.title || '',
+          path: data.path || publicItem.path || '',
+          type: data.type || data.category || publicItem.type || '',
+          description: data.description || publicItem.description || '',
+          extension: publicItem.extension || '',
+          exists: Boolean(publicItem.url),
+          url: publicItem.url || '',
+          valid: true,
+          error: ''
+        });
+      })
+    };
+  }
+
+  _normalizeFeelieItem(item = {}) {
+    return {
+      index: Number.isFinite(Number(item.index)) ? Number(item.index) : 0,
+      title: item.title || '',
+      path: item.path || '',
+      type: item.type || '',
+      description: item.description || '',
+      extension: item.extension || (item.path ? String(item.path).split('.').pop() : ''),
+      exists: Boolean(item.exists),
+      url: item.url || '',
+      valid: item.valid !== false,
+      error: item.error || ''
+    };
+  }
+
+  _currentFeelieItems() {
+    const items = this.state.editor?.feelies?.items || [];
+    return Array.isArray(items) ? items.map(item => ({ ...item })) : [];
   }
 
   _currentScreenshotPaths() {

@@ -9,7 +9,7 @@
 - Admin2 routes should continue to use controller-style API integration rather than ad hoc request handlers.
 - Current write workflows are scoped to specific package-management actions; TerpVault should not expose an arbitrary package file browser.
 - Admin2/API write permissions should remain conservative unless a future release defines a more granular permission model.
-- v0.4.2 development folds the local iFiction preview work together with a narrow Admin2 UX polish pass for contextual help and actionable media cards.
+- v0.4.4 development starts narrow Admin2 feelies/extras management for curated `resources.feelies` entries without physical delete behavior.
 
 ## Shipped milestones
 
@@ -83,8 +83,8 @@
 
 ### Feelies/extras management
 
-- Add Admin2 management for package-local feelies/extras.
-- Support allowlisted uploads and manifest updates for `resources.feelies`.
+- Started in v0.4.4 with Admin2 listing, metadata edits, add, manifest-only remove, reorder, public/open links when valid, and allowlisted package-local uploads for `resources.feelies`.
+- Keep remove behavior manifest-only; physical file deletion remains out of scope.
 - Do not turn feelies into arbitrary package file browsing; expose and manage only curated supplemental files.
 - Keep SVG feelies excluded unless a future safe sanitization or forced-download strategy is designed.
 

@@ -218,6 +218,8 @@ Allowed extensions:
 
 Archives and executable-like files are not accepted for feelies. Import/export continues to reject traversal, absolute paths, URI-like paths, unsafe cruft-looking paths, and unrelated files.
 
+Admin2 feelies/extras management edits only curated `resources.feelies` entries and controlled uploads under the package. Removing an entry from the manifest does not delete the physical file. Uploads and edited paths must remain package-local and use the allowlisted document, image, or audio extensions above; SVG remains excluded.
+
 ## Inform release mapping
 
 TerpVault borrows useful naming ideas from Inform release folders:
