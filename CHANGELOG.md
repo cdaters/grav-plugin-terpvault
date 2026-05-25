@@ -1,6 +1,6 @@
 # v0.4.2
 
-## Unreleased
+## 05/25/2026
 
 1. Changed
     - Added authenticated Admin2 preview for package-local `metadata.iFiction.xml`.
