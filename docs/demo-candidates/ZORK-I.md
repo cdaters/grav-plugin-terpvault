@@ -5,9 +5,10 @@
 - Candidate only.
 - Upstream repo verified on 2026-05-24.
 - License/provenance reviewed from observed repository files only.
-- Requires build/package verification.
+- Source build verified on 2026-05-25.
+- Requires package verification.
 - Requires original package assets and helper docs.
-- Next state: build verification needed.
+- Next state: package/provenance/playback verification needed.
 
 Zork I must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -50,8 +51,8 @@ Source/build notes summary:
 - Source language/format: ZIL (Zork Implementation Language), with `.zil` source files and related source/build-side files including `parser.cmp`, `zork1.chart`, `zork1.errors`, `zork1.record`, `zork1.serial`, and `zork1freq.xzap`.
 - README build context: Infocom historically used TOPS20 and ZILCH; the README says there is currently no known way to compile with an official Infocom compiler, and says user-maintained ZILF has been shown to compile these `.ZIL` files with minor issues.
 - Repository build path: no exact command, script, Makefile, or documented ZILF/ZAPF invocation was observed.
-- Local tooling check: `zilf`, `Zilf`, `ZILF`, `zapf`, `Zapf`, `ZAPF`, `zilch`, `frotz`, and `dotnet` were not found in `PATH`.
-- Build attempt: not performed because required tooling was unavailable locally and no tooling was installed.
+- Local tooling check on 2026-05-25: .NET SDK, ZILF/ZAPF, and Frotz were available outside the TerpVault repo for scratch build verification.
+- Build attempt: completed from source in scratch with ZILF 1.8 / ZAPF 1.8.
 
 Available files/artifacts summary:
 
@@ -63,41 +64,56 @@ Available files/artifacts summary:
 
 ## Build tooling verification
 
-Verification date: 2026-05-24.
+Verification date: 2026-05-25.
 
-This pass checked local tooling and the likely ZILF/ZAPF upstream path only. No tool installation was performed, no source/tool repository was cloned into TerpVault, and no Zork I build artifacts were created or copied into this repository.
+This pass used scratch paths outside the TerpVault repo. No source/tool repository, generated story file, screenshot, image, or package content was created or copied into this repository.
 
-Exact local tooling command used:
+.NET SDK:
 
-```sh
-for c in dotnet zilf zapf Zilf Zapf ZILF ZAPF mono frotz dfrotz zoom gargoyle parchment; do
-  if command -v "$c" >/dev/null 2>&1; then
-    printf '%s: %s\n' "$c" "$(command -v "$c")"
-  else
-    printf '%s: not found\n' "$c"
-  fi
-done
+- Executable: `/usr/local/share/dotnet/dotnet`.
+- SDK version: `10.0.300`.
+
+ZILF/ZAPF:
+
+- Scratch checkout/build path: `/tmp/terpvault-zilf-verification`.
+- ZILF executable: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf`.
+- ZAPF executable: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf`.
+- ZILF repo branch: `branch/default`.
+- ZILF repo commit: `e1434a03a5f82b931234f52c07fe5f43ff7ea7d6`.
+- Latest ZILF repo commit observed: `e1434a03a5f82b931234f52c07fe5f43ff7ea7d6`, `2026-05-13 23:46:24 -0700`, `Fix INSERT-HELD-WORD truncation bug`.
+- ZILF version: `1.8`.
+- ZAPF version: `1.8`.
+
+Frotz:
+
+- Executable: `/opt/homebrew/bin/frotz`.
+- Version output:
+
+```text
+FROTZ V2.55
+Curses interface.
+Audio output enabled.
+Commit date: 2025-02-01 14:36:37 -0800
+Git commit: acf205585a9472d27c07c0fe62da4b8bc89d1ec7
+Official release.
 ```
+
+- Smoke-test commands used inside Frotz:
+
+```text
+look
+inventory
+quit
+y
+```
+
+- Both source-built historical-header variants launched and responded successfully in Frotz:
+  - `zork1-release119-serial880429.z3`.
+  - `zork1-release119-serial880429-nocreator.z3`.
 
 ## Tooling discovered
 
-Local tools in `PATH`:
-
-- `dotnet`: not found.
-- `zilf`: not found.
-- `zapf`: not found.
-- `Zilf`: not found.
-- `Zapf`: not found.
-- `ZILF`: not found.
-- `ZAPF`: not found.
-- `mono`: not found.
-- `frotz`: not found.
-- `dfrotz`: not found.
-- `zoom`: not found.
-- `gargoyle`: not found.
-- `parchment`: not found.
-
-Likely ZILF/ZAPF upstream:
+ZILF/ZAPF upstream:
 
 - Main project/repository: `https://foss.heptapod.net/zilf/zilf`.
 - GitHub mirror observed: `https://github.com/taradinoc/zilf`.
@@ -111,63 +127,101 @@ Likely ZILF/ZAPF upstream:
 
 ## Build attempt
 
-Build from source was not attempted in this pass.
+Build from source was completed in scratch.
 
-Reason:
+Zork I source checkout:
 
-- `dotnet` is not installed or not available in `PATH`.
-- ZILF/ZAPF executables are not installed or not available in `PATH`.
-- No system packages were installed because this pass was documentation/tooling verification only and package installation requires explicit approval.
+- Scratch checkout: `/tmp/terpvault-zork1-build`.
+- Repository: `https://github.com/historicalsource/zork1.git`.
+- Commit: `97b7b3d68c075dd9af7da499c3e9690ada3471fd`.
 
-Scratch paths reserved for a later practical build pass:
-
-- ZILF/ZAPF tooling checkout/build: `/tmp/terpvault-zilf-verification`.
-- Zork I source/build checkout: `/tmp/terpvault-zork1-build`.
-
-Planned build verification commands for a later pass, after prerequisites are installed in a scratch or user-local tooling path:
+Default build command:
 
 ```sh
-git clone https://github.com/historicalsource/zork1.git /tmp/terpvault-zork1-build
-cd /tmp/terpvault-zork1-build
-git checkout 97b7b3d68c075dd9af7da499c3e9690ada3471fd
 zilf zork1.zil
 ```
 
-The exact ZILF/ZAPF invocation may need adjustment after inspecting installed ZILF 1.8 behavior and any Zork I-specific warnings/errors.
+Result:
+
+- Built successfully with ZILF 1.8 / ZAPF 1.8.
+- Output banner: `Renovated ZORK I: The Great Underground Empire`.
+- Warnings: `28 warnings (26 suppressed)`.
+- Visible warnings were ZSCII 9 tab warnings in `1DUNGEON.zil` for Z-machine version 3.
+- Output: `zork1.z3`, 86928 bytes.
+- File identification: `Infocom (Z-machine 3, Release 0, Serial 260525)`.
+- SHA-256: `2ede50b5b2346e6078de8ab1fcee8631c377d66d856333fb00ff39e9c77ba6b6`.
+
+Historical release/serial reassembly command:
+
+```sh
+zapf zork1.zap zork1-release119-serial880429.z3 -r 119 -s 880429
+```
+
+Result:
+
+- Built successfully.
+- Output: `zork1-release119-serial880429.z3`, 86928 bytes.
+- File identification: `Infocom (Z-machine 3, Release 119, Serial 880429)`.
+- SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- Frotz smoke test: passed.
+
+Historical release/serial no-creator reassembly command:
+
+```sh
+zapf zork1.zap zork1-release119-serial880429-nocreator.z3 -r 119 -s 880429 -N
+```
+
+Result:
+
+- Built successfully.
+- Output: `zork1-release119-serial880429-nocreator.z3`, 86928 bytes.
+- File identification: `Infocom (Z-machine 3, Release 119, Serial 880429)`.
+- SHA-256: `208b82f59c6639bb89dd16dbb1b83fa0b3b6d11523aa7a3a3236be028071ddc`.
+- Frotz smoke test: passed.
 
 ## Artifact result
 
-- Generated artifact filename: none.
-- Generated artifact SHA-256: none.
-- Comparison with upstream `COMPILED/zork1.z3`: not performed.
-- Interpreter smoke test: not performed.
+- Generated artifact filename: `zork1.z3`.
+- Generated artifact SHA-256: `2ede50b5b2346e6078de8ab1fcee8631c377d66d856333fb00ff39e9c77ba6b6`.
+- Historical-header artifact filename: `zork1-release119-serial880429.z3`.
+- Historical-header artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- Historical-header no-creator artifact filename: `zork1-release119-serial880429-nocreator.z3`.
+- Historical-header no-creator artifact SHA-256: `208b82f59c6639bb89dd16dbb1b83fa0b3b6d11523aa7a3a3236be028071ddc`.
+- Upstream prebuilt `COMPILED/zork1.z3` and `zork1.zip` file identification: `Infocom (Z-machine 3, Release 119, Serial 880429)`.
+- Upstream prebuilt `COMPILED/zork1.z3` and `zork1.zip` SHA-256: `37084966477dff679282de42974b2077156b1bd68fad92a65d4ea94d8eb64d79`.
+- Comparison with upstream `COMPILED/zork1.z3`: neither source-built historical-header artifact matched the upstream prebuilt checksum.
+- Interpreter smoke test: passed in Frotz for both source-built historical-header variants.
 - TerpVault/Parchment playback testing: pending.
 
 ## Remaining blockers
 
-- Install or otherwise provide a verified .NET 10 SDK outside the TerpVault repo.
-- Install or build ZILF/ZAPF outside the TerpVault repo, preferably in a scratch or user-local tooling path.
-- Re-run the Zork I source build at commit `97b7b3d68c075dd9af7da499c3e9690ada3471fd`.
-- Record the exact build command, output filename, generated artifact SHA-256, and whether it matches or differs from upstream `COMPILED/zork1.z3`.
-- Install or provide a Z-machine interpreter such as Frotz, or verify browser playback through TerpVault/Parchment, before claiming runtime smoke-test coverage.
-- Keep Zork I candidate-only until build output, redistribution basis, TerpVault playback, package metadata, provenance notes, and package export/import behavior are verified.
+- Package metadata is not complete.
+- Package-local provenance notes are not complete.
+- TerpVault/Parchment playback testing is pending.
+- Package export/import smoke testing is pending.
+- Original package art is not created.
+- Screenshots are not created.
+- Helper docs are not created.
+- Feelies are not created.
+- Redistribution/package basis for the exact generated story artifact still needs to be recorded in package-local notes before bundling.
+- Keep Zork I candidate-only until package metadata, provenance notes, TerpVault/Parchment playback, export/import behavior, original art, screenshots, helper docs, and feelies are complete.
 
 ## Recommended next action
 
-Install/verify the .NET 10 SDK and ZILF/ZAPF outside the TerpVault repo, using a scratch or user-local tooling path. Then re-run a build verification pass from a fresh scratch checkout of `https://github.com/historicalsource/zork1.git` at commit `97b7b3d68c075dd9af7da499c3e9690ada3471fd`, record the artifact checksum and comparison against `COMPILED/zork1.z3`, and only then decide whether a TerpVault demo package path is appropriate.
+Keep Zork I candidate-only and proceed with package-planning work only after the package metadata, package-local provenance notes, TerpVault/Parchment playback test plan, export/import smoke test plan, original art plan, screenshot plan, helper docs, and feelies are ready. Do not create `_demo` package contents yet.
 
 Packaging recommendation:
 
 - Keep Zork I as candidate-only.
 - Do not create `_demo` package contents yet.
-- Do not bundle `zork1.zip` or `COMPILED/zork1.z3` until the redistribution basis for generated/prebuilt story artifacts is documented, the build path is verified or an explicit packaging decision is made, and TerpVault playback/import/export smoke tests are complete.
+- Recommended eventual package artifact is probably the source-built `zork1-release119-serial880429.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
+- Do not bundle `zork1.zip` or `COMPILED/zork1.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
+- Do not mark Zork I package-ready until package metadata, provenance notes, TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, and feelies are complete.
 - If packaging proceeds later, include upstream MIT license text and package-local provenance notes, and use only Craig-created art/helper docs unless other assets have separately verified redistribution rights.
 
 Remaining blockers:
 
-- Install or otherwise provide verified ZILF/ZAPF-compatible tooling outside the repo.
-- Build from source in a scratch location and record exact command, output artifact name, and checksum.
-- Decide whether the generated artifact, prebuilt artifact, source provenance, or some combination is appropriate for the package.
+- Decide whether the source-built `zork1-release119-serial880429.z3`, source provenance, or some combination is appropriate for the package.
 - Verify IFID/format and TerpVault/Parchment playback behavior.
 - Create original package assets and helper docs only after packaging basis is resolved.
 - Run package export/import smoke tests once a package exists.
@@ -186,16 +240,16 @@ Remaining blockers:
 
 ## Build/package verification checklist
 
-- Identify required build toolchain.
-- Build from source locally.
-- Record build command.
-- Record output story artifact.
-- Record output checksum.
+- Identify required build toolchain. Done for source-build verification.
+- Build from source locally. Done in scratch.
+- Record build command. Done.
+- Record output story artifact. Done for scratch build artifacts.
+- Record output checksum. Done for scratch build artifacts.
 - Confirm artifact plays in TerpVault/Parchment.
 - Confirm IFID and format.
 - Decide whether to include generated story artifact, source provenance, or both.
 - Confirm package export/import smoke test.
-- Record any interpreter-specific behavior, warnings, or metadata gaps discovered during testing.
+- Record any interpreter-specific behavior, warnings, or metadata gaps discovered during TerpVault/Parchment testing.
 
 ## TerpVault package plan
 
@@ -221,7 +275,7 @@ zork-i/
 
 Notes:
 
-- Story file exact filename: TBD.
+- Story file exact filename: probably `zork1-release119-serial880429.z3`, unless a later package decision selects a different artifact.
 - `LICENSE-upstream.txt` or equivalent should be included if required by the verified license.
 - Provenance notes should record source URL, retrieved date, commit/tag, build toolchain, build command, output checksum, and any package-local asset authorship notes.
 
@@ -245,9 +299,7 @@ Notes:
 
 ## Open questions
 
-- Which exact repo/commit is authoritative for TerpVault packaging?
-- What build toolchain is required?
-- What output story format/filename should be used?
+- Should the source-built `zork1-release119-serial880429.z3` artifact be selected for eventual packaging?
 - Is the generated artifact clearly redistributable under the same license path?
 - What IFID should be recorded?
 - Should Zork I install as draft or published in the future demo installer?
@@ -256,8 +308,6 @@ Notes:
 
 ## Next actions
 
-- Verify repo/license.
-- Build story artifact.
 - Test in TerpVault.
 - Draft `game.yaml`.
 - Create original art.
