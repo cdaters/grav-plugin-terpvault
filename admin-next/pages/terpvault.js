@@ -226,7 +226,7 @@ class TerpVaultPage extends HTMLElement {
         legend { padding:0 .25rem; font-weight:700; }
         .field { display:grid; gap:.25rem; margin:.55rem 0; }
         .field label, .checkbox label { font-weight:600; font-size:.84rem; }
-        .help { opacity:.74; font-size:.875rem; line-height:1.45; }
+        .help { opacity:.72; font-size:.875rem; font-style:italic; line-height:1.45; }
         .section-help { margin:.2rem 0 .65rem; }
         input, textarea, select { width:100%; border:1px solid rgba(127,127,127,.35); border-radius:8px; padding:.48rem .55rem; background:rgba(127,127,127,.055); color:inherit; font:inherit; }
         select option, select optgroup { background:var(--tv-admin-select-bg, Canvas); color:var(--tv-admin-select-color, CanvasText); }
@@ -1452,15 +1452,18 @@ class TerpVaultPage extends HTMLElement {
         method: 'POST',
         body: formData
       });
-      const media = this._mediaFromApi(data, this._findGame(slug) || {});
+      const fallbackMedia = this._mediaFromApi(data, this._findGame(slug) || {});
+      await this._reloadManifest();
+      const media = await this._refreshMediaInventory(slug, fallbackMedia);
       this.state.editor = {
         ...this.state.editor,
+        selectedMediaType: this.state.editor.selectedMediaType || 'cover',
         media: {
           ...media,
+          cacheKey: this._newMediaCacheKey(),
           success: 'Media uploaded and package metadata updated.'
         }
       };
-      await this._reloadManifest();
     } catch (error) {
       this.state.editor = {
         ...this.state.editor,
@@ -1515,15 +1518,17 @@ class TerpVaultPage extends HTMLElement {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ screenshots })
       });
-      const media = this._mediaFromApi(data, this._findGame(slug) || {});
+      const fallbackMedia = this._mediaFromApi(data, this._findGame(slug) || {});
+      await this._reloadManifest();
+      const media = await this._refreshMediaInventory(slug, fallbackMedia);
       this.state.editor = {
         ...this.state.editor,
         media: {
           ...media,
+          cacheKey: this._newMediaCacheKey(),
           success
         }
       };
-      await this._reloadManifest();
     } catch (error) {
       this.state.editor = {
         ...this.state.editor,
@@ -1536,6 +1541,18 @@ class TerpVaultPage extends HTMLElement {
     }
 
     this._renderLibrary();
+  }
+
+  async _refreshMediaInventory(slug, fallbackMedia) {
+    try {
+      const data = await this._requestJson(this._mediaApiUrl(slug), { method: 'GET' });
+      return this._mediaFromApi(data, this._findGame(slug) || {});
+    } catch (error) {
+      return {
+        ...(fallbackMedia || this._emptyMediaState()),
+        error: `Media uploaded, but inventory refresh failed: ${error.message || error}`
+      };
+    }
   }
 
   async _exportPackage(slug) {
@@ -1760,10 +1777,11 @@ class TerpVaultPage extends HTMLElement {
   _mediaPanel(game, slug) {
     const media = this.state.editor.media || this._mediaFromGame(game);
     const urls = game.urls || {};
+    const cacheKey = media.cacheKey || '';
     const screenshots = Array.isArray(urls.screenshots) ? urls.screenshots : (Array.isArray(game.screenshots) ? game.screenshots : []);
     const assetTypes = this._mediaAssetTypes();
     const selectedType = assetTypes.some(item => item.type === this.state.editor.selectedMediaType) ? this.state.editor.selectedMediaType : 'cover';
-    const selectedAsset = this._mediaAssetData(selectedType, urls, media.resources || {});
+    const selectedAsset = this._mediaAssetData(selectedType, urls, media.resources || {}, cacheKey);
 
     return `
       <section class="media-manager">
@@ -1773,13 +1791,13 @@ class TerpVaultPage extends HTMLElement {
         ${media.error ? `<div class="message error">${this._esc(media.error)}</div>` : ''}
         ${media.success ? `<div class="message success">${this._esc(media.success)}</div>` : ''}
         <div class="media-grid">
-          ${assetTypes.map(asset => this._mediaCard(asset, this._mediaAssetData(asset.type, urls, media.resources || {}), selectedType === asset.type)).join('')}
+          ${assetTypes.map(asset => this._mediaCard(asset, this._mediaAssetData(asset.type, urls, media.resources || {}, cacheKey), selectedType === asset.type)).join('')}
         </div>
         ${this._mediaFocusPanel(slug, selectedAsset, media.saving === selectedType)}
         <div class="screenshot-list">
           <strong>Screenshots</strong>
           <p class="meta">Screenshots show representative play moments. Remove only updates <code>resources.screenshots</code>; it does not delete the underlying image file.</p>
-          ${screenshots.length ? screenshots.map((url, index) => this._screenshotRow(slug, url, media.resources?.screenshots?.[index] || '', index, screenshots.length, media.saving === 'screenshots' || media.saving === `screenshot-${index}`)).join('') : '<p class="meta">No screenshots recorded.</p>'}
+          ${screenshots.length ? screenshots.map((url, index) => this._screenshotRow(slug, this._cacheBustUrl(url, cacheKey), media.resources?.screenshots?.[index] || '', index, screenshots.length, media.saving === 'screenshots' || media.saving === `screenshot-${index}`)).join('') : '<p class="meta">No screenshots recorded.</p>'}
         </div>
         <div class="media-uploads">
           ${this._mediaUploadForm(slug, 'screenshot', 'Add screenshot', media.saving === 'screenshot')}
@@ -1832,7 +1850,7 @@ class TerpVaultPage extends HTMLElement {
     ];
   }
 
-  _mediaAssetData(type, urls, resources) {
+  _mediaAssetData(type, urls, resources, cacheKey = '') {
     const asset = this._mediaAssetTypes().find(item => item.type === type) || this._mediaAssetTypes()[0];
     const urlMap = {
       cover: urls.cover || '',
@@ -1842,7 +1860,7 @@ class TerpVaultPage extends HTMLElement {
 
     return {
       ...asset,
-      url: urlMap[asset.type] || '',
+      url: this._cacheBustUrl(urlMap[asset.type] || '', cacheKey),
       path: resources[asset.key] || ''
     };
   }
@@ -2096,6 +2114,19 @@ class TerpVaultPage extends HTMLElement {
     };
   }
 
+  _newMediaCacheKey() {
+    return String(Date.now());
+  }
+
+  _cacheBustUrl(url, cacheKey) {
+    if (!url || !cacheKey) {
+      return url || '';
+    }
+
+    const separator = String(url).includes('?') ? '&' : '?';
+    return `${url}${separator}tv_media=${encodeURIComponent(cacheKey)}`;
+  }
+
   _readOnlyFromApi(data, fallbackGame) {
     const payload = this._unwrapApiResponse(data);
     const metadata = payload.metadata || {};
@@ -2347,6 +2378,7 @@ class TerpVaultPage extends HTMLElement {
       saving: '',
       error: '',
       success: '',
+      cacheKey: '',
       resources: {
         cover: '',
         small_cover: '',

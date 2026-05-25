@@ -5,6 +5,7 @@
 1. Changed
     - Added lightweight contextual Admin2 help for package status, metadata fields, IFIDs, iFiction preview, catalog references, media roles, helper docs, story replacement, import/export, provenance, and read-only diagnostics.
     - Turned Cover, Small Cover, and Hero previews into actionable Admin2 media asset tiles with a focused management panel.
+    - Styled contextual Admin2 help as dimmed italic text and refreshed/cache-busted media previews after upload or replacement.
 
 2. Safety
     - Media asset tiles reuse the existing allowlisted upload route and support safe actions only: view the current asset, replace it, show the manifest path, and explain the asset role.
