@@ -40,6 +40,7 @@ class TerpVaultPage extends HTMLElement {
         success: '',
         values: null,
         readOnly: null,
+        selectedMediaType: 'cover',
         activeHelper: 'how-to-play',
         helper: {
           type: 'how-to-play',
@@ -225,6 +226,8 @@ class TerpVaultPage extends HTMLElement {
         legend { padding:0 .25rem; font-weight:700; }
         .field { display:grid; gap:.25rem; margin:.55rem 0; }
         .field label, .checkbox label { font-weight:600; font-size:.84rem; }
+        .help { opacity:.74; font-size:.875rem; line-height:1.45; }
+        .section-help { margin:.2rem 0 .65rem; }
         input, textarea, select { width:100%; border:1px solid rgba(127,127,127,.35); border-radius:8px; padding:.48rem .55rem; background:rgba(127,127,127,.055); color:inherit; font:inherit; }
         select option, select optgroup { background:var(--tv-admin-select-bg, Canvas); color:var(--tv-admin-select-color, CanvasText); }
         :host-context(.dark) select option,
@@ -258,9 +261,14 @@ class TerpVaultPage extends HTMLElement {
         .create-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:.75rem; }
         .media-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .media-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:.75rem; margin:.75rem 0; }
-        .media-card { border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.65rem; background:rgba(127,127,127,.035); }
+        .media-card { display:block; width:100%; border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.65rem; background:rgba(127,127,127,.035); color:inherit; font:inherit; text-align:left; cursor:pointer; }
+        .media-card:hover, .media-card:focus { border-color:rgba(93,164,255,.72); outline:none; }
+        .media-card[aria-selected="true"] { border-color:rgba(93,164,255,.72); background:rgba(93,164,255,.08); }
         .media-card img { display:block; width:100%; aspect-ratio:16/10; object-fit:cover; border-radius:8px; border:1px solid rgba(127,127,127,.22); background:rgba(127,127,127,.12); margin-bottom:.45rem; }
         .media-card .placeholder { display:grid; place-items:center; width:100%; aspect-ratio:16/10; border-radius:8px; border:1px dashed rgba(127,127,127,.34); background:rgba(127,127,127,.06); margin-bottom:.45rem; }
+        .media-focus { border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.8rem; margin:.75rem 0; background:rgba(127,127,127,.035); display:grid; grid-template-columns:minmax(180px, 280px) minmax(0,1fr); gap:.8rem; align-items:start; }
+        .media-focus img, .media-focus .placeholder { width:100%; aspect-ratio:16/10; border-radius:8px; border:1px solid rgba(127,127,127,.22); background:rgba(127,127,127,.12); object-fit:cover; }
+        .media-focus .placeholder { display:grid; place-items:center; border-style:dashed; }
         .media-uploads { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:.75rem; }
         .screenshot-list { display:grid; gap:.55rem; margin:.75rem 0; }
         .screenshot-row { border:1px solid rgba(127,127,127,.24); border-radius:10px; padding:.6rem; display:grid; grid-template-columns:96px minmax(0,1fr); gap:.65rem; align-items:start; background:rgba(127,127,127,.03); }
@@ -276,6 +284,7 @@ class TerpVaultPage extends HTMLElement {
           dl { grid-template-columns: 1fr; }
           .editor-head { display:block; }
           .readonly div { grid-template-columns:1fr; }
+          .media-focus { grid-template-columns:1fr; }
           .screenshot-row { grid-template-columns:1fr; }
           .screenshot-row img { width:100%; }
         }
@@ -284,7 +293,7 @@ class TerpVaultPage extends HTMLElement {
         <section class="hero">
           <h1>TerpVault Library Manager</h1>
           <p>Package inventory, package creation, metadata editing, helper Markdown editing, media management, screenshot ordering, and story-file replacement for installed TerpVault interactive-fiction packages.</p>
-          <p class="meta">v0.3.0 is opt-in. Package export, import inspection, and draft-only import install are available. Package delete, overwrite, arbitrary file browsing, player settings editing, and <code>metadata.iFiction.xml</code> editing are not available.</p>
+          <p class="meta">Admin2 is opt-in. Package export, import inspection, draft-only import install, and local iFiction preview are available. Package delete, overwrite, arbitrary file browsing, player settings editing, iFiction apply/import, and remote catalog lookup are not available.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -354,7 +363,7 @@ class TerpVaultPage extends HTMLElement {
         <div class="editor-head">
           <div>
             <strong>${games.length} package${games.length === 1 ? '' : 's'} found</strong>
-            <p class="meta">Source: ${this._esc(this.state.source)}. Package creation, editing, export, import inspection, and draft-only import install use the Admin2 API when available. Delete and overwrite are intentionally unavailable.</p>
+            <p class="meta">Source: ${this._esc(this.state.source)}. Status and validation notes flag playability problems and metadata gaps before publication. Package creation, editing, export, import inspection, and draft-only import install use the Admin2 API when available. Delete and overwrite are intentionally unavailable.</p>
           </div>
           <div class="actions" style="margin-top:0;">
             <button class="button" type="button" data-action="inspect-import">${this.state.importInspect.open ? 'Inspecting Import' : 'Inspect Import'}</button>
@@ -761,6 +770,10 @@ class TerpVaultPage extends HTMLElement {
       button.addEventListener('click', () => this._previewIFiction(button.dataset.slug || ''));
     });
 
+    root.querySelectorAll('[data-action="media-select"]').forEach(button => {
+      button.addEventListener('click', () => this._selectMediaType(button.dataset.type || 'cover'));
+    });
+
     root.querySelectorAll('form[data-editor-slug]').forEach(form => {
       form.addEventListener('submit', event => this._saveEditor(event));
     });
@@ -896,9 +909,11 @@ class TerpVaultPage extends HTMLElement {
           values: this._editableFromGame(game),
           readOnly: this._readOnlyFromGame(game),
           activeHelper: 'how-to-play',
+          selectedMediaType: 'cover',
           helper: this._emptyHelperState('how-to-play'),
           media: this._mediaFromGame(game),
-          story: this._storyFromGame(game)
+          story: this._storyFromGame(game),
+          ifiction: this._emptyIFictionState()
         };
       }
       this.state.importInspect = {
@@ -951,9 +966,11 @@ class TerpVaultPage extends HTMLElement {
           values: this._editableFromGame(this._findGame(slug) || {}),
           readOnly: this._readOnlyFromGame(this._findGame(slug) || {}),
           activeHelper: 'how-to-play',
+          selectedMediaType: 'cover',
           helper: this._emptyHelperState('how-to-play'),
           media: this._mediaFromGame(this._findGame(slug) || {}),
-          story: this._storyFromGame(this._findGame(slug) || {})
+          story: this._storyFromGame(this._findGame(slug) || {}),
+          ifiction: this._emptyIFictionState()
         };
         await this._loadHelperDoc(slug, 'how-to-play', false);
         await this._loadStory(slug, false);
@@ -987,6 +1004,7 @@ class TerpVaultPage extends HTMLElement {
       values: this._editableFromGame(game || {}),
       readOnly: this._readOnlyFromGame(game || {}),
       activeHelper: 'how-to-play',
+      selectedMediaType: 'cover',
       helper: this._emptyHelperState('how-to-play'),
       media: this._mediaFromGame(game || {}),
       story: this._storyFromGame(game || {}),
@@ -1028,6 +1046,7 @@ class TerpVaultPage extends HTMLElement {
       values: null,
       readOnly: null,
       activeHelper: 'how-to-play',
+      selectedMediaType: 'cover',
       helper: this._emptyHelperState('how-to-play'),
       media: this._emptyMediaState(),
       story: this._emptyStoryState(),
@@ -1373,6 +1392,18 @@ class TerpVaultPage extends HTMLElement {
     this._renderLibrary();
   }
 
+  _selectMediaType(type) {
+    if (!this._mediaAssetTypes().some(item => item.type === type)) {
+      return;
+    }
+
+    this.state.editor = {
+      ...this.state.editor,
+      selectedMediaType: type
+    };
+    this._renderLibrary();
+  }
+
   async _uploadMedia(event) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -1589,16 +1620,18 @@ class TerpVaultPage extends HTMLElement {
           <div class="fieldsets">
             <fieldset>
               <legend>Bibliographic</legend>
-              ${this._input('Title', 'bibliographic.title', values)}
-              ${this._input('Author', 'bibliographic.author', values)}
-              ${this._input('Headline', 'bibliographic.headline', values)}
-              ${this._input('First published', 'bibliographic.first_published', values)}
+              ${this._help('bibliographic')}
+              ${this._input('Title', 'bibliographic.title', values, this._helpText('title'))}
+              ${this._input('Author', 'bibliographic.author', values, this._helpText('author'))}
+              ${this._input('Headline', 'bibliographic.headline', values, this._helpText('headline'))}
+              ${this._input('First published', 'bibliographic.first_published', values, this._helpText('first_published'))}
               ${this._input('Genre', 'bibliographic.genre', values)}
-              ${this._input('Language', 'bibliographic.language', values)}
-              ${this._textarea('Description', 'bibliographic.description', values)}
+              ${this._input('Language', 'bibliographic.language', values, this._helpText('language'))}
+              ${this._textarea('Description', 'bibliographic.description', values, '', this._helpText('description'))}
             </fieldset>
             <fieldset>
               <legend>Identification</legend>
+              ${this._help('identification')}
               ${this._select('Format', 'identification.format', values, [
                 ['', 'Unspecified'],
                 ['zcode', 'Z-code'],
@@ -1607,37 +1640,42 @@ class TerpVaultPage extends HTMLElement {
                 ['tads3', 'TADS 3'],
                 ['hugo', 'Hugo'],
                 ['adrift', 'ADRIFT']
-              ])}
-              ${this._textarea('IFIDs', 'identification.ifids', values, 'short', 'One IFID per line, or comma-separated.')}
+              ], this._helpText('format'))}
+              ${this._textarea('IFIDs', 'identification.ifids', values, 'short', this._helpText('ifids'))}
             </fieldset>
             <fieldset>
               <legend>Catalog</legend>
-              ${this._input('IFDB TUID', 'catalog.ifdb.tuid', values)}
-              ${this._input('IFDB URL', 'catalog.ifdb.url', values)}
-              ${this._input('IFWiki URL', 'catalog.ifwiki.url', values)}
-              ${this._input('IF Archive path', 'catalog.ifarchive.path', values)}
-              ${this._input('IF Archive URL', 'catalog.ifarchive.url', values)}
+              ${this._help('catalog')}
+              ${this._input('IFDB TUID', 'catalog.ifdb.tuid', values, this._helpText('ifdb_tuid'))}
+              ${this._input('IFDB URL', 'catalog.ifdb.url', values, this._helpText('ifdb_url'))}
+              ${this._input('IFWiki URL', 'catalog.ifwiki.url', values, this._helpText('ifwiki_url'))}
+              ${this._input('IF Archive path', 'catalog.ifarchive.path', values, this._helpText('ifarchive_path'))}
+              ${this._input('IF Archive URL', 'catalog.ifarchive.url', values, this._helpText('ifarchive_url'))}
             </fieldset>
             <fieldset>
               <legend>Release & Provenance</legend>
-              ${this._input('License name', 'release.license.name', values)}
+              ${this._help('provenance')}
+              ${this._input('License name', 'release.license.name', values, this._helpText('license_name'))}
               ${this._input('License URL', 'release.license.url', values)}
-              ${this._textarea('License notes', 'release.license.notes', values, 'short')}
-              ${this._input('Source URL', 'release.source.url', values)}
-              ${this._input('Source retrieved', 'release.source.retrieved', values)}
-              ${this._textarea('Source notes', 'release.source.notes', values, 'short')}
+              ${this._textarea('License notes', 'release.license.notes', values, 'short', this._helpText('license_notes'))}
+              ${this._input('Source URL', 'release.source.url', values, this._helpText('source_url'))}
+              ${this._input('Source retrieved', 'release.source.retrieved', values, this._helpText('source_retrieved'))}
+              ${this._textarea('Source notes', 'release.source.notes', values, 'short', this._helpText('source_notes'))}
             </fieldset>
             <fieldset>
               <legend>TerpVault</legend>
-              ${this._select('Status', 'terpvault.status', values, [['draft', 'Draft'], ['published', 'Published']])}
+              ${this._help('terpvault')}
+              ${this._select('Status', 'terpvault.status', values, [['draft', 'Draft'], ['published', 'Published']], this._helpText('status'))}
               <div class="checkbox">
                 <input id="tv-featured-${this._esc(slug)}" type="checkbox" name="terpvault.featured" ${this._get(values, 'terpvault.featured') ? 'checked' : ''}>
                 <label for="tv-featured-${this._esc(slug)}">Featured</label>
               </div>
-              ${this._textarea('Tags', 'terpvault.tags', values, 'short', 'One tag per line, or comma-separated.')}
+              ${this._help('featured')}
+              ${this._textarea('Tags', 'terpvault.tags', values, 'short', this._helpText('tags'))}
             </fieldset>
             <fieldset>
               <legend>Read-only package files</legend>
+              ${this._help('readonly_files')}
               ${this._readOnlyList(readOnly)}
             </fieldset>
           </div>
@@ -1660,7 +1698,7 @@ class TerpVaultPage extends HTMLElement {
     return `
       <section class="story-manager">
         <h3>Story File</h3>
-        <p class="meta">Replacing the story file may affect playability. The existing registered story file will be backed up when present.</p>
+        <p class="meta">The story file is the playable IF payload. Replacing it may affect playability. The existing registered story file will be backed up when present.</p>
         ${story.loading ? '<div class="message">Loading story file info...</div>' : ''}
         ${story.error ? `<div class="message error">${this._esc(story.error)}</div>` : ''}
         ${story.success ? `<div class="message success">${this._esc(story.success)}</div>` : ''}
@@ -1692,7 +1730,7 @@ class TerpVaultPage extends HTMLElement {
     return `
       <section class="story-manager">
         <h3>iFiction Metadata</h3>
-        <p class="meta">Preview-only parser for package-local <code>metadata.iFiction.xml</code>. It does not fetch remote resources and does not write <code>game.yaml</code>.</p>
+        <p class="meta">Preview-only parser for package-local <code>metadata.iFiction.xml</code>, a common IF metadata format. It does not fetch remote resources and does not write <code>game.yaml</code>.</p>
         ${ifiction.loading ? '<div class="message">Parsing local metadata.iFiction.xml...</div>' : ''}
         ${ifiction.error ? `<div class="message error">${this._esc(ifiction.error)}</div>` : ''}
         ${report && report.errors?.length ? `<div class="message error">${report.errors.map(error => this._esc(error)).join('<br>')}</div>` : ''}
@@ -1723,6 +1761,9 @@ class TerpVaultPage extends HTMLElement {
     const media = this.state.editor.media || this._mediaFromGame(game);
     const urls = game.urls || {};
     const screenshots = Array.isArray(urls.screenshots) ? urls.screenshots : (Array.isArray(game.screenshots) ? game.screenshots : []);
+    const assetTypes = this._mediaAssetTypes();
+    const selectedType = assetTypes.some(item => item.type === this.state.editor.selectedMediaType) ? this.state.editor.selectedMediaType : 'cover';
+    const selectedAsset = this._mediaAssetData(selectedType, urls, media.resources || {});
 
     return `
       <section class="media-manager">
@@ -1732,19 +1773,15 @@ class TerpVaultPage extends HTMLElement {
         ${media.error ? `<div class="message error">${this._esc(media.error)}</div>` : ''}
         ${media.success ? `<div class="message success">${this._esc(media.success)}</div>` : ''}
         <div class="media-grid">
-          ${this._mediaCard('Cover', urls.cover, media.resources?.cover || '')}
-          ${this._mediaCard('Small Cover', urls.small_cover || urls.thumbnail, media.resources?.small_cover || '')}
-          ${this._mediaCard('Hero', urls.hero, media.resources?.hero || '')}
+          ${assetTypes.map(asset => this._mediaCard(asset, this._mediaAssetData(asset.type, urls, media.resources || {}), selectedType === asset.type)).join('')}
         </div>
+        ${this._mediaFocusPanel(slug, selectedAsset, media.saving === selectedType)}
         <div class="screenshot-list">
           <strong>Screenshots</strong>
-          <p class="meta">Remove only updates <code>resources.screenshots</code>; it does not delete the underlying image file.</p>
+          <p class="meta">Screenshots show representative play moments. Remove only updates <code>resources.screenshots</code>; it does not delete the underlying image file.</p>
           ${screenshots.length ? screenshots.map((url, index) => this._screenshotRow(slug, url, media.resources?.screenshots?.[index] || '', index, screenshots.length, media.saving === 'screenshots' || media.saving === `screenshot-${index}`)).join('') : '<p class="meta">No screenshots recorded.</p>'}
         </div>
         <div class="media-uploads">
-          ${this._mediaUploadForm(slug, 'cover', 'Replace cover', media.saving === 'cover')}
-          ${this._mediaUploadForm(slug, 'small-cover', 'Replace small cover', media.saving === 'small-cover')}
-          ${this._mediaUploadForm(slug, 'hero', 'Replace hero', media.saving === 'hero')}
           ${this._mediaUploadForm(slug, 'screenshot', 'Add screenshot', media.saving === 'screenshot')}
         </div>
       </section>
@@ -1769,12 +1806,74 @@ class TerpVaultPage extends HTMLElement {
     `;
   }
 
-  _mediaCard(label, url, path) {
+  _mediaAssetTypes() {
+    return [
+      {
+        type: 'cover',
+        label: 'Cover',
+        key: 'cover',
+        shortHelp: 'Package/title art.',
+        help: 'Package/title art. This is not the same as the wide hero image.'
+      },
+      {
+        type: 'small-cover',
+        label: 'Small Cover',
+        key: 'small_cover',
+        shortHelp: 'Compact library artwork.',
+        help: 'Compact card artwork used in library and catalog views.'
+      },
+      {
+        type: 'hero',
+        label: 'Hero',
+        key: 'hero',
+        shortHelp: 'Wide presentation image.',
+        help: 'Wide presentation image used behind detail and play headers.'
+      }
+    ];
+  }
+
+  _mediaAssetData(type, urls, resources) {
+    const asset = this._mediaAssetTypes().find(item => item.type === type) || this._mediaAssetTypes()[0];
+    const urlMap = {
+      cover: urls.cover || '',
+      'small-cover': urls.small_cover || urls.thumbnail || '',
+      hero: urls.hero || ''
+    };
+
+    return {
+      ...asset,
+      url: urlMap[asset.type] || '',
+      path: resources[asset.key] || ''
+    };
+  }
+
+  _mediaCard(asset, data, selected) {
     return `
-      <div class="media-card">
-        ${url ? `<img src="${this._esc(url)}" alt="">` : '<div class="placeholder"><span class="meta">No image</span></div>'}
-        <strong>${this._esc(label)}</strong>
-        <p class="meta">${path ? `<code>${this._esc(path)}</code>` : 'Not recorded'}</p>
+      <button class="media-card" type="button" data-action="media-select" data-type="${this._esc(asset.type)}" aria-selected="${selected ? 'true' : 'false'}">
+        ${data.url ? `<img src="${this._esc(data.url)}" alt="">` : '<div class="placeholder"><span class="meta">No image</span></div>'}
+        <strong>${this._esc(asset.label)}</strong>
+        <p class="meta">${data.path ? `<code>${this._esc(data.path)}</code>` : 'Not recorded'}</p>
+        <span class="help">${this._esc(asset.shortHelp)}</span>
+      </button>
+    `;
+  }
+
+  _mediaFocusPanel(slug, asset, saving) {
+    return `
+      <div class="media-focus">
+        ${asset.url ? `<img src="${this._esc(asset.url)}" alt="">` : '<div class="placeholder"><span class="meta">No image recorded</span></div>'}
+        <div>
+          <h3>${this._esc(asset.label)}</h3>
+          <p class="meta">${this._esc(asset.help)}</p>
+          <dl>
+            <dt>Manifest path</dt><dd>${asset.path ? `<code>${this._esc(asset.path)}</code>` : 'Not recorded'}</dd>
+          </dl>
+          <div class="actions">
+            ${asset.url ? `<a class="button" href="${this._esc(asset.url)}" target="_blank" rel="noopener">Open Current Asset</a>` : ''}
+          </div>
+          ${this._mediaUploadForm(slug, asset.type, `Replace ${asset.label.toLowerCase()}`, saving)}
+          <p class="meta">Clearing references and deleting physical files are intentionally left for a later safe workflow.</p>
+        </div>
       </div>
     `;
   }
@@ -1793,6 +1892,45 @@ class TerpVaultPage extends HTMLElement {
     `;
   }
 
+  _help(key) {
+    const text = this._helpText(key);
+    return text ? `<p class="help section-help">${this._esc(text)}</p>` : '';
+  }
+
+  _helpText(key) {
+    const messages = {
+      bibliographic: 'Curator-facing description fields for the public detail page and library cards.',
+      title: 'Use the story or package title visitors should recognize.',
+      author: 'Primary credited author or authors.',
+      headline: 'Short one-line catalog summary, useful on cards and headers.',
+      first_published: 'Original or package publication year/date when known.',
+      language: 'Short language code such as en when known.',
+      description: 'Public-facing synopsis or curator note. Keep rights-sensitive source text out unless you can redistribute it.',
+      identification: 'Identifiers and format hints help TerpVault choose player behavior and connect the package to IF ecosystem metadata.',
+      format: 'Story-file family such as Z-code, Glulx, or TADS. Leave unspecified if the file extension should speak for now.',
+      ifids: 'A unique identifier used by the interactive fiction ecosystem. Add one when known; some stories have more than one.',
+      catalog: 'External catalog references are for human review and future lookup workflows. TerpVault does not fetch remote catalog data here.',
+      ifdb_tuid: 'The IFDB story id, not the full URL.',
+      ifdb_url: 'Public IFDB page for this work, when known.',
+      ifwiki_url: 'Relevant IFWiki page for this work, author, or package.',
+      ifarchive_path: 'IF Archive path such as games/zcode/example.z5, when known.',
+      ifarchive_url: 'Full IF Archive URL, when useful alongside the path.',
+      provenance: 'Where this package or story file came from. Useful for rights review and future maintenance.',
+      license_name: 'Human-readable license or rights status.',
+      license_notes: 'Redistribution limits, permission notes, or review reminders.',
+      source_url: 'Original download, repository, catalog, or project page for the package or story file.',
+      source_retrieved: 'Date the source was retrieved, if you track it.',
+      source_notes: 'Source/provenance notes for future maintenance and rights review.',
+      terpvault: 'TerpVault-specific curation fields control publication and library presentation.',
+      status: 'Draft keeps a package out of normal public listings unless your site is configured to show unpublished content.',
+      featured: 'Marks a package for featured placement where a theme or template uses that signal.',
+      tags: 'One tag per line, or comma-separated.',
+      readonly_files: 'Package-local paths currently managed by dedicated tools or read from game.yaml. Feelies are curated extras such as manuals, maps, clue sheets, images, or audio and are read-only here for now.'
+    };
+
+    return messages[key] || '';
+  }
+
   _helperDocsPanel(slug) {
     const editor = this.state.editor || {};
     const helper = editor.helper || this._emptyHelperState(editor.activeHelper || 'how-to-play');
@@ -1806,7 +1944,7 @@ class TerpVaultPage extends HTMLElement {
     return `
       <section class="helper-docs">
         <h3>Helper Docs</h3>
-        <p class="meta">Plain Markdown editor for package-local curator/helper content. This does not edit story files, artwork, iFiction XML, or player config.</p>
+        <p class="meta">Plain Markdown editor for package-local curator/helper content such as play notes, hints, and walkthroughs. This does not edit story files, artwork, iFiction XML, or player config.</p>
         <div class="helper-tabs" role="tablist" aria-label="Helper Markdown files">
           ${Object.entries(labels).map(([type, label]) => `
             <button class="button" type="button" role="tab" aria-selected="${active === type ? 'true' : 'false'}" data-action="helper-doc" data-slug="${this._esc(slug)}" data-type="${this._esc(type)}">${this._esc(label)}</button>
@@ -1832,11 +1970,12 @@ class TerpVaultPage extends HTMLElement {
     `;
   }
 
-  _input(label, path, values) {
+  _input(label, path, values, help = '') {
     return `
       <div class="field">
         <label>${this._esc(label)}</label>
         <input type="text" name="${this._esc(path)}" value="${this._esc(this._get(values, path) || '')}">
+        ${help ? `<span class="help">${this._esc(help)}</span>` : ''}
       </div>
     `;
   }
@@ -1847,12 +1986,12 @@ class TerpVaultPage extends HTMLElement {
       <div class="field">
         <label>${this._esc(label)}</label>
         <textarea class="${this._esc(className)}" name="${this._esc(path)}">${this._esc(value)}</textarea>
-        ${help ? `<span class="meta">${this._esc(help)}</span>` : ''}
+        ${help ? `<span class="help">${this._esc(help)}</span>` : ''}
       </div>
     `;
   }
 
-  _select(label, path, values, options) {
+  _select(label, path, values, options, help = '') {
     const value = String(this._get(values, path) || '');
     return `
       <div class="field">
@@ -1860,6 +1999,7 @@ class TerpVaultPage extends HTMLElement {
         <select name="${this._esc(path)}">
           ${options.map(([optionValue, optionLabel]) => `<option value="${this._esc(optionValue)}" ${value === optionValue ? 'selected' : ''}>${this._esc(optionLabel)}</option>`).join('')}
         </select>
+        ${help ? `<span class="help">${this._esc(help)}</span>` : ''}
       </div>
     `;
   }
@@ -2210,6 +2350,7 @@ class TerpVaultPage extends HTMLElement {
       resources: {
         cover: '',
         small_cover: '',
+        hero: '',
         screenshots: []
       }
     };

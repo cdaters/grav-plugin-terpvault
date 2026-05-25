@@ -21,7 +21,7 @@ This is a **v0.4.0 early public-beta release** on the TerpVault foundation. It i
 - Provides a native shortcode-style embed:
   - `[terpvault game="adventure"]`
 - Bundles the Parchment 2025.1.14 single-file web build as the first engine adapter.
-- Includes an optional Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a limited package creation wizard, package export, draft-only package import, a metadata-only `game.yaml` editor, helper Markdown editing, limited package-local cover/small-cover/hero/screenshot image uploads, and limited story-file replacement. It is disabled by default.
+- Includes an optional Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a limited package creation wizard, package export, draft-only package import, a metadata-only `game.yaml` editor, preview-only local iFiction metadata parsing, helper Markdown editing, limited package-local cover/small-cover/hero/screenshot image uploads, and limited story-file replacement. It is disabled by default.
 
 ## What it does not do yet
 
@@ -29,13 +29,13 @@ This is a **v0.4.0 early public-beta release** on the TerpVault foundation. It i
 - It enables only the opt-in Admin2 package creation, export, draft-only import, and metadata/helper/media/story API for TerpVault packages; package delete and import overwrite/replace endpoints are not implemented.
 - It does not provide an arbitrary package file browser.
 - It does not yet provide named save slots or server-side save syncing.
-- It does not yet parse or edit iFiction XML, but the package metadata model now maps toward Treaty of Babel/iFiction concepts.
+- It previews local `metadata.iFiction.xml` values but does not apply/import them into `game.yaml`.
 - It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
 - It is not packaged or claimed as GPM-ready yet.
 
 ## Known limitations
 
-- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory, package export, draft-only import, whitelisted `game.yaml` metadata edits, allowlisted helper Markdown edits, limited cover/small-cover/hero/screenshot image uploads, and limited story-file replacement. Feelies are manifest-rendered and read-only in Admin2 for now.
+- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory, package export, draft-only import, whitelisted `game.yaml` metadata edits, preview-only local iFiction metadata parsing, allowlisted helper Markdown edits, limited cover/small-cover/hero/screenshot image uploads, and limited story-file replacement. Feelies are manifest-rendered and read-only in Admin2 for now.
 - Public virtual routes and Admin2 API routes are separate integration surfaces. Admin2 API routes are registered only when the Admin2 Library Manager is enabled.
 - `.terpvault.zip` export and draft-only import are available through Admin2. Import overwrite/replace is not implemented.
 - Parchment save/restore is interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
@@ -319,7 +319,7 @@ TerpVault keeps a human-friendly `game.yaml` manifest, but its structure now map
 - `catalog.ifdb`, `catalog.ifwiki`, and `catalog.ifarchive` store public catalog/reference links.
 - `release.license` and `release.source` store rights, redistribution, and provenance notes.
 
-A package may also include an optional `metadata.iFiction.xml` file. TerpVault includes that file in package exports when present, but it does not parse or edit the XML yet.
+A package may also include an optional `metadata.iFiction.xml` file. TerpVault includes that file in package exports when present and can preview a conservative local subset in Admin2, but it does not apply/import XML values into `game.yaml` yet.
 
 ## Supported interpreter formats
 
@@ -438,7 +438,7 @@ The current page provides package inventory plus metadata/helper/media/story edi
 - Edit Metadata action for whitelisted existing `game.yaml` fields such as bibliographic details, IFIDs, catalog links, license/source notes, status, featured, and tags.
 - Preview iFiction Metadata action for local package `metadata.iFiction.xml`; preview does not write `game.yaml`.
 - Helper Docs editor for package-local `how-to-play.md`, `hints.md`, and `walkthrough.md` content.
-- Media Manager Lite controls for replacing cover/small-cover/hero art, adding screenshots, replacing registered screenshots, and reordering/removing screenshot entries with package-local `jpg`, `jpeg`, `png`, `webp`, or `gif` files. Feelies/extras are rendered from `resources.feelies` but are read-only in Admin2 for now.
+- Media Manager Lite asset tiles for viewing/replacing cover, small-cover, and hero art, plus controls for adding screenshots, replacing registered screenshots, and reordering/removing screenshot entries with package-local `jpg`, `jpeg`, `png`, `webp`, or `gif` files. Feelies/extras are rendered from `resources.feelies` but are read-only in Admin2 for now.
 - Story File Manager Lite controls for replacing the package-local playable story file with allowlisted IF story formats.
 - Export action for downloading a single installed package as `{slug}.terpvault.zip`.
 - Import panel for validating a `.terpvault.zip` package and committing it as a draft package after server-side revalidation.

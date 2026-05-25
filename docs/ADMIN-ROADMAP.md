@@ -9,6 +9,7 @@
 - Admin2 routes should continue to use controller-style API integration rather than ad hoc request handlers.
 - Current write workflows are scoped to specific package-management actions; TerpVault should not expose an arbitrary package file browser.
 - Admin2/API write permissions should remain conservative unless a future release defines a more granular permission model.
+- v0.4.2 development has started as a narrow Admin2 UX polish pass for contextual help and actionable media cards.
 
 ## Shipped milestones
 
@@ -62,14 +63,18 @@
 
 ### Admin2 contextual help and glossary
 
+- Started in v0.4.2 with inline guidance in the Library Manager and metadata/media/story/helper/import/export areas.
+- Continue refining wording as real curator workflows expose confusing terms.
+
 - Add lightweight contextual help for users unfamiliar with interactive fiction terminology and TerpVault package conventions.
 - Cover jargon-heavy fields and concepts such as IFID, iFiction, IFDB, IFWiki, IF Archive, TUID, cover, small cover, hero image, feelies, story file formats, catalog identifiers, import/export, and player settings.
 - Keep help unobtrusive for experienced curators but discoverable for users who need terminology support.
 
 ### Actionable media cards
 
+- Started in v0.4.2 with selectable Cover, Small Cover, and Hero tiles plus a focused safe-action panel.
 - Turn Cover, Small Cover, and Hero preview cards into actionable asset tiles.
-- Clicking an asset tile should open a focused management affordance such as view, replace, clear manifest reference, and later delete physical file.
+- Clicking an asset tile should open a focused management affordance such as view and replace now, with clear-reference and physical delete left for later safe workflows.
 - Keep visible and accessibility-friendly controls; do not rely only on clicking the image.
 - Continue using allowlisted package-local media handling and path validation.
 

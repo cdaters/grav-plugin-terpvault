@@ -1,3 +1,15 @@
+# v0.4.2
+
+## Unreleased
+
+1. Changed
+    - Added lightweight contextual Admin2 help for package status, metadata fields, IFIDs, iFiction preview, catalog references, media roles, helper docs, story replacement, import/export, provenance, and read-only diagnostics.
+    - Turned Cover, Small Cover, and Hero previews into actionable Admin2 media asset tiles with a focused management panel.
+
+2. Safety
+    - Media asset tiles reuse the existing allowlisted upload route and support safe actions only: view the current asset, replace it, show the manifest path, and explain the asset role.
+    - No package delete, physical file delete, manifest clear-reference action, iFiction apply/import, remote lookup, package overwrite, or GPM release behavior was added.
+
 # v0.4.1
 
 ## Unreleased
