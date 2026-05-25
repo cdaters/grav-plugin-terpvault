@@ -47,17 +47,70 @@ class PackageIFictionService
     public function preview(string $slug): array
     {
         $paths = $this->packagePaths($slug);
-        $xmlPath = $paths['package'] . DIRECTORY_SEPARATOR . 'metadata.iFiction.xml';
         $metadata = $this->loadYaml($paths['yaml']);
+        return $this->previewFromPaths($paths, $metadata);
+    }
+
+    public function apply(string $slug, array $selectedFields): array
+    {
+        $paths = $this->packagePaths($slug);
+        $metadata = $this->loadYaml($paths['yaml']);
+        $selectedFields = $this->normalizeSelectedFields($selectedFields);
+
+        foreach ($selectedFields as $field) {
+            if (!array_key_exists($field, self::FIELD_MAP)) {
+                throw new InvalidArgumentException('Unsupported iFiction target field: ' . $field);
+            }
+        }
+
+        $preview = $this->previewFromPaths($paths, $metadata);
+        if (!$selectedFields) {
+            $preview['applied'] = false;
+            $preview['updated_fields'] = [];
+            return $preview;
+        }
+
+        if (!$preview['ok']) {
+            $preview['applied'] = false;
+            $preview['updated_fields'] = [];
+            return $preview;
+        }
+
+        $available = [];
+        foreach ($preview['fields'] as $field) {
+            $available[(string) $field['path']] = $field['xml'];
+        }
+
+        $updates = [];
+        foreach ($selectedFields as $field) {
+            if (!array_key_exists($field, $available) || $this->stringify($available[$field]) === '') {
+                throw new InvalidArgumentException('Selected iFiction field has no non-empty XML value: ' . $field);
+            }
+            $updates[$field] = $available[$field];
+        }
+
+        $write = (new PackageMetadataService())->updateMetadata($paths['slug'], $updates);
+        $updatedMetadata = is_array($write['metadata'] ?? null) ? $write['metadata'] : $this->loadYaml($paths['yaml']);
+        $updatedPreview = $this->previewFromPaths($paths, $updatedMetadata);
+        $updatedPreview['applied'] = true;
+        $updatedPreview['updated_fields'] = array_keys($updates);
+        $updatedPreview['backup'] = $write['backup'] ?? null;
+
+        return $updatedPreview;
+    }
+
+    private function previewFromPaths(array $paths, array $metadata): array
+    {
         $result = [
             'slug' => $paths['slug'],
-            'exists' => is_file($xmlPath),
+            'exists' => is_file($paths['package'] . DIRECTORY_SEPARATOR . 'metadata.iFiction.xml'),
             'ok' => false,
             'errors' => [],
             'xml_path' => 'metadata.iFiction.xml',
             'extracted' => [],
             'fields' => [],
         ];
+        $xmlPath = $paths['package'] . DIRECTORY_SEPARATOR . 'metadata.iFiction.xml';
 
         if (!is_file($xmlPath)) {
             $result['errors'][] = 'metadata.iFiction.xml was not found in this package.';
@@ -163,10 +216,28 @@ class PackageIFictionService
                 'xml' => $xmlValue,
                 'would_change' => $this->stringify($current) !== $this->stringify($xmlValue),
                 'current_empty' => $this->stringify($current) === '',
+                'default_selected' => $this->stringify($current) === '' && $this->stringify($xmlValue) !== '',
+                'overwrite_warning' => $this->stringify($current) !== '' && $this->stringify($current) !== $this->stringify($xmlValue),
             ];
         }
 
         return $fields;
+    }
+
+    private function normalizeSelectedFields(array $selectedFields): array
+    {
+        $fields = [];
+        foreach ($selectedFields as $field) {
+            if (!is_scalar($field)) {
+                continue;
+            }
+            $field = trim((string) $field);
+            if ($field !== '') {
+                $fields[] = $field;
+            }
+        }
+
+        return array_values(array_unique($fields));
     }
 
     private function firstElement(DOMXPath $xpath, string $query, ?DOMElement $context = null): ?DOMElement

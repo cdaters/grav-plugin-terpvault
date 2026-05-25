@@ -72,7 +72,9 @@ class TerpVaultPage extends HTMLElement {
         },
         ifiction: {
           loading: false,
+          applying: false,
           error: '',
+          success: '',
           report: null
         }
       }
@@ -249,6 +251,23 @@ class TerpVaultPage extends HTMLElement {
         .readonly { display:grid; gap:.35rem; margin-top:.35rem; }
         .readonly div { display:grid; grid-template-columns:120px minmax(0,1fr); gap:.45rem; font-size:.86rem; }
         .readonly span:first-child { opacity:.68; }
+        .ifiction-fields { display:grid; gap:.65rem; margin:.7rem 0; }
+        .ifiction-field { display:grid; grid-template-columns:2rem minmax(0,1fr); gap:.65rem; align-items:start; border:1px solid rgba(127,127,127,.24); border-radius:10px; padding:.7rem; background:rgba(127,127,127,.035); }
+        .ifiction-field.overwrite { border-color:rgba(255,188,87,.65); background:rgba(255,188,87,.08); }
+        .ifiction-field.same { opacity:.78; }
+        .ifiction-field input { width:auto; margin:.18rem 0 0; }
+        .ifiction-field-main { display:grid; gap:.55rem; min-width:0; }
+        .ifiction-field-head { display:flex; flex-wrap:wrap; gap:.45rem; align-items:center; justify-content:space-between; }
+        .ifiction-field-label { font-weight:700; min-width:12rem; overflow-wrap:anywhere; }
+        .ifiction-field-values { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:.6rem; }
+        .ifiction-value { display:grid; gap:.25rem; min-width:0; }
+        .ifiction-value span { opacity:.68; font-size:.75rem; text-transform:uppercase; }
+        .ifiction-value code { display:block; min-height:2.35rem; max-height:14rem; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; border:1px solid rgba(127,127,127,.2); border-radius:8px; padding:.45rem .5rem; background:rgba(127,127,127,.055); line-height:1.42; }
+        .ifiction-badge { display:inline-flex; align-items:center; border:1px solid rgba(127,127,127,.35); border-radius:999px; padding:.12rem .5rem; font-size:.75rem; white-space:nowrap; }
+        .ifiction-badge.same { border-color:rgba(127,127,127,.32); background:rgba(127,127,127,.07); }
+        .ifiction-badge.empty { border-color:rgba(79,190,124,.58); background:rgba(79,190,124,.1); }
+        .ifiction-badge.overwrite { border-color:rgba(255,188,87,.65); background:rgba(255,188,87,.13); }
+        .ifiction-badge.changed { border-color:rgba(93,164,255,.6); background:rgba(93,164,255,.11); }
         .message { border:1px solid rgba(127,127,127,.28); border-radius:10px; padding:.55rem .65rem; margin:.45rem 0; }
         .message.error { border-color:rgba(255,95,95,.7); background:rgba(255,95,95,.1); }
         .message.success { border-color:rgba(79,190,124,.58); background:rgba(79,190,124,.1); }
@@ -284,6 +303,10 @@ class TerpVaultPage extends HTMLElement {
           dl { grid-template-columns: 1fr; }
           .editor-head { display:block; }
           .readonly div { grid-template-columns:1fr; }
+          .ifiction-field { grid-template-columns:1.6rem minmax(0,1fr); }
+          .ifiction-field-head { display:grid; justify-content:start; }
+          .ifiction-field-label { min-width:0; }
+          .ifiction-field-values { grid-template-columns:1fr; }
           .media-focus { grid-template-columns:1fr; }
           .screenshot-row { grid-template-columns:1fr; }
           .screenshot-row img { width:100%; }
@@ -293,7 +316,7 @@ class TerpVaultPage extends HTMLElement {
         <section class="hero">
           <h1>TerpVault Library Manager</h1>
           <p>Package inventory, package creation, metadata editing, helper Markdown editing, media management, screenshot ordering, and story-file replacement for installed TerpVault interactive-fiction packages.</p>
-          <p class="meta">Admin2 is opt-in. Package export, import inspection, draft-only import install, and local iFiction preview are available. Package delete, overwrite, arbitrary file browsing, player settings editing, iFiction apply/import, and remote catalog lookup are not available.</p>
+          <p class="meta">Admin2 is opt-in. Package export, import inspection, draft-only import install, local iFiction preview, and selected-field iFiction apply are available. Package delete, overwrite, arbitrary file browsing, player settings editing, and remote catalog lookup are not available.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -768,6 +791,10 @@ class TerpVaultPage extends HTMLElement {
 
     root.querySelectorAll('[data-action="preview-ifiction"]').forEach(button => {
       button.addEventListener('click', () => this._previewIFiction(button.dataset.slug || ''));
+    });
+
+    root.querySelectorAll('form[data-ifiction-apply-slug]').forEach(form => {
+      form.addEventListener('submit', event => this._applyIFiction(event));
     });
 
     root.querySelectorAll('[data-action="media-select"]').forEach(button => {
@@ -1362,7 +1389,9 @@ class TerpVaultPage extends HTMLElement {
       ...this.state.editor,
       ifiction: {
         loading: true,
+        applying: false,
         error: '',
+        success: '',
         report: null
       }
     };
@@ -1374,7 +1403,9 @@ class TerpVaultPage extends HTMLElement {
         ...this.state.editor,
         ifiction: {
           loading: false,
+          applying: false,
           error: '',
+          success: '',
           report: this._unwrapApiResponse(data)
         }
       };
@@ -1383,8 +1414,73 @@ class TerpVaultPage extends HTMLElement {
         ...this.state.editor,
         ifiction: {
           loading: false,
+          applying: false,
           error: error.message || String(error),
+          success: '',
           report: null
+        }
+      };
+    }
+
+    this._renderLibrary();
+  }
+
+  async _applyIFiction(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const slug = form.dataset.ifictionApplySlug || this.state.editingSlug;
+    const fields = Array.from(form.querySelectorAll('input[name="ifiction_fields"]:checked')).map(input => input.value);
+    if (!slug) {
+      return;
+    }
+
+    this.state.editor = {
+      ...this.state.editor,
+      ifiction: {
+        ...(this.state.editor.ifiction || this._emptyIFictionState()),
+        applying: true,
+        error: '',
+        success: ''
+      }
+    };
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._ifictionPreviewApiUrl(slug), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields })
+      });
+      const report = this._unwrapApiResponse(data);
+      const applyErrors = Array.isArray(report?.errors) ? report.errors.filter(Boolean).map(error => String(error)) : [];
+      const applySuccess = report?.applied === true;
+      const applyMessage = applySuccess
+        ? 'Selected iFiction fields were applied to game.yaml. A package-local backup was created before writing.'
+        : (!fields.length ? 'No iFiction fields were selected. game.yaml was not changed.' : '');
+      await this._reloadManifest();
+      const metadata = await this._requestJson(this._metadataApiUrl(slug), { method: 'GET' });
+      this.state.editor = {
+        ...this.state.editor,
+        loading: false,
+        saving: false,
+        values: this._editableFromApi(metadata, this._findGame(slug) || {}),
+        readOnly: this._readOnlyFromApi(metadata, this._findGame(slug) || {}),
+        ifiction: {
+          loading: false,
+          applying: false,
+          error: !applySuccess && fields.length && applyErrors.length ? applyErrors.join('\n') : '',
+          success: applyMessage,
+          report
+        }
+      };
+    } catch (error) {
+      this.state.editor = {
+        ...this.state.editor,
+        ifiction: {
+          ...(this.state.editor.ifiction || this._emptyIFictionState()),
+          applying: false,
+          error: error.message || String(error),
+          success: ''
         }
       };
     }
@@ -1747,31 +1843,70 @@ class TerpVaultPage extends HTMLElement {
     return `
       <section class="story-manager">
         <h3>iFiction Metadata</h3>
-        <p class="meta">Preview-only parser for package-local <code>metadata.iFiction.xml</code>, a common IF metadata format. It does not fetch remote resources and does not write <code>game.yaml</code>.</p>
+        <p class="meta">Parser for package-local <code>metadata.iFiction.xml</code>, a common IF metadata format. Remote lookup is not performed.</p>
         ${ifiction.loading ? '<div class="message">Parsing local metadata.iFiction.xml...</div>' : ''}
         ${ifiction.error ? `<div class="message error">${this._esc(ifiction.error)}</div>` : ''}
+        ${ifiction.success ? `<div class="message success">${this._esc(ifiction.success)}</div>` : ''}
         ${report && report.errors?.length ? `<div class="message error">${report.errors.map(error => this._esc(error)).join('<br>')}</div>` : ''}
-        ${report && report.ok ? '<div class="message success">Local iFiction metadata parsed for preview. Review values before manually applying any changes.</div>' : ''}
+        ${report && report.ok ? '<div class="message success">Local iFiction metadata parsed. Select fields explicitly before applying changes.</div>' : ''}
         <div class="form-actions">
-          <button class="button" type="button" data-action="preview-ifiction" data-slug="${this._esc(slug)}" ${ifiction.loading ? 'disabled' : ''}>${ifiction.loading ? 'Previewing...' : 'Preview iFiction Metadata'}</button>
+          <button class="button" type="button" data-action="preview-ifiction" data-slug="${this._esc(slug)}" ${ifiction.loading || ifiction.applying ? 'disabled' : ''}>${ifiction.loading ? 'Previewing...' : 'Preview iFiction Metadata'}</button>
         </div>
-        ${fields.length ? this._ifictionFieldTable(fields) : (report ? '<p class="meta">No supported preview fields are available.</p>' : '')}
+        ${fields.length ? this._ifictionFieldTable(slug, fields, ifiction.applying) : (report ? '<p class="meta">No supported preview fields are available.</p>' : '')}
       </section>
     `;
   }
 
-  _ifictionFieldTable(fields) {
+  _ifictionFieldTable(slug, fields, applying = false) {
     return `
-      <div class="readonly">
-        ${fields.map(field => `
-          <div>
-            <span>${this._esc(field.label || field.path || '')}${field.would_change ? '' : ' (same)'}</span>
-            <code>Current: ${this._esc(this._asText(field.current) || 'Empty')}</code>
-            <code>XML: ${this._esc(this._asText(field.xml) || 'Empty')}</code>
-          </div>
-        `).join('')}
-      </div>
+      <form data-ifiction-apply-slug="${this._esc(slug)}">
+        <p class="meta">This updates <code>game.yaml</code>. Existing non-empty values are only overwritten if selected. Remote lookup is not performed.</p>
+        <div class="ifiction-fields">
+          ${fields.map(field => {
+            const status = this._ifictionFieldStatus(field);
+            const disabled = applying || !field.would_change || !this._asText(field.xml);
+            return `
+              <div class="ifiction-field ${this._esc(status.className)}">
+                <input type="checkbox" name="ifiction_fields" value="${this._esc(field.path || '')}" aria-label="Apply ${this._esc(field.label || field.path || '')}" ${field.default_selected ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+                <div class="ifiction-field-main">
+                  <div class="ifiction-field-head">
+                    <span class="ifiction-field-label">${this._esc(field.label || field.path || '')}</span>
+                    <span class="ifiction-badge ${this._esc(status.className)}">${this._esc(status.label)}</span>
+                  </div>
+                  <div class="ifiction-field-values">
+                    <div class="ifiction-value">
+                      <span>Current game.yaml</span>
+                      <code>${this._esc(this._asText(field.current) || 'Empty')}</code>
+                    </div>
+                    <div class="ifiction-value">
+                      <span>metadata.iFiction.xml</span>
+                      <code>${this._esc(this._asText(field.xml) || 'Empty')}</code>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="form-actions">
+          <button class="button primary" type="submit" ${applying ? 'disabled' : ''}>${applying ? 'Applying...' : 'Apply Selected iFiction Fields'}</button>
+        </div>
+      </form>
     `;
+  }
+
+  _ifictionFieldStatus(field) {
+    if (!field.would_change) {
+      return { label: 'Same', className: 'same' };
+    }
+    if (field.overwrite_warning) {
+      return { label: 'Overwrites current value', className: 'overwrite' };
+    }
+    if (field.current_empty) {
+      return { label: 'Empty target', className: 'empty' };
+    }
+
+    return { label: 'Changed', className: 'changed' };
   }
 
   _mediaPanel(game, slug) {
@@ -2391,7 +2526,9 @@ class TerpVaultPage extends HTMLElement {
   _emptyIFictionState() {
     return {
       loading: false,
+      applying: false,
       error: '',
+      success: '',
       report: null
     };
   }

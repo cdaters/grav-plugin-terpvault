@@ -202,6 +202,29 @@ class ApiController extends AbstractApiController
         }
     }
 
+    public function applyIFiction(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+        $body = $this->getRequestBody($request);
+        if (!is_array($body)) {
+            throw new ValidationException('Request body must be a JSON object.');
+        }
+
+        $fields = $body['fields'] ?? $body['paths'] ?? [];
+        if (!is_array($fields)) {
+            throw new ValidationException('Selected iFiction fields must be an array.');
+        }
+
+        try {
+            return ApiResponse::create($this->ifictionService()->apply($slug, $fields));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
     public function markdown(ServerRequestInterface $request): ResponseInterface
     {
         $this->requireAdminApiSuper($request);

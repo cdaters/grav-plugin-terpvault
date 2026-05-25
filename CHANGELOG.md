@@ -1,3 +1,16 @@
+# v0.4.3
+
+## Unreleased
+
+1. Changed
+    - Added authenticated Admin2/API apply for selected fields from package-local `metadata.iFiction.xml`.
+    - Extended the Admin2 iFiction preview with per-field checkboxes and an explicit Apply Selected iFiction Fields action.
+
+2. Safety
+    - iFiction apply is local-only, selected-field-only, and re-parses `metadata.iFiction.xml` server-side before writing `game.yaml`.
+    - Existing non-empty `game.yaml` values are only overwritten when the curator explicitly selects that field.
+    - No IFDB, IFWiki, IF Archive, or other remote lookup behavior was added.
+
 # v0.4.2
 
 ## 05/25/2026

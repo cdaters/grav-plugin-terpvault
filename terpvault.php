@@ -281,6 +281,7 @@ class TerpVaultPlugin extends Plugin
         $routes->get('/terpvault/packages/{slug}/export', [$controller, 'exportPackage']);
         $routes->get('/terpvault/packages/{slug}/metadata', [$controller, 'metadata']);
         $routes->get('/terpvault/packages/{slug}/metadata/ifiction', [$controller, 'previewIFiction']);
+        $routes->patch('/terpvault/packages/{slug}/metadata/ifiction', [$controller, 'applyIFiction']);
         $routes->patch('/terpvault/packages/{slug}/metadata', [$controller, 'updateMetadata']);
         $routes->get('/terpvault/packages/{slug}/markdown/{type}', [$controller, 'markdown']);
         $routes->patch('/terpvault/packages/{slug}/markdown/{type}', [$controller, 'updateMarkdown']);
