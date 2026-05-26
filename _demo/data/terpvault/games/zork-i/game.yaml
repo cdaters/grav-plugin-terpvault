@@ -1,0 +1,61 @@
+id: zork-i
+slug: zork-i
+identification:
+  format: zcode
+  ifids: []
+bibliographic:
+  title: Zork I
+  author: 'Infocom; source release by Microsoft/Open Source Programs Office/Xbox/Activision'
+  headline: 'The Great Underground Empire'
+  first_published: '1980'
+  genre: 'Interactive Fiction'
+  language: en
+  description: |
+    Zork I is a landmark parser-based interactive fiction adventure set around a mysterious white house, a small mailbox, and the vast underground world waiting beyond. This TerpVault package uses a source-built Z-machine story file from the verified MIT-licensed historical source release, with original package art, helper notes, and provenance documentation prepared for review.
+resources:
+  story_file: zork1.z3
+  cover: cover.jpg
+  small_cover: small-cover.jpg
+  hero: hero.jpg
+  screenshots:
+    - screenshots/01.png
+    - screenshots/02.png
+  how_to_play: how-to-play.md
+  hints: hints.md
+  walkthrough: walkthrough.md
+  feelies:
+    - title: The Great Underground Empire Poster
+      path: feelies/feelie-01-poster.png
+      type: poster
+      description: Original Craig Daters 2026 poster art inspired by the retail-era tradition of adventure-game feelies; not a scan or reproduction of historical Infocom packaging.
+catalog:
+  ifdb:
+    tuid: ''
+    url: ''
+  ifwiki:
+    url: ''
+  ifarchive:
+    path: ''
+    url: ''
+release:
+  license:
+    name: 'MIT License'
+    url: 'https://github.com/historicalsource/zork1/blob/master/LICENSE'
+    notes: 'Observed upstream source license is MIT. Historical commercial packaging, manuals, maps, ads, logos, trade dress, and scans are excluded from this draft.'
+  source:
+    url: 'https://github.com/historicalsource/zork1.git'
+    retrieved: '2026-05-24'
+    notes: 'Source commit 97b7b3d68c075dd9af7da499c3e9690ada3471fd. Story file selected from scratch-built artifact /tmp/terpvault-zork1-build/zork1-release119-serial880429.z3; SHA-256 973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917. Built with ZILF/ZAPF 1.8 and reassembled as Release 119 / Serial 880429.'
+terpvault:
+  status: published
+  featured: false
+  tags:
+    - candidate
+    - parser
+    - z-code
+    - classic
+    - zork
+player:
+  engine: parchment
+  theme: retro-terminal
+  autosave: true

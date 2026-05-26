@@ -2,7 +2,7 @@
 
 ## Status
 
-- Candidate only.
+- Approved for bundled demo in `_demo`.
 - Upstream repo verified on 2026-05-24.
 - License/provenance reviewed from observed repository files only.
 - Source build verified on 2026-05-25.
@@ -11,11 +11,11 @@
 - Second DDEV-only screenshot and public copy polish verified on 2026-05-25.
 - Original DDEV-only poster feelie and final export/import smoke test verified on 2026-05-25.
 - DDEV-only walkthrough expansion and partial Frotz route verification completed on 2026-05-25.
-- Requires final Craig review before copying a finished package into `_demo`.
-- Requires final walkthrough transcript verification before bundled demo approval.
-- Next state: final package polish and Craig approval for any `_demo` copy.
+- Copied into `_demo/data/terpvault/games/zork-i` on 2026-05-25.
+- Requires final full walkthrough transcript verification before claiming full walkthrough coverage.
+- Next state: review release metadata and, after Craig approval, commit/tag/release v0.4.6.
 
-Zork I must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
+Zork I is ready for this bundled development demo tree with source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes present. Do not claim the walkthrough is fully verified until a complete transcript reaches final victory or the target score.
 
 ## Upstream source to verify
 
@@ -414,7 +414,7 @@ Final DDEV export/import smoke test:
 - Import inspect accepted the feelie, `provenance.md`, and `LICENSE-upstream.txt`; fatal errors: none.
 - Import commit used temporary slug `zork-i-final-import-test`, forced draft status and not-featured, and restored the story file, art files, screenshots, feelie, package-root support files, and helper docs.
 
-This completes the current DDEV package assembly smoke test. Zork I remains candidate-only until Craig explicitly approves copying a finished package into `_demo`.
+This completed the DDEV package assembly smoke test before the v0.4.6 `_demo` copy.
 
 ## Package-root support-file export/import retest
 
@@ -453,7 +453,7 @@ Import commit result:
 - Import was forced to draft status and not featured.
 - Restored files included `provenance.md` and `LICENSE-upstream.txt`.
 
-The previous package-root provenance/license export blocker is resolved pending final package retest. Zork I remains candidate-only and is not approved for bundled demo inclusion.
+The previous package-root provenance/license export blocker is resolved. Zork I has since been copied into `_demo` for the v0.4.6 starter package pass.
 
 ## DDEV-only walkthrough expansion
 
@@ -471,7 +471,8 @@ Frotz verification level:
 
 - Interactive Frotz checks against `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i/zork1.z3` verified the early route through white-house entry, lamp/trap-door setup, painting collection and trophy-case deposit, attic rope collection, troll combat, rope/dome descent, temple/Egyptian-room path, coffin pickup after dropping the sword, prayer exit, and sceptre retrieval setup.
 - A later Frotz chunk verified the dam-control path from the cleared troll room through Reservoir South and Dam, including matchbook/wrench/screwdriver pickup, `push yellow button`, `turn bolt with wrench`, and access to Dam Base with the folded plastic boat present.
-- The walkthrough remains explicitly marked as partially verified. Full reservoir/river, coal mine, scarab, thief/cyclops/egg/chalice, and final 350-point cleanup still need a clean full-game transcript pass before bundled demo approval.
+- A final `dfrotz` full-route attempt reached 85 of 350 points before going off-route during the reservoir/boat and later coal-mine sequence.
+- The walkthrough remains explicitly marked as partially verified. Full reservoir/river, coal mine, scarab, thief/cyclops/egg/chalice, and final 350-point cleanup still need a clean full-game transcript pass before claiming full walkthrough verification.
 
 Route/export checks after walkthrough cleanup:
 
@@ -485,43 +486,64 @@ Route/export checks after walkthrough cleanup:
 - Export included `zork-i/walkthrough.md` and the expected story, art, screenshots, poster feelie, package-root provenance/license files, and helper docs.
 - No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, `desktop.ini`, hidden/system-looking paths, or other cruft entries were observed.
 
+## Bundled `_demo` package
+
+Verification date: 2026-05-25.
+
+Craig approved copying the finished DDEV package into `_demo` after one more full-command verification attempt, provided the package honestly documents the actual walkthrough verification state.
+
+Package copy result:
+
+- Source package: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i`.
+- Bundled package path: `_demo/data/terpvault/games/zork-i`.
+- Preserved package status: `published`.
+- Preserved featured flag: `false`.
+- Story checksum in `_demo`: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+
+Bundled files:
+
+- `game.yaml`.
+- `provenance.md`.
+- `LICENSE-upstream.txt`.
+- `how-to-play.md`.
+- `hints.md`.
+- `walkthrough.md`.
+- `zork1.z3`.
+- `cover.jpg`.
+- `small-cover.jpg`.
+- `hero.jpg`.
+- `screenshots/01.png`.
+- `screenshots/02.png`.
+- `feelies/feelie-01-poster.png`.
+
+No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, `desktop.ini`, hidden/system-looking paths, or other cruft files were observed in the `_demo` copy.
+
 ## Remaining blockers
 
-- Final package metadata is not complete.
-- Final package-local provenance notes are not complete.
-- DDEV-only shell playback has passed, but final package verification is still pending after art, screenshots, feelies, and final polish.
-- Core package art exists only in the DDEV package and still needs final review.
-- Both planned screenshots exist only in the DDEV package and still need final review.
-- Helper docs exist only as DDEV-only draft package content and still need final review/polish.
-- `walkthrough.md` is expanded, original, and partially Frotz-verified, but the late-game route still needs a full clean transcript pass before bundled demo approval.
-- One original poster feelie exists only in the DDEV package and still needs final review.
-- Redistribution/package basis for the exact generated story artifact still needs to be recorded in package-local notes before bundling.
-- Final DDEV package export/import passed with the poster feelie, provenance, upstream license, story, art, screenshots, and helper docs.
-- Public About copy has been polished in DDEV, but final wording still needs review before bundled demo approval.
+- `walkthrough.md` is expanded, original, and partially Frotz-verified, but the late-game route still needs a full clean transcript pass before claiming full walkthrough verification.
 - The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in this pass; keep it as a follow-up only if it becomes reproducible.
 - A transient compiled-language cache parse error appeared immediately after cache clear and disappeared on refresh; record as a DDEV/Grav cache follow-up if it becomes consistently reproducible.
 - Decide later whether public game tags should render on detail/card views.
-- Keep Zork I candidate-only until Craig explicitly approves copying a finished package into `_demo`.
+- Consider adding verified IFID/iFiction metadata in a later package polish pass.
 
 ## Recommended next action
 
-Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) and [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) as the docs-only plans for turning Zork I from verified candidate into a finished TerpVault demo package. The local DDEV-only package shell has passed basic route, checksum, manual browser inspection, visual asset route/render checks, both screenshot checks, public copy cleanup, poster-feelie route/render checks, and final export/import smoke testing. Zork I remains candidate-only until Craig explicitly approves copying a finished package into `_demo`. Do not create `_demo` package contents yet.
+Review the prepared v0.4.6 changes, then commit, tag, and release only after Craig approval. Zork I is now present in `_demo`; future work should focus on full walkthrough transcript verification and optional metadata polish.
 
 Packaging recommendation:
 
-- Keep Zork I as candidate-only.
-- Do not create `_demo` package contents yet.
-- Recommended eventual package artifact is probably the source-built `zork1-release119-serial880429.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
+- Keep Zork I bundled as the first `_demo` starter package.
+- Selected story artifact is the source-built `zork1-release119-serial880429.z3`, copied into the package as `zork1.z3`.
 - Do not bundle `zork1.zip` or `COMPILED/zork1.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
-- Do not mark Zork I package-ready until package metadata, provenance notes, full TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, and feelies are complete.
-- If packaging proceeds later, include upstream MIT license text and package-local provenance notes, and use only Craig-created art/helper docs unless other assets have separately verified redistribution rights.
+- Keep upstream MIT license text and package-local provenance notes in the package.
+- Use only Craig-created art/helper docs unless other assets have separately verified redistribution rights.
+- Keep the walkthrough marked partially verified until a full transcript reaches final victory or target score.
 
-Remaining blockers:
+Remaining follow-ups:
 
-- Decide whether the source-built `zork1-release119-serial880429.z3`, source provenance, or some combination is appropriate for the package.
-- Verify IFID/format and full TerpVault/Parchment browser playback behavior.
-- Create original package assets and helper docs only after packaging basis is resolved.
-- Run package export/import smoke tests once a package exists.
+- Verify IFID/iFiction metadata if desired.
+- Run a full clean walkthrough transcript to final victory or target score.
+- Re-test public tag rendering decisions in a later frontend polish pass.
 
 ## Legal/provenance checklist
 

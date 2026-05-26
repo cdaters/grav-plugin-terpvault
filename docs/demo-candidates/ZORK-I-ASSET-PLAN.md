@@ -2,11 +2,11 @@
 
 ## Status
 
-- Zork I remains candidate-only.
-- A DDEV-only package shell exists for local review.
+- Zork I is approved for the bundled `_demo` development starter package.
+- A DDEV-only package shell exists for local review and has been copied into `_demo/data/terpvault/games/zork-i`.
 - Core visual assets are now integrated in the DDEV-only package shell: `cover.jpg`, `small-cover.jpg`, `hero.jpg`, `screenshots/01.png`, and `screenshots/02.png`.
 - One original poster feelie is now integrated in the DDEV-only package shell: `feelies/feelie-01-poster.png`.
-- This is a planning document only. Do not create `_demo` contents, copy story files, add images, or add package assets from this plan until a later explicit packaging pass.
+- This plan is complete for the current v0.4.6 bundled starter package. Future asset work should be handled as a later polish pass.
 
 ## Legal/art guardrails
 
@@ -133,8 +133,8 @@
 7. Test any feelies links. Done for `feelies/feelie-01-poster.png`.
 8. Export the package and confirm the zip contains expected files and no `.DS_Store`, `__MACOSX`, AppleDouble, or other cruft. Current DDEV retest has no cruft and includes visual assets, `feelies/feelie-01-poster.png`, and root `provenance.md` / `LICENSE-upstream.txt`.
 9. Keep package-root provenance/license files separate from feelies.
-10. Run import inspect/commit smoke testing in DDEV.
-11. Only after review, consider copying a finished package into `_demo`.
+10. Run import inspect/commit smoke testing in DDEV. Completed for the v0.4.6 package pass.
+11. Only after review, consider copying a finished package into `_demo`. Completed for `zork-i` after Craig approval.
 
 ## Acceptance checklist
 
@@ -148,6 +148,7 @@
 - Export/import smoke test passes, including package-local provenance and upstream license files.
 - Package remains legally/provenance clean.
 - Candidate docs are updated with final asset verification results.
+- `_demo/data/terpvault/games/zork-i` contains the verified asset set and no hidden/system cruft.
 
 ## Open questions
 
@@ -155,4 +156,4 @@
 - Whether cover should include text or be text-free.
 - Whether map should be image or PDF.
 - Whether a command cheat sheet is useful.
-- Whether feelies should be included in the first demo package or added later.
+- Whether additional optional feelies should be added later.

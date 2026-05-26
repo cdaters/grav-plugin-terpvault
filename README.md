@@ -40,6 +40,7 @@ This is a **v0.4.5 early public-beta release** on the TerpVault foundation. It i
 - `.terpvault.zip` export and draft-only import are available through Admin2. Import overwrite/replace is not implemented.
 - Parchment save/restore is interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
 - The `_demo` tree includes development starter packages for testing. Real IF packages need license/provenance review before broad redistribution.
+- `zork-i` is the first provenance-reviewed bundled starter package, with source-built story file, package-local provenance, upstream license text, original art/helper docs/screenshots, and one original poster-style feelie.
 - `sample-cave` is the public-safe original structure demo, but its placeholder `game.z5` is not a playable story file.
 
 ## Installation for local development
@@ -368,11 +369,14 @@ This development package includes starter packages under:
 
 ```text
 user/plugins/terpvault/_demo/data/terpvault/games/
+  zork-i/
   sample-cave/
   adventure/
   you-are-standing/
   grue/
 ```
+
+`zork-i` is the first bundled starter package approved for this development demo tree. It uses a source-built Z-machine story file from the verified MIT-licensed historical source release, includes package-local provenance and upstream license text, and has original package art, helper docs, screenshots, and one original poster-style feelie. Its walkthrough is original package copy, but remains partially Frotz-verified pending a future full 350-point transcript.
 
 `sample-cave` is original placeholder/demo content intended for public-safe structure testing. It is not a playable game. `adventure`, `you-are-standing`, and `grue` are real IF development starter packages with source/license notes in their manifests. Review their provenance before broad redistribution or before including them in a public plugin release.
 
@@ -380,6 +384,7 @@ To install the real development starter packages into a local Grav site:
 
 ```bash
 mkdir -p user/data/terpvault/games
+cp -R user/plugins/terpvault/_demo/data/terpvault/games/zork-i user/data/terpvault/games/
 cp -R user/plugins/terpvault/_demo/data/terpvault/games/adventure user/data/terpvault/games/
 cp -R user/plugins/terpvault/_demo/data/terpvault/games/you-are-standing user/data/terpvault/games/
 cp -R user/plugins/terpvault/_demo/data/terpvault/games/grue user/data/terpvault/games/
@@ -390,6 +395,7 @@ Then visit:
 
 ```text
 /if
+/if/zork-i
 /if/adventure
 /if/you-are-standing
 /if/grue
@@ -409,7 +415,7 @@ Then visit:
 
 ## Future GPM packaging notes
 
-Before any future GPM-ready package, ship the plugin, bundled Parchment notices, and the public-safe `sample-cave` structure demo only. Keep real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, and metadata source.
+Before any future GPM-ready package, re-check bundled Parchment notices and the provenance for each `_demo` starter package. `zork-i` has package-local source/license/provenance notes and original package assets, but its walkthrough remains partially Frotz-verified. Keep other real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, and metadata source.
 
 ## Admin2 Library Manager
 

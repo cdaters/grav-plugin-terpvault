@@ -1,3 +1,17 @@
+# v0.4.6
+
+## 05/25/2026
+
+1. Changed
+    - Added Zork I as the first bundled `_demo` starter package at `_demo/data/terpvault/games/zork-i`.
+    - Bundled the selected source-built Zork I Release 119 / Serial 880429 story file with package-local provenance, upstream MIT license text, original helper docs, original Craig-created art, screenshots, and one original poster-style feelie.
+    - Preserved package-root `provenance.md` and `LICENSE-upstream.txt` in the demo package.
+
+2. Verification
+    - Re-ran DDEV route, story checksum, asset route, export, import inspect, and draft import commit smoke tests before copying the package into `_demo`.
+    - Confirmed the bundled story file checksum remains `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+    - Attempted a fuller `dfrotz` walkthrough transcript; the walkthrough remains honestly marked as partially verified because the script reached 85/350 points and went off-route before final victory.
+
 # v0.4.5
 
 ## 05/25/2026

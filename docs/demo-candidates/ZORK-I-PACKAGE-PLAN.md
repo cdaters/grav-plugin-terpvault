@@ -2,7 +2,7 @@
 
 ## Status
 
-- Zork I remains candidate-only.
+- Zork I is approved for the bundled `_demo` development starter package.
 - Source-build verification has passed.
 - Frotz smoke testing has passed.
 - DDEV-only TerpVault/Parchment browser playback has passed.
@@ -10,10 +10,10 @@
 - A DDEV-only package shell has been created and manually inspected.
 - Core DDEV-only visual assets have been integrated and route/render checked.
 - The DDEV-only walkthrough has been expanded from placeholder text into original package copy with partial Frotz route verification.
-- The package is not yet approved for bundled demo.
-- Actual `_demo` package creation is still pending.
+- The package has been copied into `_demo/data/terpvault/games/zork-i`.
+- The walkthrough remains partially Frotz-verified; full 350-point transcript verification is still pending.
 
-This is a planning document only. Do not create package contents, copy story files, add art, or bundle generated packages from this plan until a later explicit packaging pass.
+This document records the completed package plan and remaining polish follow-ups. Do not create tags or releases from this plan; use the v0.4.6 release checklist and Craig approval.
 
 ## DDEV-only package shell status
 
@@ -68,10 +68,10 @@ The DDEV package `walkthrough.md` has also been expanded into original TerpVault
 
 Remaining asset/package gaps:
 
-- Final public package copy still needs final review before bundled demo approval.
+- Final full walkthrough transcript verification is still pending.
 - Any reproducible Parsdown/deprecation warning or repeated compiled-language cache parse error should be captured with exact text as a separate follow-up.
 - Public tag rendering on detail/card views remains a later frontend polish decision.
-- Copying a finished package into `_demo` remains pending explicit Craig approval.
+- Optional IFID/iFiction metadata polish remains a later pass.
 
 ## Proposed package identity
 
@@ -85,14 +85,13 @@ Remaining asset/package gaps:
 - Build basis: source-built from `https://github.com/historicalsource/zork1.git` at commit `97b7b3d68c075dd9af7da499c3e9690ada3471fd` with ZILF/ZAPF 1.8.
 - Checksum note: the selected source-built artifact reproduces Release 119 / Serial 880429 header metadata but does not match upstream prebuilt `COMPILED/zork1.z3` / `zork1.zip`.
 
-## Proposed package structure
+## Bundled package structure
 
-Do not create these files yet.
+The v0.4.6 `_demo` package currently contains:
 
 ```text
 zork-i/
   game.yaml
-  metadata.iFiction.xml
   zork1.z3
   cover.jpg
   small-cover.jpg
@@ -104,8 +103,7 @@ zork-i/
   hints.md
   walkthrough.md
   feelies/
-    map.jpg or map.pdf
-    adventurer-notes.pdf or similar if useful
+    feelie-01-poster.png
   LICENSE-upstream.txt
   provenance.md
 ```
@@ -261,13 +259,12 @@ See [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) for optional feelies scope, leg
 - Confirm imported package story checksum matches.
 - Update candidate docs with final package verification results.
 - Confirm final package polish after original art, screenshots, and feelies are added.
-- Only after all checks pass, decide whether to copy into `_demo`.
+- Copy into `_demo` after Craig approval. Completed for v0.4.6 at `_demo/data/terpvault/games/zork-i`.
 
 ## Open questions
 
 - Exact IFID.
-- Whether package status should install as draft or published in a future demo installer.
+- Whether future demo installer copies should preserve published status or install as draft.
 - Whether to include source-build logs or only `provenance.md`.
-- Whether Zork I alone should ship first before Zork III.
-- Final naming, copyright, and attribution wording.
-- Final art, screenshot, and feelies scope.
+- Whether Zork III should follow after Zork I.
+- Final IFID/iFiction metadata.
