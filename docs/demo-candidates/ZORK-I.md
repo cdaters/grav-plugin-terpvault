@@ -10,9 +10,10 @@
 - Core DDEV-only visual asset integration verified on 2026-05-25.
 - Second DDEV-only screenshot and public copy polish verified on 2026-05-25.
 - Original DDEV-only poster feelie and final export/import smoke test verified on 2026-05-25.
+- DDEV-only walkthrough expansion and partial Frotz route verification completed on 2026-05-25.
 - Requires final Craig review before copying a finished package into `_demo`.
-- Requires original package assets and helper docs.
-- Next state: art/screenshots/feelies planning and final package polish.
+- Requires final walkthrough transcript verification before bundled demo approval.
+- Next state: final package polish and Craig approval for any `_demo` copy.
 
 Zork I must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -454,6 +455,34 @@ Import commit result:
 
 The previous package-root provenance/license export blocker is resolved pending final package retest. Zork I remains candidate-only and is not approved for bundled demo inclusion.
 
+## DDEV-only walkthrough expansion
+
+Verification date: 2026-05-25.
+
+The DDEV-only `walkthrough.md` placeholder was replaced with an original TerpVault package walkthrough for the selected source-built Release 119 / Serial 880429 artifact.
+
+Reference/source analysis:
+
+- Local reference files consulted as solution references only: `/Users/cdaters/Downloads/for-Zork1/assets/zork1.txt` and `/Users/cdaters/Downloads/for-Zork1/assets/zork1.sol.txt`.
+- Source checkout consulted for object names, score/treasure definitions, and puzzle vocabulary: `/tmp/terpvault-zork1-build`.
+- Final DDEV package text was rewritten as original package copy and is not copied wholesale from the reference files.
+
+Frotz verification level:
+
+- Interactive Frotz checks against `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i/zork1.z3` verified the early route through white-house entry, lamp/trap-door setup, painting collection and trophy-case deposit, attic rope collection, troll combat, rope/dome descent, temple/Egyptian-room path, coffin pickup after dropping the sword, prayer exit, and sceptre retrieval setup.
+- The walkthrough is explicitly marked as partially verified. Dam/reservoir, coal mine, river/scarab, thief/cyclops/egg/chalice, and final 350-point cleanup still need a clean full-game transcript pass before bundled demo approval.
+
+Route/export checks after walkthrough replacement:
+
+- Detail page `https://grav20.ddev.site/if/zork-i` returned `200`.
+- Play page `https://grav20.ddev.site/if/zork-i/play` returned `200`.
+- Story route `https://grav20.ddev.site/if/_story/zork-i/zork1.z3` returned `200`, 86928 bytes.
+- Served story SHA-256 remained `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- Detail HTML rendered the new `Zork I Walkthrough`, `Partially verified command route`, and `Remaining verification notes` sections.
+- Scratch export path inside the DDEV container: `/tmp/terpvault-export-zork-i-5k6g3iup72pk4Bz88qh.zip`.
+- Export included `zork-i/walkthrough.md` and the expected story, art, screenshots, poster feelie, package-root provenance/license files, and helper docs.
+- No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, `desktop.ini`, hidden/system-looking paths, or other cruft entries were observed.
+
 ## Remaining blockers
 
 - Final package metadata is not complete.
@@ -462,6 +491,7 @@ The previous package-root provenance/license export blocker is resolved pending 
 - Core package art exists only in the DDEV package and still needs final review.
 - Both planned screenshots exist only in the DDEV package and still need final review.
 - Helper docs exist only as DDEV-only draft package content and still need final review/polish.
+- `walkthrough.md` is expanded, original, and partially Frotz-verified, but the late-game route still needs a full clean transcript pass before bundled demo approval.
 - One original poster feelie exists only in the DDEV package and still needs final review.
 - Redistribution/package basis for the exact generated story artifact still needs to be recorded in package-local notes before bundling.
 - Final DDEV package export/import passed with the poster feelie, provenance, upstream license, story, art, screenshots, and helper docs.

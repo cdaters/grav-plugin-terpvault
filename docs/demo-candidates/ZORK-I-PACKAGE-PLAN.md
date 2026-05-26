@@ -9,6 +9,7 @@
 - DDEV-only export/import smoke testing has passed.
 - A DDEV-only package shell has been created and manually inspected.
 - Core DDEV-only visual assets have been integrated and route/render checked.
+- The DDEV-only walkthrough has been expanded from placeholder text into original package copy with partial Frotz route verification.
 - The package is not yet approved for bundled demo.
 - Actual `_demo` package creation is still pending.
 
@@ -22,7 +23,7 @@ A local package assembly draft exists only in the DDEV test site:
 
 - Package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i`.
 - Files present: `game.yaml`, `provenance.md`, `LICENSE-upstream.txt`, `how-to-play.md`, `hints.md`, `walkthrough.md`, and `zork1.z3`.
-- Art, screenshots, and feelies are still pending.
+- Art, screenshots, and one original poster feelie are now present in the DDEV package; optional additional feelies remain pending.
 - `terpvault.status` is published only for local DDEV route testing. Final demo installer status remains undecided.
 
 Route/checksum results:
@@ -62,6 +63,8 @@ Export-inspect initially found that package-root `provenance.md` and `LICENSE-up
 The DDEV package description was also polished with original public-facing copy so the visible About section no longer exposes DDEV/test-package wording. The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in repeated detail-page fetches, though one transient compiled-language cache parse error appeared immediately after cache clear and resolved on refresh.
 
 The DDEV package now includes `feelies/feelie-01-poster.png`, an original Craig Daters 2026 poster-style feelie inspired by retail-era adventure-game feelies. It is not a scan or reproduction of historical Infocom packaging, manuals, maps, ads, logos, trade dress, scans, or commercial feelies. Final DDEV export/import smoke testing passed with the feelie, provenance file, upstream license file, story, visual assets, screenshots, and helper docs restored into a forced-draft import.
+
+The DDEV package `walkthrough.md` has also been expanded into original TerpVault package text. Local reference files in `/Users/cdaters/Downloads/for-Zork1/assets/` and the verified source checkout in `/tmp/terpvault-zork1-build` were consulted, but the package text is rewritten. Early-route commands were checked in Frotz through the white-house opening, painting/trophy-case route, troll fight, rope/dome descent, temple/Egyptian-room path, coffin pickup after inventory adjustment, and sceptre retrieval setup. The dam/reservoir, coal mine, river/scarab, thief/cyclops/egg/chalice, and final 350-point cleanup sections remain marked for full transcript verification before bundled demo approval.
 
 Remaining asset/package gaps:
 
@@ -220,14 +223,14 @@ See [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) for the detailed docs-only asse
 - `small-cover.jpg`: Craig-created square or thumbnail-friendly crop.
 - `hero.jpg`: Craig-created wide detail/play-page visual.
 - `screenshots/01.png`: captured from the DDEV package/play page.
-- `screenshots/02.png`: still pending; capture from the final DDEV package/play page.
+- `screenshots/02.png`: captured from the DDEV package/play page and present in the DDEV package.
 - Avoid copying Infocom packaging, trade dress, logos, manual art, advertisements, maps, or scans.
 
 ## Helper docs plan
 
 - `how-to-play.md`: original parser primer, basic movement/object commands, save/restore expectations, and Zork-specific parser conventions.
 - `hints.md`: original spoiler-light progressive hints with clear spoiler boundaries.
-- `walkthrough.md`: original clearly spoilery walkthrough aligned to the exact bundled playable version.
+- `walkthrough.md`: original clearly spoilery walkthrough aligned to the exact bundled playable version; currently partially Frotz-verified and still requiring a full late-game transcript pass.
 - Do not copy Invisiclues, manuals, commercial hint books, online walkthroughs, or catalog prose unless explicitly licensed for redistribution.
 
 ## Feelies plan
@@ -249,6 +252,7 @@ See [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) for optional feelies scope, leg
 - Confirm story route checksum matches selected artifact.
 - Confirm media assets display.
 - Confirm helper docs render.
+- Confirm final `walkthrough.md` full route transcript reaches the intended score/endgame path.
 - Confirm feelies links work.
 - Confirm export includes package-local provenance and upstream license files.
 - Confirm export zip contains expected files and no cruft.
