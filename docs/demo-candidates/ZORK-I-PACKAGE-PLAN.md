@@ -8,6 +8,7 @@
 - DDEV-only TerpVault/Parchment browser playback has passed.
 - DDEV-only export/import smoke testing has passed.
 - A DDEV-only package shell has been created and manually inspected.
+- Core DDEV-only visual assets have been integrated and route/render checked.
 - The package is not yet approved for bundled demo.
 - Actual `_demo` package creation is still pending.
 
@@ -40,6 +41,27 @@ Manual browser inspection result:
 - Helper docs appear and render.
 
 The DDEV shell is suitable for local review and package polish. It does not approve Zork I for bundled demo inclusion.
+
+## DDEV-only visual asset integration status
+
+Verification date: 2026-05-25.
+
+Core visual assets are now present in the DDEV-only package shell:
+
+- `cover.jpg`.
+- `small-cover.jpg`.
+- `hero.jpg`.
+- `screenshots/01.png`.
+
+Route/render checks passed for the detail page, play page, story route, and controlled `_asset` routes for the four visual assets. The story route checksum still matched the selected source-built artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+
+Export-inspect found that the existing TerpVault package archive service included `game.yaml`, the story file, helper docs, and visual assets, with no macOS cruft observed. It did not include root `provenance.md` or `LICENSE-upstream.txt`; treat that as a packaging/export blocker before any bundled demo approval.
+
+Remaining asset/package gaps:
+
+- `screenshots/02.png` is still pending.
+- Optional feelies are still pending.
+- Provenance/license export inclusion must be resolved without mislabeling those files as feelies.
 
 ## Proposed package identity
 
@@ -185,12 +207,13 @@ Record these facts in package-local `provenance.md` and preserve upstream licens
 
 ## Art plan
 
-See [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) for the detailed docs-only asset requirements and creation workflow.
+See [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) for the detailed docs-only asset requirements, current DDEV asset status, and creation workflow.
 
 - `cover.jpg`: Craig-created original art.
 - `small-cover.jpg`: Craig-created square or thumbnail-friendly crop.
 - `hero.jpg`: Craig-created wide detail/play-page visual.
-- `screenshots/01.png` and `screenshots/02.png`: captured from the bundled playable version after the final story file is selected.
+- `screenshots/01.png`: captured from the DDEV package/play page.
+- `screenshots/02.png`: still pending; capture from the final DDEV package/play page.
 - Avoid copying Infocom packaging, trade dress, logos, manual art, advertisements, maps, or scans.
 
 ## Helper docs plan
@@ -220,6 +243,7 @@ See [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) for optional feelies scope, leg
 - Confirm media assets display.
 - Confirm helper docs render.
 - Confirm feelies links work.
+- Confirm export includes package-local provenance and upstream license files.
 - Confirm export zip contains expected files and no cruft.
 - Confirm import inspect passes.
 - Confirm import commit creates a draft package.

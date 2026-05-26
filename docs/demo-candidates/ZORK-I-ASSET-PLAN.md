@@ -4,7 +4,8 @@
 
 - Zork I remains candidate-only.
 - A DDEV-only package shell exists for local review.
-- Art, screenshots, and feelies are not yet created.
+- Core visual assets are now integrated in the DDEV-only package shell: `cover.jpg`, `small-cover.jpg`, `hero.jpg`, and `screenshots/01.png`.
+- `screenshots/02.png` and optional feelies are not yet created.
 - This is a planning document only. Do not create `_demo` contents, copy story files, add images, or add package assets from this plan until a later explicit packaging pass.
 
 ## Legal/art guardrails
@@ -23,7 +24,7 @@
 - Recommended aspect/usage: square or near-square; should crop cleanly in card and cover contexts.
 - Visual direction: original title/cover art evoking classic parser interactive fiction, underground exploration, white house/forest/cave mystery, brass lantern/adventurer energy, and fantasy-adventure atmosphere.
 - Filename/path: `cover.jpg`.
-- Status: pending.
+- Status: present in DDEV package; final review still pending.
 - Notes for creation: no text is required unless Craig later chooses to create an original title treatment. Avoid Infocom package mimicry and historical trade dress.
 
 ### `small-cover.jpg`
@@ -32,7 +33,7 @@
 - Recommended aspect/usage: square thumbnail; should remain legible at small sizes.
 - Visual direction: simple central subject, high contrast, clear silhouette, and minimal tiny detail.
 - Filename/path: `small-cover.jpg`.
-- Status: pending.
+- Status: present in DDEV package; final review still pending.
 - Notes for creation: derive from original cover art or create a separate thumbnail-focused crop after testing in Admin2 and public catalog cards.
 
 ### `hero.jpg`
@@ -41,7 +42,7 @@
 - Recommended aspect/usage: wide cinematic image that can work behind or near page text.
 - Visual direction: forest edge, white house, dark cave mouth, brass lantern glow, underground passage, or mysterious fantasy-adventure atmosphere.
 - Filename/path: `hero.jpg`.
-- Status: pending.
+- Status: present in DDEV package; final review still pending.
 - Notes for creation: avoid clutter and leave visual breathing room for page layout. Do not include copied packaging, logos, or historical marketing imagery.
 
 ### `screenshots/01.png`
@@ -50,7 +51,7 @@
 - Recommended aspect/usage: capture at the final package/player viewport size used for TerpVault screenshots.
 - Visual direction: opening/banner or first room from the selected source-built playable artifact.
 - Filename/path: `screenshots/01.png`.
-- Status: pending.
+- Status: present in DDEV package; final review still pending.
 - Notes for capture: capture from the final DDEV package/play page, not from unrelated interpreters, prebuilt artifacts, or other story versions.
 
 ### `screenshots/02.png`
@@ -117,25 +118,27 @@
 ## Asset creation workflow
 
 1. Create art and supplemental files outside the TerpVault plugin repo first.
-2. Add assets to the DDEV package first.
-3. Update `game.yaml` resource references only after the files exist.
+2. Add assets to the DDEV package first. Done for `cover.jpg`, `small-cover.jpg`, `hero.jpg`, and `screenshots/01.png`.
+3. Update `game.yaml` resource references only after the files exist. Done for the four current DDEV visual assets.
 4. Test Admin2 media preview cards.
-5. Test the public detail page.
-6. Confirm screenshots render and match the selected playable artifact.
+5. Test the public detail page. Route/render checks passed for the DDEV package.
+6. Confirm screenshots render and match the selected playable artifact. Done for `screenshots/01.png`; `screenshots/02.png` remains pending.
 7. Test any feelies links.
-8. Export the package and confirm the zip contains expected files and no `.DS_Store`, `__MACOSX`, AppleDouble, or other cruft.
-9. Run import inspect/commit smoke testing in DDEV.
-10. Only after review, consider copying a finished package into `_demo`.
+8. Export the package and confirm the zip contains expected files and no `.DS_Store`, `__MACOSX`, AppleDouble, or other cruft. Current export has no cruft and includes visual assets, but omits root `provenance.md` and `LICENSE-upstream.txt`.
+9. Resolve provenance/license export packaging before bundled demo approval.
+10. Run import inspect/commit smoke testing in DDEV.
+11. Only after review, consider copying a finished package into `_demo`.
 
 ## Acceptance checklist
 
-- `cover.jpg` displays.
-- `small-cover.jpg` displays in card/thumbnail contexts.
-- `hero.jpg` displays in the detail-page context.
-- `screenshots/01.png` and `screenshots/02.png` display.
+- `cover.jpg` displays. DDEV `_asset` route passed.
+- `small-cover.jpg` displays in card/thumbnail contexts. DDEV `_asset` route passed.
+- `hero.jpg` displays in the detail-page context. DDEV detail/play HTML and `_asset` route passed.
+- `screenshots/01.png` displays. DDEV detail HTML and `_asset` route passed.
+- `screenshots/02.png` displays. Pending.
 - Feelies links work if feelies are included.
 - No broken resource references exist in `game.yaml`.
-- Export/import smoke test passes.
+- Export/import smoke test passes, including package-local provenance and upstream license files.
 - Package remains legally/provenance clean.
 - Candidate docs are updated with final asset verification results.
 
