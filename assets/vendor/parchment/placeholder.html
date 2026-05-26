@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TerpVault Player Adapter</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; background:#10130f; color:#d8f7c2; font:16px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    main { width:min(760px, calc(100% - 2rem)); border:1px solid rgba(216,247,194,.28); border-radius:18px; padding:1.25rem; background:rgba(0,0,0,.35); box-shadow:0 24px 80px rgba(0,0,0,.35); }
+    h1 { margin:.1rem 0 .5rem; font-size:1.2rem; }
+    code { color:#fff; }
+    .prompt { opacity:.7; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="prompt">&gt; look</p>
+    <h1>TerpVault is ready, but Parchment is not bundled yet.</h1>
+    <p>This placeholder is intentionally included so the plugin has a safe player target before you add the actual browser interpreter.</p>
+    <p>Install a Parchment web build into:</p>
+    <p><code>user/plugins/terpvault/assets/vendor/parchment/index.html</code></p>
+    <p>Or set <code>player.parchment_url</code> in <code>user/config/plugins/terpvault.yaml</code>.</p>
+    <p class="prompt">Story URL passed to adapter:</p>
+    <p><code id="story"></code></p>
+  </main>
+  <script>
+    document.getElementById('story').textContent = new URLSearchParams(location.search).get('story') || '(none)';
+  </script>
+</body>
+</html>

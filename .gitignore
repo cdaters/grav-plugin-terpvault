@@ -64,6 +64,13 @@ composer.lock
 /tmp/
 /images/
 /assets/
+!/assets/
+!/assets/vendor/
+!/assets/vendor/parchment/
+!/assets/vendor/parchment/index.html
+!/assets/vendor/parchment/placeholder.html
+!/assets/vendor/parchment/README.md
+!/assets/vendor/parchment/NOTICE.md
 /user/cache/
 /user/logs/
 /user/backup/
