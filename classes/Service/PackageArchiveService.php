@@ -34,6 +34,11 @@ class PackageArchiveService
         'metadata.iFiction.xml',
     ];
 
+    private const SUPPORT_FILES = [
+        'provenance.md',
+        'LICENSE-upstream.txt',
+    ];
+
     private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
 
     private const FEELIE_EXTENSIONS = ['pdf', 'txt', 'md', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp3', 'ogg', 'wav', 'm4a'];
@@ -140,6 +145,10 @@ class PackageArchiveService
         }
 
         foreach (self::CONVENTIONAL_FILES as $relative) {
+            $this->addFile($files, $package, $relative);
+        }
+
+        foreach (self::SUPPORT_FILES as $relative) {
             $this->addFile($files, $package, $relative);
         }
 

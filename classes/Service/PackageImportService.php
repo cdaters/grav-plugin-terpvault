@@ -18,6 +18,33 @@ class PackageImportService
         'ulx', 'gblorb', 'glb', 'gam', 't3', 'taf',
     ];
 
+    private const CONVENTIONAL_FILES = [
+        'cover.jpg',
+        'cover.jpeg',
+        'cover.png',
+        'cover.webp',
+        'cover.gif',
+        'hero.jpg',
+        'hero.jpeg',
+        'hero.png',
+        'hero.webp',
+        'hero.gif',
+        'small-cover.jpg',
+        'small-cover.jpeg',
+        'small-cover.png',
+        'small-cover.webp',
+        'small-cover.gif',
+        'how-to-play.md',
+        'hints.md',
+        'walkthrough.md',
+        'metadata.iFiction.xml',
+    ];
+
+    private const SUPPORT_FILES = [
+        'provenance.md',
+        'LICENSE-upstream.txt',
+    ];
+
     private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
 
     private const FEELIE_EXTENSIONS = ['pdf', 'txt', 'md', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp3', 'ogg', 'wav', 'm4a'];
@@ -372,6 +399,8 @@ class PackageImportService
             $report['warnings'][] = 'metadata.iFiction.xml is not present.';
         }
 
+        $this->inspectUnsupportedPackageFiles($metadata, $packageFiles, $report);
+
         $report['warnings'][] = 'Future import commit should force imported packages to draft status for review.';
         $report['package_summary'] = [
             'candidate_slug' => $report['candidate_slug'],
@@ -426,6 +455,59 @@ class PackageImportService
             }
         } catch (InvalidArgumentException $e) {
             $report['fatal_errors'][] = $e->getMessage();
+        }
+    }
+
+    private function inspectUnsupportedPackageFiles(array $metadata, array $packageFiles, array &$report): void
+    {
+        $allowed = array_fill_keys(array_merge(['game.yaml'], self::CONVENTIONAL_FILES, self::SUPPORT_FILES), true);
+        $resources = is_array($metadata['resources'] ?? null) ? $metadata['resources'] : [];
+
+        $this->allowResourcePath($allowed, isset($resources['story_file']) ? (string) $resources['story_file'] : '');
+
+        foreach (['how_to_play', 'hints', 'walkthrough', 'cover', 'small_cover'] as $key) {
+            $this->allowResourcePath($allowed, isset($resources[$key]) ? (string) $resources[$key] : '');
+        }
+
+        $this->allowResourcePath($allowed, $this->resourcePath($resources['hero'] ?? ''));
+
+        $screenshots = is_array($resources['screenshots'] ?? null) ? $resources['screenshots'] : [];
+        foreach ($screenshots as $screenshot) {
+            $this->allowResourcePath($allowed, (string) $screenshot);
+        }
+
+        $feelies = is_array($resources['feelies'] ?? null) ? $resources['feelies'] : [];
+        foreach ($feelies as $feelie) {
+            $this->allowResourcePath($allowed, $this->resourcePath($feelie));
+        }
+
+        foreach (array_keys($packageFiles) as $relative) {
+            if (isset($allowed[$relative])) {
+                continue;
+            }
+
+            if (strpos($relative, 'screenshots/') === 0 && in_array(strtolower(pathinfo($relative, PATHINFO_EXTENSION)), self::IMAGE_EXTENSIONS, true)) {
+                continue;
+            }
+
+            if (strpos($relative, 'feelies/') === 0 && in_array(strtolower(pathinfo($relative, PATHINFO_EXTENSION)), self::FEELIE_EXTENSIONS, true)) {
+                continue;
+            }
+
+            $report['fatal_errors'][] = 'Unsupported package file in import: ' . $relative;
+        }
+    }
+
+    private function allowResourcePath(array &$allowed, string $relative): void
+    {
+        if ($relative === '') {
+            return;
+        }
+
+        try {
+            $allowed[$this->normalizePackagePath($relative, 'Resource path')] = true;
+        } catch (InvalidArgumentException $e) {
+            // The field-specific validators report invalid resource paths.
         }
     }
 
@@ -619,6 +701,9 @@ class PackageImportService
         $segments = explode('/', $path);
 
         foreach ($segments as $segment) {
+            if ($segment !== 'metadata.iFiction.xml' && strpos($segment, '.') === 0) {
+                return true;
+            }
             if ($segment === '__MACOSX' || $segment === '.DS_Store' || $segment === 'Thumbs.db' || $segment === 'desktop.ini') {
                 return true;
             }

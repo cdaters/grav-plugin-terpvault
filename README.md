@@ -257,7 +257,7 @@ Then visit:
 /if/adventure
 ```
 
-Admin2 export creates a `.terpvault.zip` package with one top-level `{slug}/` folder containing `game.yaml`, the playable story file, referenced package resources, hero art, feelies/extras, `metadata.iFiction.xml` when present, and safe conventional helper/media files. Admin2 can inspect and import an uploaded `.terpvault.zip`, but imported packages are always installed as draft, forced to not featured, and existing package folders are never overwritten.
+Admin2 export creates a `.terpvault.zip` package with one top-level `{slug}/` folder containing `game.yaml`, the playable story file, referenced package resources, hero art, feelies/extras, `metadata.iFiction.xml` when present, exact package-root support files such as `provenance.md` and `LICENSE-upstream.txt` when present, and safe conventional helper/media files. Admin2 can inspect and import an uploaded `.terpvault.zip`, but imported packages are always installed as draft, forced to not featured, and existing package folders are never overwritten.
 
 ### Import security notes
 
@@ -266,6 +266,7 @@ Admin2 export creates a `.terpvault.zip` package with one top-level `{slug}/` fo
 - Import rejects destination slug collisions and does not overwrite existing package folders.
 - Import rejects path traversal, absolute paths, Windows absolute paths, URI-like paths, null bytes, and unsafe cruft-looking paths.
 - Import ignores safe platform cruft such as `__MACOSX/`, `.DS_Store`, AppleDouble `._*`, `Thumbs.db`, and `desktop.ini`.
+- Import accepts only package files that are required, referenced by the manifest, safe conventional package files, curated feelies/screenshots, `metadata.iFiction.xml`, or exact package-root support files `provenance.md` and `LICENSE-upstream.txt`.
 - Import stages files outside the package listing and moves the package into `games/{slug}` only after validation succeeds.
 
 ### Package creation checklist

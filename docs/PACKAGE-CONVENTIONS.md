@@ -14,6 +14,8 @@ user/data/terpvault/games/
     cover.jpg
     small-cover.jpg
     metadata.iFiction.xml
+    provenance.md
+    LICENSE-upstream.txt
     screenshots/
       01.png
       02.png
@@ -57,6 +59,8 @@ These files make a package easier to browse, verify, and play:
 - `small-cover.jpg` or `small-cover.png`: compact art for library cards.
 - `hero.jpg` or `hero.png`: optional wide presentation art for public detail/play page backgrounds.
 - `metadata.iFiction.xml`: original or exported iFiction metadata.
+- `provenance.md`: package-local source/build/asset provenance notes for curator review.
+- `LICENSE-upstream.txt`: package-local copy of upstream license text when redistribution terms require or benefit from preserving it.
 - `screenshots/`: screenshots such as `screenshots/01.png`.
 - `how-to-play.md`: basic commands, parser conventions, or accessibility notes.
 - `hints.md`: spoiler-safe hint sections, ideally using Markdown headings or `<details>` blocks.
@@ -294,6 +298,8 @@ adventure/
   small-cover.jpg
   hero.jpg
   metadata.iFiction.xml
+  provenance.md
+  LICENSE-upstream.txt
   screenshots/01.png
   feelies/manual.pdf
   how-to-play.md
@@ -307,8 +313,9 @@ Export includes:
 - One playable story file referenced by `resources.story_file`.
 - Referenced cover, small-cover, hero, screenshot, feelies, how-to-play, hints, and walkthrough files.
 - `metadata.iFiction.xml` when present.
+- Exact package-root support files `provenance.md` and `LICENSE-upstream.txt` when present.
 - Safe conventional cover, small-cover, hero, screenshot, feelies, and helper Markdown filenames when present.
 
 Export excludes backups, lock files, temp files, hidden files/directories, macOS cruft such as `__MACOSX/` and `.DS_Store`, Windows cruft such as `Thumbs.db` and `desktop.ini`, and unrelated/unreferenced files.
 
-Admin2 import requires relative package paths only, rejects traversal and unsafe absolute/URI paths, ignores safe platform cruft, and shows a validation report before commit. Import commit always installs as a draft, not-featured package, rewrites `id`, `slug`, `terpvault.status`, and `terpvault.featured`, and refuses to overwrite an existing package folder.
+Admin2 import requires relative package paths only, rejects traversal and unsafe absolute/URI paths, ignores safe platform cruft, rejects unsupported package entries, and shows a validation report before commit. Import commit always installs as a draft, not-featured package, rewrites `id`, `slug`, `terpvault.status`, and `terpvault.featured`, and refuses to overwrite an existing package folder.

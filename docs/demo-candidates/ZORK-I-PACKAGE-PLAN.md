@@ -55,13 +55,15 @@ Core visual assets are now present in the DDEV-only package shell:
 
 Route/render checks passed for the detail page, play page, story route, and controlled `_asset` routes for the four visual assets. The story route checksum still matched the selected source-built artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
 
-Export-inspect found that the existing TerpVault package archive service included `game.yaml`, the story file, helper docs, and visual assets, with no macOS cruft observed. It did not include root `provenance.md` or `LICENSE-upstream.txt`; treat that as a packaging/export blocker before any bundled demo approval.
+Export-inspect initially found that package-root `provenance.md` and `LICENSE-upstream.txt` were omitted. Narrow package-root support-file export/import handling has since been added and DDEV smoke-tested: the export now includes both files, import inspect accepts them, and import commit restores them into a draft package.
 
 Remaining asset/package gaps:
 
 - `screenshots/02.png` is still pending.
 - Optional feelies are still pending.
-- Provenance/license export inclusion must be resolved without mislabeling those files as feelies.
+- Final public package copy still needs to replace DDEV/test-package wording.
+- Any reproducible Parsdown/deprecation warning should be captured with exact text as a separate follow-up.
+- Public tag rendering on detail/card views remains a later frontend polish decision.
 
 ## Proposed package identity
 

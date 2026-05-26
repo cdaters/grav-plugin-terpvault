@@ -124,8 +124,8 @@
 5. Test the public detail page. Route/render checks passed for the DDEV package.
 6. Confirm screenshots render and match the selected playable artifact. Done for `screenshots/01.png`; `screenshots/02.png` remains pending.
 7. Test any feelies links.
-8. Export the package and confirm the zip contains expected files and no `.DS_Store`, `__MACOSX`, AppleDouble, or other cruft. Current export has no cruft and includes visual assets, but omits root `provenance.md` and `LICENSE-upstream.txt`.
-9. Resolve provenance/license export packaging before bundled demo approval.
+8. Export the package and confirm the zip contains expected files and no `.DS_Store`, `__MACOSX`, AppleDouble, or other cruft. Current DDEV retest has no cruft and includes visual assets plus root `provenance.md` and `LICENSE-upstream.txt`.
+9. Keep package-root provenance/license files separate from feelies.
 10. Run import inspect/commit smoke testing in DDEV.
 11. Only after review, consider copying a finished package into `_demo`.
 

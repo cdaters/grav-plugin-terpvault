@@ -1,3 +1,16 @@
+# Unreleased
+
+## Changed
+
+- Added export/import support for exact package-root support files `provenance.md` and `LICENSE-upstream.txt`.
+- Kept support files separate from `resources.feelies`; they are not exposed as public feelie links.
+
+## Safety
+
+- Import now rejects unsupported package entries instead of copying arbitrary files from otherwise valid `.terpvault.zip` archives.
+- Root support-file handling is limited to exact filenames and preserves existing traversal, absolute path, URI-like path, hidden/system path, and platform-cruft protections, including hidden/system-looking segments under `screenshots/` and `feelies/`.
+- No unauthenticated routes, arbitrary package browsing, physical delete behavior, public asset/story serving changes, release metadata changes, or `_demo` package contents were added.
+
 # v0.4.4
 
 ## 05/25/2026

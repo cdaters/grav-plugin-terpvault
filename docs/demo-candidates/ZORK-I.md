@@ -8,7 +8,7 @@
 - Source build verified on 2026-05-25.
 - DDEV-only package shell created and manually inspected on 2026-05-25.
 - Core DDEV-only visual asset integration verified on 2026-05-25.
-- Requires final package verification after second screenshot, feelies, export packaging gaps, and final polish are complete.
+- Requires final package verification after second screenshot, feelies, final public copy polish, and final package review are complete.
 - Requires original package assets and helper docs.
 - Next state: art/screenshots/feelies planning and final package polish.
 
@@ -355,6 +355,36 @@ Export-inspect result:
 
 Core visuals are now present in the local DDEV package. `screenshots/02.png` and optional feelies remain pending.
 
+## Package-root support-file export/import retest
+
+Verification date: 2026-05-25.
+
+After adding narrow package-root support-file export/import handling for `provenance.md` and `LICENSE-upstream.txt`, the DDEV-only `zork-i` package was exported and import-tested again.
+
+Export result:
+
+- Scratch export path inside the DDEV container: `/tmp/terpvault-export-zork-i-ffd96694as4q4tMlXZO.zip`.
+- Export size: 1415847 bytes.
+- Export included `zork-i/provenance.md` and `zork-i/LICENSE-upstream.txt`.
+- Export still included `zork-i/game.yaml`, `zork-i/zork1.z3`, `zork-i/cover.jpg`, `zork-i/small-cover.jpg`, `zork-i/hero.jpg`, `zork-i/screenshots/01.png`, `zork-i/how-to-play.md`, `zork-i/hints.md`, and `zork-i/walkthrough.md`.
+- No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, or `desktop.ini` entries were observed.
+
+Import inspect result:
+
+- Import inspect accepted `provenance.md` and `LICENSE-upstream.txt` as package-root support files.
+- Fatal errors: none.
+- Expected warnings: existing candidate slug collision, missing `metadata.iFiction.xml`, and draft-forcing note.
+
+Import commit result:
+
+- Imported only after confirming the destination did not already exist.
+- Imported temporary slug: `zork-i-provenance-import-test`.
+- Import result: ok.
+- Import was forced to draft status and not featured.
+- Restored files included `provenance.md` and `LICENSE-upstream.txt`.
+
+The previous package-root provenance/license export blocker is resolved pending final package retest. Zork I remains candidate-only and is not approved for bundled demo inclusion.
+
 ## Remaining blockers
 
 - Final package metadata is not complete.
@@ -365,12 +395,15 @@ Core visuals are now present in the local DDEV package. `screenshots/02.png` and
 - Helper docs exist only as DDEV-only draft package content and still need final review/polish.
 - Feelies are not created.
 - Redistribution/package basis for the exact generated story artifact still needs to be recorded in package-local notes before bundling.
-- Package export/import smoke testing has passed only for DDEV-only temporary packages; the DDEV `zork-i` visual-asset export currently omits root `provenance.md` and `LICENSE-upstream.txt`, so final package export/import remains blocked until provenance/license packaging is resolved.
+- Package-root provenance/license export/import support has passed a DDEV smoke test; final package export/import still needs to be rerun after remaining package polish.
+- Final public detail-page copy should replace DDEV/test-package wording before bundled demo approval.
+- If the transient Parsdown/deprecation warning becomes reproducible, record the exact warning text and source for a separate follow-up.
+- Decide later whether public game tags should render on detail/card views.
 - Keep Zork I candidate-only until package metadata, provenance notes, full TerpVault/Parchment playback, export/import behavior, original art, screenshots, helper docs, and feelies are complete.
 
 ## Recommended next action
 
-Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) and [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) as the docs-only plans for turning Zork I from verified candidate into a finished TerpVault demo package. The local DDEV-only package shell has passed basic route, checksum, manual browser inspection, and core visual asset route/render checks, but Zork I remains candidate-only. Next, add the second screenshot, decide optional feelies, resolve provenance/license export packaging, and complete final package polish in DDEV before any `_demo` package decision. Do not create `_demo` package contents yet.
+Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) and [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) as the docs-only plans for turning Zork I from verified candidate into a finished TerpVault demo package. The local DDEV-only package shell has passed basic route, checksum, manual browser inspection, core visual asset route/render checks, and package-root provenance/license export/import retesting, but Zork I remains candidate-only. Next, add the second screenshot, decide optional feelies, polish public copy, and complete final package review in DDEV before any `_demo` package decision. Do not create `_demo` package contents yet.
 
 Packaging recommendation:
 
