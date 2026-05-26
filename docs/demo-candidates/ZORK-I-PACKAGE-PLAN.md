@@ -52,17 +52,19 @@ Core visual assets are now present in the DDEV-only package shell:
 - `small-cover.jpg`.
 - `hero.jpg`.
 - `screenshots/01.png`.
+- `screenshots/02.png`.
 
 Route/render checks passed for the detail page, play page, story route, and controlled `_asset` routes for the four visual assets. The story route checksum still matched the selected source-built artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
 
 Export-inspect initially found that package-root `provenance.md` and `LICENSE-upstream.txt` were omitted. Narrow package-root support-file export/import handling has since been added and DDEV smoke-tested: the export now includes both files, import inspect accepts them, and import commit restores them into a draft package.
 
+The DDEV package description was also polished with original public-facing copy so the visible About section no longer exposes DDEV/test-package wording. The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in repeated detail-page fetches, though one transient compiled-language cache parse error appeared immediately after cache clear and resolved on refresh.
+
 Remaining asset/package gaps:
 
-- `screenshots/02.png` is still pending.
 - Optional feelies are still pending.
-- Final public package copy still needs to replace DDEV/test-package wording.
-- Any reproducible Parsdown/deprecation warning should be captured with exact text as a separate follow-up.
+- Final public package copy still needs final review before bundled demo approval.
+- Any reproducible Parsdown/deprecation warning or repeated compiled-language cache parse error should be captured with exact text as a separate follow-up.
 - Public tag rendering on detail/card views remains a later frontend polish decision.
 
 ## Proposed package identity

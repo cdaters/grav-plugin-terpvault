@@ -4,8 +4,8 @@
 
 - Zork I remains candidate-only.
 - A DDEV-only package shell exists for local review.
-- Core visual assets are now integrated in the DDEV-only package shell: `cover.jpg`, `small-cover.jpg`, `hero.jpg`, and `screenshots/01.png`.
-- `screenshots/02.png` and optional feelies are not yet created.
+- Core visual assets are now integrated in the DDEV-only package shell: `cover.jpg`, `small-cover.jpg`, `hero.jpg`, `screenshots/01.png`, and `screenshots/02.png`.
+- Optional feelies are not yet created.
 - This is a planning document only. Do not create `_demo` contents, copy story files, add images, or add package assets from this plan until a later explicit packaging pass.
 
 ## Legal/art guardrails
@@ -60,7 +60,7 @@
 - Recommended aspect/usage: same capture dimensions/style as `screenshots/01.png`.
 - Visual direction: gameplay after a basic command such as `look` or `inventory`.
 - Filename/path: `screenshots/02.png`.
-- Status: pending.
+- Status: present in DDEV package; final review still pending.
 - Notes for capture: capture from the final DDEV package/play page after confirming the selected story route checksum still matches the chosen artifact.
 
 ## Cover image plan
@@ -118,11 +118,11 @@
 ## Asset creation workflow
 
 1. Create art and supplemental files outside the TerpVault plugin repo first.
-2. Add assets to the DDEV package first. Done for `cover.jpg`, `small-cover.jpg`, `hero.jpg`, and `screenshots/01.png`.
-3. Update `game.yaml` resource references only after the files exist. Done for the four current DDEV visual assets.
+2. Add assets to the DDEV package first. Done for `cover.jpg`, `small-cover.jpg`, `hero.jpg`, `screenshots/01.png`, and `screenshots/02.png`.
+3. Update `game.yaml` resource references only after the files exist. Done for the current DDEV visual assets.
 4. Test Admin2 media preview cards.
 5. Test the public detail page. Route/render checks passed for the DDEV package.
-6. Confirm screenshots render and match the selected playable artifact. Done for `screenshots/01.png`; `screenshots/02.png` remains pending.
+6. Confirm screenshots render and match the selected playable artifact. Done for `screenshots/01.png` and `screenshots/02.png`.
 7. Test any feelies links.
 8. Export the package and confirm the zip contains expected files and no `.DS_Store`, `__MACOSX`, AppleDouble, or other cruft. Current DDEV retest has no cruft and includes visual assets plus root `provenance.md` and `LICENSE-upstream.txt`.
 9. Keep package-root provenance/license files separate from feelies.
@@ -135,7 +135,7 @@
 - `small-cover.jpg` displays in card/thumbnail contexts. DDEV `_asset` route passed.
 - `hero.jpg` displays in the detail-page context. DDEV detail/play HTML and `_asset` route passed.
 - `screenshots/01.png` displays. DDEV detail HTML and `_asset` route passed.
-- `screenshots/02.png` displays. Pending.
+- `screenshots/02.png` displays. DDEV detail HTML and `_asset` route passed.
 - Feelies links work if feelies are included.
 - No broken resource references exist in `game.yaml`.
 - Export/import smoke test passes, including package-local provenance and upstream license files.

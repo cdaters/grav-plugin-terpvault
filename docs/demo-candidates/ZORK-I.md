@@ -8,7 +8,8 @@
 - Source build verified on 2026-05-25.
 - DDEV-only package shell created and manually inspected on 2026-05-25.
 - Core DDEV-only visual asset integration verified on 2026-05-25.
-- Requires final package verification after second screenshot, feelies, final public copy polish, and final package review are complete.
+- Second DDEV-only screenshot and public copy polish verified on 2026-05-25.
+- Requires final package verification after feelies and final package review are complete.
 - Requires original package assets and helper docs.
 - Next state: art/screenshots/feelies planning and final package polish.
 
@@ -322,6 +323,7 @@ Asset slots populated in DDEV:
 - `small-cover.jpg`.
 - `hero.jpg`.
 - `screenshots/01.png`.
+- `screenshots/02.png`.
 
 `game.yaml` was updated in the DDEV package only with:
 
@@ -332,6 +334,7 @@ resources:
   hero: hero.jpg
   screenshots:
     - screenshots/01.png
+    - screenshots/02.png
 ```
 
 Route/render checks:
@@ -339,9 +342,10 @@ Route/render checks:
 - Detail page `https://grav20.ddev.site/if/zork-i` returned `200`.
 - Play page `https://grav20.ddev.site/if/zork-i/play` returned `200`.
 - Story route `https://grav20.ddev.site/if/_story/zork-i/zork1.z3` returned `200`.
+- Screenshot route `https://grav20.ddev.site/if/_asset/zork-i/screenshots/02.png` returned `200`.
 - Story route checksum still matched the selected source-built artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
 - Detail/play HTML referenced `/if/_asset/zork-i/hero.jpg`.
-- Detail HTML referenced `/if/_asset/zork-i/cover.jpg` and `/if/_asset/zork-i/screenshots/01.png`.
+- Detail HTML referenced `/if/_asset/zork-i/cover.jpg`, `/if/_asset/zork-i/screenshots/01.png`, and `/if/_asset/zork-i/screenshots/02.png`.
 - Controlled asset routes returned `200` for `cover.jpg`, `small-cover.jpg`, `hero.jpg`, and `screenshots/01.png`.
 
 Export-inspect result:
@@ -353,7 +357,14 @@ Export-inspect result:
 - No `.DS_Store`, `__MACOSX`, AppleDouble, or other macOS cruft entries were observed.
 - Export did not include `zork-i/provenance.md` or `zork-i/LICENSE-upstream.txt`. Treat this as a remaining packaging/export blocker before bundled demo approval; do not work around it by mislabeling provenance/license files as feelies.
 
-Core visuals are now present in the local DDEV package. `screenshots/02.png` and optional feelies remain pending.
+Current polish result:
+
+- The public `bibliographic.description` in the DDEV package was replaced with original candidate-facing copy.
+- The visible About section no longer contains `DDEV-only TerpVault draft package` or related internal test-package wording.
+- Repeated detail-page fetches after refresh returned `200` and did not reproduce the `ParsedownExtra::blockSetextHeader()` deprecation warning.
+- One first detail-page fetch immediately after cache clear returned `500` from a compiled-language cache parse error: `ParseError: syntax error, unexpected string content "Please create template file fo..." in /var/www/html/cache/compiled/files/89cf2a6f6dc3de605d3c25c1066dcd7c.yaml.php on line 74`. Immediate refreshes returned `200`; treat this as a transient DDEV/Grav cache follow-up, not a TerpVault package-content change.
+
+Core visuals and both planned screenshots are now present in the local DDEV package. Optional feelies remain pending.
 
 ## Package-root support-file export/import retest
 
@@ -365,6 +376,15 @@ Export result:
 
 - Scratch export path inside the DDEV container: `/tmp/terpvault-export-zork-i-ffd96694as4q4tMlXZO.zip`.
 - Export size: 1415847 bytes.
+- Export included `zork-i/provenance.md` and `zork-i/LICENSE-upstream.txt`.
+- Export still included `zork-i/game.yaml`, `zork-i/zork1.z3`, `zork-i/cover.jpg`, `zork-i/small-cover.jpg`, `zork-i/hero.jpg`, `zork-i/screenshots/01.png`, `zork-i/how-to-play.md`, `zork-i/hints.md`, and `zork-i/walkthrough.md`.
+- No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, or `desktop.ini` entries were observed.
+
+Latest DDEV package polish export:
+
+- Scratch export path inside the DDEV container: `/tmp/terpvault-export-zork-i-qs374j71jbh8eUaK2fV.zip`.
+- Export size: 1632106 bytes.
+- Export included `zork-i/screenshots/02.png`.
 - Export included `zork-i/provenance.md` and `zork-i/LICENSE-upstream.txt`.
 - Export still included `zork-i/game.yaml`, `zork-i/zork1.z3`, `zork-i/cover.jpg`, `zork-i/small-cover.jpg`, `zork-i/hero.jpg`, `zork-i/screenshots/01.png`, `zork-i/how-to-play.md`, `zork-i/hints.md`, and `zork-i/walkthrough.md`.
 - No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, or `desktop.ini` entries were observed.
@@ -391,19 +411,20 @@ The previous package-root provenance/license export blocker is resolved pending 
 - Final package-local provenance notes are not complete.
 - DDEV-only shell playback has passed, but final package verification is still pending after art, screenshots, feelies, and final polish.
 - Core package art exists only in the DDEV package and still needs final review.
-- First screenshot exists only in the DDEV package; second screenshot is still pending.
+- Both planned screenshots exist only in the DDEV package and still need final review.
 - Helper docs exist only as DDEV-only draft package content and still need final review/polish.
 - Feelies are not created.
 - Redistribution/package basis for the exact generated story artifact still needs to be recorded in package-local notes before bundling.
 - Package-root provenance/license export/import support has passed a DDEV smoke test; final package export/import still needs to be rerun after remaining package polish.
-- Final public detail-page copy should replace DDEV/test-package wording before bundled demo approval.
-- If the transient Parsdown/deprecation warning becomes reproducible, record the exact warning text and source for a separate follow-up.
+- Public About copy has been polished in DDEV, but final wording still needs review before bundled demo approval.
+- The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in this pass; keep it as a follow-up only if it becomes reproducible.
+- A transient compiled-language cache parse error appeared once immediately after cache clear and disappeared on refresh; record as a DDEV/Grav cache follow-up if it recurs.
 - Decide later whether public game tags should render on detail/card views.
 - Keep Zork I candidate-only until package metadata, provenance notes, full TerpVault/Parchment playback, export/import behavior, original art, screenshots, helper docs, and feelies are complete.
 
 ## Recommended next action
 
-Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) and [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) as the docs-only plans for turning Zork I from verified candidate into a finished TerpVault demo package. The local DDEV-only package shell has passed basic route, checksum, manual browser inspection, core visual asset route/render checks, and package-root provenance/license export/import retesting, but Zork I remains candidate-only. Next, add the second screenshot, decide optional feelies, polish public copy, and complete final package review in DDEV before any `_demo` package decision. Do not create `_demo` package contents yet.
+Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) and [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) as the docs-only plans for turning Zork I from verified candidate into a finished TerpVault demo package. The local DDEV-only package shell has passed basic route, checksum, manual browser inspection, core visual asset route/render checks, both screenshot checks, public copy cleanup, and package-root provenance/license export/import retesting, but Zork I remains candidate-only. Next, decide optional feelies and complete final package review in DDEV before any `_demo` package decision. Do not create `_demo` package contents yet.
 
 Packaging recommendation:
 
