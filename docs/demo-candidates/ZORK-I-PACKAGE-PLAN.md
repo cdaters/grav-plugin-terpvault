@@ -53,6 +53,7 @@ Core visual assets are now present in the DDEV-only package shell:
 - `hero.jpg`.
 - `screenshots/01.png`.
 - `screenshots/02.png`.
+- `feelies/feelie-01-poster.png`.
 
 Route/render checks passed for the detail page, play page, story route, and controlled `_asset` routes for the four visual assets. The story route checksum still matched the selected source-built artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
 
@@ -60,12 +61,14 @@ Export-inspect initially found that package-root `provenance.md` and `LICENSE-up
 
 The DDEV package description was also polished with original public-facing copy so the visible About section no longer exposes DDEV/test-package wording. The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in repeated detail-page fetches, though one transient compiled-language cache parse error appeared immediately after cache clear and resolved on refresh.
 
+The DDEV package now includes `feelies/feelie-01-poster.png`, an original Craig Daters 2026 poster-style feelie inspired by retail-era adventure-game feelies. It is not a scan or reproduction of historical Infocom packaging, manuals, maps, ads, logos, trade dress, scans, or commercial feelies. Final DDEV export/import smoke testing passed with the feelie, provenance file, upstream license file, story, visual assets, screenshots, and helper docs restored into a forced-draft import.
+
 Remaining asset/package gaps:
 
-- Optional feelies are still pending.
 - Final public package copy still needs final review before bundled demo approval.
 - Any reproducible Parsdown/deprecation warning or repeated compiled-language cache parse error should be captured with exact text as a separate follow-up.
 - Public tag rendering on detail/card views remains a later frontend polish decision.
+- Copying a finished package into `_demo` remains pending explicit Craig approval.
 
 ## Proposed package identity
 

@@ -9,7 +9,8 @@
 - DDEV-only package shell created and manually inspected on 2026-05-25.
 - Core DDEV-only visual asset integration verified on 2026-05-25.
 - Second DDEV-only screenshot and public copy polish verified on 2026-05-25.
-- Requires final package verification after feelies and final package review are complete.
+- Original DDEV-only poster feelie and final export/import smoke test verified on 2026-05-25.
+- Requires final Craig review before copying a finished package into `_demo`.
 - Requires original package assets and helper docs.
 - Next state: art/screenshots/feelies planning and final package polish.
 
@@ -366,6 +367,54 @@ Current polish result:
 
 Core visuals and both planned screenshots are now present in the local DDEV package. Optional feelies remain pending.
 
+## DDEV-only poster feelie integration
+
+Verification date: 2026-05-25.
+
+The DDEV-only package now includes one original poster-style feelie:
+
+- Path: `feelies/feelie-01-poster.png`.
+- Source: `/Users/cdaters/Downloads/for-Zork1/feelie-01-poster.png`.
+- Attribution/provenance: original Craig Daters 2026 poster art inspired by the retail-era tradition of adventure-game feelies.
+- Rights note: not a scan or reproduction of historical Infocom packaging, manuals, maps, ads, logos, trade dress, scans, or commercial feelies.
+
+`game.yaml` was updated in the DDEV package only with one `resources.feelies` entry:
+
+```yaml
+resources:
+  feelies:
+    - title: The Great Underground Empire Poster
+      path: feelies/feelie-01-poster.png
+      type: poster
+      description: Original Craig Daters 2026 poster art inspired by the retail-era tradition of adventure-game feelies; not a scan or reproduction of historical Infocom packaging.
+```
+
+Package-local `provenance.md` was updated with a concise note for `feelies/feelie-01-poster.png`.
+
+Route/render checks:
+
+- Detail page `https://grav20.ddev.site/if/zork-i` returned `200`.
+- Play page `https://grav20.ddev.site/if/zork-i/play` returned `200`.
+- Story route `https://grav20.ddev.site/if/_story/zork-i/zork1.z3` returned `200`.
+- Feelie route `https://grav20.ddev.site/if/_asset/zork-i/feelies/feelie-01-poster.png` returned `200`.
+- Story route checksum still matched the selected source-built artifact SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- Detail HTML referenced `feelies/feelie-01-poster.png` and displayed the title `The Great Underground Empire Poster`.
+- The polished public About copy remained in place; old DDEV/test-package copy was not observed in fetched detail/play HTML.
+- The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in fetched HTML.
+
+Final DDEV export/import smoke test:
+
+- Scratch export path inside the DDEV container: `/tmp/terpvault-export-zork-i-a2s2qdoalmmkfPFzyCn.zip`.
+- Export size: 4811707 bytes.
+- Export included `zork-i/feelies/feelie-01-poster.png`.
+- Export included `zork-i/provenance.md` and `zork-i/LICENSE-upstream.txt`.
+- Export included `zork-i/game.yaml`, `zork-i/zork1.z3`, `zork-i/cover.jpg`, `zork-i/small-cover.jpg`, `zork-i/hero.jpg`, `zork-i/screenshots/01.png`, `zork-i/screenshots/02.png`, `zork-i/how-to-play.md`, `zork-i/hints.md`, and `zork-i/walkthrough.md`.
+- No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, `desktop.ini`, hidden/system-looking paths, or other cruft entries were observed.
+- Import inspect accepted the feelie, `provenance.md`, and `LICENSE-upstream.txt`; fatal errors: none.
+- Import commit used temporary slug `zork-i-final-import-test`, forced draft status and not-featured, and restored the story file, art files, screenshots, feelie, package-root support files, and helper docs.
+
+This completes the current DDEV package assembly smoke test. Zork I remains candidate-only until Craig explicitly approves copying a finished package into `_demo`.
+
 ## Package-root support-file export/import retest
 
 Verification date: 2026-05-25.
@@ -413,18 +462,18 @@ The previous package-root provenance/license export blocker is resolved pending 
 - Core package art exists only in the DDEV package and still needs final review.
 - Both planned screenshots exist only in the DDEV package and still need final review.
 - Helper docs exist only as DDEV-only draft package content and still need final review/polish.
-- Feelies are not created.
+- One original poster feelie exists only in the DDEV package and still needs final review.
 - Redistribution/package basis for the exact generated story artifact still needs to be recorded in package-local notes before bundling.
-- Package-root provenance/license export/import support has passed a DDEV smoke test; final package export/import still needs to be rerun after remaining package polish.
+- Final DDEV package export/import passed with the poster feelie, provenance, upstream license, story, art, screenshots, and helper docs.
 - Public About copy has been polished in DDEV, but final wording still needs review before bundled demo approval.
 - The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in this pass; keep it as a follow-up only if it becomes reproducible.
 - A transient compiled-language cache parse error appeared once immediately after cache clear and disappeared on refresh; record as a DDEV/Grav cache follow-up if it recurs.
 - Decide later whether public game tags should render on detail/card views.
-- Keep Zork I candidate-only until package metadata, provenance notes, full TerpVault/Parchment playback, export/import behavior, original art, screenshots, helper docs, and feelies are complete.
+- Keep Zork I candidate-only until Craig explicitly approves copying a finished package into `_demo`.
 
 ## Recommended next action
 
-Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) and [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) as the docs-only plans for turning Zork I from verified candidate into a finished TerpVault demo package. The local DDEV-only package shell has passed basic route, checksum, manual browser inspection, core visual asset route/render checks, both screenshot checks, public copy cleanup, and package-root provenance/license export/import retesting, but Zork I remains candidate-only. Next, decide optional feelies and complete final package review in DDEV before any `_demo` package decision. Do not create `_demo` package contents yet.
+Use [ZORK-I-PACKAGE-PLAN.md](ZORK-I-PACKAGE-PLAN.md) and [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) as the docs-only plans for turning Zork I from verified candidate into a finished TerpVault demo package. The local DDEV-only package shell has passed basic route, checksum, manual browser inspection, visual asset route/render checks, both screenshot checks, public copy cleanup, poster-feelie route/render checks, and final export/import smoke testing. Zork I remains candidate-only until Craig explicitly approves copying a finished package into `_demo`. Do not create `_demo` package contents yet.
 
 Packaging recommendation:
 

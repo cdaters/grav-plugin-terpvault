@@ -5,7 +5,7 @@
 - Zork I remains candidate-only.
 - A DDEV-only package shell exists for local review.
 - Core visual assets are now integrated in the DDEV-only package shell: `cover.jpg`, `small-cover.jpg`, `hero.jpg`, `screenshots/01.png`, and `screenshots/02.png`.
-- Optional feelies are not yet created.
+- One original poster feelie is now integrated in the DDEV-only package shell: `feelies/feelie-01-poster.png`.
 - This is a planning document only. Do not create `_demo` contents, copy story files, add images, or add package assets from this plan until a later explicit packaging pass.
 
 ## Legal/art guardrails
@@ -94,6 +94,13 @@
 
 ## Feelies plan
 
+### `feelies/feelie-01-poster.png`
+
+- Purpose: original poster-style package feelie.
+- Expected contents: original Craig Daters 2026 poster art inspired by the retail-era tradition of adventure-game feelies.
+- Legal notes: not a scan or reproduction of historical Infocom packaging, manuals, maps, ads, logos, trade dress, scans, or commercial feelies.
+- Status: present in DDEV package; route/render/export/import smoke test passed; final review still pending.
+
 ### `feelies/map.jpg` or `feelies/map.pdf`
 
 - Purpose: optional original navigation aid.
@@ -123,8 +130,8 @@
 4. Test Admin2 media preview cards.
 5. Test the public detail page. Route/render checks passed for the DDEV package.
 6. Confirm screenshots render and match the selected playable artifact. Done for `screenshots/01.png` and `screenshots/02.png`.
-7. Test any feelies links.
-8. Export the package and confirm the zip contains expected files and no `.DS_Store`, `__MACOSX`, AppleDouble, or other cruft. Current DDEV retest has no cruft and includes visual assets plus root `provenance.md` and `LICENSE-upstream.txt`.
+7. Test any feelies links. Done for `feelies/feelie-01-poster.png`.
+8. Export the package and confirm the zip contains expected files and no `.DS_Store`, `__MACOSX`, AppleDouble, or other cruft. Current DDEV retest has no cruft and includes visual assets, `feelies/feelie-01-poster.png`, and root `provenance.md` / `LICENSE-upstream.txt`.
 9. Keep package-root provenance/license files separate from feelies.
 10. Run import inspect/commit smoke testing in DDEV.
 11. Only after review, consider copying a finished package into `_demo`.
@@ -136,7 +143,7 @@
 - `hero.jpg` displays in the detail-page context. DDEV detail/play HTML and `_asset` route passed.
 - `screenshots/01.png` displays. DDEV detail HTML and `_asset` route passed.
 - `screenshots/02.png` displays. DDEV detail HTML and `_asset` route passed.
-- Feelies links work if feelies are included.
+- `feelies/feelie-01-poster.png` link works. DDEV detail HTML and `_asset` route passed.
 - No broken resource references exist in `game.yaml`.
 - Export/import smoke test passes, including package-local provenance and upstream license files.
 - Package remains legally/provenance clean.
