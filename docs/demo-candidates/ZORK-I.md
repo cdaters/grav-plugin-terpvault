@@ -461,25 +461,27 @@ Verification date: 2026-05-25.
 
 The DDEV-only `walkthrough.md` placeholder was replaced with an original TerpVault package walkthrough for the selected source-built Release 119 / Serial 880429 artifact.
 
-Reference/source analysis:
+Walkthrough preparation:
 
-- Local reference files consulted as solution references only: `/Users/cdaters/Downloads/for-Zork1/assets/zork1.txt` and `/Users/cdaters/Downloads/for-Zork1/assets/zork1.sol.txt`.
-- Source checkout consulted for object names, score/treasure definitions, and puzzle vocabulary: `/tmp/terpvault-zork1-build`.
-- Final DDEV package text was rewritten as original package copy and is not copied wholesale from the reference files.
+- The package-facing walkthrough now uses neutral original-copy language and does not cite local reference filenames or paths.
+- Source review and play-through checks were used to cross-check object names, score/treasure definitions, puzzle vocabulary, and route behavior.
+- Final DDEV package text is original TerpVault/Craig package copy and is not copied from Infocom manuals, Invisiclues, commercial hint books, online walkthroughs, or local reference prose.
 
 Frotz verification level:
 
 - Interactive Frotz checks against `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i/zork1.z3` verified the early route through white-house entry, lamp/trap-door setup, painting collection and trophy-case deposit, attic rope collection, troll combat, rope/dome descent, temple/Egyptian-room path, coffin pickup after dropping the sword, prayer exit, and sceptre retrieval setup.
-- The walkthrough is explicitly marked as partially verified. Dam/reservoir, coal mine, river/scarab, thief/cyclops/egg/chalice, and final 350-point cleanup still need a clean full-game transcript pass before bundled demo approval.
+- A later Frotz chunk verified the dam-control path from the cleared troll room through Reservoir South and Dam, including matchbook/wrench/screwdriver pickup, `push yellow button`, `turn bolt with wrench`, and access to Dam Base with the folded plastic boat present.
+- The walkthrough remains explicitly marked as partially verified. Full reservoir/river, coal mine, scarab, thief/cyclops/egg/chalice, and final 350-point cleanup still need a clean full-game transcript pass before bundled demo approval.
 
-Route/export checks after walkthrough replacement:
+Route/export checks after walkthrough cleanup:
 
-- Detail page `https://grav20.ddev.site/if/zork-i` returned `200`.
+- Detail page `https://grav20.ddev.site/if/zork-i` returned `200` after one transient compiled-cache parse error immediately after `clearcache`.
 - Play page `https://grav20.ddev.site/if/zork-i/play` returned `200`.
 - Story route `https://grav20.ddev.site/if/_story/zork-i/zork1.z3` returned `200`, 86928 bytes.
 - Served story SHA-256 remained `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
 - Detail HTML rendered the new `Zork I Walkthrough`, `Partially verified command route`, and `Remaining verification notes` sections.
-- Scratch export path inside the DDEV container: `/tmp/terpvault-export-zork-i-5k6g3iup72pk4Bz88qh.zip`.
+- Detail HTML did not expose local walkthrough-reference filenames or paths.
+- Scratch export path inside the DDEV container: `/tmp/terpvault-export-zork-i-ip9onefjv6lfd9qbMaL.zip`.
 - Export included `zork-i/walkthrough.md` and the expected story, art, screenshots, poster feelie, package-root provenance/license files, and helper docs.
 - No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, `desktop.ini`, hidden/system-looking paths, or other cruft entries were observed.
 
@@ -497,7 +499,7 @@ Route/export checks after walkthrough replacement:
 - Final DDEV package export/import passed with the poster feelie, provenance, upstream license, story, art, screenshots, and helper docs.
 - Public About copy has been polished in DDEV, but final wording still needs review before bundled demo approval.
 - The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in this pass; keep it as a follow-up only if it becomes reproducible.
-- A transient compiled-language cache parse error appeared once immediately after cache clear and disappeared on refresh; record as a DDEV/Grav cache follow-up if it recurs.
+- A transient compiled-language cache parse error appeared immediately after cache clear and disappeared on refresh; record as a DDEV/Grav cache follow-up if it becomes consistently reproducible.
 - Decide later whether public game tags should render on detail/card views.
 - Keep Zork I candidate-only until Craig explicitly approves copying a finished package into `_demo`.
 
