@@ -7,6 +7,8 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - Public routes under `/if` are the stable surface.
 - Public virtual routes support subdirectory installs through Grav base-route-aware URL helpers.
 - Bundled Parchment playback is the current player path.
+- Parchment is a required bundled parser/runtime dependency under `assets/vendor/parchment/` and must remain tracked in release packages.
+- Ink support is future roadmap only and must not disturb current Parchment/Z-code playback.
 - Save and restore are interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
 - The Admin2 Library Manager is experimental and disabled by default with `admin.enable_admin2_page: false`.
 - Admin2/API package management routes are registered only when the Admin2 Library Manager is enabled.
@@ -43,6 +45,7 @@ Before tagging:
 - Confirm `/if/_story/{slug}/{story-file}` streams a story file.
 - Confirm `/if/_asset/{slug}/cover.jpg` serves package art.
 - Confirm the same routes work when Grav is installed in a subdirectory.
+- Confirm public library/detail/play pages remain readable in the active site theme, with future explicit coverage for Quark2 and Typhoon light/dark modes.
 - Confirm Admin2 loads normally with `admin.enable_admin2_page: false`.
 - If `admin.enable_admin2_page: true` is tested, confirm Admin2 create/edit/export/import workflows are authenticated, non-overwriting, and do not add package delete or overwrite/replace behavior.
 

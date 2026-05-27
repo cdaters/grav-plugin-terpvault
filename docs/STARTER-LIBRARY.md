@@ -44,6 +44,12 @@ The IF Archive story file and GitHub `GRUE.z8` file were compared by SHA-256 and
 
 ## Good candidates to package after license/provenance review
 
+### Ink works
+
+Ink should be considered for future starter/demo candidates after TerpVault has first-class Ink package support. Ink is a choice-based interactive narrative scripting language from inkle, so candidates should be reviewed as complementary choice-based IF rather than parser IF.
+
+Prefer candidates that provide clear redistribution rights, compiled Ink JSON, optional `.ink` source for transparency, and a small polished scope suitable for inline web play. Do not add Ink starter packages until the package manifest, runtime adapter, and Admin2 validation path exist.
+
 ### Scott Adams conversions
 
 IF Archive lists `adamsinform.zip`, containing 17 Scott Adams adventures and one sample mini-adventure converted from ScottFree to Inform `.z5`. This would make a terrific optional package set, but it should not be bundled until redistribution rights are verified for the converted story files and any metadata/art we add.

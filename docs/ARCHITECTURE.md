@@ -77,12 +77,39 @@ Current intended adapter:
 Parchment
 ```
 
+Parchment is bundled as a required runtime dependency under `assets/vendor/parchment/` and served through `/if/_engine/parchment`. Those vendor assets must remain tracked in repository and release packages for local/self-contained playback.
+
 Future adapters could include:
 
 - WebAssembly Frotz/Bocfel wrapper
 - custom Z-machine JS interpreter
 - Glulx-only adapter
+- Ink/inkjs choice-based narrative adapter
 - remote hosted player adapter
+
+The current adapter family is parser IF. Ink support should be treated as a complementary future web-playable narrative adapter, not as a replacement for Z-code, Glulx, TADS, Parchment, Quixe, or parser IF.
+
+## Public theme integration future
+
+TerpVault should continue owning the Grav-facing shell around the interpreter iframe. A future theme-polish pass should:
+
+- use theme-aware CSS variables for library/detail/play pages and player chrome where practical
+- avoid hard dependency on a single Grav theme's dark-mode class
+- fall back to `prefers-color-scheme` when site theme signals are unavailable
+- pass light/dark/system/default theme hints to Parchment only when supported by Parchment's documented options
+- verify Quark2 light/dark, Typhoon light/dark, browser/system dark mode, and fullscreen readability
+
+The bundled Parchment `index.html` should not be edited for normal theme polish. Prefer TerpVault-controlled wrapping, configuration, and supported Parchment URL/config parameters.
+
+## Ink roadmap architecture
+
+Ink support should land in phases:
+
+1. TerpVault package support for Ink manifests, preferably using compiled Ink JSON as the playable artifact and optional `.ink` source for review.
+2. Grav shortcode/block support for embedding package-backed or explicit-source Ink stories in pages.
+3. Interactive Grav pages powered by Ink for onboarding, guided tutorials, narrative documentation, and RetroRealm/TerpVault page experiences.
+
+The package/runtime boundary should stay clear: TerpVault owns package metadata, routing, permissions, assets, and Grav integration; the Ink runtime should be an adapter such as `inkjs` or a TerpVault-hosted web player added in a later implementation pass.
 
 ## Admin2 model
 

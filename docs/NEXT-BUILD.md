@@ -1,6 +1,6 @@
 # TerpVault Next Build Notes
 
-TerpVault is in a v0.3.x early public-beta foundation phase. Public routes and bundled Parchment playback are established, while the Admin2 Library Manager remains experimental, opt-in, and disabled by default.
+TerpVault is in an early public-beta foundation phase. Public routes and bundled Parchment playback are established, while the Admin2 Library Manager remains experimental, opt-in, and disabled by default.
 
 ## Validation focus before the next code build
 
@@ -27,9 +27,18 @@ TerpVault is in a v0.3.x early public-beta foundation phase. Public routes and b
 
 ## Candidate next work
 
-- Field-test the current v0.3.x Admin2 package lifecycle: create package, edit metadata, edit helper Markdown, manage media/screenshots, replace story file, export `.terpvault.zip`, inspect import, and import as draft.
+- Field-test the current Admin2 package lifecycle: create package, edit metadata, edit helper Markdown, manage media/screenshots, replace story file, export `.terpvault.zip`, inspect import, and import as draft.
 - Improve diagnostics or release packaging notes based on that testing.
 - Defer new package mutation features until the existing draft-only, non-overwriting workflow has more mileage.
+- Polish public library/detail/play rendering across light and dark Grav themes, with Quark2 and Typhoon as explicit verification targets.
+- Explore first-class future Ink package support as a complementary choice-based interactive narrative format, without disturbing current Z-code/Parchment playback.
+
+## Player and format roadmap position
+
+- Current supported playback path: parser IF packages served to bundled Parchment under `/if/_engine/parchment`, with Parchment tracked as a required runtime dependency under `assets/vendor/parchment/`.
+- Near-term polish: make the TerpVault player shell more theme-aware around the existing iframe, using CSS variables, `prefers-color-scheme` fallbacks, and carefully tested fullscreen behavior.
+- Future format expansion: Ink should be planned as a first-class choice-based/narrative scripting package family, likely through compiled Ink JSON and `inkjs` or a TerpVault-hosted web player in a later build.
+- Ink is complementary to Z-machine, Glulx, TADS, Inform parser works, Parchment, Quixe, and other parser-focused adapters. It should not be described as a replacement for parser IF support.
 
 ## Packaging posture
 

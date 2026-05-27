@@ -337,6 +337,20 @@ The bundled Parchment adapter can be used for these broad story families:
 
 Format labels are shown per package, based on package metadata and story-file extension where useful.
 
+Parchment is the current bundled parser/runtime dependency and must remain tracked under `assets/vendor/parchment/` for local/self-contained playback. Future Ink support is planned as a complementary choice-based interactive narrative format, not a replacement for Z-machine, Glulx, TADS, Parchment, Quixe, or parser IF.
+
+## Future Ink support
+
+Ink is a choice-based interactive narrative scripting language from inkle. TerpVault should eventually support Ink as a first-class web-playable package family alongside parser IF packages.
+
+Planned phases:
+
+1. Add TerpVault Ink package support, preferably using compiled Ink JSON as the playable artifact and optional `.ink` source files for preservation/transparency.
+2. Add Grav/Admin2-friendly shortcode or block embeds, such as `[terpvault-ink game="example-game"]` or `[ink src="user://path/to/story.json"]`, with safe JS/CSS enqueueing and caching behavior.
+3. Explore Ink-powered interactive Grav pages for onboarding, guided tutorials, narrative documentation, and RetroRealm/TerpVault page experiences.
+
+This is roadmap only. No Ink runtime, demo package, story file, or `inkjs` dependency is included yet.
+
 ## Save and restore
 
 With the bundled Parchment player, TerpVault expects players to use the story/interpreter's native save workflow. In many parser works, that means typing:
@@ -362,6 +376,8 @@ TerpVault's public CSS is scoped under `.terpvault` and exposes CSS variables fo
 ```
 
 The library cards are intentionally compact so a shelf of packages scans quickly instead of behaving like oversized poster tiles.
+
+Future theme polish should verify TerpVault library/detail/play pages under Quark2 and Typhoon in light and dark modes, plus browser/system dark mode. The player shell should prefer theme-aware CSS variables and `prefers-color-scheme` fallbacks, pass a Parchment theme hint only when supported, and keep fullscreen, save/restore help, iframe borders, title bars, buttons, and backgrounds readable.
 
 ## Installing starter packages
 

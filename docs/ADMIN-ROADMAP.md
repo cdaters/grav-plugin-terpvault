@@ -111,6 +111,27 @@
 - Preserve unknown YAML fields when applying accepted changes.
 - Keep the local XML file package-local and reviewable.
 
+### Public theme and Parchment integration polish
+
+- Render TerpVault public library, detail, and play pages cleanly under light and dark Grav themes, including Quark2, Typhoon, and similar Grav/Grav2 themes.
+- Move the player shell around the iframe toward theme-aware CSS variables where practical instead of hard-coded light/dark colors.
+- Avoid assuming every Grav theme exposes the same dark-mode class; use robust defaults and CSS fallbacks such as `prefers-color-scheme`.
+- Investigate Parchment's supported theme options and URL/config parameters before adding TerpVault-side controls.
+- Consider future player settings such as `player.theme: auto | light | dark | parchment-default`, `player.match_site_theme`, `player.frame_background`, and `player.chrome_style`.
+- Pass a theme hint to the Parchment iframe when the bundled or configured Parchment runtime supports it, such as light, dark, system, or Parchment default.
+- Verify Quark2 light mode, Quark2 dark mode, Typhoon light mode, Typhoon dark mode, browser/system dark mode, and fullscreen mode.
+- Keep save/restore help panel, iframe border, title bar, buttons, and page background readable in every tested theme.
+- Do not edit the bundled Parchment runtime directly for theme polish unless there is no supported wrapping/configuration path.
+- Update `README.md` and `docs/PARCHMENT-BUNDLING.md` if future player theme options become real configuration.
+
+### Ink package support
+
+- Treat Ink as a first-class future choice-based/narrative scripting format for TerpVault packages.
+- Keep Ink positioned as complementary to parser IF and existing Parchment-backed Z-code/Glulx/TADS/Hugo/ADRIFT support.
+- Prefer compiled Ink JSON as the playable package artifact, with optional `.ink` source files for preservation and transparency.
+- Plan a future runtime path through `inkjs` or a TerpVault-hosted web player; do not add `inkjs` until the package format and runtime adapter are designed.
+- Extend Admin2 package metadata, validation, and creation flows later so curators can identify Ink content without weakening current parser-story validation.
+
 ## Later / advanced
 
 ### Remote IFDB/IFWiki/IF Archive enrichment
@@ -145,6 +166,13 @@
 
 - Add server-side named saves for logged-in users in a later player-focused milestone.
 - Keep this separate from Admin2 package-management work unless a future release explicitly joins the workflows.
+
+### Ink shortcode/block and interactive page experiments
+
+- After Ink package support exists, explore Grav/Admin2-friendly embeds such as `[terpvault-ink game="example-game"]` or `[ink src="user://path/to/story.json"]`.
+- Enqueue Ink JavaScript and CSS safely and make the embed compatible with Grav caching where practical.
+- Longer term, evaluate Ink-powered interactive articles, onboarding pages, guided tutorials, and narrative documentation for TerpVault and RetroRealm.
+- Possible examples include "Enter the Vault", "The Archivist's Tour", and a beginner guided path through parser IF, choice IF, Z-machine, Glulx, TADS, Inform, Twine, Ink, feelies, IFIDs, and TerpVault packages.
 
 ### GPM readiness
 

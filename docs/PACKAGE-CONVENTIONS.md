@@ -250,6 +250,42 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 
 `metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can preview a conservative subset of local iFiction XML fields and apply explicitly selected supported fields into `game.yaml`. TerpVault does not edit the XML file.
 
+## Future Ink package shape
+
+Ink is a choice-based interactive narrative scripting language from inkle. It is not parser IF like Z-machine, Glulx, TADS, or Inform parser works, but it belongs in TerpVault's roadmap as a complementary web-playable IF format.
+
+Future Ink packages should prefer compiled Ink JSON as the playable artifact and may include source `.ink` files for preservation/transparency:
+
+```text
+user/data/terpvault/games/example-ink/
+  game.yaml
+  story/
+    game.ink
+    game.json
+  images/
+    cover.jpg
+  docs/
+    how-to-play.md
+  resources/
+    feelies/
+```
+
+Possible future manifest concepts:
+
+```yaml
+identification:
+  engine_family: choice-based
+  format: ink
+resources:
+  source_file: story/game.ink
+  compiled_file: story/game.json
+player:
+  runtime: inkjs
+  play_mode: embedded_web
+```
+
+These fields are roadmap concepts only. Current TerpVault playback remains centered on parser IF packages served through bundled Parchment, and Ink package support should not disturb existing Z-code/Parchment behavior.
+
 ## Manual import workflow
 
 Manual folder installation remains available:
