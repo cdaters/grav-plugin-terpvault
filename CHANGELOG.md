@@ -1,3 +1,19 @@
+# v0.4.10
+
+## 05/27/2026
+
+1. Changed
+    - Added Admin2 Library Manager search controls.
+    - Added Admin2 Library Manager sort controls for title, author, year/date, format/engine, status, and slug.
+    - Added status, featured, format, and metadata-completeness filters.
+    - Added visible result counts, empty-state messaging, reset filters, and `localStorage` persistence for library controls.
+    - Added defensive format inference for Admin2 library search, filter, and sort behavior.
+    - Fixed TADS/TADS 2 packages such as Babel appearing in the Format filter when `identification.format` is blank.
+    - Added safe package format inference for creation, import, and metadata handling when `identification.format` is blank, while preserving non-empty curator-supplied values.
+
+2. Notes
+    - No package delete, bulk actions, remote metadata lookup, pagination, or virtual scrolling were added.
+
 # v0.4.9
 
 ## 05/26/2026

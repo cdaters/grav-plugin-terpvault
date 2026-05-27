@@ -1,7 +1,7 @@
 name: TerpVault
 slug: terpvault
 type: plugin
-version: 0.4.9
+version: 0.4.10
 description: "Curate, manage, import/export, and play interactive fiction story packages in Grav."
 icon: book-open
 author:
