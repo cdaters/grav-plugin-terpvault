@@ -16,6 +16,19 @@
   --tv-button-hover-bg: var(--pico-primary-hover-background, var(--pico-primary-hover, var(--theme-accent-hover, var(--accent-hover, var(--color-accent-hover, var(--tv-button-bg))))));
   --tv-button-color: #fff;
   --tv-button-border: var(--pico-primary-border, var(--tv-button-bg));
+  --tv-player-bg: #f8f7f3;
+  --tv-player-bg: color-mix(in srgb, Canvas 92%, #f4f1e8 8%);
+  --tv-player-surface: rgba(255, 255, 255, 0.72);
+  --tv-player-surface-strong: rgba(255, 255, 255, 0.88);
+  --tv-player-border: rgba(27, 31, 36, 0.22);
+  --tv-player-border-strong: rgba(27, 31, 36, 0.34);
+  --tv-player-text: #1f2937;
+  --tv-player-text: color-mix(in srgb, CanvasText 92%, #1f2937 8%);
+  --tv-player-muted: rgba(31, 41, 55, 0.72);
+  --tv-player-muted: color-mix(in srgb, var(--tv-player-text) 70%, transparent);
+  --tv-player-frame-bg: #0b0d10;
+  --tv-player-button-bg: rgba(127, 127, 127, 0.1);
+  --tv-player-button-hover-bg: rgba(127, 127, 127, 0.16);
   --tv-radius: 8px;
   --tv-radius-sm: 6px;
   --tv-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
@@ -27,11 +40,18 @@
 }
 
 body.dark-mode .terpvault,
+body.dark .terpvault,
+body.theme-dark .terpvault,
+body.dark-theme .terpvault,
 html.dark .terpvault,
+html.theme-dark .terpvault,
+html.dark-theme .terpvault,
 [data-theme="dark"] .terpvault,
 [data-bs-theme="dark"] .terpvault,
+[data-color-scheme="dark"] .terpvault,
 .terpvault[data-theme="dark"],
-.terpvault[data-bs-theme="dark"] {
+.terpvault[data-bs-theme="dark"],
+.terpvault[data-color-scheme="dark"] {
   --tv-surface: rgba(180, 180, 180, 0.08);
   --tv-surface-strong: rgba(180, 180, 180, 0.14);
   --tv-surface-raised: rgba(180, 180, 180, 0.075);
@@ -42,6 +62,16 @@ html.dark .terpvault,
   --tv-soft-opacity: 0.9;
   --tv-button-color: #fff;
   --tv-shadow: none;
+  --tv-player-bg: #0f1115;
+  --tv-player-surface: rgba(255, 255, 255, 0.07);
+  --tv-player-surface-strong: rgba(255, 255, 255, 0.1);
+  --tv-player-border: rgba(255, 255, 255, 0.18);
+  --tv-player-border-strong: rgba(255, 255, 255, 0.28);
+  --tv-player-text: #f4f1e8;
+  --tv-player-muted: rgba(244, 241, 232, .72);
+  --tv-player-frame-bg: #050607;
+  --tv-player-button-bg: rgba(255, 255, 255, 0.08);
+  --tv-player-button-hover-bg: rgba(255, 255, 255, 0.14);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -56,15 +86,32 @@ html.dark .terpvault,
     --tv-soft-opacity: 0.9;
     --tv-button-color: #fff;
     --tv-shadow: none;
+    --tv-player-bg: #0f1115;
+    --tv-player-surface: rgba(255, 255, 255, 0.07);
+    --tv-player-surface-strong: rgba(255, 255, 255, 0.1);
+    --tv-player-border: rgba(255, 255, 255, 0.18);
+    --tv-player-border-strong: rgba(255, 255, 255, 0.28);
+    --tv-player-text: #f4f1e8;
+    --tv-player-muted: rgba(244, 241, 232, .72);
+    --tv-player-frame-bg: #050607;
+    --tv-player-button-bg: rgba(255, 255, 255, 0.08);
+    --tv-player-button-hover-bg: rgba(255, 255, 255, 0.14);
   }
 }
 
 body.light-mode .terpvault,
+body.light .terpvault,
+body.theme-light .terpvault,
+body.light-theme .terpvault,
 html.light .terpvault,
+html.theme-light .terpvault,
+html.light-theme .terpvault,
 [data-theme="light"] .terpvault,
 [data-bs-theme="light"] .terpvault,
+[data-color-scheme="light"] .terpvault,
 .terpvault[data-theme="light"],
-.terpvault[data-bs-theme="light"] {
+.terpvault[data-bs-theme="light"],
+.terpvault[data-color-scheme="light"] {
   --tv-surface: rgba(127, 127, 127, 0.07);
   --tv-surface-strong: rgba(127, 127, 127, 0.12);
   --tv-surface-raised: rgba(127, 127, 127, 0.055);
@@ -75,6 +122,19 @@ html.light .terpvault,
   --tv-soft-opacity: 0.88;
   --tv-button-color: #fff;
   --tv-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+  --tv-player-bg: #f8f7f3;
+  --tv-player-bg: color-mix(in srgb, Canvas 92%, #f4f1e8 8%);
+  --tv-player-surface: rgba(255, 255, 255, 0.72);
+  --tv-player-surface-strong: rgba(255, 255, 255, 0.88);
+  --tv-player-border: rgba(27, 31, 36, 0.22);
+  --tv-player-border-strong: rgba(27, 31, 36, 0.34);
+  --tv-player-text: #1f2937;
+  --tv-player-text: color-mix(in srgb, CanvasText 92%, #1f2937 8%);
+  --tv-player-muted: rgba(31, 41, 55, 0.72);
+  --tv-player-muted: color-mix(in srgb, var(--tv-player-text) 70%, transparent);
+  --tv-player-frame-bg: #0b0d10;
+  --tv-player-button-bg: rgba(127, 127, 127, 0.1);
+  --tv-player-button-hover-bg: rgba(127, 127, 127, 0.16);
 }
 
 .terpvault * { box-sizing: border-box; }
@@ -625,8 +685,9 @@ html.light .terpvault,
 
 .terpvault-player-shell {
   padding: .75rem;
-  background: #0f1115;
-  color: #f4f1e8;
+  background: var(--tv-player-bg);
+  color: var(--tv-player-text);
+  box-shadow: var(--tv-shadow);
 }
 
 .terpvault-player-toolbar {
@@ -646,7 +707,7 @@ html.light .terpvault,
 }
 
 .terpvault-player-toolbar span {
-  color: rgba(244, 241, 232, .7);
+  color: var(--tv-player-muted);
 }
 
 .terpvault-player-toolbar button {
@@ -655,26 +716,29 @@ html.light .terpvault,
   justify-content: center;
   gap: .35rem;
   min-height: 2.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 1px solid var(--tv-player-border-strong);
   border-radius: var(--tv-radius-sm);
   padding: .48rem .8rem;
-  background: rgba(255, 255, 255, 0.08);
-  color: #f4f1e8;
+  background: var(--tv-player-button-bg);
+  color: var(--tv-player-text);
   cursor: pointer;
   line-height: 1.1;
 }
 
-.terpvault-player-toolbar button:hover {
-  background: rgba(255, 255, 255, 0.14);
+.terpvault-player-toolbar button:hover,
+.terpvault-player-toolbar button:focus,
+.terpvault-player-toolbar button:focus-visible {
+  background: var(--tv-player-button-hover-bg);
+  color: var(--tv-player-text);
 }
 
 .terpvault-player-frame {
   display: block;
   width: 100%;
   min-height: min(76vh, 820px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--tv-player-border);
   border-radius: var(--tv-radius-sm);
-  background: #050607;
+  background: var(--tv-player-frame-bg);
 }
 
 .terpvault-save-note,
@@ -689,21 +753,23 @@ html.light .terpvault,
 
 .terpvault-player-shell .terpvault-save-note,
 .terpvault-player-shell .terpvault-alert {
-  border-color: rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(244, 241, 232, .82);
+  border-color: var(--tv-player-border);
+  background: var(--tv-player-surface);
+  color: var(--tv-player-muted);
 }
 
 .terpvault-player-shell code,
 .terpvault-player-shell pre {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--tv-player-border);
+  background: var(--tv-player-surface-strong);
   color: inherit;
 }
 
 .terpvault-player-shell:fullscreen {
-  background: #000;
+  background: var(--tv-player-bg);
   padding: 1rem;
+  border: 0;
+  border-radius: 0;
 }
 
 .terpvault-player-shell:fullscreen .terpvault-player-frame {

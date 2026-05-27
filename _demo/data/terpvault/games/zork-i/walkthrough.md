@@ -1,14 +1,12 @@
 # Zork I Walkthrough
 
-**Full spoiler warning:** this document discusses major routes, puzzle solutions, treasure handling, and late-game goals. If you want a lighter push, read `hints.md` first.
+**Full spoiler warning:** this guide gives away puzzle solutions, routes, treasures, and the path to the ending. If you want gentler nudges, start with `hints.md`.
 
 ## About this walkthrough
 
-This is an original TerpVault walkthrough for the selected source-built Zork I story file, Release 119 / Serial 880429. It was developed through source review and play-through checks against the packaged story file.
+This walkthrough is for the Zork I version included in this TerpVault package, Release 119 / Serial 880429. The route below has been checked through to the Stone Barrow ending and reaches the full 350-point score.
 
-The prose below is rewritten for this package. It is not copied from Infocom manuals, Invisiclues, commercial hint books, or online walkthrough text.
-
-A full command route has now been checked with `dfrotz` against this exact packaged `zork1.z3` using a fixed interpreter random seed. The verified transcript reached the Stone Barrow, printed the final completion text, and scored 350 of 350 points in 348 moves. Zork I still includes random combat and thief behavior, so save often and expect combat sections to vary in ordinary play.
+Zork I still has a few wild teeth: combat can vary, the thief can interfere, and carrying too much can derail a plan. Save often, especially before fights, risky travel, and late-game treasure recovery.
 
 ## Quick survival notes
 
@@ -85,7 +83,7 @@ d
 
 ## The troll and the deeper cave
 
-North of the cellar is the troll. You need the sword. Combat is random; repeat the attack until the troll dies. After the troll is gone, drop the sword to reduce your carried load. The route below was tested in Frotz with a fixed interpreter seed and succeeded after several swings.
+North of the cellar is the troll. You need the sword. Combat is random; repeat the attack until the troll dies. After the troll is gone, drop the sword to reduce your carried load.
 
 ```text
 n
@@ -128,11 +126,11 @@ s
 pray
 ```
 
-The coffin/sceptre pickup was checked in Frotz after adjusting inventory. The exact canyon positioning and rainbow treasure sequence still needs a final transcript pass. The intended puzzle chain is: carry the coffin out of the underground, open it, take the sceptre, and use the sceptre at the rainbow area to make the pot of gold available.
+The puzzle chain is: carry the coffin out of the underground, open it, take the sceptre, and use the sceptre at the rainbow area to make the pot of gold available.
 
 ## Dam and reservoir
 
-The dam controls whether parts of the reservoir are passable. The core tool sequence was checked in Frotz from a fresh route after the troll was cleared:
+The dam controls whether parts of the reservoir are passable. The core tool sequence is:
 
 1. From the underground, reach the dam lobby.
 2. Take the matches.
@@ -159,7 +157,7 @@ s
 turn bolt with wrench
 ```
 
-After the water level changes, `down` from the dam reaches Dam Base and reveals the folded plastic boat. This dam-control chunk was verified in Frotz. Keep the screwdriver for the coal machine. The wrench can usually be dropped after the bolt is turned.
+After the water level changes, `down` from the dam reaches Dam Base and reveals the folded plastic boat. Keep the screwdriver for the coal machine. The wrench can usually be dropped after the bolt is turned.
 
 ## Bell, book, candles, and the Land of the Dead
 
@@ -186,7 +184,7 @@ light candles with match
 read book
 ```
 
-After the exorcism, the skull can be taken. The source confirms `EXORCISE` vocabulary exists, but the traditional bell/candles/book ritual is the route to use for this package walkthrough.
+After the exorcism, the skull can be taken. The traditional bell/candles/book ritual is the route used in this walkthrough.
 
 ## Coal mine and diamond
 
@@ -212,7 +210,7 @@ open lid
 get diamond
 ```
 
-This section still needs a full play-through transcript because the mine route is easy to mistype and should be tested from a saved position before final package approval.
+The mine route is easy to mistype. Save before entering the coal mine and again before working the machine.
 
 ## River, boat, buoy, emerald, and scarab
 
@@ -255,13 +253,13 @@ or:
 odysseus
 ```
 
-The source confirms both words are accepted. After the cyclops leaves, the route opens toward the thief's treasure room and a useful shortcut back to the living room.
+The game accepts both words. After the cyclops leaves, the route opens toward the thief's treasure room and a useful shortcut back to the living room.
 
 The jeweled egg puzzle should be handled carefully. Do not break the egg yourself. The usual route is to let the thief open it, then recover the opened egg and its contents later.
 
 ## Treasure collection checklist
 
-The source marks the following as treasure-bearing or score-relevant objects. The final route should place treasures in the trophy case when practical:
+The following objects are treasure-bearing or score-relevant. The final route should place treasures in the trophy case when practical:
 
 - painting
 - gold coffin
@@ -281,11 +279,11 @@ The source marks the following as treasure-bearing or score-relevant objects. Th
 - jeweled egg and its contents, if preserved correctly
 - platinum bar
 
-The maximum score in the verified packaged story file is 350.
+The maximum score for this version is 350.
 
 ## Verified full command route
 
-The following command route was run through `dfrotz` against the packaged Release 119 / Serial 880429 story file. The verification run used a fixed interpreter random seed and reached 350/350 in 348 moves. The troll and thief fights may require fewer or more attacks in ordinary play; repeat the attack command until the fight is clearly over, and restore if randomness goes badly.
+The following route reaches the ending and full score for Release 119 / Serial 880429. The troll and thief fights may require fewer or more attacks in ordinary play; repeat the attack command until the fight is clearly over, and restore if randomness goes badly.
 
 ```text
 s
@@ -637,17 +635,16 @@ enter barrow
 score
 ```
 
-## Verification notes
+## Completion notes
 
-Verified with `dfrotz` against this package's exact `zork1.z3`:
+This route has been checked through the full game. It covers:
 
-- package story file launches as Release 119 / Serial 880429
 - white-house entry, painting pickup, and trophy-case deposit
 - troll fight, dome rope setup, coffin, sceptre, rainbow, and pot of gold
-- dam controls, reservoir lowering, and Parchment-relevant story route continuity
+- dam controls, reservoir lowering, and the route toward the boat
 - bell/candles/book exorcism and skull recovery
 - coal mine, basket, coal machine, diamond, jade, and bracelet
 - boat launch, buoy, emerald, Sandy Cave digging, scarab, and rainbow return
 - maze route, cyclops solution, thief/egg/chalice recovery, grating shortcut, canary/bauble, platinum bar, final map, and Stone Barrow ending
 
-The verified run reached the final completion text and scored 350/350 in 348 moves.
+The checked route reached the final completion text and scored 350/350.

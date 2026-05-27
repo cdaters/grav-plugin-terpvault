@@ -370,6 +370,7 @@ TerpVault's public CSS is scoped under `.terpvault` and exposes CSS variables fo
 .terpvault {
   --tv-link-color: var(--pico-primary, currentColor);
   --tv-button-bg: var(--pico-primary-background, var(--pico-primary, currentColor));
+  --tv-player-bg: #f8f7f3;
   --tv-radius: 8px;
   --tv-grid-min: 250px;
 }
@@ -377,7 +378,7 @@ TerpVault's public CSS is scoped under `.terpvault` and exposes CSS variables fo
 
 The library cards are intentionally compact so a shelf of packages scans quickly instead of behaving like oversized poster tiles.
 
-Future theme polish should verify TerpVault library/detail/play pages under Quark2 and Typhoon in light and dark modes, plus browser/system dark mode. The player shell should prefer theme-aware CSS variables and `prefers-color-scheme` fallbacks, pass a Parchment theme hint only when supported, and keep fullscreen, save/restore help, iframe borders, title bars, buttons, and backgrounds readable.
+The player shell around the Parchment iframe uses scoped TerpVault variables, common light/dark theme selectors, and `prefers-color-scheme` fallback so the toolbar, iframe border, save/restore help, and fullscreen background stay readable. Future theme polish should verify TerpVault library/detail/play pages under Quark2 and Typhoon in light and dark modes, plus browser/system dark mode, and pass a Parchment theme hint only when supported.
 
 ## Installing starter packages
 

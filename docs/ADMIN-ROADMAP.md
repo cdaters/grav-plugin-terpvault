@@ -114,8 +114,8 @@
 ### Public theme and Parchment integration polish
 
 - Render TerpVault public library, detail, and play pages cleanly under light and dark Grav themes, including Quark2, Typhoon, and similar Grav/Grav2 themes.
-- Move the player shell around the iframe toward theme-aware CSS variables where practical instead of hard-coded light/dark colors.
-- Avoid assuming every Grav theme exposes the same dark-mode class; use robust defaults and CSS fallbacks such as `prefers-color-scheme`.
+- Current baseline: the public player shell around the iframe uses TerpVault-controlled CSS variables, light defaults, cautious common light/dark selectors, and `prefers-color-scheme` fallback instead of hard-coded player chrome colors.
+- Continue avoiding assumptions that every Grav theme exposes the same dark-mode class; theme-specific refinements should remain additive and scoped.
 - Investigate Parchment's supported theme options and URL/config parameters before adding TerpVault-side controls.
 - Consider future player settings such as `player.theme: auto | light | dark | parchment-default`, `player.match_site_theme`, `player.frame_background`, and `player.chrome_style`.
 - Pass a theme hint to the Parchment iframe when the bundled or configured Parchment runtime supports it, such as light, dark, system, or Parchment default.

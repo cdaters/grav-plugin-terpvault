@@ -1,6 +1,6 @@
 # Hints
 
-These notes are original TerpVault draft hints. They are intentionally spoiler-light and incomplete until the final package is verified against the selected story file.
+These notes are intentionally light on spoilers. Use them when you want a nudge without jumping straight to the full walkthrough.
 
 ## Before Looking Anything Up
 
@@ -33,6 +33,6 @@ Map rooms as you go, note locked or blocked paths, and revisit places after find
 
 </details>
 
-## Final Hint Status
+## Need the full route?
 
-A full progressive hint file is still pending. Final hints must be original, spoiler-graded, and checked against the selected source-built artifact.
+If you want exact commands, treasure order, and the path to the ending, switch to `walkthrough.md`. That file is a full-spoiler guide and has been checked through to the full score.

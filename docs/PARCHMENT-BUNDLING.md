@@ -43,13 +43,13 @@ TerpVault will pass the same JSON `story=` parameter to that URL.
 
 TerpVault does not add custom save slots around Parchment yet. Players should use the story/interpreter's native `SAVE` and `RESTORE` flow inside the iframe. See `docs/PARCHMENT-SAVES.md` for the current expectations and future save-manager direction.
 
-## Future theme integration
+## Theme integration
 
-TerpVault should polish the public library/detail/play pages and the player shell around the Parchment iframe for light and dark Grav themes, including Quark2, Typhoon, and similar Grav/Grav2 themes.
+TerpVault's public CSS scopes its library, detail, and play-page styling under `.terpvault`. The player shell around the Parchment iframe uses TerpVault-controlled CSS variables, light defaults, cautious support for common light/dark theme selectors, and `prefers-color-scheme` fallbacks so the shell, toolbar, iframe border, save/restore note, and fullscreen background remain readable across light and dark Grav themes.
 
-Future work should prefer TerpVault-controlled CSS variables, robust site-theme detection, and `prefers-color-scheme` fallbacks. Do not assume every Grav theme exposes the same dark-mode class.
+Do not assume every Grav theme exposes the same dark-mode class. Theme-specific improvements should keep using scoped TerpVault CSS or wrapper/configuration changes before considering edits to the bundled Parchment runtime.
 
-Before adding player theme controls, investigate Parchment's supported theme options and URL/config parameters. Possible TerpVault settings include:
+Parchment 2025.1.14 supports a `theme` option internally and otherwise falls back to its `parchment_theme` cookie or browser `prefers-color-scheme`. TerpVault does not currently inject a Parchment theme hint into the bundled iframe. Before adding player theme controls, verify the safest supported integration path for bundled and externally configured Parchment URLs. Possible future TerpVault settings include:
 
 ```yaml
 player:
@@ -59,7 +59,7 @@ player:
   chrome_style: ''
 ```
 
-If supported by Parchment, TerpVault can pass a light, dark, system, or Parchment-default theme hint into the iframe. Prefer supported options or TerpVault wrapping/configuration over editing the bundled `assets/vendor/parchment/index.html` runtime.
+If safely supported by Parchment, TerpVault can pass a light, dark, system, or Parchment-default theme hint into the iframe. Prefer supported options or TerpVault wrapping/configuration over editing the bundled `assets/vendor/parchment/index.html` runtime.
 
 Verification should cover Quark2 light mode, Quark2 dark mode, Typhoon light mode, Typhoon dark mode, browser/system dark mode, and fullscreen mode. The save/restore help panel, iframe border, title bar, buttons, and background should remain readable.
 
