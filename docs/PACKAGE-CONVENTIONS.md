@@ -250,6 +250,17 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 
 `metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can preview a conservative subset of local iFiction XML fields and apply explicitly selected supported fields into `game.yaml`. TerpVault does not edit the XML file.
 
+Current metadata workflow limits:
+
+- Admin2 does not upload, replace, or edit `metadata.iFiction.xml`.
+- Package creation creates `game.yaml`, starter helper Markdown, and the initial story file; it does not ingest iFiction XML.
+- Import preserves accepted `metadata.iFiction.xml` files, but import commit does not currently use the XML to prefill or merge `game.yaml`.
+- Remote IFDB, IFWiki, IF Archive, or catalog metadata lookup is not implemented.
+
+Future Metadata Assistant work should stay explicit and preview-driven. It may compare current `game.yaml` values with package-local or manually uploaded iFiction XML and, later, explicit IFDB/IFWiki/IF Archive lookup candidates. Curators should see side-by-side current/candidate values, select fields one by one, and receive a `game.yaml` backup before changes are applied. Metadata import should remain separate from story-file/package download, and provenance/license review should remain visible.
+
+Future large-library cleanup filters should include metadata completeness checks such as missing IFID, missing cover, missing screenshots, missing helper docs, missing catalog URLs, provenance needs review, license needs review, and `metadata.iFiction.xml` present/missing.
+
 ## Future Ink package shape
 
 Ink is a choice-based interactive narrative scripting language from inkle. It is not parser IF like Z-machine, Glulx, TADS, or Inform parser works, but it belongs in TerpVault's roadmap as a complementary web-playable IF format.
@@ -355,3 +366,14 @@ Export includes:
 Export excludes backups, lock files, temp files, hidden files/directories, macOS cruft such as `__MACOSX/` and `.DS_Store`, Windows cruft such as `Thumbs.db` and `desktop.ini`, and unrelated/unreferenced files.
 
 Admin2 import requires relative package paths only, rejects traversal and unsafe absolute/URI paths, ignores safe platform cruft, rejects unsupported package entries, and shows a validation report before commit. Import commit always installs as a draft, not-featured package, rewrites `id`, `slug`, `terpvault.status`, and `terpvault.featured`, and refuses to overwrite an existing package folder.
+
+## Future package deletion/removal
+
+Full package delete is not implemented. Existing Admin2 remove controls are manifest-only for curated lists such as screenshots and feelies/extras; they do not delete package-local files.
+
+Before any future delete workflow ships, the behavior must distinguish:
+
+- Removing a package from a list or manifest, if that concept is added.
+- Deleting or moving the physical package folder and its files.
+
+Physical deletion should require title/slug confirmation, preferably a two-step confirmation, and should prefer moving to trash/quarantine before permanent removal. The result should report what happened to story files, images, screenshots, feelies/extras, helper docs, provenance files, `metadata.iFiction.xml`, `game.yaml`, backups, and other package-local support files. Delete routes must remain authenticated Admin2/API actions with conservative permission and CSRF/token guardrails, package containment validation, and tests for traversal, symlink, missing-file, partial-failure, and audit-output behavior.

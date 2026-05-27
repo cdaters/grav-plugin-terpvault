@@ -26,6 +26,8 @@
 - Added a limited Package Creation Wizard.
 - Added authenticated package export.
 - Added inspect-only package import validation.
+- The Library Manager currently renders all packages returned by the manifest as one collapsible list; it does not yet have search, filters, sorting controls, pagination, or virtual scrolling.
+- Browser `localStorage` is currently used for the active Admin2 tab and package row expanded/collapsed state.
 
 ### v0.3.x import/export hardening
 
@@ -90,11 +92,33 @@
 
 ### Safe package/resource remove/delete/archive workflows
 
-- Add safe workflows for removing package/resource references and, later, deleting physical files.
-- Distinguish removing a manifest reference from deleting a physical file.
-- Prefer archive/trash behavior before permanent package delete.
-- Require clear review, confirmation, package containment validation, and backup/archive behavior for destructive actions.
+- Current state: full package delete is not implemented. There is no Admin2 package delete UI, no package delete API route, and no service that physically deletes a package folder.
+- Current remove behavior is intentionally narrower: screenshot remove updates `resources.screenshots` only, and feelie remove updates the pending/saved `resources.feelies` manifest list only. These actions do not delete package-local files.
+- Add safe workflows for removing package/resource references and, later, deleting physical files. Clearly distinguish "remove from manifest/index/listing" from "delete the physical package folder and files."
+- If a package-index/listing removal concept is added later, document whether it only hides/unregisters the package or changes package files.
+- Physical package deletion must never happen silently. Show the package title and slug, require explicit confirmation, and prefer a two-step confirmation for permanent folder deletion.
+- Prefer move-to-trash or quarantine behavior before permanent delete. A quarantine should preserve enough structure to restore or inspect what was moved.
+- Before deleting or moving, validate that every target path is package-local and inside the configured TerpVault games directory.
+- Document exactly what happens to story files, cover/small-cover/hero images, screenshots, feelies/extras, helper Markdown docs, provenance files, `metadata.iFiction.xml`, `game.yaml`, generated backups, and any package-local support files.
+- Require Admin2/API authentication and conservative permissions for destructive actions, and add CSRF/token handling appropriate to the Grav Admin2/API request model before exposing any delete route.
+- Return audit/result feedback after every destructive attempt: files deleted, files moved, manifest entries removed, files intentionally left untouched, skipped files, and errors.
+- Add tests/checks before implementation for containment validation, dry-run/audit output, trash/quarantine behavior, permission failures, slug collisions, missing files, symlink/path traversal attempts, and partial-failure reporting.
 - Keep public routes and package-management API routes separated.
+
+### Large-library management
+
+- Make Admin2 usable for libraries with hundreds or thousands of packages without rendering one giant page.
+- Add search/filter/sort controls before adding bulk mutation workflows.
+- Search should cover title, slug, author, format, engine/runtime, tags, status, year, IFID, and IFDB/IFWiki/IF Archive/source/provenance fields where available.
+- Sorting should include title A-Z/Z-A, author, year, format/engine, status, recently modified, and recently added.
+- Filters should include published/draft, featured/not featured, format or engine family such as z-code, glulx, tads, hugo, adrift, and future ink, has/missing cover, has/missing screenshots, has/missing walkthrough or helper docs, has/missing IFID, has/missing catalog URLs, provenance verified/needs review, license verified/needs review, bundled demo/user library, and `metadata.iFiction.xml` present/missing.
+- Add pagination or virtual scrolling so large libraries do not render as one giant DOM. Support items-per-page choices of 25, 50, and 100 if pagination is used.
+- Keep the existing collapsible package row model, but make expanded rows behave predictably when a package is filtered out, moved to a different page, or returned by a new search.
+- Preserve Admin2 UI state in `localStorage` where practical: search query, filters, sort order, page size, active page, and expanded/collapsed rows.
+- Lazy-load or defer heavy media previews so hundreds of covers/screenshots do not slow the admin page.
+- Consider compact, grid, and list view modes later, after search/filter/sort/page state is stable.
+- Add bulk actions only after safe single-package workflows exist and their audit/confirmation behavior is proven.
+- Use metadata-completeness filters to feed curation workflows: missing IFID, missing cover, missing screenshots, missing helper docs, missing catalog URLs, provenance needs review, license needs review, and `metadata.iFiction.xml` present/missing.
 
 ### Library ordering/sorting
 
@@ -105,11 +129,27 @@
 
 ### iFiction apply/import
 
-- Add explicit curator-controlled apply/import from the local iFiction preview.
-- Show proposed `game.yaml` changes before applying them.
-- Prefer merge previews that identify source, confidence, current value, proposed value, and target field.
-- Preserve unknown YAML fields when applying accepted changes.
-- Keep the local XML file package-local and reviewable.
+- Current state: Admin2 can preview package-local `metadata.iFiction.xml` and apply explicitly selected supported fields into `game.yaml`. The apply route re-parses local XML server-side and creates a package-local `game.yaml` backup through the metadata service before writing.
+- Supported mapped fields are title, author, headline/subtitle, description/teaser, first published/date, genre, language, IFIDs, and format/system.
+- Uploading or replacing `metadata.iFiction.xml` directly is not implemented yet.
+- Package creation does not accept `metadata.iFiction.xml`, and import preserves the file but does not use it to prefill or merge metadata during import commit.
+- Keep the local XML file package-local and reviewable. Preserve unknown YAML fields when applying accepted changes.
+- Future local iFiction improvements should show `metadata.iFiction.xml` presence/status in collapsed package rows, support explicit upload/replace of the XML file, improve preview/apply ergonomics, and integrate local preview/apply into package creation/import when XML is present.
+- Continue to avoid remote lookup in local iFiction workflows.
+
+### Metadata Assistant
+
+- Add a future preview-driven Metadata Assistant to reduce manual metadata entry without silently changing packages.
+- Candidate sources should include local `game.yaml`, package-local `metadata.iFiction.xml`, manually uploaded/replaced `metadata.iFiction.xml`, future IFDB lookup by IFID/title/URL, future IFWiki lookup by title/URL, and future IF Archive path/URL helpers.
+- Show candidate matches with confidence and notes. Use side-by-side previews of current package metadata and candidate metadata, with field-level apply checkboxes.
+- Never silently overwrite existing metadata. Always back up `game.yaml` before applying selected changes.
+- Do not perform remote fetches without explicit user action.
+- Keep provenance and license review explicit, even when external catalog metadata is found.
+- Clearly distinguish metadata import/enrichment from story-file or package download.
+- Phase 1: improve local iFiction XML upload/replace, show XML presence/status in package rows, improve local preview/apply, and integrate local iFiction preview/apply into package creation/import when present.
+- Phase 2: assist catalog/provenance fields such as IFDB TUID, IFDB URL, IFWiki URL, IF Archive path, IF Archive URL, source URL, retrieved date, and license notes.
+- Phase 3: add explicit remote metadata lookup by title/author, by IFID where possible, and from pasted IFDB/IFWiki/IF Archive URLs. Preview candidates, apply selected fields only, and document source/retrieval date.
+- Tie this assistant to large-library cleanup by letting admins filter for incomplete metadata groups, then use the assistant to resolve missing IFID, catalog URL, cover, screenshot, helper-doc, provenance, license, or `metadata.iFiction.xml` gaps.
 
 ### Public theme and Parchment integration polish
 
@@ -141,6 +181,7 @@
 - Keep remote catalog lookup preview-based and curator-reviewed, not authoritative.
 - Treat remote data as a curator aid, not a replacement for license/provenance review.
 - Show source, confidence, and target field for every proposed remote change.
+- Do not add IFDB/IFWiki scraping or IF Archive/story package downloads as part of metadata lookup. Any future remote feature must respect source terms, distinguish references from redistributable assets, and keep license/provenance review visible.
 
 ### Advanced File Type Policy
 
@@ -156,6 +197,11 @@
 - Add a future package builder for creating or refining TerpVault packages from curated inputs.
 - Keep generated packages reviewable before installation or publication.
 - Reuse import/export validation rules rather than bypassing package safety checks.
+- Allow a curator to paste an IFDB, IFWiki, or IF Archive URL, resolve/fetch metadata where allowed, and preview the resulting candidate package metadata.
+- Optionally stage a story file only when it is legally and directly available for that use. Do not silently download, redistribute, or package questionable assets.
+- Create draft packages only, with `game.yaml`, `metadata.iFiction.xml` when available, helper Markdown stubs, and the normal package folder structure.
+- Keep provenance/license review explicit and do not auto-publish.
+- Keep cover, screenshot, and art import conservative and license-aware.
 
 ### Curated demo/starter library
 

@@ -18,10 +18,14 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 ## Current package-management boundaries
 
 - Package delete is not implemented.
+- Removing screenshots and feelies/extras is currently manifest-only and does not delete the physical package-local files.
 - Package overwrite/replace is not implemented.
 - Import overwrite is not implemented.
 - Arbitrary package file browsing is not implemented.
 - `metadata.iFiction.xml` editing is not implemented.
+- `metadata.iFiction.xml` upload/replace is not implemented.
+- Remote IFDB, IFWiki, IF Archive, or other catalog lookup/import is not implemented.
+- Admin2 search, filters, sorting controls, pagination, and virtual scrolling are not implemented.
 - Named save slots and server-side saves are not implemented.
 - Public frontend routing and Parchment/player behavior should stay unchanged during Admin2 work.
 
@@ -30,6 +34,10 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Field-test the current Admin2 package lifecycle: create package, edit metadata, edit helper Markdown, manage media/screenshots, replace story file, export `.terpvault.zip`, inspect import, and import as draft.
 - Improve diagnostics or release packaging notes based on that testing.
 - Defer new package mutation features until the existing draft-only, non-overwriting workflow has more mileage.
+- Design safe package delete/remove before implementing it. The design should distinguish manifest/listing removal from physical folder deletion, require title/slug confirmation, prefer trash/quarantine before permanent delete, preserve audit feedback, and specify behavior for story files, images, screenshots, feelies/extras, helper docs, provenance files, `metadata.iFiction.xml`, and `game.yaml`.
+- Design large-library management for Admin2: search by title, slug, author, format, engine, tags, status, year, IFID, catalog, and provenance/source fields; filters for metadata completeness and review status; sorting by title, author, year, format/engine, status, modified, and added; pagination or virtual scrolling; items-per-page choices of 25, 50, and 100; and `localStorage` state preservation.
+- Plan the preview-driven Metadata Assistant around local `game.yaml`, package-local or uploaded `metadata.iFiction.xml`, and later explicit IFDB/IFWiki/IF Archive lookup. It must never silently overwrite metadata, must back up `game.yaml`, and must keep license/provenance review distinct from story-file/package download.
+- Treat future IFDB/IFWiki/IF Archive package-builder work as draft-only and license-aware: pasted URLs may seed metadata where allowed, but story files/assets should only be staged when legally and directly available.
 - Polish public library/detail/play rendering across light and dark Grav themes, with Quark2 and Typhoon as explicit verification targets.
 - Explore first-class future Ink package support as a complementary choice-based interactive narrative format, without disturbing current Z-code/Parchment playback.
 

@@ -129,7 +129,9 @@ admin:
   enable_admin2_page: false
 ```
 
-When explicitly enabled, TerpVault registers the Admin2 sidebar/page and controller-style Admin2/API package routes for Admin2/API requests. Current workflows cover package creation, metadata/helper/media/story edits, export, import inspection, and draft-only import commit. Package delete and overwrite/replace are not implemented.
+When explicitly enabled, TerpVault registers the Admin2 sidebar/page and controller-style Admin2/API package routes for Admin2/API requests. Current workflows cover package creation, metadata/helper/media/story edits, export, import inspection, and draft-only import commit. Package delete and overwrite/replace are not implemented. Current screenshot and feelie remove actions are manifest-only and do not delete physical files.
+
+The Admin2 Library Manager currently receives the full package list and renders it as collapsible rows in one page. It preserves active tab and expanded row state in browser `localStorage`, but search, filters, sorting controls, pagination, and virtual scrolling are future work. Large-library architecture should add a query/state layer before bulk actions, defer heavy media previews, and preserve search/filter/sort/page state in `localStorage` where practical.
 
 Admin2/API routes are deliberately separate from the public virtual page routes under `/if`, and write operations require authenticated Admin2/API access.
 
@@ -162,3 +164,7 @@ TerpVault's `game.yaml` should remain friendly and Grav-like. Later, add optiona
 - license/provenance checks
 
 Metadata enrichment should be non-destructive. The first pass should parse local `metadata.iFiction.xml`, show proposed `game.yaml` changes, and let a curator decide what to apply. Remote catalog enrichment should come later and should not replace rights/provenance review.
+
+The future Metadata Assistant should be a preview-and-apply workflow rather than an automatic importer. It should compare current `game.yaml` with package-local or uploaded `metadata.iFiction.xml`, and later with explicit IFDB/IFWiki/IF Archive lookup candidates. It should show confidence/notes, apply only selected fields, create a `game.yaml` backup, and keep metadata import distinct from story-file/package download.
+
+Any future package-builder that accepts IFDB, IFWiki, or IF Archive URLs should create draft packages only, reuse package validation rules, and keep provenance/license review explicit. It may stage story files only when legally and directly available, and should not silently download or redistribute questionable assets.

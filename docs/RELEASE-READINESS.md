@@ -48,6 +48,9 @@ Before tagging:
 - Confirm public library/detail/play pages remain readable in the active site theme, with future explicit coverage for Quark2 and Typhoon light/dark modes.
 - Confirm Admin2 loads normally with `admin.enable_admin2_page: false`.
 - If `admin.enable_admin2_page: true` is tested, confirm Admin2 create/edit/export/import workflows are authenticated, non-overwriting, and do not add package delete or overwrite/replace behavior.
+- For future delete/remove work, confirm destructive actions are absent until a reviewed design exists with package title/slug confirmation, manifest-vs-physical-delete distinction, trash/quarantine or backup behavior, CSRF/token and permission guardrails, package containment checks, and audit/result feedback.
+- For future large-library work, confirm Admin2 still handles small libraries while search/filter/sort/pagination or virtual scrolling preserve row state and avoid rendering hundreds of heavy media previews at once.
+- For future metadata-assistant work, confirm local iFiction apply remains preview-driven, `game.yaml` is backed up before writes, remote lookup requires explicit action, and metadata enrichment remains separate from story-file/package download or asset redistribution.
 
 ## GPM/public-release checklist
 
