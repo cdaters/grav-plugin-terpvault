@@ -68,7 +68,7 @@ Before tagging:
 - If `admin.enable_admin2_page: true` is tested, confirm Admin2 create/edit/export/import workflows are authenticated, non-overwriting, and do not add package delete or overwrite/replace behavior.
 - For future delete/remove work, confirm destructive actions are absent until a reviewed design exists with package title/slug confirmation, manifest-vs-physical-delete distinction, trash/quarantine or backup behavior, CSRF/token and permission guardrails, package containment checks, and audit/result feedback.
 - For large-library work, confirm Admin2 search/filter/sort controls preserve state, show accurate result counts, keep expanded row state intact, and still handle small libraries normally. Pagination or virtual scrolling remains future work for very large libraries.
-- For future metadata-assistant work, confirm local iFiction apply remains preview-driven, `game.yaml` is backed up before writes, remote lookup requires explicit action, and metadata enrichment remains separate from story-file/package download or asset redistribution.
+- For metadata-assistant work, confirm local iFiction status/upload/preview/apply remains preview-driven, upload writes only package-root `metadata.iFiction.xml`, `game.yaml` is backed up before selected-field writes, remote lookup requires explicit action, and metadata enrichment remains separate from story-file/package download or asset redistribution.
 
 ## GPM/public-release checklist
 

@@ -248,13 +248,13 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 - `release.source.*`: where the package files came from and when they were retrieved.
 - `release.license.*`: license, rights, and redistribution notes.
 
-`metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can preview a conservative subset of local iFiction XML fields and apply explicitly selected supported fields into `game.yaml`. TerpVault does not edit the XML file.
+`metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can show whether the XML is present, upload or replace the package-root XML file, preview a conservative subset of local iFiction XML fields, and apply explicitly selected supported fields into `game.yaml`. TerpVault does not edit XML contents in place.
 
 When `identification.format` is blank, TerpVault may infer a normalized package format from strong local evidence such as IFID prefixes, story-file extension, or declared player engine/runtime. Curator-supplied non-empty format values should be preserved rather than overwritten. Admin2 also uses defensive format inference for library search, sort, and filters so packages with blank format fields can still appear under the right format family.
 
 Current metadata workflow limits:
 
-- Admin2 does not upload, replace, or edit `metadata.iFiction.xml`.
+- Admin2 can upload or replace `metadata.iFiction.xml`, but upload writes only the package-root XML file and does not apply fields automatically.
 - Package creation creates `game.yaml`, starter helper Markdown, and the initial story file; it does not ingest iFiction XML.
 - Import preserves accepted `metadata.iFiction.xml` files, but import commit does not currently use the XML to prefill or merge `game.yaml`.
 - Remote IFDB, IFWiki, IF Archive, or catalog metadata lookup is not implemented.

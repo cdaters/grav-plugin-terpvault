@@ -23,7 +23,7 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Import overwrite is not implemented.
 - Arbitrary package file browsing is not implemented.
 - `metadata.iFiction.xml` editing is not implemented.
-- `metadata.iFiction.xml` upload/replace is not implemented.
+- `metadata.iFiction.xml` upload/replace is limited to the package-root XML file, validates XML, and does not apply metadata automatically.
 - Remote IFDB, IFWiki, IF Archive, or other catalog lookup/import is not implemented.
 - Admin2 baseline client-side search, filters, sorting controls, result counts, reset controls, and `localStorage` state preservation are implemented.
 - Admin2 pagination and virtual scrolling are not implemented.
@@ -36,7 +36,7 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 
 - Keep v0.4.x focused and incremental rather than treating every small improvement as a milestone release.
 - Use v0.4.x for Admin2 large-library basics. Search, sort, simple filters, metadata-completeness filters, and `localStorage` state preservation are now baseline; pagination or virtual scrolling remains future work.
-- Use v0.4.x for Metadata Assistant Phase 1 work: better local `metadata.iFiction.xml` status, safe upload/replace planning or implementation, preview/apply polish, and package creation/import awareness where practical.
+- Use v0.4.x for Metadata Assistant Phase 1 work. Local `metadata.iFiction.xml` status, upload/replace, XML present/missing filters, and preview/apply polish are now baseline; package creation/import awareness remains future polish where practical.
 - Continue safe delete/remove design before implementation. Do not add physical package delete until guardrails are reviewed; keep manifest removal distinct from physical package deletion; prefer trash/quarantine before permanent deletion.
 - Continue demo package preparation incrementally. Zork II and Zork III remain candidates until legal/provenance/build/playback/package docs are clean.
 - Polish public/demo suite candidates such as Adventure / Colossal Cave, Grue, and You Are Standing only when story files, art, helper docs, and license notes are original or properly licensed.

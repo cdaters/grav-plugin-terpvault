@@ -231,6 +231,24 @@ class ApiController extends AbstractApiController
         }
     }
 
+    public function uploadIFiction(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+        $upload = $this->firstUploadedFile($request->getUploadedFiles());
+        if (!$upload) {
+            throw new ValidationException('No metadata.iFiction.xml file was uploaded.');
+        }
+
+        try {
+            return ApiResponse::create($this->ifictionService()->upload($slug, $upload));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
     public function markdown(ServerRequestInterface $request): ResponseInterface
     {
         $this->requireAdminApiSuper($request);

@@ -76,13 +76,13 @@ A package may include:
 metadata.iFiction.xml
 ```
 
-TerpVault includes this file in `.terpvault.zip` export/import payloads when present. Admin2 can preview a conservative subset of local iFiction XML fields, including title, author, description/headline, publication date, genre, language, IFIDs, and format/system where available. Preview is local-only, and curators can explicitly apply selected supported fields into `game.yaml`.
+TerpVault includes this file in `.terpvault.zip` export/import payloads when present. Admin2 shows whether each package has local iFiction XML, can upload or replace package-root `metadata.iFiction.xml`, and can preview a conservative subset of local iFiction XML fields, including title, author, description/headline, publication date, genre, language, IFIDs, and format/system where available. Preview is local-only, and curators can explicitly apply selected supported fields into `game.yaml`.
 
-The apply workflow re-parses package-local XML on the server, does not perform remote lookup, and only overwrites existing non-empty `game.yaml` values when the curator selects that field.
+The upload workflow validates XML and writes only `metadata.iFiction.xml` in the package root. It does not apply metadata automatically. The apply workflow re-parses package-local XML on the server, does not perform remote lookup, backs up `game.yaml`, and only overwrites existing non-empty `game.yaml` values when the curator selects that field.
 
 Current limits:
 
-- Admin2 does not upload, replace, or edit `metadata.iFiction.xml`.
+- Admin2 can upload or replace `metadata.iFiction.xml`, but it does not edit XML contents in place.
 - Package creation does not accept `metadata.iFiction.xml` as an input.
 - Import preserves `metadata.iFiction.xml` in accepted `.terpvault.zip` packages, but import commit does not use it to merge or prefill `game.yaml`.
 - Remote IFDB, IFWiki, IF Archive, or catalog lookup is not implemented.
@@ -114,7 +114,7 @@ Required behavior:
 
 Phased plan:
 
-- Phase 1: improve local iFiction XML upload/replace, show `metadata.iFiction.xml` presence/status in Admin2 package rows, improve local preview/apply, and integrate local preview/apply into package creation/import when present.
+- Phase 1 baseline: local iFiction XML presence/status, package-root upload/replace, preview/apply polish, and metadata-completeness filters for XML present/missing. Future Phase 1 polish may integrate local preview/apply into package creation/import when XML is present.
 - Phase 2: assist catalog and provenance fields such as IFDB TUID, IFDB URL, IFWiki URL, IF Archive path, IF Archive URL, source URL, retrieved date, and license notes.
 - Phase 3: add explicit remote metadata lookup by title/author, IFID where possible, and pasted IFDB/IFWiki/IF Archive URL. Preview candidates, apply selected fields only, and document the source/retrieval date.
 

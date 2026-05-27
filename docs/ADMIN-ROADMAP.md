@@ -146,12 +146,12 @@
 
 ### iFiction apply/import
 
-- Current state: Admin2 can preview package-local `metadata.iFiction.xml` and apply explicitly selected supported fields into `game.yaml`. The apply route re-parses local XML server-side and creates a package-local `game.yaml` backup through the metadata service before writing.
+- Current state: Admin2 shows package-local `metadata.iFiction.xml` presence/status in package rows and details, can preview package-local XML, and can apply explicitly selected supported fields into `game.yaml`. The apply route re-parses local XML server-side and creates a package-local `game.yaml` backup through the metadata service before writing.
 - Supported mapped fields are title, author, headline/subtitle, description/teaser, first published/date, genre, language, IFIDs, and format/system.
-- Uploading or replacing `metadata.iFiction.xml` directly is not implemented yet.
+- Admin2 can upload or replace package-root `metadata.iFiction.xml`. Upload validates XML, rejects DOCTYPE declarations, backs up an existing XML file before replacement, and never applies metadata into `game.yaml` automatically.
 - Package creation does not accept `metadata.iFiction.xml`, and import preserves the file but does not use it to prefill or merge metadata during import commit.
 - Keep the local XML file package-local and reviewable. Preserve unknown YAML fields when applying accepted changes.
-- Future local iFiction improvements should show `metadata.iFiction.xml` presence/status in collapsed package rows, support explicit upload/replace of the XML file, improve preview/apply ergonomics, and integrate local preview/apply into package creation/import when XML is present.
+- Future local iFiction improvements should integrate local preview/apply into package creation/import when XML is present.
 - Continue to avoid remote lookup in local iFiction workflows.
 
 ### Metadata Assistant
@@ -163,7 +163,7 @@
 - Do not perform remote fetches without explicit user action.
 - Keep provenance and license review explicit, even when external catalog metadata is found.
 - Clearly distinguish metadata import/enrichment from story-file or package download.
-- Phase 1: improve local iFiction XML upload/replace, show XML presence/status in package rows, improve local preview/apply, and integrate local iFiction preview/apply into package creation/import when present.
+- Phase 1 baseline: local iFiction XML presence/status in package rows, XML present/missing filters, package-root upload/replace, and improved local preview/apply. Remaining Phase 1 polish is package creation/import awareness where practical.
 - Phase 2: assist catalog/provenance fields such as IFDB TUID, IFDB URL, IFWiki URL, IF Archive path, IF Archive URL, source URL, retrieved date, and license notes.
 - Phase 3: add explicit remote metadata lookup by title/author, by IFID where possible, and from pasted IFDB/IFWiki/IF Archive URLs. Preview candidates, apply selected fields only, and document source/retrieval date.
 - Tie this assistant to large-library cleanup by letting admins filter for incomplete metadata groups, then use the assistant to resolve missing IFID, catalog URL, cover, screenshot, helper-doc, provenance, license, or `metadata.iFiction.xml` gaps.

@@ -214,6 +214,11 @@ class GamePackage
         return $this->storyPath() !== null;
     }
 
+    public function hasIFictionMetadata(): bool
+    {
+        return is_file($this->path . DIRECTORY_SEPARATOR . 'metadata.iFiction.xml');
+    }
+
     public function assetPath(?string $relative): ?string
     {
         if (!$relative) {
@@ -728,6 +733,8 @@ class GamePackage
         $data['catalog'] = $this->catalog();
         $data['metadata_summary'] = $this->metadataSummary();
         $data['catalog_links'] = $this->catalogLinks();
+        $data['has_ifiction'] = $this->hasIFictionMetadata();
+        $data['ifiction_path'] = 'metadata.iFiction.xml';
         $data['warnings'] = $this->warnings();
         $data['warning_count'] = $this->warningCount();
         $data['error_count'] = $this->warningCount('error');

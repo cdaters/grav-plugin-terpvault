@@ -10,6 +10,7 @@ use DOMXPath;
 use Grav\Common\Grav;
 use Grav\Common\Yaml;
 use InvalidArgumentException;
+use Psr\Http\Message\UploadedFileInterface;
 use RuntimeException;
 
 class PackageIFictionService
@@ -99,6 +100,61 @@ class PackageIFictionService
         return $updatedPreview;
     }
 
+    public function upload(string $slug, UploadedFileInterface $upload): array
+    {
+        $paths = $this->packagePaths($slug);
+        if ($upload->getError() !== UPLOAD_ERR_OK) {
+            throw new InvalidArgumentException('metadata.iFiction.xml upload failed.');
+        }
+
+        $clientName = (string) $upload->getClientFilename();
+        if (strtolower(pathinfo($clientName, PATHINFO_EXTENSION)) !== 'xml') {
+            throw new InvalidArgumentException('metadata.iFiction.xml upload must be an XML file.');
+        }
+
+        $stream = $upload->getStream();
+        if ($stream->isSeekable()) {
+            $stream->rewind();
+        }
+        $xml = (string) $stream;
+        if (trim($xml) === '') {
+            throw new InvalidArgumentException('metadata.iFiction.xml upload is empty.');
+        }
+        if (strlen($xml) > 524288) {
+            throw new InvalidArgumentException('metadata.iFiction.xml upload is too large.');
+        }
+        if (stripos($xml, '<!DOCTYPE') !== false) {
+            throw new InvalidArgumentException('metadata.iFiction.xml contains a DOCTYPE declaration and was not saved.');
+        }
+
+        $this->parseXml($xml);
+
+        $target = $paths['package'] . DIRECTORY_SEPARATOR . 'metadata.iFiction.xml';
+        $backup = null;
+        if (is_file($target)) {
+            $backup = $this->backupPath($target);
+            if (!copy($target, $backup)) {
+                throw new RuntimeException('Unable to create metadata.iFiction.xml backup.');
+            }
+        }
+
+        $temp = $paths['package'] . DIRECTORY_SEPARATOR . '.metadata.iFiction.xml.tmp-' . bin2hex(random_bytes(8));
+        if (file_put_contents($temp, $xml) === false) {
+            throw new RuntimeException('Unable to write metadata.iFiction.xml temp file.');
+        }
+        if (!rename($temp, $target)) {
+            @unlink($temp);
+            throw new RuntimeException('Unable to replace metadata.iFiction.xml.');
+        }
+
+        $metadata = $this->loadYaml($paths['yaml']);
+        $preview = $this->previewFromPaths($paths, $metadata);
+        $preview['uploaded'] = true;
+        $preview['backup'] = $backup;
+
+        return $preview;
+    }
+
     private function previewFromPaths(array $paths, array $metadata): array
     {
         $result = [
@@ -143,6 +199,19 @@ class PackageIFictionService
         }
 
         return $result;
+    }
+
+    private function backupPath(string $path): string
+    {
+        $base = $path . '.bak-' . date('Ymd-His');
+        $candidate = $base;
+        $index = 1;
+        while (file_exists($candidate)) {
+            $candidate = $base . '-' . $index;
+            $index++;
+        }
+
+        return $candidate;
     }
 
     private function parseXml(string $xml): array
