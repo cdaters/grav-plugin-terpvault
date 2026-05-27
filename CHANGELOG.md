@@ -1,3 +1,16 @@
+# v0.4.8
+
+## 05/26/2026
+
+1. Changed
+    - Verified the bundled Zork I walkthrough route through the Stone Barrow ending and full 350/350 score.
+    - Polished Zork I player-facing hints and walkthrough copy so technical audit/provenance language stays out of end-user helper docs.
+    - Improved the Parchment/player shell theme CSS with scoped variables, light/dark fallbacks, and better readability for the toolbar, iframe border, save/restore help, and fullscreen background.
+
+2. Notes
+    - No bundled Parchment runtime replacement was made.
+    - No story file changes were made.
+
 # v0.4.7
 
 ## 05/26/2026
