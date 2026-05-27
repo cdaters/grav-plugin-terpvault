@@ -21,6 +21,8 @@ parchment-single-file-2025-01-14.zip
 
 The file was renamed to `index.html` for TerpVault's local adapter path.
 
+The bundled `assets/vendor/parchment/` files are required runtime assets for local/self-contained playback and must remain included in redistributed plugin packages.
+
 Parchment itself is MIT licensed and may incorporate upstream components under MIT, BSD-2-Clause, OFL, GPL-2.0, and/or other licenses depending on the release/build included. The bundled single-file HTML includes an embedded bundled-license comment near the end of the file; keep it intact.
 
 Known bundled/upstream component families include jQuery, js-cookie, Lodash, Bocfel, Glulxe, Git, Hugo, Scare, TADS, RemGlk-rs, AsyncGlk, Emglken, and Iosevka. Verify against the upstream Parchment release when updating this vendor build.

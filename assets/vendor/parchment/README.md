@@ -1,6 +1,6 @@
 # Parchment Vendor Build
 
-This folder contains the bundled TerpVault Parchment adapter.
+This folder contains the bundled TerpVault Parchment adapter. These files are a required runtime dependency for local/self-contained playback and must remain tracked in repository and release packages.
 
 Included file:
 

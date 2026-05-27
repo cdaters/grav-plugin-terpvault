@@ -16,11 +16,10 @@
 <body>
   <main>
     <p class="prompt">&gt; look</p>
-    <h1>TerpVault is ready, but Parchment is not bundled yet.</h1>
-    <p>This placeholder is intentionally included so the plugin has a safe player target before you add the actual browser interpreter.</p>
-    <p>Install a Parchment web build into:</p>
+    <h1>TerpVault could not load the bundled Parchment adapter.</h1>
+    <p>The bundled Parchment runtime is expected at:</p>
     <p><code>user/plugins/terpvault/assets/vendor/parchment/index.html</code></p>
-    <p>Or set <code>player.parchment_url</code> in <code>user/config/plugins/terpvault.yaml</code>.</p>
+    <p>Restore the tracked vendor files from the plugin package or set <code>player.parchment_url</code> in <code>user/config/plugins/terpvault.yaml</code>.</p>
     <p class="prompt">Story URL passed to adapter:</p>
     <p><code id="story"></code></p>
   </main>

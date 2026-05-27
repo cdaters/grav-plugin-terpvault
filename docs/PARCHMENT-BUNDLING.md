@@ -10,6 +10,8 @@ This package includes the single-file Parchment web build **2025.1.14** here:
 assets/vendor/parchment/index.html
 ```
 
+The `assets/vendor/parchment/` files are required runtime assets for local/self-contained playback. Keep them tracked in the repository and included in release packages.
+
 The uploaded release artifact contained one file named `parchment.html`; TerpVault renames it to `index.html` so the plugin can load a stable local URL.
 
 ## How TerpVault calls Parchment

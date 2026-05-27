@@ -2,7 +2,7 @@
 
 **TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a standards-aware shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, optional hero art, screenshots, feelies/extras, hints, walkthroughs, and a bundled web player.
 
-This is a **v0.4.5 early public-beta release** on the TerpVault foundation. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
+This is a **v0.4.7 early public-beta release** on the TerpVault foundation. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
 
 ## What it does now
 
@@ -20,7 +20,7 @@ This is a **v0.4.5 early public-beta release** on the TerpVault foundation. It i
   - `/if/_asset/{slug}/{path}` controlled package-asset endpoint
 - Provides a native shortcode-style embed:
   - `[terpvault game="adventure"]`
-- Bundles the Parchment 2025.1.14 single-file web build as the first engine adapter.
+- Bundles the tracked Parchment 2025.1.14 single-file web build under `assets/vendor/parchment/` as the first engine adapter, served locally through `/if/_engine/parchment`.
 - Includes an optional Admin2 Library Manager with collapsible package rows, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a limited package creation wizard, package export, draft-only package import, a metadata-only `game.yaml` editor, local iFiction metadata preview with selected-field apply, helper Markdown editing, limited package-local cover/small-cover/hero/screenshot image uploads, curated feelies/extras manifest management and upload, and limited story-file replacement. It is disabled by default.
 
 ## What it does not do yet

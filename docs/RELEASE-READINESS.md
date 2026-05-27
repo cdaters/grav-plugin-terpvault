@@ -51,6 +51,7 @@ Before tagging:
 - Exclude development-only real IF packages unless redistribution review is complete.
 - Keep `sample-cave` if a structure demo is needed.
 - Preserve `docs/THIRD-PARTY-NOTICES.md`.
+- Preserve tracked bundled Parchment adapter assets under `assets/vendor/parchment/`; GitHub source/download ZIP installs must include the files served through `/if/_engine/parchment`.
 - Preserve Parchment's embedded bundled-license comment in `assets/vendor/parchment/index.html`.
 - Confirm README describes Admin2/API package creation, editing, export, import inspection, and draft-only import commit as experimental opt-in workflows.
 - Confirm README states `.terpvault.zip` import is draft-only, non-overwriting, and forced to not featured.

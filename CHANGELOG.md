@@ -1,3 +1,16 @@
+# v0.4.7
+
+## 05/26/2026
+
+1. Fixed
+    - Tracked the bundled Parchment adapter assets under `assets/vendor/parchment/` so source installs and GitHub download ZIP installs include the local player.
+    - Added the `.gitignore` carve-out needed to keep the bundled Parchment files in repository and release packages despite the broader `/assets/` ignore rule.
+    - Fixed installs made from GitHub source/download ZIP missing the `/if/_engine/parchment` runtime asset.
+
+2. Notes
+    - No Parchment runtime replacement was made.
+    - No runtime code changes were made.
+
 # v0.4.6
 
 ## 05/25/2026
