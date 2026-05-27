@@ -1,3 +1,21 @@
+# v0.4.9
+
+## 05/26/2026
+
+1. Changed
+    - Added TerpVault version visibility to the Admin2 Library Manager.
+    - Added a Plugin version row to Admin2 Runtime Settings.
+    - Added optional muted public "Powered by TerpVault vX.Y.Z" footer text on public TerpVault pages.
+    - Added the `display.show_public_version` config toggle for the public version footer.
+    - Added plugin version data to `/if/_manifest`.
+    - Read the displayed version from plugin metadata/blueprints instead of hard-coding it into the UI.
+
+2. Documentation
+    - Documented the roadmap for safe package delete/remove workflows.
+    - Documented the roadmap for large-library search, filter, sort, pagination, and virtual scrolling.
+    - Documented the Metadata Assistant roadmap.
+    - Documented future IFDB, IFWiki, and IF Archive metadata lookup and package-builder roadmap concepts.
+
 # v0.4.8
 
 ## 05/26/2026
