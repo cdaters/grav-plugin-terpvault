@@ -1,3 +1,18 @@
+# v0.4.11
+
+## 05/27/2026
+
+1. Changed
+    - Added iFiction XML present/missing status in Admin2 package rows and details.
+    - Added metadata-completeness filters for iFiction XML present/missing.
+    - Added a local package-root `metadata.iFiction.xml` upload/replace workflow.
+    - Improved local iFiction preview/apply copy around selective apply, no silent overwrite, and `game.yaml` backups.
+    - Exposed `has_ifiction` and `ifiction_path` in manifest/status package data.
+
+2. Safety
+    - Upload validates XML, rejects DOCTYPE declarations, enforces `.xml`, limits file size, backs up existing XML, returns preview data, and does not apply fields automatically.
+    - No remote IFDB, IFWiki, or IF Archive lookup, package-builder, auto-apply, package delete, bulk actions, pagination, or virtual scrolling were added.
+
 # v0.4.10
 
 ## 05/27/2026
