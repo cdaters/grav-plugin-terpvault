@@ -8,7 +8,7 @@ This is an original TerpVault walkthrough for the selected source-built Zork I s
 
 The prose below is rewritten for this package. It is not copied from Infocom manuals, Invisiclues, commercial hint books, or online walkthrough text.
 
-Several command chunks were checked directly in Frotz against this package's `zork1.z3`, including the early house route, troll route, temple/coffin setup, and dam control sequence. A final full-route transcript attempt was also run with `dfrotz`; it reached 85 of 350 points before going off-route during the reservoir/boat and later coal-mine sequence. The full 350-point route has not been replayed end to end, mostly because Zork I has random combat, thief behavior, and route-sensitive inventory/navigation constraints. Treat the later sections as source-assisted route guidance until the package receives a clean full transcript pass.
+A full command route has now been checked with `dfrotz` against this exact packaged `zork1.z3` using a fixed interpreter random seed. The verified transcript reached the Stone Barrow, printed the final completion text, and scored 350 of 350 points in 348 moves. Zork I still includes random combat and thief behavior, so save often and expect combat sections to vary in ordinary play.
 
 ## Quick survival notes
 
@@ -281,17 +281,17 @@ The source marks the following as treasure-bearing or score-relevant objects. Th
 - jeweled egg and its contents, if preserved correctly
 - platinum bar
 
-The maximum score in the verified source is 350. The package walkthrough should not claim a complete 350-point path until the final command transcript reaches that result.
+The maximum score in the verified packaged story file is 350.
 
-## Partially verified command route
+## Verified full command route
 
-The following route was tested interactively in Frotz against the selected DDEV package story file through the troll, dome, temple approach, coffin pickup, and sceptre retrieval setup. The troll fight may require fewer or more attacks depending on randomness.
+The following command route was run through `dfrotz` against the packaged Release 119 / Serial 880429 story file. The verification run used a fixed interpreter random seed and reached 350/350 in 348 moves. The troll and thief fights may require fewer or more attacks in ordinary play; repeat the attack command until the fight is clearly over, and restore if randomness goes badly.
 
 ```text
 s
 e
 open window
-enter house
+w
 w
 get lamp
 move rug
@@ -304,15 +304,17 @@ get painting
 n
 u
 u
-get rope
+get knife and rope
 d
 w
 open case
 put painting in case
+drop knife
 get sword
 open trap door
 d
 n
+kill troll with sword
 kill troll with sword
 kill troll with sword
 kill troll with sword
@@ -331,32 +333,321 @@ get coffin
 w
 s
 pray
+turn off lamp
+s
+n
+e
+d
+d
+n
+drop coffin
+open coffin
+get sceptre
+wave sceptre
+look
+get gold
+get coffin
+sw
+u
+u
+nw
+w
+w
+open bag
+get garlic
+w
+put coffin in case
+put sceptre in case
+put gold in case
+score
+open trap door
+turn on lamp
+d
+n
+e
+n
+ne
+e
+n
+get matches
+n
+get wrench and screwdriver
+push yellow button
+s
+s
+turn bolt with wrench
+drop wrench
+s
+sw
+s
+se
+e
+climb down rope
+get torch
+turn off lamp
+s
+get bell
+s
+get book
+get candles
+d
+d
+ring bell
+get candles
+light match
+light candles with match
+read book
+drop book
+s
+get skull
+n
+u
+n
+put out candles
+rub mirror
+n
+w
+n
+w
+n
+e
+put torch in basket
+turn on lamp
+n
+d
+e
+ne
+se
+sw
+d
+d
+s
+get coal
+n
+u
+u
+n
+e
+s
+n
+u
+s
+put coal in basket
+put screwdriver in basket
+lower basket
+n
+d
+e
+ne
+se
+sw
+d
+d
+w
+drop all
+w
+get coal
+get torch
+get screwdriver
+s
+open lid
+put coal in machine
+close lid
+turn switch with screwdriver
+open lid
+get diamond
+drop screwdriver
+n
+put torch in basket
+put diamond in basket
+e
+get lamp
+get garlic
+e
+u
+u
+n
+e
+s
+n
+get bracelet
+u
+s
+raise basket
+get torch
+get diamond
+turn off lamp
+w
+get jade
+s
+e
+s
+d
+u
+put diamond in case
+put jade in case
+put bracelet in case
+put torch in case
+drop garlic
+score
+turn on lamp
+d
+n
+e
+n
+ne
+n
+get trunk
+n
+get pump
+n
+get trident
+s
+s
+s
+e
+e
+inflate boat with pump
+drop pump
+get in boat
+launch
+wait
+wait
+wait
+wait
+get buoy
+e
+get out
+open buoy
+get emerald
+drop buoy
+get shovel
+ne
+dig sand with shovel
+dig sand with shovel
+dig sand with shovel
+dig sand with shovel
+drop shovel
+get scarab
+sw
+s
+s
+cross rainbow
+turn off lamp
+sw
+u
+u
+nw
+w
+w
+w
+put scarab in case
+put emerald in case
+put trunk in case
+put trident in case
+e
+e
+n
+n
+climb tree
+get egg
+climb down
+s
+e
+w
+w
+turn on lamp
+d
+n
+w
+s
+e
+u
+get coins
+get key
+sw
+e
+s
+se
+ulysses
+u
+give egg to thief
+d
+e
+e
+put coins in case
+get knife
+w
+w
+u
+kill thief with knife
+kill thief with knife
+kill thief with knife
+kill thief with knife
+kill thief with knife
+kill thief with knife
+get all
+d
+nw
+s
+w
+u
+d
+ne
+unlock grate
+open grate
+u
+s
+climb tree
+wind up canary
+climb down
+get bauble
+s
+e
+w
+w
+put chalice in case
+put stiletto in case
+put skull in case
+remove canary from egg
+put egg in case
+put canary in case
+put bauble in case
+d
+n
+e
+e
+e
+echo
+get bar
+w
+w
+w
+s
+u
+put all except lamp in case
+look in case
+get map
+e
+e
+s
+w
+sw
+enter barrow
+score
 ```
 
-From this point, continue with the canyon/rainbow route and then return treasures to the living room trophy case. That continuation should be fully transcript-tested before this walkthrough is treated as final.
+## Verification notes
 
-## Remaining verification notes
-
-Verified in Frotz during this pass:
+Verified with `dfrotz` against this package's exact `zork1.z3`:
 
 - package story file launches as Release 119 / Serial 880429
-- white-house entry route
-- lamp, rug, trap-door, cellar route
-- painting collection and trophy-case deposit
-- attic rope collection
-- troll fight with sword using repeated attacks
-- dropping the sword after the troll to manage inventory
-- dome rope setup and descent
-- temple/Egyptian-room path
-- coffin pickup after inventory adjustment
-- prayer exit from the altar area
-- coffin opening and sceptre retrieval from an outdoor canyon position
+- white-house entry, painting pickup, and trophy-case deposit
+- troll fight, dome rope setup, coffin, sceptre, rainbow, and pot of gold
+- dam controls, reservoir lowering, and Parchment-relevant story route continuity
+- bell/candles/book exorcism and skull recovery
+- coal mine, basket, coal machine, diamond, jade, and bracelet
+- boat launch, buoy, emerald, Sandy Cave digging, scarab, and rainbow return
+- maze route, cyclops solution, thief/egg/chalice recovery, grating shortcut, canary/bauble, platinum bar, final map, and Stone Barrow ending
 
-Source/play-through assisted but not fully replayed end to end in this pass:
-
-- full reservoir and river route after the dam opens
-- coal mine and machine route
-- river and scarab route
-- thief, cyclops, egg, chalice, and final 350-point cleanup
-
-Before copying a finished package into `_demo`, run a clean full-game transcript against this exact `zork1.z3`, update this walkthrough with the verified late-game command route, and confirm the final score path.
+The verified run reached the final completion text and scored 350/350 in 348 moves.

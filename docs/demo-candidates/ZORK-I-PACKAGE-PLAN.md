@@ -9,9 +9,9 @@
 - DDEV-only export/import smoke testing has passed.
 - A DDEV-only package shell has been created and manually inspected.
 - Core DDEV-only visual assets have been integrated and route/render checked.
-- The DDEV-only walkthrough has been expanded from placeholder text into original package copy with partial Frotz route verification.
+- The DDEV-only walkthrough has been expanded from placeholder text into original package copy, and the bundled `_demo` walkthrough route now has full `dfrotz` transcript verification.
 - The package has been copied into `_demo/data/terpvault/games/zork-i`.
-- The walkthrough remains partially Frotz-verified; full 350-point transcript verification is still pending.
+- Full 350-point transcript verification is complete against the exact bundled story file.
 
 This document records the completed package plan and remaining polish follow-ups. Do not create tags or releases from this plan; use the v0.4.6 release checklist and Craig approval.
 
@@ -64,11 +64,11 @@ The DDEV package description was also polished with original public-facing copy 
 
 The DDEV package now includes `feelies/feelie-01-poster.png`, an original Craig Daters 2026 poster-style feelie inspired by retail-era adventure-game feelies. It is not a scan or reproduction of historical Infocom packaging, manuals, maps, ads, logos, trade dress, scans, or commercial feelies. Final DDEV export/import smoke testing passed with the feelie, provenance file, upstream license file, story, visual assets, screenshots, and helper docs restored into a forced-draft import.
 
-The DDEV package `walkthrough.md` has also been expanded into original TerpVault package text. Package-facing references to local walkthrough/reference filenames and paths have been removed from the public walkthrough copy. The walkthrough is source-assisted and play-through tested against the selected packaged story file. Frotz checks verified the white-house opening, painting/trophy-case route, troll fight, rope/dome descent, temple/coffin setup, and dam-control sequence through Dam Base. Full reservoir/river, coal mine, scarab, thief/cyclops/egg/chalice, and final 350-point cleanup sections remain marked for full transcript verification before bundled demo approval.
+The package `walkthrough.md` has also been expanded into original TerpVault package text. Package-facing references to local walkthrough/reference filenames and paths have been removed from the public walkthrough copy. The walkthrough is source-assisted and play-through tested against the selected packaged story file. Frotz checks verified the early route, and a full `dfrotz` transcript against the bundled `_demo` `zork1.z3` reached the Stone Barrow and scored 350/350 in 348 moves.
 
 Remaining asset/package gaps:
 
-- Final full walkthrough transcript verification is still pending.
+- Final full walkthrough transcript verification is complete for the bundled story file.
 - Any reproducible Parsdown/deprecation warning or repeated compiled-language cache parse error should be captured with exact text as a separate follow-up.
 - Public tag rendering on detail/card views remains a later frontend polish decision.
 - Optional IFID/iFiction metadata polish remains a later pass.
@@ -228,7 +228,7 @@ See [ZORK-I-ASSET-PLAN.md](ZORK-I-ASSET-PLAN.md) for the detailed docs-only asse
 
 - `how-to-play.md`: original parser primer, basic movement/object commands, save/restore expectations, and Zork-specific parser conventions.
 - `hints.md`: original spoiler-light progressive hints with clear spoiler boundaries.
-- `walkthrough.md`: original clearly spoilery walkthrough aligned to the exact bundled playable version; currently partially Frotz-verified and still requiring a full late-game transcript pass.
+- `walkthrough.md`: original clearly spoilery walkthrough aligned to the exact bundled playable version; fully `dfrotz`-verified to 350/350 against the bundled story file.
 - Do not copy Invisiclues, manuals, commercial hint books, online walkthroughs, or catalog prose unless explicitly licensed for redistribution.
 
 ## Feelies plan

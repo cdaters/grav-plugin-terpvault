@@ -11,11 +11,12 @@
 - Second DDEV-only screenshot and public copy polish verified on 2026-05-25.
 - Original DDEV-only poster feelie and final export/import smoke test verified on 2026-05-25.
 - DDEV-only walkthrough expansion and partial Frotz route verification completed on 2026-05-25.
+- Full `dfrotz` walkthrough transcript verification against the bundled `_demo` story file completed on 2026-05-26.
 - Copied into `_demo/data/terpvault/games/zork-i` on 2026-05-25.
-- Requires final full walkthrough transcript verification before claiming full walkthrough coverage.
+- Full walkthrough coverage is verified against the exact bundled story file.
 - Next state: review release metadata and, after Craig approval, commit/tag/release v0.4.6.
 
-Zork I is ready for this bundled development demo tree with source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes present. Do not claim the walkthrough is fully verified until a complete transcript reaches final victory or the target score.
+Zork I is ready for this bundled development demo tree with source, license, build output, TerpVault package contents, assets, helper docs, provenance notes, and a full verified walkthrough route present. The verified `dfrotz` transcript reached the Stone Barrow and scored 350/350 in 348 moves against the exact bundled `_demo` story file.
 
 ## Upstream source to verify
 
@@ -471,8 +472,8 @@ Frotz verification level:
 
 - Interactive Frotz checks against `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i/zork1.z3` verified the early route through white-house entry, lamp/trap-door setup, painting collection and trophy-case deposit, attic rope collection, troll combat, rope/dome descent, temple/Egyptian-room path, coffin pickup after dropping the sword, prayer exit, and sceptre retrieval setup.
 - A later Frotz chunk verified the dam-control path from the cleared troll room through Reservoir South and Dam, including matchbook/wrench/screwdriver pickup, `push yellow button`, `turn bolt with wrench`, and access to Dam Base with the folded plastic boat present.
-- A final `dfrotz` full-route attempt reached 85 of 350 points before going off-route during the reservoir/boat and later coal-mine sequence.
-- The walkthrough remains explicitly marked as partially verified. Full reservoir/river, coal mine, scarab, thief/cyclops/egg/chalice, and final 350-point cleanup still need a clean full-game transcript pass before claiming full walkthrough verification.
+- A final `dfrotz` full-route verification against the bundled `_demo` `zork1.z3` reached the Stone Barrow and scored 350/350 in 348 moves.
+- The walkthrough is now marked fully verified for the packaged story file.
 
 Route/export checks after walkthrough cleanup:
 
@@ -520,7 +521,7 @@ No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, `desktop.ini`, hidden/syst
 
 ## Remaining blockers
 
-- `walkthrough.md` is expanded, original, and partially Frotz-verified, but the late-game route still needs a full clean transcript pass before claiming full walkthrough verification.
+- `walkthrough.md` is expanded, original, and fully `dfrotz`-verified against the exact bundled story file.
 - The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in this pass; keep it as a follow-up only if it becomes reproducible.
 - A transient compiled-language cache parse error appeared immediately after cache clear and disappeared on refresh; record as a DDEV/Grav cache follow-up if it becomes consistently reproducible.
 - Decide later whether public game tags should render on detail/card views.
@@ -528,7 +529,7 @@ No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, `desktop.ini`, hidden/syst
 
 ## Recommended next action
 
-Review the prepared v0.4.6 changes, then commit, tag, and release only after Craig approval. Zork I is now present in `_demo`; future work should focus on full walkthrough transcript verification and optional metadata polish.
+Review the prepared v0.4.6 changes, then commit, tag, and release only after Craig approval. Zork I is now present in `_demo`; future work should focus on optional metadata polish.
 
 Packaging recommendation:
 
@@ -537,12 +538,12 @@ Packaging recommendation:
 - Do not bundle `zork1.zip` or `COMPILED/zork1.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
 - Keep upstream MIT license text and package-local provenance notes in the package.
 - Use only Craig-created art/helper docs unless other assets have separately verified redistribution rights.
-- Keep the walkthrough marked partially verified until a full transcript reaches final victory or target score.
+- Keep the walkthrough verification note tied to the exact bundled story file and transcript result.
 
 Remaining follow-ups:
 
 - Verify IFID/iFiction metadata if desired.
-- Run a full clean walkthrough transcript to final victory or target score.
+- Re-run the full clean walkthrough transcript if the story file changes.
 - Re-test public tag rendering decisions in a later frontend polish pass.
 
 ## Legal/provenance checklist
