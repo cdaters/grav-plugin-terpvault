@@ -95,7 +95,7 @@ class PackageCreationService
             'id' => $slug,
             'slug' => $slug,
             'identification' => [
-                'format' => trim((string)($fields['format'] ?? '')),
+                'format' => $this->format((string)($fields['format'] ?? ''), $storyFile),
                 'ifids' => [],
             ],
             'bibliographic' => [
@@ -160,6 +160,44 @@ class PackageCreationService
         }
 
         return $status;
+    }
+
+    private function format(string $format, string $storyFile): string
+    {
+        $format = $this->normalizeFormat($format);
+        if ($format !== '') {
+            return $format;
+        }
+
+        return $this->normalizeFormat(strtolower(pathinfo($storyFile, PATHINFO_EXTENSION)));
+    }
+
+    private function normalizeFormat(string $format): string
+    {
+        $format = strtolower(trim(str_replace(['_', ' '], '-', $format)));
+        if (in_array($format, ['zcode', 'z-code', 'z-machine', 'zmachine', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb', 'zlb'], true)) {
+            return 'zcode';
+        }
+        if (in_array($format, ['glulx', 'ulx', 'gblorb', 'glb', 'blorb'], true)) {
+            return 'glulx';
+        }
+        if (in_array($format, ['tads2', 'tads-2', 'tadsii', 'tads-ii', 'gam'], true)) {
+            return 'tads2';
+        }
+        if (in_array($format, ['tads3', 'tads-3', 'tadsiii', 'tads-iii', 't3'], true)) {
+            return 'tads3';
+        }
+        if (in_array($format, ['tads', 'hugo', 'adrift', 'ink'], true)) {
+            return $format;
+        }
+        if ($format === 'hex') {
+            return 'hugo';
+        }
+        if ($format === 'taf') {
+            return 'adrift';
+        }
+
+        return $format;
     }
 
     private function tags($value): array

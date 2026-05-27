@@ -26,8 +26,8 @@
 - Added a limited Package Creation Wizard.
 - Added authenticated package export.
 - Added inspect-only package import validation.
-- The Library Manager currently renders all packages returned by the manifest as one collapsible list; it does not yet have search, filters, sorting controls, pagination, or virtual scrolling.
-- Browser `localStorage` is currently used for the active Admin2 tab and package row expanded/collapsed state.
+- The Library Manager renders packages as collapsible rows and now has baseline client-side search, sort, status/featured/format filters, metadata-completeness filters, visible result counts, and reset controls.
+- Browser `localStorage` is currently used for the active Admin2 tab, package row expanded/collapsed state, and Library Manager search/sort/filter state.
 
 ### v0.3.x import/export hardening
 
@@ -124,13 +124,14 @@
 ### Large-library management
 
 - Make Admin2 usable for libraries with hundreds or thousands of packages without rendering one giant page.
-- Add search/filter/sort controls before adding bulk mutation workflows.
-- Search should cover title, slug, author, format, engine/runtime, tags, status, year, IFID, and IFDB/IFWiki/IF Archive/source/provenance fields where available.
-- Sorting should include title A-Z/Z-A, author, year, format/engine, status, recently modified, and recently added.
-- Filters should include published/draft, featured/not featured, format or engine family such as z-code, glulx, tads, hugo, adrift, and future ink, has/missing cover, has/missing screenshots, has/missing walkthrough or helper docs, has/missing IFID, has/missing catalog URLs, provenance verified/needs review, license verified/needs review, bundled demo/user library, and `metadata.iFiction.xml` present/missing.
+- Baseline shipped: client-side search/filter/sort controls before bulk mutation workflows.
+- Baseline search covers available manifest fields including title, slug, author, format, engine/runtime, tags, status, year/date, IFID, catalog links, source/license, and provenance rows.
+- Baseline sorting includes title A-Z/Z-A, author, year/date newest/oldest, format/engine, status, and slug A-Z.
+- Baseline filters include published/draft, featured/not featured, format/engine, missing cover, missing screenshots, missing walkthrough, missing IFID, and missing catalog links.
+- Future filters should add provenance verified/needs review, license verified/needs review, bundled demo/user library, and `metadata.iFiction.xml` present/missing after those signals are exposed consistently in the manifest/status data.
 - Add pagination or virtual scrolling so large libraries do not render as one giant DOM. Support items-per-page choices of 25, 50, and 100 if pagination is used.
 - Keep the existing collapsible package row model, but make expanded rows behave predictably when a package is filtered out, moved to a different page, or returned by a new search.
-- Preserve Admin2 UI state in `localStorage` where practical: search query, filters, sort order, page size, active page, and expanded/collapsed rows.
+- Preserve Admin2 UI state in `localStorage` where practical. Search query, filters, sort order, active tab, and expanded/collapsed rows are persisted; page size and active page remain future pagination work.
 - Lazy-load or defer heavy media previews so hundreds of covers/screenshots do not slow the admin page.
 - Consider compact, grid, and list view modes later, after search/filter/sort/page state is stable.
 - Add bulk actions only after safe single-package workflows exist and their audit/confirmation behavior is proven.

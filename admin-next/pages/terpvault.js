@@ -9,6 +9,7 @@ class TerpVaultPage extends HTMLElement {
       status: null,
       source: 'loading',
       activeTab: localStorage.getItem('terpvault.admin.tab') || 'library',
+      libraryControls: this._libraryControlsFromStorage(),
       editingSlug: null,
       create: {
         open: false,
@@ -174,6 +175,7 @@ class TerpVaultPage extends HTMLElement {
     this.state.formats = data.formats || this._fallbackFormats();
     this.state.status = data;
     this.state.source = source;
+    this._normalizeLibraryControlsForData();
     this._renderVersionBadge();
     this._renderLibrary();
     this._renderFormats();
@@ -212,6 +214,12 @@ class TerpVaultPage extends HTMLElement {
         .badge.warn { border-color: rgba(255,188,87,.65); background: rgba(255,188,87,.12); }
         .badge.error { border-color: rgba(255,95,95,.75); background: rgba(255,95,95,.13); }
         .badge.ok { border-color: rgba(79,190,124,.58); background: rgba(79,190,124,.10); }
+        .library-controls { border:1px solid rgba(127,127,127,.28); border-radius:12px; padding:.8rem; margin:0 0 .85rem; background:rgba(127,127,127,.035); display:grid; gap:.7rem; }
+        .library-control-grid { display:grid; grid-template-columns:minmax(220px, 1.4fr) repeat(4, minmax(150px, 1fr)) auto; gap:.55rem; align-items:end; }
+        .library-control { display:grid; gap:.25rem; min-width:0; }
+        .library-control label { font-weight:600; font-size:.78rem; opacity:.78; }
+        .library-control input, .library-control select { min-height:2.35rem; }
+        .library-count { display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap; }
         .body { border-top:1px solid rgba(127,127,127,.18); padding:.85rem; display:grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, .9fr); gap:1rem; }
         dl { display:grid; grid-template-columns: 125px minmax(0,1fr); gap:.4rem .75rem; margin:0; }
         dt { opacity:.68; }
@@ -317,6 +325,8 @@ class TerpVaultPage extends HTMLElement {
           .game summary { grid-template-columns: 56px 1fr; }
           .cover { width:56px; }
           .badges { grid-column: 1 / -1; justify-content:flex-start; }
+          .library-control-grid { grid-template-columns:1fr; }
+          .library-count { display:grid; }
           .body { grid-template-columns: 1fr; }
           dl { grid-template-columns: 1fr; }
           .editor-head { display:block; }
@@ -416,6 +426,7 @@ class TerpVaultPage extends HTMLElement {
 
     const errors = games.reduce((sum, game) => sum + Number(game.error_count || 0), 0);
     const warnings = games.reduce((sum, game) => sum + Number(game.warning_count || 0), 0);
+    const visibleGames = this._visibleGames();
     root.innerHTML = `
       <div class="box notice">
         <div class="editor-head">
@@ -435,9 +446,497 @@ class TerpVaultPage extends HTMLElement {
       </div>
       ${this.state.create.open ? this._createPackagePanel() : ''}
       ${this.state.importInspect.open ? this._importInspectPanel() : ''}
-      ${games.map(game => this._gameRow(game)).join('')}
+      ${this._libraryControlBar(games, visibleGames)}
+      ${visibleGames.length ? visibleGames.map(game => this._gameRow(game)).join('') : this._emptyLibraryResults(games.length)}
     `;
     this._bindLibraryActions();
+  }
+
+  _libraryControlBar(games, visibleGames) {
+    const controls = this.state.libraryControls || this._defaultLibraryControls();
+    const formats = this._libraryFormatOptions(games);
+    return `
+      <section class="library-controls" aria-label="Library search and filters">
+        <div class="library-control-grid">
+          <div class="library-control">
+            <label for="tv-library-search">Search</label>
+            <input id="tv-library-search" type="search" data-library-control="search" value="${this._esc(controls.search)}" placeholder="Title, slug, author, IFID, source...">
+          </div>
+          <div class="library-control">
+            <label for="tv-library-sort">Sort</label>
+            <select id="tv-library-sort" data-library-control="sort">
+              ${this._options([
+                ['title-asc', 'Title A-Z'],
+                ['title-desc', 'Title Z-A'],
+                ['author-asc', 'Author A-Z'],
+                ['year-desc', 'Year newest'],
+                ['year-asc', 'Year oldest'],
+                ['format-asc', 'Format / engine'],
+                ['status-asc', 'Status'],
+                ['slug-asc', 'Slug A-Z']
+              ], controls.sort)}
+            </select>
+          </div>
+          <div class="library-control">
+            <label for="tv-library-status">Status</label>
+            <select id="tv-library-status" data-library-control="status">
+              ${this._options([['all', 'All statuses'], ['published', 'Published'], ['draft', 'Draft']], controls.status)}
+            </select>
+          </div>
+          <div class="library-control">
+            <label for="tv-library-featured">Featured</label>
+            <select id="tv-library-featured" data-library-control="featured">
+              ${this._options([['all', 'All packages'], ['featured', 'Featured'], ['not-featured', 'Not featured']], controls.featured)}
+            </select>
+          </div>
+          <div class="library-control">
+            <label for="tv-library-format">Format</label>
+            <select id="tv-library-format" data-library-control="format">
+              ${this._options([['all', 'All formats'], ...formats], controls.format)}
+            </select>
+          </div>
+          <div class="library-control">
+            <label for="tv-library-completeness">Completeness</label>
+            <select id="tv-library-completeness" data-library-control="completeness">
+              ${this._options([
+                ['all', 'All metadata'],
+                ['missing-cover', 'Missing cover'],
+                ['missing-screenshots', 'Missing screenshots'],
+                ['missing-walkthrough', 'Missing walkthrough'],
+                ['missing-ifid', 'Missing IFID'],
+                ['missing-catalog-links', 'Missing catalog links']
+              ], controls.completeness)}
+            </select>
+          </div>
+        </div>
+        <div class="library-count">
+          <span class="meta">Showing ${visibleGames.length} of ${games.length} package${games.length === 1 ? '' : 's'}.</span>
+          <button class="button" type="button" data-action="reset-library-controls" ${this._libraryControlsAreDefault() ? 'disabled' : ''}>Reset filters</button>
+        </div>
+      </section>
+    `;
+  }
+
+  _emptyLibraryResults(total) {
+    return `
+      <div class="empty">
+        <h2>No packages match</h2>
+        <p class="meta">No packages match the current search and filters. ${total ? 'Reset filters or broaden the search query.' : ''}</p>
+      </div>
+    `;
+  }
+
+  _defaultLibraryControls() {
+    return {
+      search: '',
+      sort: 'title-asc',
+      status: 'all',
+      featured: 'all',
+      format: 'all',
+      completeness: 'all'
+    };
+  }
+
+  _libraryControlsFromStorage() {
+    const defaults = this._defaultLibraryControls();
+    try {
+      const stored = JSON.parse(localStorage.getItem('terpvault.admin.library.controls') || '{}');
+      return {
+        search: String(stored.search || defaults.search),
+        sort: this._allowedValue(stored.sort, ['title-asc', 'title-desc', 'author-asc', 'year-desc', 'year-asc', 'format-asc', 'status-asc', 'slug-asc'], defaults.sort),
+        status: this._allowedValue(stored.status, ['all', 'published', 'draft'], defaults.status),
+        featured: this._allowedValue(stored.featured, ['all', 'featured', 'not-featured'], defaults.featured),
+        format: String(stored.format || defaults.format),
+        completeness: this._allowedValue(stored.completeness, ['all', 'missing-cover', 'missing-screenshots', 'missing-walkthrough', 'missing-ifid', 'missing-catalog-links'], defaults.completeness)
+      };
+    } catch (e) {
+      return defaults;
+    }
+  }
+
+  _allowedValue(value, allowed, fallback) {
+    const text = String(value || '');
+    return allowed.includes(text) ? text : fallback;
+  }
+
+  _persistLibraryControls() {
+    localStorage.setItem('terpvault.admin.library.controls', JSON.stringify(this.state.libraryControls || this._defaultLibraryControls()));
+  }
+
+  _updateLibraryControl(key, value) {
+    if (!Object.prototype.hasOwnProperty.call(this._defaultLibraryControls(), key)) {
+      return;
+    }
+
+    const activeId = this.shadowRoot.activeElement?.id || '';
+    const selectionStart = typeof this.shadowRoot.activeElement?.selectionStart === 'number' ? this.shadowRoot.activeElement.selectionStart : null;
+    const selectionEnd = typeof this.shadowRoot.activeElement?.selectionEnd === 'number' ? this.shadowRoot.activeElement.selectionEnd : null;
+    this.state.libraryControls = {
+      ...(this.state.libraryControls || this._defaultLibraryControls()),
+      [key]: String(value || '')
+    };
+    this._persistLibraryControls();
+    this._renderLibrary();
+    if (activeId) {
+      queueMicrotask(() => {
+        const next = this.shadowRoot.getElementById(activeId);
+        if (next) {
+          next.focus();
+          if (selectionStart !== null && typeof next.setSelectionRange === 'function') {
+            next.setSelectionRange(selectionStart, selectionEnd ?? selectionStart);
+          }
+        }
+      });
+    }
+  }
+
+  _resetLibraryControls() {
+    this.state.libraryControls = this._defaultLibraryControls();
+    this._persistLibraryControls();
+    this._renderLibrary();
+  }
+
+  _libraryControlsAreDefault() {
+    const controls = this.state.libraryControls || this._defaultLibraryControls();
+    const defaults = this._defaultLibraryControls();
+    return Object.keys(defaults).every(key => String(controls[key] || '') === String(defaults[key] || ''));
+  }
+
+  _normalizeLibraryControlsForData() {
+    const controls = this.state.libraryControls || this._defaultLibraryControls();
+    if (controls.format === 'all') {
+      return;
+    }
+
+    const availableFormats = new Set(this._libraryFormatOptions(this.state.games || []).map(([value]) => value));
+    if (!availableFormats.has(controls.format)) {
+      this.state.libraryControls = { ...controls, format: 'all' };
+      this._persistLibraryControls();
+    }
+  }
+
+  _visibleGames() {
+    const controls = this.state.libraryControls || this._defaultLibraryControls();
+    const query = this._normalizeSearch(controls.search);
+    const filtered = (this.state.games || []).filter(game => {
+      if (query && !this._librarySearchText(game).includes(query)) {
+        return false;
+      }
+      if (controls.status !== 'all' && this._gameStatus(game) !== controls.status) {
+        return false;
+      }
+      if (controls.featured === 'featured' && !this._gameFeatured(game)) {
+        return false;
+      }
+      if (controls.featured === 'not-featured' && this._gameFeatured(game)) {
+        return false;
+      }
+      if (controls.format !== 'all' && this._gameFormatKey(game) !== controls.format) {
+        return false;
+      }
+      return this._matchesCompletenessFilter(game, controls.completeness);
+    });
+
+    return filtered.sort((a, b) => this._compareGames(a, b, controls.sort));
+  }
+
+  _librarySearchText(game) {
+    const format = this._gameFormatInfo(game);
+    const values = [
+      game.title,
+      game.slug,
+      game.author,
+      format.key,
+      format.label,
+      ...format.aliases,
+      game.format,
+      game.format_label,
+      game.player_engine,
+      game.player?.engine,
+      game.status,
+      game.year,
+      game.bibliographic?.first_published,
+      game.genre,
+      game.language,
+      game.story_file,
+      ...(Array.isArray(game.ifids) ? game.ifids : []),
+      ...(Array.isArray(game.tags) ? game.tags : []),
+      ...(Array.isArray(game.terpvault?.tags) ? game.terpvault.tags : []),
+      ...this._catalogSearchValues(game.catalog || {}),
+      ...this._catalogLinkSearchValues(game.catalog_links || []),
+      ...this._provenanceSearchValues(game.provenance_rows || []),
+      ...this._objectValues(game.release || {}),
+      ...this._objectValues(game.source || {}),
+      ...this._objectValues(game.license || {})
+    ];
+
+    return this._normalizeSearch(values.filter(value => value !== undefined && value !== null).join(' '));
+  }
+
+  _normalizeSearch(value) {
+    return String(value || '').toLowerCase().trim();
+  }
+
+  _objectValues(value) {
+    if (!value || typeof value !== 'object') {
+      return [];
+    }
+
+    return Object.values(value).flatMap(item => {
+      if (Array.isArray(item)) {
+        return item.map(entry => String(entry || ''));
+      }
+      if (item && typeof item === 'object') {
+        return this._objectValues(item);
+      }
+      return [String(item || '')];
+    });
+  }
+
+  _catalogSearchValues(catalog) {
+    return [
+      catalog.ifdb?.tuid,
+      catalog.ifdb?.url,
+      catalog.ifwiki?.url,
+      catalog.ifarchive?.path,
+      catalog.ifarchive?.url,
+      catalog.babel?.url
+    ].filter(Boolean);
+  }
+
+  _catalogLinkSearchValues(links) {
+    return Array.isArray(links) ? links.flatMap(link => [link.key, link.label, link.url, link.value, link.text].filter(Boolean)) : [];
+  }
+
+  _provenanceSearchValues(rows) {
+    return Array.isArray(rows) ? rows.flatMap(row => [row.label, row.url, row.text, row.note, ...(Array.isArray(row.values) ? row.values : [])].filter(Boolean)) : [];
+  }
+
+  _libraryFormatOptions(games) {
+    const seen = new Map();
+    games.forEach(game => {
+      const format = this._gameFormatInfo(game);
+      if (!format.key) {
+        return;
+      }
+      seen.set(format.key, format.label);
+    });
+
+    return Array.from(seen.entries()).sort((a, b) => this._compareText(a[1], b[1]));
+  }
+
+  _options(options, selected) {
+    return options.map(([value, label]) => `<option value="${this._esc(value)}" ${String(value) === String(selected) ? 'selected' : ''}>${this._esc(label)}</option>`).join('');
+  }
+
+  _gameFormatKey(game) {
+    return this._gameFormatInfo(game).key;
+  }
+
+  _gameFormatInfo(game) {
+    const explicit = this._normalizeFormatToken(game.identification?.format || game.identification?.system || game.format || game.system || '');
+    const strong = [
+      this._formatFromIfids(game.ifids || game.identification?.ifids || []),
+      this._formatFromStoryFile(game.story_file || game.resources?.story_file || ''),
+      this._formatFromCatalog(game.catalog || {}),
+      this._normalizeFormatToken(game.player?.format || game.player?.runtime || '')
+    ].find(Boolean);
+    const engine = this._normalizeFormatToken(game.player_engine || game.player?.engine || '');
+    const weak = this._formatFromTags([...(Array.isArray(game.tags) ? game.tags : []), ...(Array.isArray(game.terpvault?.tags) ? game.terpvault.tags : [])]);
+    const key = explicit && explicit !== 'tads' ? explicit : (strong || explicit || engine || weak);
+    const label = this._formatLabel(key, game.format_label || game.format || game.player_engine || '');
+
+    return {
+      key,
+      label,
+      aliases: this._formatAliases(key)
+    };
+  }
+
+  _normalizeFormatToken(value) {
+    const token = String(value || '').toLowerCase().trim().replace(/[_\s]+/g, '-');
+    if (!token) {
+      return '';
+    }
+    if (['zcode', 'z-code', 'z-machine', 'zmachine', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb', 'zlb'].includes(token)) {
+      return 'zcode';
+    }
+    if (['glulx', 'ulx', 'gblorb', 'glb', 'blorb'].includes(token)) {
+      return 'glulx';
+    }
+    if (['tads2', 'tads-2', 'tadsii', 'tads-ii', 'gam'].includes(token)) {
+      return 'tads2';
+    }
+    if (['tads3', 'tads-3', 'tadsiii', 'tads-iii', 't3'].includes(token)) {
+      return 'tads3';
+    }
+    if (token === 'tads') {
+      return 'tads';
+    }
+    if (token === 'hugo' || token === 'hex') {
+      return 'hugo';
+    }
+    if (token === 'adrift' || token === 'taf') {
+      return 'adrift';
+    }
+    if (token === 'ink') {
+      return 'ink';
+    }
+
+    return token;
+  }
+
+  _formatFromIfids(ifids) {
+    const values = Array.isArray(ifids) ? ifids : [ifids];
+    const joined = values.map(value => String(value || '').toUpperCase()).join(' ');
+    if (joined.includes('TADS2-')) return 'tads2';
+    if (joined.includes('TADS3-')) return 'tads3';
+    if (joined.includes('ZCODE-')) return 'zcode';
+    if (joined.includes('GLULX-')) return 'glulx';
+    return '';
+  }
+
+  _formatFromStoryFile(storyFile) {
+    const ext = String(storyFile || '').toLowerCase().split('?')[0].split('#')[0].split('.').pop();
+    return this._normalizeFormatToken(ext);
+  }
+
+  _formatFromCatalog(catalog) {
+    const text = [
+      catalog.ifarchive?.path,
+      catalog.ifarchive?.url
+    ].filter(Boolean).join(' ').toLowerCase();
+
+    if (text.includes('/games/tads/') || text.includes('games/tads/')) {
+      if (text.includes('.t3')) return 'tads3';
+      if (text.includes('.gam')) return 'tads2';
+      return 'tads';
+    }
+
+    return this._formatFromStoryFile(text);
+  }
+
+  _formatFromTags(tags) {
+    const normalized = (Array.isArray(tags) ? tags : []).map(tag => this._normalizeFormatToken(tag)).filter(Boolean);
+    return normalized.find(tag => ['zcode', 'glulx', 'tads2', 'tads3', 'tads', 'hugo', 'adrift', 'ink'].includes(tag)) || '';
+  }
+
+  _formatLabel(key, fallback = '') {
+    const labels = {
+      zcode: 'Z-code',
+      glulx: 'Glulx',
+      tads2: 'TADS 2',
+      tads3: 'TADS 3',
+      tads: 'TADS',
+      hugo: 'Hugo',
+      adrift: 'ADRIFT',
+      ink: 'Ink'
+    };
+    if (labels[key]) {
+      return labels[key];
+    }
+
+    return String(fallback || key || 'Unknown').trim();
+  }
+
+  _formatAliases(key) {
+    const aliases = {
+      zcode: ['zcode', 'z-code', 'z-machine'],
+      glulx: ['glulx', 'ulx'],
+      tads2: ['tads', 'tads2', 'tads 2', 'tads-2'],
+      tads3: ['tads', 'tads3', 'tads 3', 'tads-3'],
+      tads: ['tads'],
+      hugo: ['hugo'],
+      adrift: ['adrift'],
+      ink: ['ink']
+    };
+
+    return aliases[key] || [];
+  }
+
+  _gameStatus(game) {
+    return String(game.terpvault?.status || game.status || 'draft').toLowerCase().trim();
+  }
+
+  _gameFeatured(game) {
+    return Boolean(game.terpvault?.featured || game.featured);
+  }
+
+  _matchesCompletenessFilter(game, filter) {
+    if (filter === 'all') {
+      return true;
+    }
+    if (filter === 'missing-cover') {
+      return this._hasWarning(game, 'missing-cover') || !(game.urls?.cover || game.cover || game.resources?.cover);
+    }
+    if (filter === 'missing-screenshots') {
+      const screenshots = Array.isArray(game.urls?.screenshots) ? game.urls.screenshots : (Array.isArray(game.resources?.screenshots) ? game.resources.screenshots : game.screenshots);
+      return !Array.isArray(screenshots) || screenshots.length === 0;
+    }
+    if (filter === 'missing-walkthrough') {
+      return this._hasWarning(game, 'missing-walkthrough') || !(game.walkthrough || game.resources?.walkthrough);
+    }
+    if (filter === 'missing-ifid') {
+      return !Array.isArray(game.ifids) || game.ifids.length === 0;
+    }
+    if (filter === 'missing-catalog-links') {
+      return !this._hasCatalogLinks(game);
+    }
+
+    return true;
+  }
+
+  _hasWarning(game, code) {
+    return Array.isArray(game.warnings) && game.warnings.some(warning => warning?.code === code);
+  }
+
+  _hasCatalogLinks(game) {
+    if (Array.isArray(game.catalog_links) && game.catalog_links.length) {
+      return true;
+    }
+
+    const values = this._catalogSearchValues(game.catalog || {});
+    return values.some(value => String(value || '').trim() !== '');
+  }
+
+  _compareGames(a, b, sort) {
+    if (sort === 'title-desc') {
+      return this._compareText(b.title || b.slug, a.title || a.slug);
+    }
+    if (sort === 'author-asc') {
+      return this._compareText(a.author || '', b.author || '') || this._compareText(a.title || a.slug, b.title || b.slug);
+    }
+    if (sort === 'year-desc') {
+      return this._yearValue(b) - this._yearValue(a) || this._compareText(a.title || a.slug, b.title || b.slug);
+    }
+    if (sort === 'year-asc') {
+      return this._yearValue(a) - this._yearValue(b) || this._compareText(a.title || a.slug, b.title || b.slug);
+    }
+    if (sort === 'format-asc') {
+      return this._compareText(this._gameFormatSortText(a), this._gameFormatSortText(b)) || this._compareText(a.title || a.slug, b.title || b.slug);
+    }
+    if (sort === 'status-asc') {
+      return this._compareText(this._gameStatus(a), this._gameStatus(b)) || this._compareText(a.title || a.slug, b.title || b.slug);
+    }
+    if (sort === 'slug-asc') {
+      return this._compareText(a.slug || '', b.slug || '');
+    }
+
+    return this._compareText(a.title || a.slug, b.title || b.slug);
+  }
+
+  _compareText(a, b) {
+    return String(a || '').localeCompare(String(b || ''), undefined, { sensitivity: 'base', numeric: true });
+  }
+
+  _yearValue(game) {
+    const value = String(game.year || game.bibliographic?.first_published || '').match(/\d{4}/);
+    return value ? Number(value[0]) : 0;
+  }
+
+  _gameFormatSortText(game) {
+    const format = this._gameFormatInfo(game);
+    return [format.label, game.player_engine || game.player?.engine || ''].join(' ');
   }
 
   _gameRow(game) {
@@ -806,6 +1305,15 @@ class TerpVaultPage extends HTMLElement {
 
     root.querySelectorAll('[data-action="cancel-create"]').forEach(button => {
       button.addEventListener('click', () => this._closeCreatePackage());
+    });
+
+    root.querySelectorAll('[data-library-control]').forEach(control => {
+      const eventName = control.tagName === 'INPUT' ? 'input' : 'change';
+      control.addEventListener(eventName, () => this._updateLibraryControl(control.dataset.libraryControl || '', control.value || ''));
+    });
+
+    root.querySelectorAll('[data-action="reset-library-controls"]').forEach(button => {
+      button.addEventListener('click', () => this._resetLibraryControls());
     });
 
     root.querySelectorAll('form[data-import-inspect]').forEach(form => {

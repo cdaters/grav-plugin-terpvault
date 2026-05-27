@@ -25,7 +25,8 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - `metadata.iFiction.xml` editing is not implemented.
 - `metadata.iFiction.xml` upload/replace is not implemented.
 - Remote IFDB, IFWiki, IF Archive, or other catalog lookup/import is not implemented.
-- Admin2 search, filters, sorting controls, pagination, and virtual scrolling are not implemented.
+- Admin2 baseline client-side search, filters, sorting controls, result counts, reset controls, and `localStorage` state preservation are implemented.
+- Admin2 pagination and virtual scrolling are not implemented.
 - Named save slots and server-side saves are not implemented.
 - Public frontend routing and Parchment/player behavior should stay unchanged during Admin2 work.
 
@@ -34,7 +35,7 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 ### v0.4.x incremental path
 
 - Keep v0.4.x focused and incremental rather than treating every small improvement as a milestone release.
-- Use v0.4.x for Admin2 large-library basics: search, sort, simple filters, metadata-completeness filters, `localStorage` state preservation, and eventually pagination or virtual scrolling.
+- Use v0.4.x for Admin2 large-library basics. Search, sort, simple filters, metadata-completeness filters, and `localStorage` state preservation are now baseline; pagination or virtual scrolling remains future work.
 - Use v0.4.x for Metadata Assistant Phase 1 work: better local `metadata.iFiction.xml` status, safe upload/replace planning or implementation, preview/apply polish, and package creation/import awareness where practical.
 - Continue safe delete/remove design before implementation. Do not add physical package delete until guardrails are reviewed; keep manifest removal distinct from physical package deletion; prefer trash/quarantine before permanent deletion.
 - Continue demo package preparation incrementally. Zork II and Zork III remain candidates until legal/provenance/build/playback/package docs are clean.
@@ -57,7 +58,7 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Improve diagnostics or release packaging notes based on that testing.
 - Defer new package mutation features until the existing draft-only, non-overwriting workflow has more mileage.
 - Design safe package delete/remove before implementing it. The design should distinguish manifest/listing removal from physical folder deletion, require title/slug confirmation, prefer trash/quarantine before permanent delete, preserve audit feedback, and specify behavior for story files, images, screenshots, feelies/extras, helper docs, provenance files, `metadata.iFiction.xml`, and `game.yaml`.
-- Design large-library management for Admin2: search by title, slug, author, format, engine, tags, status, year, IFID, catalog, and provenance/source fields; filters for metadata completeness and review status; sorting by title, author, year, format/engine, status, modified, and added; pagination or virtual scrolling; items-per-page choices of 25, 50, and 100; and `localStorage` state preservation.
+- Continue large-library management for Admin2: add pagination or virtual scrolling; consider items-per-page choices of 25, 50, and 100 if pagination is selected; add richer review-status filters when the manifest exposes those signals; and defer heavy media previews where needed.
 - Plan the preview-driven Metadata Assistant around local `game.yaml`, package-local or uploaded `metadata.iFiction.xml`, and later explicit IFDB/IFWiki/IF Archive lookup. It must never silently overwrite metadata, must back up `game.yaml`, and must keep license/provenance review distinct from story-file/package download.
 - Treat future IFDB/IFWiki/IF Archive package-builder work as draft-only and license-aware: pasted URLs may seed metadata where allowed, but story files/assets should only be staged when legally and directly available.
 - Polish public library/detail/play rendering across light and dark Grav themes, with Quark2 and Typhoon as explicit verification targets.

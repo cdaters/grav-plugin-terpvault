@@ -103,6 +103,7 @@ class PackageMetadataService
         foreach ($flatUpdates as $field => $value) {
             $this->setNestedValue($updated, $field, $this->normalizeValue($field, $value));
         }
+        $this->fillBlankFormat($updated);
 
         $backup = $this->writeYamlAtomically($paths['yaml'], $updated);
         $result = $this->metadata($paths['slug']);
@@ -235,6 +236,88 @@ class PackageMetadataService
         }
 
         return is_scalar($value) || $value === null ? (string) ($value ?? '') : '';
+    }
+
+    private function fillBlankFormat(array &$metadata): void
+    {
+        if (!isset($metadata['identification']) || !is_array($metadata['identification'])) {
+            $metadata['identification'] = [];
+        }
+        if (trim((string)($metadata['identification']['format'] ?? '')) !== '') {
+            return;
+        }
+
+        $format = $this->inferFormat($metadata);
+        if ($format !== '') {
+            $metadata['identification']['format'] = $format;
+        }
+    }
+
+    private function inferFormat(array $metadata): string
+    {
+        $ifids = $metadata['identification']['ifids'] ?? [];
+        $ifids = is_array($ifids) ? $ifids : [$ifids];
+        $ifidFormat = $this->formatFromIfids($ifids);
+        if ($ifidFormat !== '') {
+            return $ifidFormat;
+        }
+
+        $storyFile = (string)($metadata['resources']['story_file'] ?? $metadata['story_file'] ?? '');
+        $storyFormat = $this->normalizeFormatToken(strtolower(pathinfo($storyFile, PATHINFO_EXTENSION)));
+        if ($storyFormat !== '') {
+            return $storyFormat;
+        }
+
+        $player = is_array($metadata['player'] ?? null) ? $metadata['player'] : [];
+        return $this->normalizeFormatToken((string)($player['engine'] ?? $player['runtime'] ?? ''));
+    }
+
+    private function formatFromIfids(array $ifids): string
+    {
+        // Treaty IFID prefixes are strong enough to fill a blank package format.
+        $joined = strtoupper(implode(' ', array_map('strval', $ifids)));
+        if (strpos($joined, 'TADS2-') !== false) {
+            return 'tads2';
+        }
+        if (strpos($joined, 'TADS3-') !== false) {
+            return 'tads3';
+        }
+        if (strpos($joined, 'ZCODE-') !== false) {
+            return 'zcode';
+        }
+        if (strpos($joined, 'GLULX-') !== false) {
+            return 'glulx';
+        }
+
+        return '';
+    }
+
+    private function normalizeFormatToken(string $format): string
+    {
+        $format = strtolower(trim(str_replace(['_', ' '], '-', $format)));
+        if (in_array($format, ['zcode', 'z-code', 'z-machine', 'zmachine', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb', 'zlb'], true)) {
+            return 'zcode';
+        }
+        if (in_array($format, ['glulx', 'ulx', 'gblorb', 'glb', 'blorb'], true)) {
+            return 'glulx';
+        }
+        if (in_array($format, ['tads2', 'tads-2', 'tadsii', 'tads-ii', 'gam'], true)) {
+            return 'tads2';
+        }
+        if (in_array($format, ['tads3', 'tads-3', 'tadsiii', 'tads-iii', 't3'], true)) {
+            return 'tads3';
+        }
+        if (in_array($format, ['tads', 'hugo', 'adrift', 'ink'], true)) {
+            return $format;
+        }
+        if ($format === 'hex') {
+            return 'hugo';
+        }
+        if ($format === 'taf') {
+            return 'adrift';
+        }
+
+        return '';
     }
 
     private function normalizeList($value): array

@@ -72,7 +72,19 @@ class GamePackage
 
     public function format(): string
     {
-        return (string) $this->get('identification.format', $this->get('format', 'zcode'));
+        foreach ([
+            $this->get('identification.format'),
+            $this->get('identification.system'),
+            $this->get('format'),
+            $this->get('system'),
+        ] as $value) {
+            $value = trim((string) $value);
+            if ($value !== '') {
+                return $this->normalizeFormat($value);
+            }
+        }
+
+        return $this->inferFormat();
     }
 
     public function formatLabel(): string
@@ -97,6 +109,88 @@ class GamePackage
         ];
         $format = strtolower($this->format());
         return $labels[$format] ?? strtoupper($this->format());
+    }
+
+    private function inferFormat(): string
+    {
+        $ifidFormat = $this->formatFromIfids($this->ifids());
+        if ($ifidFormat !== '') {
+            return $ifidFormat;
+        }
+
+        $storyFormat = $this->formatFromPath($this->storyFile());
+        if ($storyFormat !== '') {
+            return $storyFormat;
+        }
+
+        $playerFormat = $this->normalizeKnownFormat((string) $this->get('player.engine', $this->get('player.runtime', '')));
+        if ($playerFormat !== '') {
+            return $playerFormat;
+        }
+
+        $catalog = $this->catalog();
+        $archiveFormat = $this->formatFromPath((string)($catalog['ifarchive']['path'] ?? $catalog['ifarchive']['url'] ?? ''));
+        return $archiveFormat !== '' ? $archiveFormat : 'zcode';
+    }
+
+    private function normalizeFormat(string $value): string
+    {
+        $format = strtolower(trim(str_replace(['_', ' '], '-', $value)));
+        if (in_array($format, ['zcode', 'z-code', 'z-machine', 'zmachine', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb', 'zlb'], true)) {
+            return 'zcode';
+        }
+        if (in_array($format, ['glulx', 'ulx', 'gblorb', 'glb', 'blorb'], true)) {
+            return 'glulx';
+        }
+        if (in_array($format, ['tads2', 'tads-2', 'tadsii', 'tads-ii', 'gam'], true)) {
+            return 'tads2';
+        }
+        if (in_array($format, ['tads3', 'tads-3', 'tadsiii', 'tads-iii', 't3'], true)) {
+            return 'tads3';
+        }
+        if (in_array($format, ['tads', 'hugo', 'adrift', 'ink'], true)) {
+            return $format;
+        }
+        if ($format === 'hex') {
+            return 'hugo';
+        }
+        if ($format === 'taf') {
+            return 'adrift';
+        }
+
+        return $format;
+    }
+
+    private function formatFromIfids(array $ifids): string
+    {
+        // Treaty IFID prefixes are strong enough to fill a blank package format.
+        $joined = strtoupper(implode(' ', $ifids));
+        if (strpos($joined, 'TADS2-') !== false) {
+            return 'tads2';
+        }
+        if (strpos($joined, 'TADS3-') !== false) {
+            return 'tads3';
+        }
+        if (strpos($joined, 'ZCODE-') !== false) {
+            return 'zcode';
+        }
+        if (strpos($joined, 'GLULX-') !== false) {
+            return 'glulx';
+        }
+
+        return '';
+    }
+
+    private function formatFromPath(string $path): string
+    {
+        $extension = strtolower(pathinfo(parse_url($path, PHP_URL_PATH) ?: $path, PATHINFO_EXTENSION));
+        return $this->normalizeKnownFormat($extension);
+    }
+
+    private function normalizeKnownFormat(string $value): string
+    {
+        $format = $this->normalizeFormat($value);
+        return in_array($format, ['zcode', 'glulx', 'tads2', 'tads3', 'tads', 'hugo', 'adrift', 'ink'], true) ? $format : '';
     }
 
     public function storyFile(): string
