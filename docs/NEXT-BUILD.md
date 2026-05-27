@@ -31,6 +31,28 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 
 ## Candidate next work
 
+### v0.4.x incremental path
+
+- Keep v0.4.x focused and incremental rather than treating every small improvement as a milestone release.
+- Use v0.4.x for Admin2 large-library basics: search, sort, simple filters, metadata-completeness filters, `localStorage` state preservation, and eventually pagination or virtual scrolling.
+- Use v0.4.x for Metadata Assistant Phase 1 work: better local `metadata.iFiction.xml` status, safe upload/replace planning or implementation, preview/apply polish, and package creation/import awareness where practical.
+- Continue safe delete/remove design before implementation. Do not add physical package delete until guardrails are reviewed; keep manifest removal distinct from physical package deletion; prefer trash/quarantine before permanent deletion.
+- Continue demo package preparation incrementally. Zork II and Zork III remain candidates until legal/provenance/build/playback/package docs are clean.
+- Polish public/demo suite candidates such as Adventure / Colossal Cave, Grue, and You Are Standing only when story files, art, helper docs, and license notes are original or properly licensed.
+- Continue Quark2/Typhoon light/dark checks and player shell refinements. Pass future Parchment theme hints only if the bundled/configured Parchment runtime supports them safely.
+
+### v0.5.0 milestone concept
+
+- Treat v0.5.0 as a coherent public milestone and possible GPM-readiness/submission candidate, not just another small feature release.
+- v0.5.0 should mean the plugin metadata, blueprints, README, CHANGELOG, LICENSE, third-party notices, dependencies, and compatibility are GPM-friendly and internally consistent.
+- Public routes should be stable: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_engine/parchment`, and `/if/_manifest`.
+- Parchment should remain bundled, tracked, documented, and license-noticed.
+- Admin2 should be stable enough for beta use across package create, metadata edit, helper Markdown edit, media/screenshots management, story replacement, export, import inspect, draft-only import commit, version visibility, and any completed large-library search/filter/sort basics.
+- Demo material should be credible and conservative: Zork I fully bundled and verified; Zork II/Zork III added only if provenance/build/playback/helper docs are clean; Adventure / Colossal Cave, Grue, and You Are Standing polished only if included; no questionable historical/commercial assets; helper docs original or properly licensed.
+- Metadata/iFiction workflows should be clear: local `metadata.iFiction.xml` preview/apply documented, and remote IFDB/IFWiki/IF Archive lookup still clearly roadmap unless explicitly implemented.
+- Security/destructive boundaries should stay clear: no package delete unless the safe workflow exists, no silent physical file deletion, and import remains non-overwriting and draft-only.
+- Run a GPM readiness audit before calling v0.5.0 a submission candidate: blueprints, README, CHANGELOG, LICENSE, third-party notices, no dev-only paths, no accidental test/private artifacts, and a GitHub release/download ZIP sanity check.
+
 - Field-test the current Admin2 package lifecycle: create package, edit metadata, edit helper Markdown, manage media/screenshots, replace story file, export `.terpvault.zip`, inspect import, and import as draft.
 - Improve diagnostics or release packaging notes based on that testing.
 - Defer new package mutation features until the existing draft-only, non-overwriting workflow has more mileage.
@@ -47,7 +69,10 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Near-term polish: make the TerpVault player shell more theme-aware around the existing iframe, using CSS variables, `prefers-color-scheme` fallbacks, and carefully tested fullscreen behavior.
 - Future format expansion: Ink should be planned as a first-class choice-based/narrative scripting package family, likely through compiled Ink JSON and `inkjs` or a TerpVault-hosted web player in a later build.
 - Ink is complementary to Z-machine, Glulx, TADS, Inform parser works, Parchment, Quixe, and other parser-focused adapters. It should not be described as a replacement for parser IF support.
+- Ink may be explored around the v0.5.0 era as roadmap/demo planning, but it is not required for v0.5.0 unless the package format, runtime adapter, validation path, and documentation are ready.
+- Any Ink element included before v0.5.0 should be clearly experimental and separate from parser/Parchment support. Do not add `inkjs` or another Ink runtime until implementation is intentionally scoped.
+- Interactive Grav page concepts such as "Enter the Vault", "The Archivist's Tour", and a beginner guided IF introduction remain roadmap-only.
 
 ## Packaging posture
 
-TerpVault is not GPM-ready yet. Before any future GPM-ready package, keep real IF starter packages development-only unless redistribution review is complete for every story file, cover, helper document, and metadata source.
+TerpVault v0.4.x remains an incremental early public-beta line. TerpVault v0.5.0 is the first planned point where the project may be evaluated as a GPM-readiness/public milestone candidate. Before any future GPM-ready package, keep real IF starter packages development-only unless redistribution review is complete for every story file, cover, helper document, and metadata source.

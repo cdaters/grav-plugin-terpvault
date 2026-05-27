@@ -18,6 +18,15 @@ Use `docs/DEMO-CANDIDATES.md` as the working verification worksheet for individu
 - Prefer original/custom-created art and helper docs when historical assets are not clearly licensed for redistribution.
 - Keep demo package structure aligned with TerpVault package conventions so each package can also serve as a reference implementation.
 
+## v0.4.x and v0.5.0 posture
+
+- During v0.4.x, continue preparing demo packages incrementally. A candidate can be researched, built, smoke-tested, or documented without becoming bundled.
+- Do not add Zork II, Zork III, Open Adventure / Colossal Cave, Grue, You Are Standing, or any other real IF package to a public/GPM-ready bundle unless story-file provenance, license terms, build/playback behavior, helper docs, artwork, screenshots, and package metadata are clean.
+- Treat v0.5.0 as the first possible public milestone where the demo suite should feel coherent rather than ad hoc.
+- A v0.5.0 candidate demo suite may include Zork I as the verified anchor package. Zork II and Zork III may join only if they reach the same provenance/build/playback/helper-doc standard.
+- Adventure / Colossal Cave, Grue, and You Are Standing may be polished for public/demo use only when their exact rights, package notes, and original or properly licensed art/helper docs are complete.
+- Avoid questionable historical/commercial assets. Generated or Craig-created art/helper docs should be identified honestly and should not imitate restricted packaging, manuals, logos, or trade dress.
+
 ## Package completeness checklist
 
 Each finished demo package should include, where appropriate:
@@ -104,3 +113,4 @@ The feature should reuse existing package validation and import/export safety ru
 - Whether demo packages should install as draft or published by default.
 - Whether demo-package install should be a one-time first-run prompt, an Admin2 action, or both.
 - Whether bundled demo packages should be included in any future GPM-ready package or offered as an optional separate artifact.
+- Whether v0.5.0 should ship with only the safest minimal demo set or with additional optional demo packages delivered separately.

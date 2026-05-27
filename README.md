@@ -4,6 +4,8 @@
 
 This is a **v0.4.9 early public-beta release** on the TerpVault foundation. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
 
+The v0.4.x line is intentionally incremental. The next larger public milestone target is v0.5.0, which may become a GPM-readiness/submission candidate only after release packaging, Admin2 beta workflows, bundled Parchment notices, public routes, demo package posture, and destructive-action boundaries are audited.
+
 ## What it does now
 
 - Reads game package folders from `user/data/terpvault/games`.

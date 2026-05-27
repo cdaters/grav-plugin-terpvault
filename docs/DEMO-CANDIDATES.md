@@ -6,6 +6,15 @@ It supports `docs/DEMO-LIBRARY.md` by tracking exact candidate packages, source,
 
 A candidate does not become bundled or distribution-ready until story file, metadata, assets, helper docs, feelies, and license/provenance notes are complete. Do not claim a candidate is ready to bundle unless the package record shows exact source, exact license, redistribution requirements, and playable packaging status.
 
+## Release-train posture
+
+- v0.4.x candidate work should stay incremental: verify sources, build artifacts, playback, package metadata, helper docs, and assets one candidate at a time.
+- v0.5.0 may be evaluated as a public/GPM-readiness milestone only after the demo suite is credible and conservative.
+- Zork II and Zork III remain candidates until build/package/playback verification and legal/provenance review are complete.
+- Open Adventure / Colossal Cave remains a candidate until the exact repository, release, license, playable artifact, and TerpVault play strategy are verified.
+- Grue and You Are Standing may be polished as demos only if exact licensing, source notes, and original or properly licensed art/helper docs are complete.
+- Ink candidates should wait for first-class Ink package/runtime/validation support. Any pre-v0.5.0 Ink work should be labeled experimental and kept separate from parser/Parchment support.
+
 ## Candidate status legend
 
 - Research

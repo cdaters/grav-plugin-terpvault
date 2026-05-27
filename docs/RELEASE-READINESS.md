@@ -16,6 +16,21 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - `.terpvault.zip` export, import inspection, and draft-only import commit are implemented; import overwrite/replace is not.
 - Imported packages are forced to draft, forced to not featured, and never overwrite existing package folders.
 - TerpVault is not GPM-ready yet.
+- The v0.4.x line should remain incremental: focused Admin2/library improvements, metadata/iFiction polish, safe delete design, demo candidate preparation, and player/theme checks.
+- v0.5.0 is the intended public milestone/GPM-readiness candidate line, pending a full audit and a credible demo/support posture.
+
+## v0.5.0 milestone criteria
+
+- Plugin metadata, `blueprints.yaml`, README, CHANGELOG, LICENSE, and third-party notices are GPM-friendly.
+- Grav/Admin2/API dependencies and compatibility are correct and stable.
+- Bundled Parchment is tracked, documented, included in GitHub source/download ZIPs, and license-noticed.
+- Public routes are stable: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_engine/parchment`, and `/if/_manifest`.
+- Admin2 Library Manager is stable enough for beta use: package create, metadata edit, helper Markdown edit, media/screenshots management, story replacement, export, import inspect, draft-only import commit, version visibility, and any completed large-library search/filter/sort basics.
+- Metadata/iFiction behavior is clear: local `metadata.iFiction.xml` preview/apply is documented, and IFDB/IFWiki/IF Archive remote lookup remains roadmap unless implemented.
+- Security/destructive boundaries are clear: no package delete unless a safe workflow exists, no silent physical file deletion, no arbitrary package browser, and import remains draft-only and non-overwriting.
+- Demo package posture is credible: Zork I remains fully bundled and verified; Zork II/Zork III are added only if provenance/build/playback/helper docs are clean; Adventure / Colossal Cave, Grue, and You Are Standing are polished only if included and properly licensed.
+- Release artifacts contain no dev-only paths, accidental test/private artifacts, platform cruft, or questionable historical/commercial assets.
+- A GitHub release/download ZIP sanity check has been completed before any GPM submission.
 
 ## Starter package policy
 
@@ -25,6 +40,9 @@ Before any future GPM-ready release, ship only public-safe original demo materia
 - `adventure`: development starter package for playback testing; keep cautious redistribution/provenance notes.
 - `you-are-standing`: development starter package. IFDB lists Creative Commons, but the exact CC variant is not confirmed in package metadata; do not overclaim specificity.
 - `grue`: development starter package. IFDB lists Creative Commons, and the author's GitHub README identifies Creative Commons Attribution-ShareAlike 4.0 International.
+- `zork-i`: bundled demo package with verified source/provenance and original package assets; keep it audited and re-verify if the story file changes.
+- `zork-ii` and `zork-iii`: candidates only unless build, provenance, playback, helper docs, and package audit are complete.
+- Open Adventure / Colossal Cave: candidate only until exact source/release/license and playable package target are verified.
 
 Generated placeholder art and curator-created helper notes should be described as TerpVault starter-package material, not original cover art or official game documentation.
 
@@ -56,6 +74,7 @@ Before tagging:
 
 - Exclude development-only real IF packages unless redistribution review is complete.
 - Keep `sample-cave` if a structure demo is needed.
+- Keep Zork II, Zork III, Adventure / Colossal Cave, Grue, and You Are Standing out of any GPM-ready bundle unless each package has clean story-file provenance, license notes, original or properly licensed art/helper docs, and package-level audit notes.
 - Preserve `docs/THIRD-PARTY-NOTICES.md`.
 - Preserve tracked bundled Parchment adapter assets under `assets/vendor/parchment/`; GitHub source/download ZIP installs must include the files served through `/if/_engine/parchment`.
 - Preserve Parchment's embedded bundled-license comment in `assets/vendor/parchment/index.html`.

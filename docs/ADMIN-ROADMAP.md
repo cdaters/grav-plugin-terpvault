@@ -66,6 +66,22 @@
 
 ## Active roadmap
 
+### v0.4.x incremental Admin2 path
+
+- Keep v0.4.x focused on small, reviewable Admin2/library improvements.
+- Prioritize large-library basics before bulk mutation: search, sort, simple filters, metadata-completeness filters, `localStorage` state preservation, and then pagination or virtual scrolling.
+- Treat Metadata Assistant Phase 1 as local-first: better `metadata.iFiction.xml` presence/status, safe upload/replace planning or implementation, preview/apply polish, and package creation/import awareness where possible.
+- Keep safe delete/remove in design until destructive guardrails are reviewed. No physical package delete should ship until manifest removal, package folder deletion, trash/quarantine, confirmation, audit feedback, containment, permission, and CSRF/token behavior are clear.
+- Keep player/theme work additive and scoped to the TerpVault shell unless Parchment exposes a supported theme-hint path.
+
+### v0.5.0 Admin2/public milestone target
+
+- Treat v0.5.0 as a public/GPM-readiness candidate milestone, not as another narrow Admin2 feature release.
+- Admin2 should be stable enough for beta use across create, metadata edit, helper Markdown edit, media/screenshots management, story replacement, export, import inspect, draft-only import commit, version visibility, and any completed large-library search/filter/sort basics.
+- Public routes should remain stable while Admin2 evolves: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_engine/parchment`, and `/if/_manifest`.
+- Security/destructive boundaries must remain explicit: no package delete unless the safe workflow exists, no silent physical file deletion, no arbitrary package browser, and import remains draft-only and non-overwriting.
+- Metadata/iFiction behavior must be easy to explain: local preview/apply is supported, remote catalog lookup is roadmap unless implemented, and metadata assistance is separate from story-file/package download.
+
 ### Admin2 contextual help and glossary
 
 - Started in v0.4.2 with inline guidance in the Library Manager and metadata/media/story/helper/import/export areas.
@@ -171,6 +187,8 @@
 - Prefer compiled Ink JSON as the playable package artifact, with optional `.ink` source files for preservation and transparency.
 - Plan a future runtime path through `inkjs` or a TerpVault-hosted web player; do not add `inkjs` until the package format and runtime adapter are designed.
 - Extend Admin2 package metadata, validation, and creation flows later so curators can identify Ink content without weakening current parser-story validation.
+- Ink may be a v0.5.0-era roadmap/demo exploration, but it is not required for v0.5.0 unless implementation, validation, docs, and runtime support are ready.
+- If any Ink element appears before v0.5.0, mark it clearly experimental and keep it separate from parser/Parchment support.
 
 ## Later / advanced
 
@@ -224,3 +242,4 @@
 
 - Prepare for GPM only when compatibility, dependency, packaging, and support posture are verified.
 - Do not make GPM-readiness claims until the release process and Grav/Admin/API compatibility targets are confirmed.
+- Use v0.5.0 as the first candidate milestone for a full GPM readiness audit if v0.4.x has stabilized the public routes, Parchment bundling, Admin2 beta workflows, starter/demo package posture, and release packaging.

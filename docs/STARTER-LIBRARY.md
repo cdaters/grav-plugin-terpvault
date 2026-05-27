@@ -8,6 +8,15 @@ Before any future GPM-ready plugin package, ship only `sample-cave`, an original
 
 For Craig's development branch, the `_demo` tree also includes real starter packages so the player and library views can be tested with multiple playable titles. Each package should retain cautious source, license, and redistribution notes before broader public distribution.
 
+## v0.4.x and v0.5.0 direction
+
+- Keep v0.4.x starter-library work incremental and evidence-driven.
+- Zork II and Zork III should remain candidates until their source build, playable artifact, Parchment playback, package metadata, helper docs, and provenance are clean.
+- Adventure / Colossal Cave should remain a candidate until the exact implementation, license, playable target, and TerpVault runtime strategy are verified.
+- Grue and You Are Standing should be polished only if the exact license and package provenance are clear enough for the intended distribution.
+- v0.5.0 may become a public/GPM-readiness candidate only if the included starter/demo set is conservative, well documented, and free of questionable historical/commercial assets.
+- Demo art and helper docs should be original or properly licensed, with package-local notes explaining source and license status.
+
 ## Current real starter packages
 
 ### Adventure / Colossal Cave
