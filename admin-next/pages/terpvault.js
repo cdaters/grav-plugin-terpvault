@@ -174,6 +174,7 @@ class TerpVaultPage extends HTMLElement {
     this.state.formats = data.formats || this._fallbackFormats();
     this.state.status = data;
     this.state.source = source;
+    this._renderVersionBadge();
     this._renderLibrary();
     this._renderFormats();
     this._renderSettings();
@@ -186,6 +187,7 @@ class TerpVaultPage extends HTMLElement {
         * { box-sizing: border-box; }
         .tv-admin { padding: 1rem; color: inherit; }
         .hero { border: 1px solid rgba(127,127,127,.28); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; background: rgba(127,127,127,.055); }
+        .hero-head { display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap; margin-bottom:.25rem; }
         h1 { margin: 0 0 .25rem; font-size: 1.55rem; letter-spacing: 0; }
         h2 { margin: 0 0 .65rem; font-size: 1.05rem; letter-spacing: 0; }
         h3 { margin: 0 0 .35rem; font-size: .95rem; letter-spacing: 0; }
@@ -206,6 +208,7 @@ class TerpVaultPage extends HTMLElement {
         .tagline { opacity:.78; font-size:.9rem; overflow-wrap:anywhere; }
         .badges { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:.35rem; }
         .badge { display:inline-flex; align-items:center; border:1px solid rgba(127,127,127,.35); border-radius:999px; padding:.12rem .5rem; font-size:.75rem; white-space:nowrap; }
+        .version-badge { opacity:.72; font-size:.75rem; font-weight:600; }
         .badge.warn { border-color: rgba(255,188,87,.65); background: rgba(255,188,87,.12); }
         .badge.error { border-color: rgba(255,95,95,.75); background: rgba(255,95,95,.13); }
         .badge.ok { border-color: rgba(79,190,124,.58); background: rgba(79,190,124,.10); }
@@ -331,7 +334,10 @@ class TerpVaultPage extends HTMLElement {
       </style>
       <div class="tv-admin">
         <section class="hero">
-          <h1>TerpVault Library Manager</h1>
+          <div class="hero-head">
+            <h1>TerpVault Library Manager</h1>
+            <span class="badge version-badge" data-terpvault-version></span>
+          </div>
           <p>Package inventory, package creation, metadata editing, helper Markdown editing, media management, screenshot ordering, and story-file replacement for installed TerpVault interactive-fiction packages.</p>
           <p class="meta">Admin2 is opt-in. Package export, import inspection, draft-only import install, local iFiction preview, and selected-field iFiction apply are available. Package delete, overwrite, arbitrary file browsing, player settings editing, and remote catalog lookup are not available.</p>
         </section>
@@ -349,6 +355,18 @@ class TerpVaultPage extends HTMLElement {
     this.shadowRoot.querySelectorAll('.tab').forEach(btn => {
       btn.addEventListener('click', () => this._setTab(btn.dataset.tab));
     });
+    this._renderVersionBadge();
+  }
+
+  _version() {
+    return this.state.status?.version || this._embeddedData()?.version || '';
+  }
+
+  _renderVersionBadge() {
+    const badge = this.shadowRoot.querySelector('[data-terpvault-version]');
+    if (!badge) return;
+    const version = this._version();
+    badge.textContent = version ? `TerpVault v${version}` : 'TerpVault';
   }
 
   _tabButton(tab, label) {
@@ -3125,6 +3143,7 @@ class TerpVaultPage extends HTMLElement {
           <dt>Mode</dt><dd>Read-only</dd>
           <dt>Route</dt><dd><code>${this._esc(data.route || this._publicRoute())}</code></dd>
           <dt>Manifest</dt><dd><code>${this._esc(data.manifest_url || this._manifestUrl())}</code></dd>
+          <dt>Plugin version</dt><dd><code>${this._esc(data.version || this._version() || 'unknown')}</code></dd>
           <dt>Storage</dt><dd><code>${this._esc(storage.games_path || 'user://data/terpvault/games')}</code></dd>
           <dt>Resolved path</dt><dd><code>${this._esc(storage.resolved_path || 'Available only when embedded Admin2 data is exposed')}</code></dd>
           <dt>Player</dt><dd><code>${this._esc(config.player_engine || 'parchment')}</code></dd>

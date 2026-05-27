@@ -76,6 +76,18 @@ form:
       validate:
         type: bool
 
+    display.show_public_version:
+      type: toggle
+      label: Show Public Version
+      help: Shows a small "Powered by TerpVault vX.Y.Z" line on public TerpVault pages. Useful during beta and deployment testing.
+      highlight: 1
+      default: 1
+      options:
+        1: 'Yes'
+        0: 'No'
+      validate:
+        type: bool
+
     player.engine:
       type: select
       label: Player Engine

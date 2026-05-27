@@ -13,6 +13,9 @@ library:
   show_unpublished: false
   cards_per_row: 3
 
+display:
+  show_public_version: true
+
 player:
   engine: parchment
   # Leave blank to use the bundled local Parchment build. Set this only if you

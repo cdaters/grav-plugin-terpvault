@@ -1,0 +1,3 @@
+{% if terpvault.config.display.show_public_version|default(true) and terpvault.version|default('') %}
+  <footer class="terpvault-version">Powered by TerpVault v{{ terpvault.version|e }}</footer>
+{% endif %}

@@ -100,6 +100,9 @@ auto_routes: true
 admin:
   enable_admin2_page: false
 
+display:
+  show_public_version: true
+
 player:
   engine: parchment
   parchment_url: ''
@@ -114,6 +117,7 @@ player:
 - The Admin2 Library Manager is disabled by default. Enable it with `admin.enable_admin2_page: true` only when testing Admin2 package management workflows.
 - Admin2 write operations require authenticated Admin2/API access with `admin.super` or `api.super`.
 - Current Admin2 package lifecycle: create a package, edit metadata, edit helper Markdown, manage cover/small-cover media and screenshots, replace the story file, export `.terpvault.zip`, inspect an import, and import as a draft package.
+- During beta, public TerpVault pages show a small "Powered by TerpVault vX.Y.Z" footer by default. Disable it with `display.show_public_version: false` if you do not want the version visible publicly.
 
 ## Game package format
 
@@ -455,7 +459,7 @@ The current page provides package inventory plus metadata/helper/media/story edi
 
 - Library tab with collapsible game package rows and package health badges.
 - Formats tab showing supported interpreter families.
-- Settings tab showing route/storage/player diagnostics.
+- Settings tab showing route/storage/player/version diagnostics.
 - Public Detail and Play links for each package.
 - Advisory validation warnings and Catalog & Provenance summaries where package metadata provides them.
 - Create Package wizard for a new folder, starter `game.yaml`, starter helper Markdown, and one initial story file.

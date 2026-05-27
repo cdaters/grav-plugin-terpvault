@@ -23,6 +23,9 @@ class TerpVaultPlugin extends Plugin
     /** @var GameRepository|null */
     protected $repository;
 
+    /** @var string|null */
+    protected $pluginVersion;
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -109,6 +112,7 @@ class TerpVaultPlugin extends Plugin
             'config' => $this->pluginConfig(),
             'games' => $this->twigGames(),
             'route' => $this->publicRoute(),
+            'version' => $this->pluginVersion(),
         ];
     }
 
@@ -139,9 +143,12 @@ class TerpVaultPlugin extends Plugin
         }
 
         if ($route === $base . '/_manifest') {
-            $this->serveJson(['games' => array_map(static function (GamePackage $game) {
-                return $game->toArray();
-            }, $this->repository()->all(true))]);
+            $this->serveJson([
+                'version' => $this->pluginVersion(),
+                'games' => array_map(static function (GamePackage $game) {
+                    return $game->toArray();
+                }, $this->repository()->all(true)),
+            ]);
         }
 
         if (strpos($route, $base . '/_story/') === 0) {
@@ -559,7 +566,7 @@ class TerpVaultPlugin extends Plugin
 
         return [
             'read_only' => true,
-            'version' => '0.2.0',
+            'version' => $this->pluginVersion(),
             'manifest_url' => $this->publicRoute() . '/_manifest',
             'route' => $this->publicRoute(),
             'storage' => [
@@ -588,6 +595,25 @@ class TerpVaultPlugin extends Plugin
     protected function pluginConfig(): array
     {
         return (array) $this->config->get('plugins.terpvault');
+    }
+
+    protected function pluginVersion(): string
+    {
+        if ($this->pluginVersion !== null) {
+            return $this->pluginVersion;
+        }
+
+        $blueprint = __DIR__ . '/blueprints.yaml';
+        if (is_file($blueprint)) {
+            $contents = file_get_contents($blueprint) ?: '';
+            if (preg_match('/^version:\s*[\'"]?([^\'"\r\n#]+)[\'"]?/m', $contents, $matches)) {
+                $this->pluginVersion = trim($matches[1]);
+                return $this->pluginVersion;
+            }
+        }
+
+        $this->pluginVersion = 'unknown';
+        return $this->pluginVersion;
     }
 
     public function twigGameFromRoute(): ?GamePackage
