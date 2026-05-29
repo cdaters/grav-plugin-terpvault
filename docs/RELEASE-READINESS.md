@@ -17,6 +17,7 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - Imported packages are forced to draft, forced to not featured, and never overwrite existing package folders.
 - TerpVault is not GPM-ready yet.
 - The v0.4.x line should remain incremental: focused Admin2/library improvements, metadata/iFiction polish, safe delete design, demo candidate preparation, and player/theme checks.
+- Inline Play Mode, autostart, terminal theme presets, and public theme pickers are roadmap-only unless a future build explicitly implements and documents them.
 - v0.5.0 is the intended public milestone/GPM-readiness candidate line, pending a full audit and a credible demo/support posture.
 
 ## v0.5.0 milestone criteria
@@ -29,6 +30,8 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - Metadata/iFiction behavior is clear: local `metadata.iFiction.xml` preview/apply is documented, and IFDB/IFWiki/IF Archive remote lookup remains roadmap unless implemented.
 - Security/destructive boundaries are clear: no package delete unless a safe workflow exists, no silent physical file deletion, no arbitrary package browser, and import remains draft-only and non-overwriting.
 - Demo package posture is credible: Zork I remains fully bundled and verified; Zork II/Zork III are added only if provenance/build/playback/helper docs are clean; Adventure / Colossal Cave, Grue, and You Are Standing are polished only if included and properly licensed.
+- Mainframe Zork / Dungeon remains research-only unless its source basis, license/provenance, reference transcripts, build/reconstruction path, playable artifact, playback behavior, and helper docs are complete and separately approved.
+- Player presentation is readable across common themes. If Inline Play Mode or terminal themes are implemented before v0.5.0, they must preserve `/if/{slug}/play`, support admin defaults, keep public controls optional, and document Parchment iframe/internal styling limits.
 - Release artifacts contain no dev-only paths, accidental test/private artifacts, platform cruft, or questionable historical/commercial assets.
 - A GitHub release/download ZIP sanity check has been completed before any GPM submission.
 
@@ -42,6 +45,7 @@ Before any future GPM-ready release, ship only public-safe original demo materia
 - `grue`: development starter package. IFDB lists Creative Commons, and the author's GitHub README identifies Creative Commons Attribution-ShareAlike 4.0 International.
 - `zork-i`: bundled demo package with verified source/provenance and original package assets; keep it audited and re-verify if the story file changes.
 - `zork-ii` and `zork-iii`: candidates only unless build, provenance, playback, helper docs, and package audit are complete.
+- Mainframe Zork / Dungeon: research-only candidate, separate from the Zork trilogy packages. Do not bundle story files, playable artifacts, draft package skeletons, package art, or demo claims until legal/provenance/build/playback/helper docs are complete.
 - Open Adventure / Colossal Cave: candidate only until exact source/release/license and playable package target are verified.
 
 Generated placeholder art and curator-created helper notes should be described as TerpVault starter-package material, not original cover art or official game documentation.
@@ -69,12 +73,13 @@ Before tagging:
 - For future delete/remove work, confirm destructive actions are absent until a reviewed design exists with package title/slug confirmation, manifest-vs-physical-delete distinction, trash/quarantine or backup behavior, CSRF/token and permission guardrails, package containment checks, and audit/result feedback.
 - For large-library work, confirm Admin2 search/filter/sort controls preserve state, show accurate result counts, keep expanded row state intact, and still handle small libraries normally. Pagination or virtual scrolling remains future work for very large libraries.
 - For metadata-assistant work, confirm local iFiction status/upload/preview/apply remains preview-driven, upload writes only package-root `metadata.iFiction.xml`, `game.yaml` is backed up before selected-field writes, remote lookup requires explicit action, and metadata enrichment remains separate from story-file/package download or asset redistribution.
+- For future Inline Play Mode or terminal theme work, confirm detail-page inline playback is optional, `/if/{slug}/play` still works, autostart behavior lands directly at the story prompt only when safe, public controls can be hidden, contrast is acceptable, scanline/CRT effects can be disabled, reduced-motion preferences are respected, font fallbacks are readable, and Quark2/Typhoon light/dark modes do not break the player.
 
 ## GPM/public-release checklist
 
 - Exclude development-only real IF packages unless redistribution review is complete.
 - Keep `sample-cave` if a structure demo is needed.
-- Keep Zork II, Zork III, Adventure / Colossal Cave, Grue, and You Are Standing out of any GPM-ready bundle unless each package has clean story-file provenance, license notes, original or properly licensed art/helper docs, and package-level audit notes.
+- Keep Zork II, Zork III, Mainframe Zork / Dungeon, Adventure / Colossal Cave, Grue, and You Are Standing out of any GPM-ready bundle unless each package has clean story-file provenance, license notes, original or properly licensed art/helper docs, and package-level audit notes.
 - Preserve `docs/THIRD-PARTY-NOTICES.md`.
 - Preserve tracked bundled Parchment adapter assets under `assets/vendor/parchment/`; GitHub source/download ZIP installs must include the files served through `/if/_engine/parchment`.
 - Preserve Parchment's embedded bundled-license comment in `assets/vendor/parchment/index.html`.

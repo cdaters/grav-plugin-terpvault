@@ -63,6 +63,28 @@ If safely supported by Parchment, TerpVault can pass a light, dark, system, or P
 
 Verification should cover Quark2 light mode, Quark2 dark mode, Typhoon light mode, Typhoon dark mode, browser/system dark mode, and fullscreen mode. The save/restore help panel, iframe border, title bar, buttons, and background should remain readable.
 
+## Inline play and terminal theme roadmap
+
+TerpVault may later support Inline Play Mode, where selected game detail pages embed the player directly on `/if/{slug}` and can optionally autostart into the story prompt. This should be additive: the separate `/if/{slug}/play` page remains supported.
+
+Candidate configuration concepts:
+
+```yaml
+player:
+  launch_mode: detail_button
+  autostart: false
+  theme: default
+  allow_theme_picker: false
+```
+
+Candidate `launch_mode` values are `detail_button`, `play_page`, and `inline`. Candidate theme presets are `default`, `cit101`, `green-screen`, `amber-crt`, and `retro-terminal`.
+
+Terminal themes should be scoped to the TerpVault/Parchment shell and should not rely on parent theme colors for readability. A CIT101-style pale blue phosphor terminal, green monochrome, amber/orange monochrome, and retro terminal theme are all reasonable presets. Scanline or CRT overlays should be optional and disableable, with reduced-motion and contrast preferences respected.
+
+Font presets should prefer safe font stacks unless TerpVault later bundles licensed fonts. Any bundled font requires license verification and third-party notices before release.
+
+Before implementation, document exactly what can be styled through TerpVault wrapper CSS, what can be passed through supported Parchment options, and what cannot be controlled because the runtime is inside an iframe. Do not edit the bundled Parchment runtime or add scanline CSS/fonts as part of roadmap documentation.
+
 ## Licensing checklist when updating
 
 Parchment itself is MIT licensed, but its web build may incorporate upstream interpreters and assets with their own licenses. Before distributing a TerpVault package that includes Parchment, confirm and preserve notices for the exact release you bundle.

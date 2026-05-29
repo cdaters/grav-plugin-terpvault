@@ -12,6 +12,7 @@ For Craig's development branch, the `_demo` tree also includes real starter pack
 
 - Keep v0.4.x starter-library work incremental and evidence-driven.
 - Zork II and Zork III should remain candidates until their source build, playable artifact, Parchment playback, package metadata, helper docs, and provenance are clean.
+- Mainframe Zork / Dungeon should remain a research-only candidate, separate from Zork I/II/III, until source selection, legal/provenance review, reference transcripts, build/reconstruction path, playback, and helper docs are clean.
 - Adventure / Colossal Cave should remain a candidate until the exact implementation, license, playable target, and TerpVault runtime strategy are verified.
 - Grue and You Are Standing should be polished only if the exact license and package provenance are clear enough for the intended distribution.
 - v0.5.0 may become a public/GPM-readiness candidate only if the included starter/demo set is conservative, well documented, and free of questionable historical/commercial assets.
@@ -66,6 +67,12 @@ IF Archive lists `adamsinform.zip`, containing 17 Scott Adams adventures and one
 ### Zork
 
 Microsoft/Open Source Programs Office announced Zork I, II, and III source code under the MIT License, but the announcement also says packaging, marketing materials, trademarks, and other assets outside the source-code scope are excluded. For TerpVault, the cleanest path is a documented user recipe: compile the official source with ZILF, then import the resulting `.z3` into TerpVault.
+
+### Mainframe Zork / Dungeon
+
+Mainframe Zork / Dungeon is a separate research-only candidate, not a fourth entry in the current Zork I/II/III package track. The Phase 0 research packet should inform future source selection and transcript comparison, but TerpVault should not copy story files, draft package skeletons, package art, or playable artifacts from it.
+
+The likely future path is to select the exact source basis, verify license/provenance, establish a reference runner, compare transcripts, choose a target story format, and only then build or reconstruct a TerpVault package. Glulx/`.gblorb` is likely a more practical first target than `.z8`, but that choice should wait for source/build constraints. Existing Z-code reconstructions such as `zdungeon.z5` are witnesses for comparison, not automatically canonical bundled artifacts.
 
 ### PDFA Ottumwa
 

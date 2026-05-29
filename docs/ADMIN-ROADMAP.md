@@ -72,7 +72,7 @@
 - Prioritize large-library basics before bulk mutation: search, sort, simple filters, metadata-completeness filters, `localStorage` state preservation, and then pagination or virtual scrolling.
 - Treat Metadata Assistant Phase 1 as local-first: better `metadata.iFiction.xml` presence/status, safe upload/replace planning or implementation, preview/apply polish, and package creation/import awareness where possible.
 - Keep safe delete/remove in design until destructive guardrails are reviewed. No physical package delete should ship until manifest removal, package folder deletion, trash/quarantine, confirmation, audit feedback, containment, permission, and CSRF/token behavior are clear.
-- Keep player/theme work additive and scoped to the TerpVault shell unless Parchment exposes a supported theme-hint path.
+- Keep player/theme work additive and scoped to the TerpVault shell unless Parchment exposes a supported theme-hint path. Inline Play Mode and terminal theme controls are roadmap-only until the Parchment integration path is documented.
 
 ### v0.5.0 Admin2/public milestone target
 
@@ -81,6 +81,7 @@
 - Public routes should remain stable while Admin2 evolves: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_engine/parchment`, and `/if/_manifest`.
 - Security/destructive boundaries must remain explicit: no package delete unless the safe workflow exists, no silent physical file deletion, no arbitrary package browser, and import remains draft-only and non-overwriting.
 - Metadata/iFiction behavior must be easy to explain: local preview/apply is supported, remote catalog lookup is roadmap unless implemented, and metadata assistance is separate from story-file/package download.
+- Player launch/theme behavior should remain coherent: `/if/{slug}/play` stays supported, inline detail-page play is optional, and theme defaults do not make Parchment unreadable inside common Grav themes.
 
 ### Admin2 contextual help and glossary
 
@@ -180,6 +181,31 @@
 - Keep save/restore help panel, iframe border, title bar, buttons, and page background readable in every tested theme.
 - Do not edit the bundled Parchment runtime directly for theme polish unless there is no supported wrapping/configuration path.
 - Update `README.md` and `docs/PARCHMENT-BUNDLING.md` if future player theme options become real configuration.
+
+### Inline Play Mode and player terminal themes
+
+- Plan a future launch model where game detail pages can optionally embed the Parchment player directly on `/if/{slug}`.
+- Keep the existing focused `/if/{slug}/play` route supported for packages, themes, and users that prefer a separate play page.
+- Candidate launch settings should support global defaults and package overrides:
+
+```yaml
+player:
+  launch_mode: detail_button
+  autostart: false
+  theme: default
+  allow_theme_picker: false
+```
+
+- Candidate `player.launch_mode` values: `detail_button`, `play_page`, and `inline`.
+- Candidate `player.theme` values: `default`, `cit101`, `green-screen`, `amber-crt`, and `retro-terminal`.
+- Admin should be able to choose a default player theme. Per-package theme and launch overrides can come later if they do not complicate package validation.
+- A public theme picker should be optional. Public pages should be able to hide player controls when the curator wants a locked presentation.
+- Inline autostart should mean the player loads directly into the story prompt when safe, not that TerpVault bypasses interpreter consent, browser restrictions, or accessibility expectations.
+- Terminal themes should include a CIT101-style pale blue phosphor option, green monochrome, amber/orange monochrome, and retro terminal chrome.
+- Scanline or CRT overlays should be optional and disableable. Reduced-motion preferences and readability must take priority over visual nostalgia.
+- Use font stacks or licensed bundled fonts only. Do not bundle questionable terminal fonts; if custom fonts are added later, verify license and notice requirements first.
+- Scope theme CSS to TerpVault/Parchment player containers so parent Grav themes, Quark2/Typhoon light/dark modes, and site-level CSS do not break player readability.
+- Document Parchment iframe/internal styling limits before implementation, especially which styling can be controlled by TerpVault wrapper CSS versus Parchment-supported options or query/config parameters.
 
 ### Ink package support
 

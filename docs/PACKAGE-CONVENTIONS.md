@@ -144,6 +144,22 @@ player:
   launch_mode: button
 ```
 
+Current player fields are intentionally minimal. Future player presentation fields may expand to support Inline Play Mode and terminal theme presets without changing the package's story/provenance contract:
+
+```yaml
+player:
+  launch_mode: detail_button
+  autostart: false
+  theme: default
+  allow_theme_picker: false
+```
+
+Candidate `player.launch_mode` values are `detail_button`, `play_page`, and `inline`. Candidate `player.theme` values are `default`, `cit101`, `green-screen`, `amber-crt`, and `retro-terminal`.
+
+These are roadmap concepts until implemented. The focused `/if/{slug}/play` page should remain supported even if a package later opts into inline detail-page playback. Public theme controls should be optional, and site/admin defaults should be able to hide controls for a locked presentation.
+
+Player theme CSS should be scoped to the TerpVault/Parchment shell and designed for accessibility: sufficient contrast, readable font fallbacks, optional scanline/CRT effects, reduced-motion handling, and compatibility with parent Grav light/dark themes. If custom fonts are bundled later, verify license and notice requirements first.
+
 ## Presentation resources
 
 The fields in this section are optional. Existing packages without hero art or feelies continue to work.

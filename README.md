@@ -31,6 +31,7 @@ The v0.4.x line is intentionally incremental. The next larger public milestone t
 - It enables only the opt-in Admin2 package creation, export, draft-only import, and metadata/helper/media/feelies/story/iFiction apply API for TerpVault packages; package delete and import overwrite/replace endpoints are not implemented.
 - It does not provide an arbitrary package file browser.
 - It does not yet provide named save slots or server-side save syncing.
+- It does not yet provide Inline Play Mode, player autostart controls, public theme pickers, or terminal theme presets beyond the current player-shell styling.
 - It shows local `metadata.iFiction.xml` status, can upload or replace the package-root XML file, and can apply explicitly selected supported fields into `game.yaml` without remote lookup.
 - It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
 - It is not packaged or claimed as GPM-ready yet.
@@ -111,6 +112,8 @@ player:
   theme: retro-terminal
   launch_mode: button
 ```
+
+Future roadmap concepts include package or global player controls such as inline detail-page playback, autostart, terminal theme presets, and optional public theme pickers. These are not implemented in v0.4.11; the stable current play surface remains `/if/{slug}/play`.
 
 ## Requirements and setup notes
 
