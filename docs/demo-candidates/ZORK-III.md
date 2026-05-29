@@ -10,6 +10,7 @@
 - Frotz smoke test passed for source-built historical-header variants.
 - Not approved for bundled demo.
 - Requires package verification, TerpVault/Parchment playback verification, original package assets, helper docs, screenshots, and provenance notes.
+- Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
 - Next state: package/provenance/playback verification needed.
 
 Zork III must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
@@ -234,6 +235,7 @@ Imported draft route check:
 - Keep Zork III candidate-only.
 - Not approved for bundled demo.
 - Do not create `_demo` package contents yet.
+- Use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) as the docs-only package-planning checklist; it does not approve bundling or artifact commits.
 - Recommended eventual package artifact is probably the source-built `zork3-release25-serial860811.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
 - Do not bundle `zork3.zip` or `COMPILED/zork3.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
 - Do not mark Zork III package-ready until package metadata, provenance notes, full TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, maps, and feelies are complete.
@@ -252,7 +254,7 @@ Imported draft route check:
 
 ## Recommended next action
 
-Keep Zork III candidate-only and proceed with package-planning work only after the package metadata, package-local provenance notes, TerpVault/Parchment playback test plan, export/import smoke test plan, original art plan, screenshot plan, helper docs, maps, and feelies are ready. Do not create `_demo` package contents yet.
+Keep Zork III candidate-only and use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) for the next docs-only package-planning pass. Proceed to package assembly only after the package metadata, package-local provenance notes, TerpVault/Parchment playback test plan, export/import smoke test plan, original art plan, screenshot plan, helper docs, maps, and feelies are ready and approved. Do not create `_demo` package contents yet.
 
 ## Promotion checklist against Zork I standard
 

@@ -72,7 +72,7 @@ Current candidate notes:
 
 - Zork I is the verified bundled anchor demo.
 - Zork II remains candidate-only because the unmodified ZILF build failed and the scratch-only compatibility patch or prebuilt artifact basis has not been approved for packaging.
-- Zork III remains candidate-only even though scratch source build, Frotz smoke test, and DDEV-only Parchment smoke test passed; it still needs final package metadata, provenance, original helper docs, screenshots, original art, and package audit notes.
+- Zork III remains candidate-only even though scratch source build, Frotz smoke test, and DDEV-only Parchment smoke test passed; a docs-only package plan exists, but it still needs final package metadata, provenance, original helper docs, screenshots, original art, and package audit notes.
 - Do not add Zork II or Zork III to `_demo` until the selected artifact basis, license/provenance, playback behavior, helper docs, screenshots, original/properly licensed art, and export/import audit are complete.
 
 ### Mainframe Zork / Dungeon
