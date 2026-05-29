@@ -35,6 +35,7 @@ License/provenance cautions:
 Existing scratch evidence from `docs/demo-candidates/ZORK-III.md`:
 
 - Build toolchain: ZILF 1.8 / ZAPF 1.8 in scratch.
+- Fresh scratch build reverified on 2026-05-29 from checkout `/tmp/terpvault-zork3-verify-20260529`.
 - Source build command used:
 
 ```sh
@@ -50,8 +51,9 @@ Existing scratch evidence from `docs/demo-candidates/ZORK-III.md`:
 - Historical-header artifact: `zork3-release25-serial860811.z3`.
 - SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - File identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
-- Frotz smoke test: passed.
+- `dfrotz` smoke test: passed on 2026-05-29 with `look`, `inventory`, `quit`, `y`.
 - DDEV-only Parchment smoke test: passed for a temporary package.
+- The 2026-05-29 pass skipped DDEV/Parchment retesting to keep the pass scratch-only; prior DDEV-only Parchment evidence remains from 2026-05-25.
 
 Recommended basis for future package planning: use the source-built `zork3-release25-serial860811.z3` unless a later review selects another basis. This recommendation is provisional and does not approve bundling.
 
@@ -209,7 +211,7 @@ Future package must include:
 - Branch and commit.
 - License file path and observed license summary.
 - Retrieval date.
-- Toolchain and build commands if source-built artifact is selected.
+- Toolchain and build commands if source-built artifact is selected, including the current scratch-only ZILF/ZAPF path or its eventual stable replacement.
 - Selected artifact filename, file identification, and checksum.
 - Whether the selected artifact differs from upstream `COMPILED/zork3.z3` / `zork3.zip`.
 - DDEV playback/export/import verification dates.

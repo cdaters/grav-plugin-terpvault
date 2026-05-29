@@ -7,7 +7,9 @@
 - Upstream repo rechecked on 2026-05-29 for branch, commit, tags/releases, license, source layout, and prebuilt artifacts.
 - License/provenance reviewed from observed repository files only.
 - Source build verified on 2026-05-25.
+- Source build reverified in fresh scratch on 2026-05-29.
 - Frotz smoke test passed for source-built historical-header variants.
+- `dfrotz` smoke test passed on 2026-05-29 for the source-built historical-header artifact.
 - Not approved for bundled demo.
 - Requires package verification, TerpVault/Parchment playback verification, original package assets, helper docs, screenshots, and provenance notes.
 - Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
@@ -230,13 +232,76 @@ Imported draft route check:
 - Story route `https://grav20.ddev.site/if/_story/zork-iii-import-test/zork3.z3` returned `404`.
 - This is expected for a draft-forced imported package while public TerpVault routes hide unpublished packages.
 
+## Fresh scratch verification pass
+
+Verification date: 2026-05-29.
+
+This pass used scratch paths outside the TerpVault repo. No source checkout, generated `.zap` file, story file, transcript, package folder, screenshot, image, helper doc, or package content was created or copied into this repository.
+
+Tool availability:
+
+- `zilf` on `PATH`: not found.
+- `zapf` on `PATH`: not found.
+- Scratch ZILF executable: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf`.
+- Scratch ZILF version: `1.8`.
+- Scratch ZAPF executable: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf`.
+- Scratch ZAPF version: `1.8`.
+- `frotz`: `/opt/homebrew/bin/frotz`, `FROTZ V2.55`.
+- `dfrotz`: `/opt/homebrew/bin/dfrotz`, `FROTZ V2.55` dumb interface.
+
+Fresh checkout:
+
+- Scratch checkout path: `/tmp/terpvault-zork3-verify-20260529`.
+- Clone source: `https://github.com/historicalsource/zork3.git`.
+- Checked out commit: `3ec9ed412b5f3cafe65d83c727d07db1fe4a86a8`.
+- Checkout status before build: clean.
+- Local tags observed in checkout: none.
+- Upstream prebuilt `COMPILED/zork3.z3` SHA-256: `b637a242865d059890184164ce8dec28554cc80901dcbf26c740b2d1ed0d4eb8`.
+- Upstream prebuilt `zork3.zip` SHA-256: `b637a242865d059890184164ce8dec28554cc80901dcbf26c740b2d1ed0d4eb8`.
+- Upstream prebuilt file identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
+
+Build commands run in scratch only:
+
+```sh
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf zork3.zil
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf zork3.zap zork3-release25-serial860811.z3 -r 25 -s 860811
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf zork3.zap zork3-release25-serial860811-nocreator.z3 -r 25 -s 860811 -N
+```
+
+Build result:
+
+- ZILF output banner: `Renovated ZORK III: The Dungeon Master`.
+- ZILF warnings: `26 warnings (26 suppressed)`.
+- Generated default artifact: `zork3.z3`, 87858 bytes.
+- Generated default artifact file identification: `Infocom (Z-machine 3, Release 0, Serial 260528)`.
+- Generated default artifact SHA-256: `e0f913ac2ee9fb43c1ae3344ffcf03427745f7670c0ee36d51c43bfc1a85abb9`.
+- Historical-header artifact: `zork3-release25-serial860811.z3`, 87858 bytes.
+- Historical-header artifact file identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
+- Historical-header artifact SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Historical-header no-creator artifact: `zork3-release25-serial860811-nocreator.z3`, 87858 bytes.
+- Historical-header no-creator artifact file identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
+- Historical-header no-creator artifact SHA-256: `2b5e26dc4961b24dc62682ed11c662d339532266d9236508993809129974b8a8`.
+- Comparison with upstream prebuilt artifact: the source-built historical-header artifact still differs from upstream `COMPILED/zork3.z3` / `zork3.zip`, which both have SHA-256 `b637a242865d059890184164ce8dec28554cc80901dcbf26c740b2d1ed0d4eb8`.
+
+`dfrotz` smoke test:
+
+- Artifact tested: `zork3-release25-serial860811.z3`.
+- Command input: `look`, `inventory`, `quit`, `y`.
+- Result: passed. The game launched, displayed the `Release 25 / Serial number 860811` banner, accepted commands, displayed room/inventory output, and reached quit confirmation.
+
+DDEV/Parchment smoke test:
+
+- Skipped in this pass to keep the work scratch-only and avoid creating temporary package folders or story-file copies outside the plugin repo.
+- Prior DDEV-only Parchment smoke evidence from 2026-05-25 remains recorded above.
+- Re-run DDEV/Parchment playback when a complete candidate package exists with final metadata, provenance, art, screenshots, and helper docs.
+
 ## Packaging recommendation
 
 - Keep Zork III candidate-only.
 - Not approved for bundled demo.
 - Do not create `_demo` package contents yet.
 - Use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) as the docs-only package-planning checklist; it does not approve bundling or artifact commits.
-- Recommended eventual package artifact is probably the source-built `zork3-release25-serial860811.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
+- Recommended eventual package artifact remains the source-built `zork3-release25-serial860811.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
 - Do not bundle `zork3.zip` or `COMPILED/zork3.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
 - Do not mark Zork III package-ready until package metadata, provenance notes, full TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, maps, and feelies are complete.
 - Do not use commercial packaging, manual, map, ad, logo, trade-dress, or scan assets.
