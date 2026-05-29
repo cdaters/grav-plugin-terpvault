@@ -68,6 +68,13 @@ IF Archive lists `adamsinform.zip`, containing 17 Scott Adams adventures and one
 
 Microsoft/Open Source Programs Office announced Zork I, II, and III source code under the MIT License, but the announcement also says packaging, marketing materials, trademarks, and other assets outside the source-code scope are excluded. For TerpVault, the cleanest path is a documented user recipe: compile the official source with ZILF, then import the resulting `.z3` into TerpVault.
 
+Current candidate notes:
+
+- Zork I is the verified bundled anchor demo.
+- Zork II remains candidate-only because the unmodified ZILF build failed and the scratch-only compatibility patch or prebuilt artifact basis has not been approved for packaging.
+- Zork III remains candidate-only even though scratch source build, Frotz smoke test, and DDEV-only Parchment smoke test passed; it still needs final package metadata, provenance, original helper docs, screenshots, original art, and package audit notes.
+- Do not add Zork II or Zork III to `_demo` until the selected artifact basis, license/provenance, playback behavior, helper docs, screenshots, original/properly licensed art, and export/import audit are complete.
+
 ### Mainframe Zork / Dungeon
 
 Mainframe Zork / Dungeon is a separate research-only candidate, not a fourth entry in the current Zork I/II/III package track. The Phase 0 research packet should inform future source selection and transcript comparison, but TerpVault should not copy story files, draft package skeletons, package art, or playable artifacts from it.

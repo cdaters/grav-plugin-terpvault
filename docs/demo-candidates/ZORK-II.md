@@ -4,6 +4,7 @@
 
 - Candidate only.
 - Upstream repo verified on 2026-05-25.
+- Upstream repo rechecked on 2026-05-29 for branch, commit, tags/releases, license, source layout, and prebuilt artifacts.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build failed; scratch-only compatibility patch produced a playable artifact.
@@ -12,15 +13,15 @@
 - Requires package verification, TerpVault/Parchment playback verification, original package assets, helper docs, screenshots, and provenance notes.
 - Next state: package/provenance/playback verification needed after deciding how to handle the scratch-only source compatibility patch.
 
-Zork II must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
+Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
 ## Upstream source verified
 
 - Exact GitHub repository URL: `https://github.com/historicalsource/zork2.git`.
 - Branch verified: `master`.
-- Exact commit verified: `3da9661098809788a99cef00f00c865c6c204f96`.
+- Exact commit verified and rechecked: `3da9661098809788a99cef00f00c865c6c204f96`.
 - Latest commit observed: `2025-11-21T01:32:50+09:00`, `Update README.md`.
-- Tags/releases observed: no local tags, no remote tags from `git ls-remote --tags origin`, and no GitHub releases returned by `gh release list --repo historicalsource/zork2 --limit 20`.
+- Tags/releases observed: no local tags, no remote tags from `git ls-remote --tags origin`, and no GitHub releases returned by `gh release list --repo historicalsource/zork2 --limit 20`. Rechecked on 2026-05-29 with the same result.
 - License file path: `LICENSE`.
 - License status: observed file appears to be MIT License text.
 - Attribution/copyright line: `Copyright (c) 2025 Microsoft`.
@@ -40,6 +41,7 @@ Zork II must not be treated as ready to bundle until the source, license, build 
 ## Verification notes
 
 - Scratch checkout location: `/tmp/terpvault-zork2-build`.
+- Docs-only recheck checkout: `/private/tmp/terpvault-zork2-doccheck`.
 - Repository URL: `https://github.com/historicalsource/zork2.git`.
 - Branch: `master`.
 - Commit: `3da9661098809788a99cef00f00c865c6c204f96`.
@@ -51,6 +53,7 @@ Zork II must not be treated as ready to bundle until the source, license, build 
 - `COMPILED/zork2.z3` SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
 - `zork2.zip` SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
 - Treat the prebuilt artifacts cautiously. This pass did not establish that either prebuilt artifact is package-ready for TerpVault.
+- The 2026-05-29 docs-only recheck did not run a new build and did not produce new compiled artifacts. It only inspected repository metadata, source files, license text, README notes, and existing upstream prebuilt files in `/private/tmp`.
 
 ## Build tooling verification
 
@@ -68,6 +71,7 @@ ZILF/ZAPF:
 - Scratch checkout/build path: `/tmp/terpvault-zilf-verification`.
 - ZILF executable: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf`.
 - ZAPF executable: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf`.
+- `zilf` was not available on `PATH` during the 2026-05-29 docs-only recheck, but the scratch-built ZILF/ZAPF executables above were still present.
 - ZILF repo branch: `branch/default`.
 - ZILF repo commit: `e1434a03a5f82b931234f52c07fe5f43ff7ea7d6`.
 - ZILF version: `1.8`.
@@ -234,3 +238,18 @@ Result:
 ## Recommended next action
 
 Review the scratch-only `DREARY-ROOM-FCN` bracket fix as a source compatibility patch candidate, preferably against upstream history or ZILF maintainers before treating it as a packaging input. Keep Zork II candidate-only until the selected artifact and patch/provenance basis are documented and TerpVault/Parchment playback is verified.
+
+## Promotion checklist against Zork I standard
+
+Before Zork II can move from candidate to bundled demo review, it still needs:
+
+- Final decision on source-built patched artifact versus upstream prebuilt artifact.
+- Source/provenance and license basis documented for the selected artifact.
+- Playable story file verified without adding it to the repo during research.
+- TerpVault/Parchment playback verification for the selected artifact.
+- Package metadata drafted.
+- Original how-to-play, hints, and walkthrough text.
+- Screenshots captured from the selected bundled playable version.
+- Original or properly licensed cover, small cover, hero art, and any feelies.
+- Explicit exclusion of historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, and Invisiclues-style material unless separately licensed.
+- Package-local audit notes, upstream license text, export/import smoke tests, and final review.

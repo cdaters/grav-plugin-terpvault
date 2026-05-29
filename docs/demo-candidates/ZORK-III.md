@@ -4,6 +4,7 @@
 
 - Candidate only.
 - Upstream repo verified on 2026-05-25.
+- Upstream repo rechecked on 2026-05-29 for branch, commit, tags/releases, license, source layout, and prebuilt artifacts.
 - License/provenance reviewed from observed repository files only.
 - Source build verified on 2026-05-25.
 - Frotz smoke test passed for source-built historical-header variants.
@@ -17,9 +18,9 @@ Zork III must not be treated as ready to bundle until the source, license, build
 
 - Exact GitHub repository URL: `https://github.com/historicalsource/zork3.git`.
 - Branch verified: `master`.
-- Exact commit verified: `3ec9ed412b5f3cafe65d83c727d07db1fe4a86a8`.
+- Exact commit verified and rechecked: `3ec9ed412b5f3cafe65d83c727d07db1fe4a86a8`.
 - Latest commit observed: `2025-11-21T01:34:48+09:00`, `Update README.md`.
-- Tags/releases observed: no local tags, no remote tags from `git ls-remote --tags origin`, and no GitHub releases returned by `gh release list --repo historicalsource/zork3 --limit 20`.
+- Tags/releases observed: no local tags, no remote tags from `git ls-remote --tags origin`, and no GitHub releases returned by `gh release list --repo historicalsource/zork3 --limit 20`. Rechecked on 2026-05-29 with the same result.
 - License file path: `LICENSE`.
 - License status: observed file appears to be MIT License text.
 - Attribution/copyright line: `Copyright (c) 2025 Microsoft`.
@@ -39,6 +40,7 @@ Zork III must not be treated as ready to bundle until the source, license, build
 ## Verification notes
 
 - Scratch checkout location: `/tmp/terpvault-zork3-build`.
+- Docs-only recheck checkout: `/private/tmp/terpvault-zork3-doccheck`.
 - Repository URL: `https://github.com/historicalsource/zork3.git`.
 - Branch: `master`.
 - Commit: `3ec9ed412b5f3cafe65d83c727d07db1fe4a86a8`.
@@ -50,6 +52,7 @@ Zork III must not be treated as ready to bundle until the source, license, build
 - `COMPILED/zork3.z3` SHA-256: `b637a242865d059890184164ce8dec28554cc80901dcbf26c740b2d1ed0d4eb8`.
 - `zork3.zip` SHA-256: `b637a242865d059890184164ce8dec28554cc80901dcbf26c740b2d1ed0d4eb8`.
 - Treat the prebuilt artifacts cautiously. This pass did not establish that either prebuilt artifact is package-ready for TerpVault.
+- The 2026-05-29 docs-only recheck did not run a new build and did not produce new compiled artifacts. It only inspected repository metadata, source files, license text, README notes, and existing upstream prebuilt files in `/private/tmp`.
 
 ## Build tooling verification
 
@@ -67,6 +70,7 @@ ZILF/ZAPF:
 - Scratch checkout/build path: `/tmp/terpvault-zilf-verification`.
 - ZILF executable: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf`.
 - ZAPF executable: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf`.
+- `zilf` was not available on `PATH` during the 2026-05-29 docs-only recheck, but the scratch-built ZILF/ZAPF executables above were still present.
 - ZILF repo branch: `branch/default`.
 - ZILF repo commit: `e1434a03a5f82b931234f52c07fe5f43ff7ea7d6`.
 - ZILF version: `1.8`.
@@ -249,3 +253,18 @@ Imported draft route check:
 ## Recommended next action
 
 Keep Zork III candidate-only and proceed with package-planning work only after the package metadata, package-local provenance notes, TerpVault/Parchment playback test plan, export/import smoke test plan, original art plan, screenshot plan, helper docs, maps, and feelies are ready. Do not create `_demo` package contents yet.
+
+## Promotion checklist against Zork I standard
+
+Before Zork III can move from candidate to bundled demo review, it still needs:
+
+- Final decision on source-built artifact versus upstream prebuilt artifact.
+- Source/provenance and license basis documented for the selected artifact.
+- Playable story file verified against the selected basis.
+- Final TerpVault/Parchment playback verification for the selected package candidate.
+- Package metadata drafted.
+- Original how-to-play, hints, and walkthrough text.
+- Screenshots captured from the selected bundled playable version.
+- Original or properly licensed cover, small cover, hero art, and any feelies.
+- Explicit exclusion of historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, `invisicluesiii.mss`, and other commercial helper material unless separately licensed.
+- Package-local audit notes, upstream license text, export/import smoke tests, and final review.

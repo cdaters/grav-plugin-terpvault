@@ -44,7 +44,8 @@ Before any future GPM-ready release, ship only public-safe original demo materia
 - `you-are-standing`: development starter package. IFDB lists Creative Commons, but the exact CC variant is not confirmed in package metadata; do not overclaim specificity.
 - `grue`: development starter package. IFDB lists Creative Commons, and the author's GitHub README identifies Creative Commons Attribution-ShareAlike 4.0 International.
 - `zork-i`: bundled demo package with verified source/provenance and original package assets; keep it audited and re-verify if the story file changes.
-- `zork-ii` and `zork-iii`: candidates only unless build, provenance, playback, helper docs, and package audit are complete.
+- `zork-ii`: candidate only unless the source-build patch or prebuilt artifact basis, provenance, playback, helper docs, original/properly licensed assets, and package audit are complete.
+- `zork-iii`: candidate only unless build/artifact basis, provenance, playback, helper docs, original/properly licensed assets, and package audit are complete.
 - Mainframe Zork / Dungeon: research-only candidate, separate from the Zork trilogy packages. Do not bundle story files, playable artifacts, draft package skeletons, package art, or demo claims until legal/provenance/build/playback/helper docs are complete.
 - Open Adventure / Colossal Cave: candidate only until exact source/release/license and playable package target are verified.
 
