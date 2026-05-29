@@ -6,11 +6,56 @@
 - Not approved for bundled demo.
 - Do not create `_demo` package contents from this plan yet.
 - Do not add story files, compiled artifacts, screenshots, art, feelies, helper docs, or package folders in this pass.
-- Package creation remains blocked until the artifact basis and final audit are approved.
+- A real DDEV-only candidate package was assembled on 2026-05-29 under `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
+- Package promotion remains blocked until final audit, full walkthrough verification, export/import verification, IFID/catalog/iFiction decisions, and Craig approval are complete.
 
 This document records the likely package shape for a future Zork III TerpVault demo candidate. It is a planning artifact, not a packaging approval.
 
 Use [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md) for the expanded docs-only materials checklist covering `game.yaml`, provenance, upstream license, iFiction metadata, helper docs, art, screenshots, optional feelies, and final audit requirements.
+
+## DDEV Candidate Package
+
+Assembly date: 2026-05-29.
+
+A real candidate package now exists only in the local DDEV data library:
+
+```text
+/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii/
+  game.yaml
+  zork3.z3
+  cover.jpg
+  small-cover.jpg
+  hero.jpg
+  screenshots/
+    01.png
+    02.png
+  how-to-play.md
+  hints.md
+  walkthrough.md
+  LICENSE-upstream.txt
+  provenance.md
+```
+
+The DDEV package uses the selected source-built artifact as `zork3.z3`:
+
+- Source artifact: `/tmp/terpvault-zork3-verify-20260529/zork3-release25-serial860811.z3`.
+- SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- File identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
+
+The package includes an upstream license copy, package-local provenance, original first-pass helper docs, and Craig-created/original image assets from `/Users/cdaters/Downloads/for-Zork3`. `walkthrough.md` remains a draft route pending full transcript verification against this exact story artifact.
+
+Verification status:
+
+- Manifest includes `zork-iii` as `draft`, `zcode`, `zork3.z3`, `has_story_file: true`, and `player.engine: parchment`.
+- Expected manifest warning: missing IFID.
+- Manifest errors: none.
+- Temporary publish check returned 200 for the detail and play routes.
+- Parchment iframe boot configuration points at `/if/_story/zork-iii/zork3.z3`.
+- DDEV-internal story route returned 200 and matched the selected artifact checksum.
+- DDEV-internal cover/small-cover asset checks returned 200.
+- Package was restored to `draft` after route verification.
+
+Host-side curl intermittently hit an existing Grav compiled-cache parse error on some `_story`/asset requests while DDEV-internal route checks succeeded. Recheck host-side binary delivery before any `_demo` promotion.
 
 ## Upstream Source Candidate
 

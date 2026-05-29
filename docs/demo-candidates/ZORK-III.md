@@ -10,11 +10,13 @@
 - Source build reverified in fresh scratch on 2026-05-29.
 - Frotz smoke test passed for source-built historical-header variants.
 - `dfrotz` smoke test passed on 2026-05-29 for the source-built historical-header artifact.
+- A real DDEV-only candidate package was assembled on 2026-05-29 at `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
+- The DDEV-only candidate package includes the verified story artifact, `game.yaml`, upstream license copy, provenance, original first-pass helper docs, Craig-created/original image assets, and two screenshots.
 - Not approved for bundled demo.
-- Requires package verification, TerpVault/Parchment playback verification, original package assets, helper docs, screenshots, and provenance notes.
+- Requires final package audit, full walkthrough transcript verification, export/import verification, IFID/catalog/iFiction decisions, and Craig approval before any `_demo` promotion.
 - Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
 - Candidate asset/materials plan: [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md).
-- Next state: package/provenance/playback verification needed.
+- Next state: complete final package verification without copying anything into `_demo`.
 
 Zork III must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -232,6 +234,63 @@ Imported draft route check:
 - Play route `https://grav20.ddev.site/if/zork-iii-import-test/play` returned `404`.
 - Story route `https://grav20.ddev.site/if/_story/zork-iii-import-test/zork3.z3` returned `404`.
 - This is expected for a draft-forced imported package while public TerpVault routes hide unpublished packages.
+
+## DDEV-only candidate package assembly
+
+Verification date: 2026-05-29.
+
+This pass assembled a real candidate package only in the local DDEV data library. No `_demo` package contents, story files, compiled artifacts, package folders, image assets, helper docs, runtime code, Parchment files, or release metadata were added to the TerpVault plugin repository.
+
+Package path:
+
+- `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
+
+Files created in the DDEV-only package:
+
+- `game.yaml`.
+- `zork3.z3`.
+- `LICENSE-upstream.txt`.
+- `provenance.md`.
+- `how-to-play.md`.
+- `hints.md`.
+- `walkthrough.md`.
+- `cover.jpg`.
+- `small-cover.jpg`.
+- `hero.jpg`.
+- `screenshots/01.png`.
+- `screenshots/02.png`.
+
+Story artifact:
+
+- Source scratch artifact: `/tmp/terpvault-zork3-verify-20260529/zork3-release25-serial860811.z3`.
+- Package story filename: `zork3.z3`.
+- SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- File identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
+
+Package materials:
+
+- `LICENSE-upstream.txt` was copied from the verified upstream checkout license file.
+- `provenance.md` records the source repo, commit, toolchain, build commands, artifact checksum/file ID, upstream prebuilt difference, smoke checks, DDEV package status, image/helper-doc authorship notes, and excluded commercial/historical assets.
+- `how-to-play.md`, `hints.md`, and `walkthrough.md` were written as original first-pass package-local helper docs.
+- `walkthrough.md` is explicitly a draft route pending transcript verification; it does not claim a complete score/path verification.
+- Images were copied from `/Users/cdaters/Downloads/for-Zork3` and treated as Craig-created/original package art/screenshots for this candidate pass.
+
+Manifest and route checks:
+
+- Manifest route `https://grav20.ddev.site/if/_manifest` returned `200 application/json`.
+- Manifest includes `zork-iii` with `status: draft`, `format: zcode`, `story_file: zork3.z3`, `has_story_file: true`, and `player.engine: parchment`.
+- Manifest exposes declared resources for cover, small cover, hero, screenshots, how-to-play, hints, and walkthrough.
+- Manifest warnings: one expected `missing-ifid` warning because IFID remains unverified.
+- Manifest errors: none.
+- The package was temporarily changed to `published` only long enough to verify public routes, then restored to `draft` and cache was cleared.
+- Detail route `https://grav20.ddev.site/if/zork-iii` returned `200 text/html; charset=utf-8` during the temporary publish check.
+- Play route `https://grav20.ddev.site/if/zork-iii/play` returned `200 text/html; charset=utf-8` during the temporary publish check.
+- The play page included a Parchment iframe boot payload pointing at `/if/_story/zork-iii/zork3.z3`, format `zcode`, title `Zork III`.
+- DDEV-internal story route check returned `200 application/octet-stream`, 87858 bytes, and SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- DDEV-internal cover and small-cover asset checks returned `200 image/jpeg`.
+- Host-side screenshot and hero asset checks returned `200` and matched the source image checksums.
+- Host-side binary/asset curl checks intermittently hit an existing Grav compiled-cache parse error on some `_story`/asset requests; DDEV-internal route checks succeeded and matched expected bytes. Recheck host-side binary delivery before `_demo` promotion.
+- Final package status after verification: `draft`.
 
 ## Fresh scratch verification pass
 

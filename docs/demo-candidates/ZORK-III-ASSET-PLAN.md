@@ -3,12 +3,67 @@
 ## Status
 
 - Zork III remains candidate-only.
-- This is a docs-only materials plan for a possible future package.
+- This began as a docs-only materials plan; a real DDEV-only candidate package was assembled on 2026-05-29 from this plan.
 - Do not create `_demo` package contents from this plan yet.
 - Do not add story files, compiled artifacts, package folders, art, screenshots, helper docs, or feelies in this pass.
-- Package assembly remains blocked until final artifact-basis approval, package metadata, provenance, helper docs, art, screenshots, playback verification, export/import verification, and final audit are complete.
+- Package promotion remains blocked until final audit, full walkthrough transcript verification, export/import verification, IFID/catalog/iFiction decisions, and Craig approval are complete.
 
 This document expands [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) into a materials checklist for eventual package assembly. It does not approve bundling.
+
+## DDEV-Only Assembly Result
+
+Assembly date: 2026-05-29.
+
+A real candidate package was assembled only in the local DDEV data library:
+
+- Package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
+- Package status after verification: `draft`.
+- No `_demo` contents were created or modified.
+- No story files, compiled artifacts, package folders, images, screenshots, helper docs, runtime code, Parchment files, or release metadata were added to the TerpVault plugin repository.
+
+Files present in the DDEV-only package:
+
+- `game.yaml`.
+- `zork3.z3`.
+- `LICENSE-upstream.txt`.
+- `provenance.md`.
+- `how-to-play.md`.
+- `hints.md`.
+- `walkthrough.md`.
+- `cover.jpg`.
+- `small-cover.jpg`.
+- `hero.jpg`.
+- `screenshots/01.png`.
+- `screenshots/02.png`.
+
+Story and provenance:
+
+- Source scratch artifact: `/tmp/terpvault-zork3-verify-20260529/zork3-release25-serial860811.z3`.
+- Package story filename: `zork3.z3`.
+- SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- File identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
+- `LICENSE-upstream.txt` was copied from the verified source checkout license file.
+- `provenance.md` records package status, upstream source, commit, toolchain, build commands, artifact checksum, upstream prebuilt difference, smoke tests, DDEV route checks, asset/helper-doc authorship, and exclusions.
+
+Assets and helper docs:
+
+- `cover.jpg`, `small-cover.jpg`, `hero.jpg`, `screenshots/01.png`, and `screenshots/02.png` were copied from `/Users/cdaters/Downloads/for-Zork3`.
+- The copied image assets are treated as Craig-created/original package art and screenshots for this candidate pass.
+- `how-to-play.md`, `hints.md`, and `walkthrough.md` were written as original first-pass package-local helper docs.
+- `walkthrough.md` is marked as a draft route pending transcript verification; it does not claim a completed score/path verification.
+
+Verification results:
+
+- Manifest includes `zork-iii` with `status: draft`, `format: zcode`, `story_file: zork3.z3`, `has_story_file: true`, and `player.engine: parchment`.
+- Manifest resources include cover, small cover, hero, screenshots, how-to-play, hints, and walkthrough paths.
+- Manifest warnings: expected missing IFID warning.
+- Manifest errors: none.
+- Temporary publish check returned 200 for `/if/zork-iii` and `/if/zork-iii/play`.
+- The play page includes a Parchment iframe story payload for `/if/_story/zork-iii/zork3.z3`.
+- DDEV-internal story route returned 200, 87858 bytes, and checksum `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- DDEV-internal cover and small-cover asset routes returned 200.
+- Host-side screenshot and hero asset downloads returned 200 and matched the copied source images.
+- Host-side curl intermittently hit an existing Grav compiled-cache parse error on some `_story`/asset requests. DDEV-internal checks succeeded, but host-side binary delivery should be rechecked before `_demo` promotion.
 
 ## Selected Candidate Basis
 
