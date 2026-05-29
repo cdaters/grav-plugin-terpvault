@@ -1,3 +1,19 @@
+# v0.4.12
+
+## 05/28/2026
+
+1. Changed
+    - Added Metadata Assistant import-awareness for package-root `metadata.iFiction.xml`.
+    - Package import inspection now reports `has_ifiction`, `ifiction_path`, and `ifiction_preview_available`.
+    - Import inspection UI now shows whether `metadata.iFiction.xml` is present.
+    - Missing `metadata.iFiction.xml` is neutral status, not an import warning.
+    - Draft import preserves `metadata.iFiction.xml` without auto-merging it into `game.yaml`.
+    - Successful draft import with XML points admins toward preview/apply from the package editor.
+    - Documented the future configurable Metadata Source Provider roadmap for local iFiction XML, IFDB, IFWiki, and IF Archive.
+
+2. Notes
+    - No remote metadata lookup, package-builder, auto-apply, package delete, bulk actions, pagination, virtual scrolling, Parchment changes, or story/demo package changes were added.
+
 # v0.4.11
 
 ## 05/27/2026
