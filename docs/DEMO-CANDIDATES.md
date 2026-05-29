@@ -52,6 +52,26 @@ A candidate does not become bundled or distribution-ready until story file, meta
 - Zork II specifically needs a decision on the scratch-only `DREARY-ROOM-FCN` compatibility patch versus a documented prebuilt artifact basis before package work.
 - Zork III has stronger scratch build/playback evidence, but still needs complete package materials and final audit before bundled-demo review.
 
+### Local ZILF/ZAPF scratch tooling
+
+- `zilf` is not installed on `PATH` in the current local environment.
+- A scratch-built ZILF/ZAPF 1.8 toolchain currently exists under:
+
+```text
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/
+```
+
+- Current direct invocation examples:
+
+```sh
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf --version
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf --version
+```
+
+- `/tmp` is volatile. Future candidate work should move this to a stable tooling location or add a documented setup/helper script that locates or configures ZILF/ZAPF without requiring a global install.
+- Future builds should write source checkouts, `.zap` files, story outputs, transcripts, and any other generated files only to scratch locations outside the TerpVault repository.
+- Compiled artifacts should not be committed until the selected package provenance, playback behavior, helper docs, screenshots/art plan, and package audit are complete.
+
 ## Open Adventure / Colossal Cave notes
 
 - Treat Open Adventure as a strong candidate because it has an explicit open-source project/license, but verify the exact repository, release version, and playable artifact path before bundling.
