@@ -76,7 +76,7 @@ A package may include:
 metadata.iFiction.xml
 ```
 
-TerpVault includes this file in `.terpvault.zip` export/import payloads when present. Admin2 shows whether each package has local iFiction XML, can upload or replace package-root `metadata.iFiction.xml`, and can preview a conservative subset of local iFiction XML fields, including title, author, description/headline, publication date, genre, language, IFIDs, and format/system where available. Preview is local-only, and curators can explicitly apply selected supported fields into `game.yaml`.
+TerpVault includes this file in `.terpvault.zip` export/import payloads when present. Admin2 shows whether each package has local iFiction XML, import inspection reports whether an incoming package contains package-root `metadata.iFiction.xml`, and draft-only import preserves that XML for later preview/apply from the package editor. Admin2 can upload or replace package-root `metadata.iFiction.xml`, and can preview a conservative subset of local iFiction XML fields, including title, author, description/headline, publication date, genre, language, IFIDs, and format/system where available. Preview is local-only, and curators can explicitly apply selected supported fields into `game.yaml`.
 
 The upload workflow validates XML and writes only `metadata.iFiction.xml` in the package root. It does not apply metadata automatically. The apply workflow re-parses package-local XML on the server, does not perform remote lookup, backs up `game.yaml`, and only overwrites existing non-empty `game.yaml` values when the curator selects that field.
 
@@ -84,7 +84,7 @@ Current limits:
 
 - Admin2 can upload or replace `metadata.iFiction.xml`, but it does not edit XML contents in place.
 - Package creation does not accept `metadata.iFiction.xml` as an input.
-- Import preserves `metadata.iFiction.xml` in accepted `.terpvault.zip` packages, but import commit does not use it to merge or prefill `game.yaml`.
+- Import inspection reports whether accepted `.terpvault.zip` packages include package-root `metadata.iFiction.xml`; import commit preserves the file but does not use it to merge or prefill `game.yaml`.
 - Remote IFDB, IFWiki, IF Archive, or catalog lookup is not implemented.
 - Metadata workflows do not download story files, packages, cover art, screenshots, or other remote assets.
 
@@ -112,9 +112,23 @@ Required behavior:
 - Keep provenance and license review explicit.
 - Clearly distinguish metadata import from story-file, package, cover, screenshot, or asset download.
 
+Future provider/source definitions should be back-end configurable before remote lookup is added. Known or preconfigured providers may include local iFiction XML, IFDB, IFWiki, and IF Archive. A provider definition should record:
+
+- Provider id.
+- Display label.
+- Enabled/disabled state.
+- Lookup method or source type.
+- Base URL or API endpoint when applicable.
+- Rate-limit and caching notes.
+- Attribution and license notes.
+- Field mapping rules.
+- Confidence or scoring notes.
+
+Remote providers must run only after an explicit admin action. No provider should silently fetch, merge, overwrite, download story files, or download assets. Candidate metadata from any provider should appear in the same side-by-side review model, with field-level checkboxes and a `game.yaml` backup before writes.
+
 Phased plan:
 
-- Phase 1 baseline: local iFiction XML presence/status, package-root upload/replace, preview/apply polish, and metadata-completeness filters for XML present/missing. Future Phase 1 polish may integrate local preview/apply into package creation/import when XML is present.
+- Phase 1 baseline: local iFiction XML presence/status, package-root upload/replace, import inspection awareness, preview/apply polish, and metadata-completeness filters for XML present/missing. Future Phase 1 polish may integrate local preview/apply into package creation/import when XML is present.
 - Phase 2: assist catalog and provenance fields such as IFDB TUID, IFDB URL, IFWiki URL, IF Archive path, IF Archive URL, source URL, retrieved date, and license notes.
 - Phase 3: add explicit remote metadata lookup by title/author, IFID where possible, and pasted IFDB/IFWiki/IF Archive URL. Preview candidates, apply selected fields only, and document the source/retrieval date.
 

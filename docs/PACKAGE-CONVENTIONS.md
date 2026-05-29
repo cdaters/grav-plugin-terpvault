@@ -264,7 +264,7 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 - `release.source.*`: where the package files came from and when they were retrieved.
 - `release.license.*`: license, rights, and redistribution notes.
 
-`metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can show whether the XML is present, upload or replace the package-root XML file, preview a conservative subset of local iFiction XML fields, and apply explicitly selected supported fields into `game.yaml`. TerpVault does not edit XML contents in place.
+`metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can show whether the XML is present, report XML presence during import inspection, upload or replace the package-root XML file, preview a conservative subset of local iFiction XML fields, and apply explicitly selected supported fields into `game.yaml`. TerpVault does not edit XML contents in place.
 
 When `identification.format` is blank, TerpVault may infer a normalized package format from strong local evidence such as IFID prefixes, story-file extension, or declared player engine/runtime. Curator-supplied non-empty format values should be preserved rather than overwritten. Admin2 also uses defensive format inference for library search, sort, and filters so packages with blank format fields can still appear under the right format family.
 
@@ -272,10 +272,12 @@ Current metadata workflow limits:
 
 - Admin2 can upload or replace `metadata.iFiction.xml`, but upload writes only the package-root XML file and does not apply fields automatically.
 - Package creation creates `game.yaml`, starter helper Markdown, and the initial story file; it does not ingest iFiction XML.
-- Import preserves accepted `metadata.iFiction.xml` files, but import commit does not currently use the XML to prefill or merge `game.yaml`.
+- Import preserves accepted `metadata.iFiction.xml` files and reports their presence during inspection, but import commit does not use the XML to prefill or merge `game.yaml`.
 - Remote IFDB, IFWiki, IF Archive, or catalog metadata lookup is not implemented.
 
 Future Metadata Assistant work should stay explicit and preview-driven. It may compare current `game.yaml` values with package-local or manually uploaded iFiction XML and, later, explicit IFDB/IFWiki/IF Archive lookup candidates. Curators should see side-by-side current/candidate values, select fields one by one, and receive a `game.yaml` backup before changes are applied. Metadata import should remain separate from story-file/package download, and provenance/license review should remain visible.
+
+Future metadata source providers should be defined on the back end before remote lookup ships. Provider definitions should include a provider id, display label, enabled/disabled state, lookup method/type, base URL or API endpoint where applicable, rate-limit/caching notes, attribution/license notes, field mapping rules, and confidence/scoring notes. Remote provider lookup must be an explicit admin action and should never run automatically during import or package creation.
 
 Future large-library cleanup filters should include metadata completeness checks such as missing IFID, missing cover, missing screenshots, missing helper docs, missing catalog URLs, provenance needs review, license needs review, and `metadata.iFiction.xml` present/missing.
 

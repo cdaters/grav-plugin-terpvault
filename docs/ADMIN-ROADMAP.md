@@ -150,21 +150,23 @@
 - Current state: Admin2 shows package-local `metadata.iFiction.xml` presence/status in package rows and details, can preview package-local XML, and can apply explicitly selected supported fields into `game.yaml`. The apply route re-parses local XML server-side and creates a package-local `game.yaml` backup through the metadata service before writing.
 - Supported mapped fields are title, author, headline/subtitle, description/teaser, first published/date, genre, language, IFIDs, and format/system.
 - Admin2 can upload or replace package-root `metadata.iFiction.xml`. Upload validates XML, rejects DOCTYPE declarations, backs up an existing XML file before replacement, and never applies metadata into `game.yaml` automatically.
-- Package creation does not accept `metadata.iFiction.xml`, and import preserves the file but does not use it to prefill or merge metadata during import commit.
+- Package creation does not accept `metadata.iFiction.xml`. Import inspection reports whether the incoming package contains package-root `metadata.iFiction.xml`, and import commit preserves the file but does not use it to prefill or merge metadata during import commit.
 - Keep the local XML file package-local and reviewable. Preserve unknown YAML fields when applying accepted changes.
-- Future local iFiction improvements should integrate local preview/apply into package creation/import when XML is present.
+- Future local iFiction improvements should make package creation/import flows even more directly connected to local preview/apply when XML is present.
 - Continue to avoid remote lookup in local iFiction workflows.
 
 ### Metadata Assistant
 
 - Add a future preview-driven Metadata Assistant to reduce manual metadata entry without silently changing packages.
 - Candidate sources should include local `game.yaml`, package-local `metadata.iFiction.xml`, manually uploaded/replaced `metadata.iFiction.xml`, future IFDB lookup by IFID/title/URL, future IFWiki lookup by title/URL, and future IF Archive path/URL helpers.
+- Future source/provider definitions should be configurable on the back end before remote lookup ships. Known or preconfigured provider definitions may include local iFiction XML, IFDB, IFWiki, and IF Archive.
+- Provider definitions should include provider id, display label, enabled/disabled state, lookup method/type, base URL or API endpoint where applicable, rate-limit/caching notes, attribution/license notes, field mapping rules, and confidence/scoring notes.
 - Show candidate matches with confidence and notes. Use side-by-side previews of current package metadata and candidate metadata, with field-level apply checkboxes.
 - Never silently overwrite existing metadata. Always back up `game.yaml` before applying selected changes.
 - Do not perform remote fetches without explicit user action.
 - Keep provenance and license review explicit, even when external catalog metadata is found.
 - Clearly distinguish metadata import/enrichment from story-file or package download.
-- Phase 1 baseline: local iFiction XML presence/status in package rows, XML present/missing filters, package-root upload/replace, and improved local preview/apply. Remaining Phase 1 polish is package creation/import awareness where practical.
+- Phase 1 baseline: local iFiction XML presence/status in package rows, XML present/missing filters, package-root upload/replace, import inspection awareness, and improved local preview/apply. Remaining Phase 1 polish is package creation awareness where practical.
 - Phase 2: assist catalog/provenance fields such as IFDB TUID, IFDB URL, IFWiki URL, IF Archive path, IF Archive URL, source URL, retrieved date, and license notes.
 - Phase 3: add explicit remote metadata lookup by title/author, by IFID where possible, and from pasted IFDB/IFWiki/IF Archive URLs. Preview candidates, apply selected fields only, and document source/retrieval date.
 - Tie this assistant to large-library cleanup by letting admins filter for incomplete metadata groups, then use the assistant to resolve missing IFID, catalog URL, cover, screenshot, helper-doc, provenance, license, or `metadata.iFiction.xml` gaps.
@@ -224,6 +226,7 @@ player:
 - Explore IFDB lookup by IFID/TUID after local iFiction apply/import is safe.
 - Explore IFWiki and IF Archive enrichment after IFDB lookup patterns are proven.
 - Keep remote catalog lookup preview-based and curator-reviewed, not authoritative.
+- Remote lookup must be an explicit admin action through a configured provider. Do not run provider lookups automatically during package import, package creation, metadata save, or manifest load.
 - Treat remote data as a curator aid, not a replacement for license/provenance review.
 - Show source, confidence, and target field for every proposed remote change.
 - Do not add IFDB/IFWiki scraping or IF Archive/story package downloads as part of metadata lookup. Any future remote feature must respect source terms, distinguish references from redistributable assets, and keep license/provenance review visible.

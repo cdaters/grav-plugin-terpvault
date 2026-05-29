@@ -200,6 +200,8 @@ class PackageImportService
                     throw new RuntimeException('Imported package destination is outside the games directory.');
                 }
 
+                $hasIFiction = (bool)($report['has_ifiction'] ?? false);
+
                 return [
                     'ok' => true,
                     'slug' => $finalSlug,
@@ -207,6 +209,9 @@ class PackageImportService
                     'metadata' => $metadata,
                     'report' => $report,
                     'draft_forced' => true,
+                    'has_ifiction' => $hasIFiction,
+                    'ifiction_path' => $hasIFiction ? 'metadata.iFiction.xml' : '',
+                    'ifiction_preview_available' => $hasIFiction,
                 ];
             } finally {
                 $zip->close();
@@ -315,6 +320,8 @@ class PackageImportService
         $report['title'] = (string)($metadata['bibliographic']['title'] ?? $metadata['title'] ?? '');
         $report['author'] = (string)($metadata['bibliographic']['author'] ?? $metadata['author'] ?? '');
         $report['has_ifiction'] = isset($packageFiles['metadata.iFiction.xml']);
+        $report['ifiction_path'] = $report['has_ifiction'] ? 'metadata.iFiction.xml' : '';
+        $report['ifiction_preview_available'] = $report['has_ifiction'];
 
         if (!preg_match('/^[a-z0-9][a-z0-9_-]*$/', $report['candidate_slug'])) {
             $report['fatal_errors'][] = 'Invalid candidate package slug.';
@@ -395,10 +402,6 @@ class PackageImportService
             $this->inspectFeelieReference($relative, $packageFiles, $report);
         }
 
-        if (!$report['has_ifiction']) {
-            $report['warnings'][] = 'metadata.iFiction.xml is not present.';
-        }
-
         $this->inspectUnsupportedPackageFiles($metadata, $packageFiles, $report);
 
         $report['warnings'][] = 'Future import commit should force imported packages to draft status for review.';
@@ -408,6 +411,9 @@ class PackageImportService
             'author' => $report['author'],
             'story_file' => $report['story_file'],
             'story_extension' => $report['story_extension'],
+            'has_ifiction' => $report['has_ifiction'],
+            'ifiction_path' => $report['ifiction_path'],
+            'ifiction_preview_available' => $report['ifiction_preview_available'],
             'feelies_count' => $feelieCount,
             'file_count' => count($report['included_files']),
         ];
@@ -924,6 +930,8 @@ class PackageImportService
             'has_collision' => false,
             'destination_exists' => false,
             'has_ifiction' => false,
+            'ifiction_path' => '',
+            'ifiction_preview_available' => false,
             'package_summary' => [],
         ];
     }

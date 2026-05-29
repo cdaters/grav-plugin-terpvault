@@ -1175,7 +1175,7 @@ class TerpVaultPage extends HTMLElement {
           <button class="button" type="button" data-action="cancel-import-inspect">Close</button>
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
-        ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
+        ${state.success ? `<div class="message success">${this._esc(state.success)}${state.importedSlug && state.hasIFiction ? ` <button class="button" type="button" data-action="open-ifiction" data-slug="${this._esc(state.importedSlug)}">Preview iFiction XML</button>` : ''}</div>` : ''}
         <form data-import-inspect>
           <div class="field">
             <label>TerpVault package zip</label>
@@ -1203,6 +1203,10 @@ class TerpVaultPage extends HTMLElement {
       ? `installed as ${committedSlug}`
       : (report.has_collision ? 'slug collision' : 'no collision');
     const collisionTone = committedSlug || !report.has_collision ? 'ok' : 'warn';
+    const ifictionPath = report.ifiction_path || 'metadata.iFiction.xml';
+    const ifictionNote = report.has_ifiction
+      ? `<div class="message success"><code>${this._esc(ifictionPath)}</code> found. After draft import, you can preview and selectively apply iFiction metadata from the package editor. Import does not auto-merge XML into <code>game.yaml</code>.</div>`
+      : '<div class="message">No <code>metadata.iFiction.xml</code> found. Import can still continue when the package is otherwise valid.</div>';
     return `
       <div class="box" style="margin-top:.85rem;">
         <h3>Inspection Report</h3>
@@ -1221,8 +1225,10 @@ class TerpVaultPage extends HTMLElement {
           <dt>Story extension</dt><dd><code>${this._esc(report.story_extension || '')}</code></dd>
           ${committedSlug ? `<dt>Installed slug</dt><dd><code>${this._esc(committedSlug)}</code></dd>` : ''}
           <dt>Destination</dt><dd>${report.destination_exists ? 'Package folder already exists.' : 'No existing package folder detected.'}</dd>
+          <dt>iFiction XML</dt><dd>${report.has_ifiction ? `<code>${this._esc(ifictionPath)}</code>` : 'Not present'}</dd>
         </dl>
         <p class="meta">Inspection does not create package files. Commit revalidates and installs as draft only.</p>
+        ${ifictionNote}
         ${this._reportList('Fatal errors', fatal, 'error')}
         ${this._reportList('Warnings', warnings, 'warn')}
         ${this._reportList('Ignored cruft', ignored)}
@@ -1508,6 +1514,13 @@ class TerpVaultPage extends HTMLElement {
       }
 
       const importedSlug = result.slug || slug;
+      const importedHasIFiction = Boolean(result.has_ifiction || result.report?.has_ifiction || this.state.importInspect.report?.has_ifiction);
+      const importReviewCopy = importedHasIFiction
+        ? 'Package imported as draft and not featured. iFiction XML is available for preview/apply from the package editor; no XML fields were auto-applied.'
+        : 'Package imported as draft and not featured. Review metadata, helper docs, media, story file, license/provenance, and publish only when ready.';
+      const importPanelCopy = importedHasIFiction
+        ? `Imported ${importedSlug} as a draft package. iFiction XML is available for preview/apply from the package editor; no XML fields were auto-applied.`
+        : `Imported ${importedSlug} as a draft package. Review metadata, helper docs, media, story file, license/provenance, and publish only when ready.`;
       await this._reloadManifest();
       if (importedSlug) {
         localStorage.setItem(`terpvault.admin.open.${importedSlug}`, '1');
@@ -1519,7 +1532,7 @@ class TerpVaultPage extends HTMLElement {
           loading: false,
           saving: false,
           error: '',
-          success: 'Package imported as draft and not featured. Review metadata, helper docs, media, story file, license/provenance, and publish only when ready.',
+          success: importReviewCopy,
           values: this._editableFromGame(game),
           readOnly: this._readOnlyFromGame(game),
           activeHelper: 'how-to-play',
@@ -1536,10 +1549,12 @@ class TerpVaultPage extends HTMLElement {
         saving: false,
         committing: false,
         error: '',
-        success: `Imported ${importedSlug} as a draft package. Review metadata, helper docs, media, story file, license/provenance, and publish only when ready.`,
+        success: importPanelCopy,
         report: this._committedImportReport(result.report || this.state.importInspect.report, importedSlug),
         file: null,
-        finalSlug: importedSlug
+        finalSlug: importedSlug,
+        importedSlug,
+        hasIFiction: importedHasIFiction
       };
     } catch (error) {
       this.state.importInspect = {
