@@ -10,6 +10,8 @@
 
 This document records the likely package shape for a future Zork III TerpVault demo candidate. It is a planning artifact, not a packaging approval.
 
+Use [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md) for the expanded docs-only materials checklist covering `game.yaml`, provenance, upstream license, iFiction metadata, helper docs, art, screenshots, optional feelies, and final audit requirements.
+
 ## Upstream Source Candidate
 
 - Repository: `https://github.com/historicalsource/zork3.git`.
@@ -230,6 +232,8 @@ Required original helper docs:
 Do not copy or adapt commercial manuals, Invisiclues, hint books, `invisicluesiii.mss`, online walkthroughs, catalog prose, or marketing text unless redistribution rights are explicit and preserved.
 
 ## Art, Screenshots, and Feelies Plan
+
+See [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md) for the expanded materials checklist and acceptance criteria.
 
 Required original art:
 

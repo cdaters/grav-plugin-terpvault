@@ -13,6 +13,7 @@
 - Not approved for bundled demo.
 - Requires package verification, TerpVault/Parchment playback verification, original package assets, helper docs, screenshots, and provenance notes.
 - Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
+- Candidate asset/materials plan: [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md).
 - Next state: package/provenance/playback verification needed.
 
 Zork III must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
@@ -365,6 +366,7 @@ Container-internal curl note:
 - Not approved for bundled demo.
 - Do not create `_demo` package contents yet.
 - Use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) as the docs-only package-planning checklist; it does not approve bundling or artifact commits.
+- Use [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md) as the docs-only materials checklist for `game.yaml`, provenance, upstream license, iFiction metadata, helper docs, art, screenshots, and optional feelies.
 - Recommended eventual package artifact remains the source-built `zork3-release25-serial860811.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
 - Do not bundle `zork3.zip` or `COMPILED/zork3.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
 - Do not mark Zork III package-ready until package metadata, provenance notes, full TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, maps, and feelies are complete.
