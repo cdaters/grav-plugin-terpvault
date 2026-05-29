@@ -52,8 +52,9 @@ Existing scratch evidence from `docs/demo-candidates/ZORK-III.md`:
 - SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - File identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
 - `dfrotz` smoke test: passed on 2026-05-29 with `look`, `inventory`, `quit`, `y`.
-- DDEV-only Parchment smoke test: passed for a temporary package.
-- The 2026-05-29 pass skipped DDEV/Parchment retesting to keep the pass scratch-only; prior DDEV-only Parchment evidence remains from 2026-05-25.
+- DDEV-only temporary package smoke test: host-side detail/play/story/manifest/Parchment routes passed on 2026-05-29 for `zork-iii-temp`.
+- DDEV story route checksum for `zork-iii-temp/zork3.z3`: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- The 2026-05-29 DDEV pass confirmed the Parchment iframe boot configuration. Manual browser confirmation of the game banner and command input remains a follow-up.
 
 Recommended basis for future package planning: use the source-built `zork3-release25-serial860811.z3` unless a later review selects another basis. This recommendation is provisional and does not approve bundling.
 
@@ -214,7 +215,7 @@ Future package must include:
 - Toolchain and build commands if source-built artifact is selected, including the current scratch-only ZILF/ZAPF path or its eventual stable replacement.
 - Selected artifact filename, file identification, and checksum.
 - Whether the selected artifact differs from upstream `COMPILED/zork3.z3` / `zork3.zip`.
-- DDEV playback/export/import verification dates.
+- DDEV playback/export/import verification dates, including whether each check was done with a temporary draft package, a temporarily published package, or the final package candidate.
 - Authorship/licensing notes for every art/helper/screenshot/feelie file.
 - Explicit exclusion of historical commercial assets.
 

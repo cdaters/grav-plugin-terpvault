@@ -295,6 +295,70 @@ DDEV/Parchment smoke test:
 - Prior DDEV-only Parchment smoke evidence from 2026-05-25 remains recorded above.
 - Re-run DDEV/Parchment playback when a complete candidate package exists with final metadata, provenance, art, screenshots, and helper docs.
 
+## DDEV-only temporary package smoke test
+
+Verification date: 2026-05-29.
+
+This pass created a temporary package only in the local DDEV site data directory. No `_demo` package, plugin-repo story file, compiled artifact, package folder, art, screenshot, feelie, helper doc, runtime code, Parchment file, or release metadata was created or changed in the TerpVault plugin repository.
+
+Temporary package:
+
+- Path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii-temp`.
+- Story file: `zork3.z3`.
+- Source artifact copied from scratch: `/tmp/terpvault-zork3-verify-20260529/zork3-release25-serial860811.z3`.
+- Story SHA-256 in DDEV package: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Story file identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
+- Minimal resources only: `game.yaml` and `zork3.z3`.
+- No cover, screenshots, art, feelies, or helper docs were added.
+
+Package status handling:
+
+- The package was first created as `terpvault.status: draft`.
+- `/if/_manifest` included `zork-iii-temp` with `status: draft`, `format: zcode`, `player.engine: parchment`, `story_file: zork3.z3`, and story/detail/play URLs.
+- Public detail/play/story routes returned 404 while the package was draft, which is expected because public TerpVault routes hide unpublished packages.
+- The temporary DDEV-only package was then changed to `terpvault.status: published` so public route and Parchment boot checks could run.
+- The temporary package was left in place as published for manual browser testing at `https://grav20.ddev.site/if/zork-iii-temp/play`.
+
+Published route checks from the host:
+
+- `https://grav20.ddev.site/if`: `200 text/html; charset=utf-8`.
+- `https://grav20.ddev.site/if/zork-iii-temp`: `200 text/html; charset=utf-8`.
+- `https://grav20.ddev.site/if/zork-iii-temp/play`: `200 text/html; charset=utf-8`.
+- `https://grav20.ddev.site/if/_manifest`: `200 application/json`.
+- `https://grav20.ddev.site/if/_story/zork-iii-temp/zork3.z3`: `200 application/octet-stream`, 87858 bytes.
+- `https://grav20.ddev.site/if/_engine/parchment`: `200 text/html; charset=utf-8`.
+
+Published manifest result:
+
+- Slug: `zork-iii-temp`.
+- Status: `published`.
+- Format: `zcode`.
+- Story file: `zork3.z3`.
+- `has_story_file`: `true`.
+- Player engine: `parchment`.
+- Error count: `0`.
+- Warning count: `7`, expected for a minimal temporary package without IFID, cover, helper docs, or final license review.
+
+Story route checksum:
+
+- Downloaded host-side route output: `/private/tmp/terpvault-zork3-story-host.z3`.
+- SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- File identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
+
+Parchment boot check:
+
+- The play page rendered a TerpVault player shell for `zork-iii-temp`.
+- The page contains an iframe pointing at `/if/_engine/parchment`.
+- The iframe `story` payload references `https://grav20.ddev.site/if/_story/zork-iii-temp/zork3.z3`, format `zcode`, and title `Zork III Temporary Verification`.
+- Browser automation for confirming the in-game banner and typed commands was not available in this session because the required browser-control Node tool was not exposed.
+- Manual follow-up: open `https://grav20.ddev.site/if/zork-iii-temp/play`, confirm Parchment loads the game banner, confirm `Release 25 / Serial number 860811` appears, and confirm `look` / `inventory` produce game output.
+
+Container-internal curl note:
+
+- `ddev exec curl` returned `200` for `/if`, `/if/zork-iii-temp/play`, `/if/_manifest`, and `/if/_engine/parchment`.
+- `ddev exec curl` returned `500` for `/if/zork-iii-temp` and `/if/_story/zork-iii-temp/zork3.z3`, with a Grav compiled-file parse error containing bytes from the story file.
+- Host-side requests to the same URLs returned `200`; treat the container-internal curl behavior as a local DDEV/Grav request-path quirk to recheck later, not as evidence that the host browser playback route is unavailable.
+
 ## Packaging recommendation
 
 - Keep Zork III candidate-only.
