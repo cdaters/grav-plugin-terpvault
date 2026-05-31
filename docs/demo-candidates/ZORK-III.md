@@ -11,7 +11,8 @@
 - Frotz smoke test passed for source-built historical-header variants.
 - `dfrotz` smoke test passed on 2026-05-29 for the source-built historical-header artifact.
 - A real DDEV-only candidate package was assembled on 2026-05-29 at `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
-- The DDEV-only candidate package includes the verified story artifact, `game.yaml`, upstream license copy, provenance, original first-pass helper docs, Craig-created/original image assets, and two screenshots.
+- The DDEV-only candidate package includes the verified story artifact, `game.yaml`, upstream license copy, provenance, revised original helper docs, Craig-created/original image assets, two screenshots, and Craig-created/original package-local feelies.
+- Craig-created/original feelies were added to the DDEV-only draft package on 2026-05-31 and documented in package provenance.
 - Not approved for bundled demo.
 - Requires final package audit, full walkthrough transcript verification, export/import verification, IFID/catalog/iFiction decisions, and Craig approval before any `_demo` promotion.
 - Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
@@ -259,6 +260,66 @@ Files created in the DDEV-only package:
 - `hero.jpg`.
 - `screenshots/01.png`.
 - `screenshots/02.png`.
+- `feelies/frobozzco-annual-report.pdf`.
+- `feelies/shareholder-letter.pdf`.
+- `feelies/stock-certificate.pdf`.
+- `feelies/zork-iii-map.pdf`.
+- `feelies/zug-map-inside.jpg`.
+- `feelies/zug-map-outside.jpg`.
+
+## DDEV-only feelies and helper-doc refresh
+
+Verification date: 2026-05-31.
+
+This pass updated only the local DDEV candidate package and repo documentation. No `_demo` contents, story files, package folders, PDFs, JPGs, compiled artifacts, runtime code, Admin2 files, Parchment files, or release metadata were added to the TerpVault plugin repository.
+
+Package path:
+
+- `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
+
+Source feelie folder:
+
+- `/Users/cdaters/Downloads/for-Zork3`.
+
+Feelies copied into the DDEV-only package:
+
+- `Zork 3 - FrobozzCo International Annual Report.pdf` to `feelies/frobozzco-annual-report.pdf`.
+  - SHA-256: `a470dccd170d208ba957e8a2ce77399f11628eb0ab985352d5ac4b83fbc59ab5`.
+- `Zork 3 - Shareholder Letter.pdf` to `feelies/shareholder-letter.pdf`.
+  - SHA-256: `7f9dc53c0d32756030f9b08cf527f38d7eeab6ef7d0229a6ef3ebe1d54e2e89f`.
+- `Zork 3 - Stock Certificate.pdf` to `feelies/stock-certificate.pdf`.
+  - SHA-256: `2a2f2ff59658e525ba35a1c1b607ae3f9f9149066707fbd21571740a25893266`.
+- `Zork 3 - Map.pdf` to `feelies/zork-iii-map.pdf`.
+  - SHA-256: `588a461158932c977f0fbd4df5dddf0998713f1237d42146a83fb5850f4175bc`.
+- `Zork 3 - ZUG Map Inside.jpg` to `feelies/zug-map-inside.jpg`.
+  - SHA-256: `9d453239ea484ee626b39c0021b53efa037a92c29a5039debbd1c7eb527e5f7e`.
+- `Zork 3 - ZUG Map Outside.jpg` to `feelies/zug-map-outside.jpg`.
+  - SHA-256: `0b5e0db2504d6592e2d25fe379eb791752bf857827f2ae21c90a43fa5623c845`.
+
+The feelies are treated as Craig-created/original package-local materials. No historical Infocom commercial scans/assets, manuals, maps, Invisiclues, packaging, logos, or trade dress were used for this feelies pass. Redistribution remains pending final audit; these files are not approved for `_demo` or public/GPM distribution.
+
+`game.yaml` was updated with `resources.feelies` entries for the six package-local feelies. `provenance.md` now records source folder, copied package paths, checksums, authorship, exclusion notes, and redistribution status.
+
+The player-facing helper docs were revised:
+
+- `how-to-play.md`: expanded into a spoiler-light player guide with parser basics, movement, looking/examining, inventory, save/restore, mapping, and Zork III-specific expectations.
+- `hints.md`: expanded into progressive hint ladders by broad area/theme, with spoiler boundaries and cautious wording where transcript verification is still pending.
+- `walkthrough.md`: revised as a clearly spoilery, player-usable draft route outline with an explicit final verification block.
+
+Walkthrough status: draft only. No complete command route was verified against the exact package artifact in this pass; do not claim full-score or full-route verification.
+
+Route/manifest check after this pass:
+
+- Final manifest route returned `200`.
+- Manifest includes `zork-iii` as `draft`.
+- Manifest includes the six `resources.feelies` entries and helper doc resource paths.
+- Manifest warning count: 1, expected `missing-ifid`.
+- Manifest error count: 0.
+- Temporary publish check returned `200` for detail, play, one PDF feelie, one JPG feelie, and `how-to-play.md`.
+- Temporary publish story route returned `200` but delivered a 204-byte Grav compiled-cache parse-error response instead of story bytes; treat story delivery as not verified in this pass.
+- Package was restored to `draft` after temporary publish checking.
+
+Package status after this pass: `draft`.
 
 Story artifact:
 
@@ -270,8 +331,8 @@ Story artifact:
 Package materials:
 
 - `LICENSE-upstream.txt` was copied from the verified upstream checkout license file.
-- `provenance.md` records the source repo, commit, toolchain, build commands, artifact checksum/file ID, upstream prebuilt difference, smoke checks, DDEV package status, image/helper-doc authorship notes, and excluded commercial/historical assets.
-- `how-to-play.md`, `hints.md`, and `walkthrough.md` were written as original first-pass package-local helper docs.
+- `provenance.md` records the source repo, commit, toolchain, build commands, artifact checksum/file ID, upstream prebuilt difference, smoke checks, DDEV package status, image/feelie/helper-doc authorship notes, and excluded commercial/historical assets.
+- `how-to-play.md`, `hints.md`, and `walkthrough.md` were written as original package-local helper docs and refreshed on 2026-05-31.
 - `walkthrough.md` is explicitly a draft route pending transcript verification; it does not claim a complete score/path verification.
 - Images were copied from `/Users/cdaters/Downloads/for-Zork3` and treated as Craig-created/original package art/screenshots for this candidate pass.
 

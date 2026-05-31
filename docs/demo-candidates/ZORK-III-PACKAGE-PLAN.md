@@ -7,6 +7,8 @@
 - Do not create `_demo` package contents from this plan yet.
 - Do not add story files, compiled artifacts, screenshots, art, feelies, helper docs, or package folders in this pass.
 - A real DDEV-only candidate package was assembled on 2026-05-29 under `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
+- Craig-created/original package-local feelies were added to the DDEV-only draft package on 2026-05-31.
+- Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` remains draft pending full transcript verification.
 - Package promotion remains blocked until final audit, full walkthrough verification, export/import verification, IFID/catalog/iFiction decisions, and Craig approval are complete.
 
 This document records the likely package shape for a future Zork III TerpVault demo candidate. It is a planning artifact, not a packaging approval.
@@ -29,6 +31,13 @@ A real candidate package now exists only in the local DDEV data library:
   screenshots/
     01.png
     02.png
+  feelies/
+    frobozzco-annual-report.pdf
+    shareholder-letter.pdf
+    stock-certificate.pdf
+    zork-iii-map.pdf
+    zug-map-inside.jpg
+    zug-map-outside.jpg
   how-to-play.md
   hints.md
   walkthrough.md
@@ -42,14 +51,34 @@ The DDEV package uses the selected source-built artifact as `zork3.z3`:
 - SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - File identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
 
-The package includes an upstream license copy, package-local provenance, original first-pass helper docs, and Craig-created/original image assets from `/Users/cdaters/Downloads/for-Zork3`. `walkthrough.md` remains a draft route pending full transcript verification against this exact story artifact.
+The package includes an upstream license copy, package-local provenance, revised original helper docs, Craig-created/original image assets, and Craig-created/original package-local feelies from `/Users/cdaters/Downloads/for-Zork3`. `walkthrough.md` remains a draft route pending full transcript verification against this exact story artifact.
+
+DDEV-only feelies added on 2026-05-31:
+
+- `feelies/frobozzco-annual-report.pdf`.
+  - SHA-256: `a470dccd170d208ba957e8a2ce77399f11628eb0ab985352d5ac4b83fbc59ab5`.
+- `feelies/shareholder-letter.pdf`.
+  - SHA-256: `7f9dc53c0d32756030f9b08cf527f38d7eeab6ef7d0229a6ef3ebe1d54e2e89f`.
+- `feelies/stock-certificate.pdf`.
+  - SHA-256: `2a2f2ff59658e525ba35a1c1b607ae3f9f9149066707fbd21571740a25893266`.
+- `feelies/zork-iii-map.pdf`.
+  - SHA-256: `588a461158932c977f0fbd4df5dddf0998713f1237d42146a83fb5850f4175bc`.
+- `feelies/zug-map-inside.jpg`.
+  - SHA-256: `9d453239ea484ee626b39c0021b53efa037a92c29a5039debbd1c7eb527e5f7e`.
+- `feelies/zug-map-outside.jpg`.
+  - SHA-256: `0b5e0db2504d6592e2d25fe379eb791752bf857827f2ae21c90a43fa5623c845`.
+
+The feelies are treated as Craig-created/original package-local materials. No historical Infocom commercial scans/assets, manuals, maps, Invisiclues, packaging, logos, or trade dress were used for this feelies pass. Redistribution remains pending final audit.
 
 Verification status:
 
 - Manifest includes `zork-iii` as `draft`, `zcode`, `zork3.z3`, `has_story_file: true`, and `player.engine: parchment`.
+- Manifest includes the six `resources.feelies` entries after the 2026-05-31 refresh.
 - Expected manifest warning: missing IFID.
 - Manifest errors: none.
 - Temporary publish check returned 200 for the detail and play routes.
+- The 2026-05-31 temporary publish check returned 200 for one PDF feelie asset, one JPG feelie asset, and `how-to-play.md`.
+- The 2026-05-31 host-side story route returned 200 but delivered a 204-byte Grav compiled-cache parse-error response instead of story bytes; story delivery was not verified in this pass.
 - Parchment iframe boot configuration points at `/if/_story/zork-iii/zork3.z3`.
 - DDEV-internal story route returned 200 and matched the selected artifact checksum.
 - DDEV-internal cover/small-cover asset checks returned 200.
@@ -142,7 +171,7 @@ Final attribution wording should be drafted carefully. It should credit Infocom 
 
 ## Required Package Structure
 
-Planned structure only; do not create these files yet.
+Current DDEV candidate structure; do not copy this package into `_demo` yet.
 
 ```text
 zork-iii/
@@ -154,6 +183,13 @@ zork-iii/
   screenshots/
     01.png
     02.png
+  feelies/
+    frobozzco-annual-report.pdf
+    shareholder-letter.pdf
+    stock-certificate.pdf
+    zork-iii-map.pdf
+    zug-map-inside.jpg
+    zug-map-outside.jpg
   how-to-play.md
   hints.md
   walkthrough.md
@@ -161,16 +197,7 @@ zork-iii/
   provenance.md
 ```
 
-Optional feelies should use package-local paths such as:
-
-```text
-zork-iii/
-  feelies/
-    map.png
-    command-cheat-sheet.pdf
-```
-
-All optional feelies must be original or otherwise clearly licensed for redistribution.
+All feelies must remain original or otherwise clearly licensed for redistribution. The current package-local feelies are Craig-created/original materials pending final audit.
 
 ## Draft Metadata Plan
 
@@ -202,6 +229,25 @@ resources:
   screenshots:
     - screenshots/01.png
     - screenshots/02.png
+  feelies:
+    - title: FrobozzCo International Annual Report
+      path: feelies/frobozzco-annual-report.pdf
+      type: pdf
+    - title: Shareholder Letter
+      path: feelies/shareholder-letter.pdf
+      type: pdf
+    - title: Stock Certificate
+      path: feelies/stock-certificate.pdf
+      type: pdf
+    - title: Zork III Map
+      path: feelies/zork-iii-map.pdf
+      type: pdf
+    - title: ZUG Map, Inside
+      path: feelies/zug-map-inside.jpg
+      type: image
+    - title: ZUG Map, Outside
+      path: feelies/zug-map-outside.jpg
+      type: image
   how_to_play: how-to-play.md
   hints: hints.md
   walkthrough: walkthrough.md
@@ -273,6 +319,13 @@ Required original helper docs:
 - `how-to-play.md`: parser primer, movement/object commands, save/restore expectations, and Zork III-specific play notes.
 - `hints.md`: original spoiler-light progressive hints with clear spoiler boundaries.
 - `walkthrough.md`: original clearly spoilery route aligned to the exact selected playable artifact.
+
+2026-05-31 status:
+
+- `how-to-play.md` was expanded into a spoiler-light guide for new parser players.
+- `hints.md` was expanded into progressive hints organized by broad puzzle/area/theme.
+- `walkthrough.md` was revised as a player-usable draft route outline with a final verification block.
+- Full-route/full-score transcript verification has not been completed against the exact package artifact.
 
 Do not copy or adapt commercial manuals, Invisiclues, hint books, `invisicluesiii.mss`, online walkthroughs, catalog prose, or marketing text unless redistribution rights are explicit and preserved.
 
