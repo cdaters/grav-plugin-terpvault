@@ -5,11 +5,11 @@
 - Zork III remains candidate-only.
 - This began as a docs-only materials plan; a real DDEV-only candidate package was assembled on 2026-05-29 from this plan.
 - Craig-created/original package-local feelies were added to the DDEV-only draft package on 2026-05-31.
-- Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` was later expanded into a Zork I-style polished draft using local solution files as route references, but remains pending full transcript verification.
+- Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` was later expanded into a Zork I-style guide using local solution files as route references, then transcript-verified against the exact package story artifact.
 - Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
 - Do not create `_demo` package contents from this plan yet.
 - Do not add story files, compiled artifacts, package folders, art, screenshots, helper docs, or feelies in this pass.
-- Package promotion remains blocked until final audit, full walkthrough transcript verification, IFID/catalog/iFiction decisions, and Craig approval are complete.
+- Package promotion remains blocked until final audit, IFID/catalog/iFiction decisions, final route/playback recheck, and Craig approval are complete.
 
 This document expands [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) into a materials checklist for eventual package assembly. It does not approve bundling.
 
@@ -60,7 +60,7 @@ Assets and helper docs:
 - The copied image assets are treated as Craig-created/original package art and screenshots for this candidate pass.
 - `how-to-play.md`, `hints.md`, and `walkthrough.md` were written as original package-local helper docs and refreshed on 2026-05-31 for readability and player usefulness.
 - `walkthrough.md` was later expanded into a fuller Zork I-style route guide using `/Users/cdaters/Downloads/for-Zork3/zork3.sol1.txt` and `/Users/cdaters/Downloads/for-Zork3/zork3.sol2.txt` as route references only.
-- `walkthrough.md` is marked as a polished draft route pending full transcript verification; it does not claim a completed score/path verification.
+- `walkthrough.md` now includes the verified command route for the exact package artifact.
 - The six package-local feelies were copied from `/Users/cdaters/Downloads/for-Zork3` and are treated as Craig-created/original materials pending final audit.
 
 Feelie checksums:
@@ -91,9 +91,13 @@ Verification results:
 - DDEV-internal cover and small-cover asset routes returned 200.
 - Host-side screenshot and hero asset downloads returned 200 and matched the copied source images.
 - Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again as part of any final `_demo` promotion audit.
-- Walkthrough verification attempt on 2026-05-31 used `dfrotz` / Frotz 2.55 dumb interface against the exact package story SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
-- Scratch route/transcript paths: `/private/tmp/zork3-route-candidate-20260531.txt` and `/private/tmp/zork3-transcript-20260531.txt`.
-- Result: partial verification only. Story launch and early-to-mid route behavior were checked, but the automated route did not complete cleanly through the ending; final score and move count remain pending.
+- Walkthrough verification on 2026-05-31 used `dfrotz` / Frotz 2.55 dumb interface against the exact package story SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Exact command: `/opt/homebrew/bin/dfrotz -p -m -s 41 /Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii/zork3.z3 < /private/tmp/zork3-route-working-20260531.txt > /private/tmp/zork3-transcript-working-20260531.txt`.
+- Scratch paths: route `/private/tmp/zork3-route-working-20260531.txt`, transcript `/private/tmp/zork3-transcript-working-20260531.txt`, debug notes `/private/tmp/zork3-route-debug-notes-20260531.md`.
+- Result: ending reached. The verified transcript reached the Treasury ending and reported 7 of 7 in 330 moves after 15 recorded route-debug iterations.
+- Post-walkthrough manifest check returned `200`; canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
+- Post-walkthrough temporary publish check returned `200` for play, `/if/_asset/zork-iii/walkthrough.md`, and `/if/_story/zork-iii/zork3.z3`; the story route returned 87858 bytes with the expected SHA-256.
+- The same temporary publish detail route returned `200` with a 224-byte Grav compiled-cache parse-error body from a compiled YAML cache file, consistent with the known local Grav cache issue. Canonical `zork-iii` was restored to `draft` and cache was cleared.
 - After the walkthrough rewrite, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
 
@@ -339,8 +343,8 @@ Required contents:
 
 - `how-to-play.md` was expanded into a spoiler-light guide for parser basics, movement, examining, inventory, save/restore, mapping, and Zork III expectations.
 - `hints.md` was expanded into progressive hints by broad puzzle/area/theme with spoiler boundaries.
-- `walkthrough.md` was revised as a clearly spoilery, player-usable draft route outline with a final verification block.
-- Full-route/full-score transcript verification has not been completed against the exact package artifact.
+- `walkthrough.md` was revised as a clearly spoilery, player-usable route guide with a verified command route.
+- Full-potential transcript verification passed against the exact package artifact with `dfrotz -p -m -s 41`, reaching 7 of 7 in 330 moves.
 
 ## Art Plan
 

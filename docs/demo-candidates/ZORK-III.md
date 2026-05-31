@@ -13,9 +13,9 @@
 - A real DDEV-only candidate package was assembled on 2026-05-29 at `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
 - The DDEV-only candidate package includes the verified story artifact, `game.yaml`, upstream license copy, provenance, revised original helper docs, Craig-created/original image assets, two screenshots, and Craig-created/original package-local feelies.
 - Craig-created/original feelies were added to the DDEV-only draft package on 2026-05-31 and documented in package provenance.
-- `walkthrough.md` was expanded on 2026-05-31 into a Zork I-style, human-readable route guide using local solution files as route references; full end-to-end transcript verification is still pending.
+- `walkthrough.md` was expanded on 2026-05-31 into a Zork I-style, human-readable route guide using local solution files as route references; full end-to-end transcript verification passed with `dfrotz -p -m -s 41`, reaching 7 of 7 in 330 moves.
 - Not approved for bundled demo.
-- Requires final package audit, full walkthrough transcript verification, IFID/catalog/iFiction decisions, and Craig approval before any `_demo` promotion.
+- Requires final package audit, IFID/catalog/iFiction decisions, final route/playback recheck, and Craig approval before any `_demo` promotion.
 - Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
 - Candidate asset/materials plan: [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md).
 - Next state: complete final package verification without copying anything into `_demo`.
@@ -304,21 +304,23 @@ The feelies are treated as Craig-created/original package-local materials. No hi
 The player-facing helper docs were revised:
 
 - `how-to-play.md`: expanded into a spoiler-light player guide with parser basics, movement, looking/examining, inventory, save/restore, mapping, and Zork III-specific expectations.
-- `hints.md`: expanded into progressive hint ladders by broad area/theme, with spoiler boundaries and cautious wording where transcript verification is still pending.
-- `walkthrough.md`: revised as a clearly spoilery, player-usable draft route outline with an explicit final verification block.
+- `hints.md`: expanded into progressive hint ladders by broad area/theme, with spoiler boundaries and cautious wording.
+- `walkthrough.md`: revised as a clearly spoilery, player-usable route guide and then updated with the verified command route.
 
-Walkthrough status: polished draft. On 2026-05-31, `/Users/cdaters/Downloads/for-Zork3/zork3.sol1.txt` and `/Users/cdaters/Downloads/for-Zork3/zork3.sol2.txt` were used as route references only; the package-facing prose was rewritten as original TerpVault text. A `dfrotz` 2.55 attempt against the exact package story file verified the story launch and early-to-mid route behavior, but did not complete cleanly through the ending. Do not claim full-score or full-route verification yet.
+Walkthrough status: verified for the exact DDEV package artifact. On 2026-05-31, `/Users/cdaters/Downloads/for-Zork3/zork3.sol1.txt` and `/Users/cdaters/Downloads/for-Zork3/zork3.sol2.txt` were used as route references only; the package-facing prose was rewritten as original TerpVault text. A final `dfrotz` 2.55 fixed-seed route reached the Treasury ending and reported `Your potential is 7 of a possible 7, in 330 moves.`
 
-Walkthrough verification attempt:
+Walkthrough verification:
 
 - Target story: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii/zork3.z3`.
 - Target story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - Interpreter: `dfrotz` / Frotz 2.55 dumb interface.
-- Command seed/options: `-p -m -s 1`.
-- Scratch route candidate: `/private/tmp/zork3-route-candidate-20260531.txt`.
-- Scratch transcript: `/private/tmp/zork3-transcript-20260531.txt`.
-- Result: partial verification only; final score and move count remain pending.
-- Package provenance now records the solution references, transcript path, interpreter, checksum, and draft verification state.
+- Command: `/opt/homebrew/bin/dfrotz -p -m -s 41 /Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii/zork3.z3 < /private/tmp/zork3-route-working-20260531.txt > /private/tmp/zork3-transcript-working-20260531.txt`.
+- Scratch route candidate: `/private/tmp/zork3-route-working-20260531.txt`.
+- Scratch transcript: `/private/tmp/zork3-transcript-working-20260531.txt`.
+- Scratch debug notes: `/private/tmp/zork3-route-debug-notes-20260531.md`.
+- Route iterations recorded: 15.
+- Result: ending reached; final score 7 of 7; final move count 330.
+- Package provenance now records the solution references, transcript path, interpreter, checksum, route iterations, final score, and verified walkthrough state.
 
 Route/manifest check after this pass:
 
@@ -332,6 +334,9 @@ Route/manifest check after this pass:
 - After the walkthrough rewrite, a temporary publish check returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; the package was restored to `draft`.
 - Temporary publish story route returned `200` but delivered a 204-byte Grav compiled-cache parse-error response instead of story bytes; treat story delivery as not verified in this pass.
 - Package was restored to `draft` after temporary publish checking.
+- After the verified walkthrough update, cache was cleared and the manifest returned `200` with `zork-iii` still `draft`, `walkthrough.md` present, one expected missing-IFID warning, and zero errors.
+- A temporary publish check after the verified walkthrough update returned `200` for the play route, `200 text/markdown` for `/if/_asset/zork-iii/walkthrough.md`, and `200 application/octet-stream` for `/if/_story/zork-iii/zork3.z3`; the story bytes matched SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- The same temporary publish detail route returned `200` with a 224-byte Grav compiled-cache parse-error body from `/cache/compiled/files/7f545128d99067b0c61724e5611ef549.yaml.php`, consistent with the known local Grav compiled-YAML cache issue. The package was restored to `draft` and cache was cleared.
 
 Package status after this pass: `draft`.
 
@@ -500,7 +505,7 @@ Package materials:
 - `LICENSE-upstream.txt` was copied from the verified upstream checkout license file.
 - `provenance.md` records the source repo, commit, toolchain, build commands, artifact checksum/file ID, upstream prebuilt difference, smoke checks, DDEV package status, image/feelie/helper-doc authorship notes, and excluded commercial/historical assets.
 - `how-to-play.md`, `hints.md`, and `walkthrough.md` were written as original package-local helper docs and refreshed on 2026-05-31.
-- `walkthrough.md` is explicitly a draft route pending transcript verification; it does not claim a complete score/path verification.
+- `walkthrough.md` now includes a verified command route for the exact DDEV package story artifact: `dfrotz -p -m -s 41` reached the Treasury ending and reported 7 of 7 in 330 moves.
 - Images were copied from `/Users/cdaters/Downloads/for-Zork3` and treated as Craig-created/original package art/screenshots for this candidate pass.
 
 Manifest and route checks:
@@ -656,7 +661,7 @@ Container-internal curl note:
 - Use [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md) as the docs-only materials checklist for `game.yaml`, provenance, upstream license, iFiction metadata, helper docs, art, screenshots, and optional feelies.
 - Recommended eventual package artifact remains the source-built `zork3-release25-serial860811.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
 - Do not bundle `zork3.zip` or `COMPILED/zork3.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
-- Do not mark Zork III package-ready until final package metadata/provenance review, full TerpVault/Parchment playback, full walkthrough verification, final audit, and approval are complete.
+- Do not mark Zork III package-ready until final package metadata/provenance review, final TerpVault/Parchment playback recheck, final audit, and approval are complete.
 - Do not use commercial packaging, manual, map, ad, logo, trade-dress, or scan assets.
 - Use Craig-created art, screenshots, helper docs, maps, and feelies later.
 
@@ -664,14 +669,14 @@ Container-internal curl note:
 
 - Decide whether the source-built `zork3-release25-serial860811.z3`, source provenance, or some combination is appropriate for the package.
 - Record selected artifact filename, file identification, checksum, and redistribution basis in package-local provenance notes.
-- Verify full TerpVault/Parchment browser playback behavior.
-- Create package metadata and package-local provenance notes.
-- Create original package art, screenshots, helper docs, maps, and feelies.
+- Recheck full TerpVault/Parchment browser playback behavior during final audit.
+- Resolve IFID/catalog/iFiction metadata decisions.
+- Complete final package metadata/provenance review.
 - Complete-package export/import smoke testing passed for the DDEV-only candidate package on 2026-05-31.
 
 ## Recommended next action
 
-Keep Zork III candidate-only and use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) for the next docs-only package-planning pass. Proceed to package assembly only after the package metadata, package-local provenance notes, TerpVault/Parchment playback test plan, export/import smoke test plan, original art plan, screenshot plan, helper docs, maps, and feelies are ready and approved. Do not create `_demo` package contents yet.
+Keep Zork III candidate-only and use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) for the remaining audit checklist. The DDEV-only package now has verified story delivery, export/import smoke coverage, feelies, helper docs, and a verified walkthrough route, but it still needs IFID/catalog/iFiction decisions, final route/playback recheck, final audit, and Craig approval before any `_demo` copy.
 
 ## Promotion checklist against Zork I standard
 
@@ -680,10 +685,8 @@ Before Zork III can move from candidate to bundled demo review, it still needs:
 - Final decision on source-built artifact versus upstream prebuilt artifact.
 - Source/provenance and license basis documented for the selected artifact.
 - Playable story file verified against the selected basis.
-- Final TerpVault/Parchment playback verification for the selected package candidate.
-- Package metadata drafted.
-- Original how-to-play, hints, and walkthrough text.
-- Screenshots captured from the selected bundled playable version.
-- Original or properly licensed cover, small cover, hero art, and any feelies.
+- Final TerpVault/Parchment playback recheck for the selected package candidate.
+- IFID/catalog/iFiction decisions and package metadata finalization.
+- Final audit of original art, screenshots, helper docs, maps, and feelies.
 - Explicit exclusion of historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, `invisicluesiii.mss`, and other commercial helper material unless separately licensed.
 - Package-local audit notes, upstream license text, export/import smoke tests, and final review.
