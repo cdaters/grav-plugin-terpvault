@@ -8,7 +8,7 @@
 - Do not add story files, compiled artifacts, screenshots, art, feelies, helper docs, or package folders in this pass.
 - A real DDEV-only candidate package was assembled on 2026-05-29 under `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
 - Craig-created/original package-local feelies were added to the DDEV-only draft package on 2026-05-31.
-- Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` remains draft pending full transcript verification.
+- Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` was later expanded into a Zork I-style polished draft using local solution files as route references, but remains pending full transcript verification.
 - Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
 - Package promotion remains blocked until final audit, full walkthrough verification, IFID/catalog/iFiction decisions, and Craig approval are complete.
 
@@ -52,7 +52,7 @@ The DDEV package uses the selected source-built artifact as `zork3.z3`:
 - SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - File identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
 
-The package includes an upstream license copy, package-local provenance, revised original helper docs, Craig-created/original image assets, and Craig-created/original package-local feelies from `/Users/cdaters/Downloads/for-Zork3`. `walkthrough.md` remains a draft route pending full transcript verification against this exact story artifact.
+The package includes an upstream license copy, package-local provenance, revised original helper docs, Craig-created/original image assets, and Craig-created/original package-local feelies from `/Users/cdaters/Downloads/for-Zork3`. `walkthrough.md` is now a polished draft route pending full transcript verification against this exact story artifact.
 
 DDEV-only feelies added on 2026-05-31:
 
@@ -86,6 +86,11 @@ Verification status:
 - DDEV-internal story route returned 200 and matched the selected artifact checksum.
 - DDEV-internal cover/small-cover asset checks returned 200.
 - Package was restored to `draft` after route verification.
+- Walkthrough rewrite check on 2026-05-31: `zork3.sol1.txt` and `zork3.sol2.txt` from `/Users/cdaters/Downloads/for-Zork3` were used as route references only; package prose was rewritten as original TerpVault text.
+- Walkthrough transcript attempt: `dfrotz` / Frotz 2.55 dumb interface, target story SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`, scratch route `/private/tmp/zork3-route-candidate-20260531.txt`, scratch transcript `/private/tmp/zork3-transcript-20260531.txt`.
+- Walkthrough result: partial verification only. The automated route verified launch and early-to-mid route behavior but did not complete cleanly through the ending; final score and move count remain pending.
+- After the walkthrough rewrite, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
+- Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
 
 Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again as part of any final `_demo` promotion audit.
 

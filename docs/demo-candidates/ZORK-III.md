@@ -13,8 +13,9 @@
 - A real DDEV-only candidate package was assembled on 2026-05-29 at `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
 - The DDEV-only candidate package includes the verified story artifact, `game.yaml`, upstream license copy, provenance, revised original helper docs, Craig-created/original image assets, two screenshots, and Craig-created/original package-local feelies.
 - Craig-created/original feelies were added to the DDEV-only draft package on 2026-05-31 and documented in package provenance.
+- `walkthrough.md` was expanded on 2026-05-31 into a Zork I-style, human-readable route guide using local solution files as route references; full end-to-end transcript verification is still pending.
 - Not approved for bundled demo.
-- Requires final package audit, full walkthrough transcript verification, export/import verification, IFID/catalog/iFiction decisions, and Craig approval before any `_demo` promotion.
+- Requires final package audit, full walkthrough transcript verification, IFID/catalog/iFiction decisions, and Craig approval before any `_demo` promotion.
 - Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
 - Candidate asset/materials plan: [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md).
 - Next state: complete final package verification without copying anything into `_demo`.
@@ -306,7 +307,18 @@ The player-facing helper docs were revised:
 - `hints.md`: expanded into progressive hint ladders by broad area/theme, with spoiler boundaries and cautious wording where transcript verification is still pending.
 - `walkthrough.md`: revised as a clearly spoilery, player-usable draft route outline with an explicit final verification block.
 
-Walkthrough status: draft only. No complete command route was verified against the exact package artifact in this pass; do not claim full-score or full-route verification.
+Walkthrough status: polished draft. On 2026-05-31, `/Users/cdaters/Downloads/for-Zork3/zork3.sol1.txt` and `/Users/cdaters/Downloads/for-Zork3/zork3.sol2.txt` were used as route references only; the package-facing prose was rewritten as original TerpVault text. A `dfrotz` 2.55 attempt against the exact package story file verified the story launch and early-to-mid route behavior, but did not complete cleanly through the ending. Do not claim full-score or full-route verification yet.
+
+Walkthrough verification attempt:
+
+- Target story: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii/zork3.z3`.
+- Target story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Interpreter: `dfrotz` / Frotz 2.55 dumb interface.
+- Command seed/options: `-p -m -s 1`.
+- Scratch route candidate: `/private/tmp/zork3-route-candidate-20260531.txt`.
+- Scratch transcript: `/private/tmp/zork3-transcript-20260531.txt`.
+- Result: partial verification only; final score and move count remain pending.
+- Package provenance now records the solution references, transcript path, interpreter, checksum, and draft verification state.
 
 Route/manifest check after this pass:
 
@@ -315,7 +327,9 @@ Route/manifest check after this pass:
 - Manifest includes the six `resources.feelies` entries and helper doc resource paths.
 - Manifest warning count: 1, expected `missing-ifid`.
 - Manifest error count: 0.
+- After the walkthrough rewrite, the manifest still returned `200`, still listed `zork-iii` as `draft`, still exposed `walkthrough.md`, and still had one expected missing-IFID warning with zero errors.
 - Temporary publish check returned `200` for detail, play, one PDF feelie, one JPG feelie, and `how-to-play.md`.
+- After the walkthrough rewrite, a temporary publish check returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; the package was restored to `draft`.
 - Temporary publish story route returned `200` but delivered a 204-byte Grav compiled-cache parse-error response instead of story bytes; treat story delivery as not verified in this pass.
 - Package was restored to `draft` after temporary publish checking.
 
