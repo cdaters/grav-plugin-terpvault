@@ -82,11 +82,13 @@ Verification results:
 - Temporary publish check returned 200 for `/if/zork-iii` and `/if/zork-iii/play`.
 - The 2026-05-31 temporary publish check returned 200 for one PDF feelie asset, one JPG feelie asset, and `how-to-play.md`.
 - The 2026-05-31 host-side story route returned 200 but delivered a 204-byte Grav compiled-cache parse-error response instead of story bytes; story delivery was not verified in this pass.
+- A later 2026-05-31 diagnosis cleared Grav cache and retested the same package. Host-side and DDEV-internal story routes both returned `200 application/octet-stream`, 87858 bytes, SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- The prior 204-byte response matched stale/corrupt Grav compiled-YAML cache errors from unrelated Grav/relatedpages blueprint files, not a Zork III package metadata/path issue and not a TerpVault story-route bug.
 - The play page includes a Parchment iframe story payload for `/if/_story/zork-iii/zork3.z3`.
 - DDEV-internal story route returned 200, 87858 bytes, and checksum `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - DDEV-internal cover and small-cover asset routes returned 200.
 - Host-side screenshot and hero asset downloads returned 200 and matched the copied source images.
-- Host-side curl intermittently hit an existing Grav compiled-cache parse error on some `_story`/asset requests. DDEV-internal checks succeeded, but host-side binary delivery should be rechecked before `_demo` promotion.
+- Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again as part of any final `_demo` promotion audit.
 
 ## Selected Candidate Basis
 

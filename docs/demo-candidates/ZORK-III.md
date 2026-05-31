@@ -321,6 +321,66 @@ Route/manifest check after this pass:
 
 Package status after this pass: `draft`.
 
+## Story route delivery diagnosis
+
+Verification date: 2026-05-31.
+
+This pass diagnosed the 204-byte parse-error response previously seen from `https://grav20.ddev.site/if/_story/zork-iii/zork3.z3`. The issue did not reproduce after the current Grav cache clear.
+
+Package and manifest checks:
+
+- DDEV package status before route testing: `draft`.
+- Local package story file: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii/zork3.z3`.
+- Local story size: 87858 bytes.
+- Local story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Local file identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
+- Draft manifest included `zork-iii` with `has_story_file: true`, `resources.story_file: zork3.z3`, story/detail/play URLs, one expected `missing-ifid` warning, and no errors.
+- Draft story route returned `404 text/plain`, which is expected while public routes hide unpublished packages.
+
+Temporary publish checks:
+
+- Detail route: `200 text/html; charset=utf-8`, 39784 bytes.
+- Play route: `200 text/html; charset=utf-8`, 18137 bytes.
+- Host story route: `200 application/octet-stream`, 87858 bytes.
+- Host story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Host `_file` route: `200 application/octet-stream`, 87858 bytes.
+- Host `_file` SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Host cover route: `200 image/jpeg`, 263156 bytes.
+- Host small-cover route: `200 image/jpeg`, 263156 bytes.
+- Host annual-report feelie route: `200 application/pdf`, 584120 bytes.
+- DDEV-internal story route: `200 application/octet-stream`, 87858 bytes.
+- DDEV-internal story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- DDEV-internal cover route: `200 image/jpeg`, 263156 bytes.
+- DDEV-internal annual-report feelie route: `200 application/pdf`, 584120 bytes.
+
+Zork I comparison:
+
+- `https://grav20.ddev.site/if/_story/zork-i/zork1.z3` returned `200 application/octet-stream`, 86928 bytes.
+- Zork I story SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- Zork I file identification: `Infocom (Z-machine 3, Release 119, Serial 880429)`.
+- Zork I and Zork III both use `resources.story_file` with a package-local `.z3` filename.
+
+Code-path review:
+
+- Story serving is handled by `TerpVaultPlugin::serveStoryFile()` and `TerpVaultPlugin::serveFile()`.
+- The route resolves the package through `GameRepository::find()`, resolves the package-local path through `GamePackage::storyPath()`, checks the configured allowed story extension, sets binary headers, calls `readfile()`, and exits.
+- Package warnings do not block story delivery.
+- Draft/published status does affect public story/detail/play routes because `show_unpublished` is false; temporary publish is required for public route checks.
+- No slug, Roman-numeral, hyphen, `.z3`, or package metadata issue was found.
+
+Log/cache findings:
+
+- The earlier 204-byte response matched PHP parse errors from Grav compiled YAML cache files, not TerpVault package files.
+- Current web logs still contained older parse errors for compiled files generated from `/var/www/html/user/plugins/relatedpages/blueprints.yaml` and `/var/www/html/system/blueprints/config/security.yaml`.
+- After cache rebuild, those compiled files were present as valid PHP arrays.
+- Diagnosis: the prior failure was consistent with a stale/corrupt Grav compiled-YAML cache state, not a Zork III package metadata/path issue and not a TerpVault story-route bug.
+
+Outcome:
+
+- No runtime code changes were made.
+- Zork III story route was verified to serve the expected 87858-byte story bytes while temporarily published.
+- Package was restored to `draft` and cache was cleared after testing.
+
 Story artifact:
 
 - Source scratch artifact: `/tmp/terpvault-zork3-verify-20260529/zork3-release25-serial860811.z3`.
@@ -350,7 +410,7 @@ Manifest and route checks:
 - DDEV-internal story route check returned `200 application/octet-stream`, 87858 bytes, and SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - DDEV-internal cover and small-cover asset checks returned `200 image/jpeg`.
 - Host-side screenshot and hero asset checks returned `200` and matched the source image checksums.
-- Host-side binary/asset curl checks intermittently hit an existing Grav compiled-cache parse error on some `_story`/asset requests; DDEV-internal route checks succeeded and matched expected bytes. Recheck host-side binary delivery before `_demo` promotion.
+- A later 2026-05-31 diagnosis verified host-side and DDEV-internal story delivery after cache clear. The prior host-side parse-error response was consistent with stale/corrupt Grav compiled-YAML cache files unrelated to TerpVault packages.
 - Final package status after verification: `draft`.
 
 ## Fresh scratch verification pass
