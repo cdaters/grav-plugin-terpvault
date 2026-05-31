@@ -9,7 +9,8 @@
 - A real DDEV-only candidate package was assembled on 2026-05-29 under `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
 - Craig-created/original package-local feelies were added to the DDEV-only draft package on 2026-05-31.
 - Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` remains draft pending full transcript verification.
-- Package promotion remains blocked until final audit, full walkthrough verification, export/import verification, IFID/catalog/iFiction decisions, and Craig approval are complete.
+- Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
+- Package promotion remains blocked until final audit, full walkthrough verification, IFID/catalog/iFiction decisions, and Craig approval are complete.
 
 This document records the likely package shape for a future Zork III TerpVault demo candidate. It is a planning artifact, not a packaging approval.
 
@@ -88,6 +89,22 @@ Verification status:
 
 Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again as part of any final `_demo` promotion audit.
 
+Complete-package export/import smoke test:
+
+- Export path inside DDEV container: `/tmp/zork-iii-export-test.terpvault.zip`.
+- Export size: 18604153 bytes.
+- Export SHA-256: `c1fe020d7720d096cb1ff4bcb9ed7954e55973febdd717ab8c48b690e0290607`.
+- Zip hygiene: passed; no `.DS_Store`, `__MACOSX`, AppleDouble, editor backup files, `.bak-*`, lock files, temp files, scratch logs, or source-build files were present.
+- Export included `game.yaml`, `zork3.z3`, license/provenance, helper docs, cover/small-cover/hero, screenshots, and six feelies.
+- Extracted story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Import inspect result: ok; fatal errors none; expected warnings for source slug collision and draft-forcing.
+- Imported throwaway slug: `zork-iii-import-test-20260531`.
+- Imported package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii-import-test-20260531`.
+- Imported story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Imported manifest status after cache clear: `draft`, `has_story_file: true`, warning count `1`, error count `0`.
+- Temporary publish check for the imported package returned `200` for detail, play, story, cover, and one PDF feelie. The story route returned `200 application/octet-stream`, 87858 bytes, and the expected checksum.
+- The throwaway import package was left as `draft`; canonical `zork-iii` remained `draft`.
+
 ## Upstream Source Candidate
 
 - Repository: `https://github.com/historicalsource/zork3.git`.
@@ -154,7 +171,7 @@ Do not select the upstream prebuilt artifact without an explicit packaging decis
 - Package-local provenance notes for the selected artifact.
 - Full DDEV TerpVault detail/play/story route checks against the final package candidate.
 - Parchment playback beyond basic smoke testing where practical.
-- Export/import smoke test for the complete candidate package.
+- Complete-package export/import smoke test passed on 2026-05-31.
 - Full walkthrough or score/path verification against the exact selected bundled artifact.
 - Final package metadata, IFIDs, catalog links, and iFiction metadata source.
 - Original helper docs, screenshots, art, and optional feelies.
@@ -410,7 +427,7 @@ Zork III can move from candidate package plan to bundled-demo review only after:
 - Original `how-to-play.md`, `hints.md`, and `walkthrough.md` are written.
 - Full route/walkthrough verification is complete against the selected artifact.
 - Original or properly licensed cover, small cover, hero art, screenshots, and optional feelies are complete.
-- Export/import smoke testing passes for the complete package.
+- Export/import smoke testing passes for the complete package. Completed for the DDEV-only candidate on 2026-05-31.
 - No historical commercial assets are included without separate license review.
 - Final package audit notes are complete.
 - Craig explicitly approves copying the finished package into `_demo`.

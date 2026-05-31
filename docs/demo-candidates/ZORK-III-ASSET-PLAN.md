@@ -6,9 +6,10 @@
 - This began as a docs-only materials plan; a real DDEV-only candidate package was assembled on 2026-05-29 from this plan.
 - Craig-created/original package-local feelies were added to the DDEV-only draft package on 2026-05-31.
 - Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` remains draft pending full transcript verification.
+- Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
 - Do not create `_demo` package contents from this plan yet.
 - Do not add story files, compiled artifacts, package folders, art, screenshots, helper docs, or feelies in this pass.
-- Package promotion remains blocked until final audit, full walkthrough transcript verification, export/import verification, IFID/catalog/iFiction decisions, and Craig approval are complete.
+- Package promotion remains blocked until final audit, full walkthrough transcript verification, IFID/catalog/iFiction decisions, and Craig approval are complete.
 
 This document expands [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) into a materials checklist for eventual package assembly. It does not approve bundling.
 
@@ -89,6 +90,19 @@ Verification results:
 - DDEV-internal cover and small-cover asset routes returned 200.
 - Host-side screenshot and hero asset downloads returned 200 and matched the copied source images.
 - Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again as part of any final `_demo` promotion audit.
+
+Complete-package export/import smoke test:
+
+- Export path inside DDEV container: `/tmp/zork-iii-export-test.terpvault.zip`.
+- Export size: 18604153 bytes.
+- Export SHA-256: `c1fe020d7720d096cb1ff4bcb9ed7954e55973febdd717ab8c48b690e0290607`.
+- Zip hygiene: passed; backup/cruft/temp/source-build files were excluded.
+- Extracted story and feelie checksums matched the canonical DDEV package copies.
+- Import inspect result: ok; fatal errors none; expected warnings for source slug collision and draft-forcing.
+- Imported throwaway slug/path: `zork-iii-import-test-20260531` at `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii-import-test-20260531`.
+- Imported package manifest status: `draft`, `has_story_file: true`, warning count `1`, error count `0`.
+- Temporary publish check for the imported package returned `200` for detail, play, story, cover, and one PDF feelie. Story route bytes matched SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- The throwaway import package was left as `draft`; canonical `zork-iii` remained `draft`.
 
 ## Selected Candidate Basis
 
@@ -238,7 +252,7 @@ Required before final package review:
 - Confirm IFID and catalog links, or explicitly record why they remain blank.
 - Keep `terpvault.status: draft` during package assembly.
 - Keep `terpvault.featured: false` until final review.
-- Confirm every `resources.*` path exists before export/import smoke testing.
+- Confirm every `resources.*` path exists before export/import smoke testing. Completed for the DDEV-only package on 2026-05-31.
 
 ## metadata.iFiction.xml Options
 
@@ -263,7 +277,7 @@ Future `provenance.md` should include these sections:
 - Upstream prebuilt comparison: checksum and file identification for `COMPILED/zork3.z3` / `zork3.zip`, plus note that selected source-built artifact differs.
 - Local interpreter verification: `dfrotz` version, smoke-test commands, and result.
 - DDEV/Parchment verification: temporary package path, route results, Parchment iframe boot configuration, story route checksum, and whether manual banner/input testing was completed.
-- Export/import verification: final zip contents, no cruft, import inspect result, draft-only import result, and imported story checksum.
+- Export/import verification: final zip contents, no cruft, import inspect result, draft-only import result, and imported story checksum. Completed for the DDEV-only package on 2026-05-31.
 - Excluded assets: historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, Invisiclues, clue sheets, `invisicluesiii.mss`, and copied online walkthroughs unless separately licensed.
 - Package asset authorship: cover, small cover, hero, screenshots, and feelies.
 - Helper doc authorship: original how-to-play, hints, and walkthrough notes.

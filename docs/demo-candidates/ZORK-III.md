@@ -381,6 +381,99 @@ Outcome:
 - Zork III story route was verified to serve the expected 87858-byte story bytes while temporarily published.
 - Package was restored to `draft` and cache was cleared after testing.
 
+## Complete package export/import smoke test
+
+Verification date: 2026-05-31.
+
+This pass exported and re-imported the complete DDEV-only Zork III candidate package. No `_demo` contents, plugin-repo package files, exported zips, story files, PDFs, JPGs, compiled artifacts, runtime code, Parchment files, or release metadata were changed.
+
+Canonical package:
+
+- Package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
+- Package status before and after test: `draft`.
+- Story SHA-256 before export: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Manifest status before export: `draft`, `has_story_file: true`, warning count `1`, error count `0`.
+
+Export result:
+
+- Export was performed through `PackageArchiveService` inside the DDEV site.
+- Export path inside DDEV container: `/tmp/zork-iii-export-test.terpvault.zip`.
+- Export size: 18604153 bytes.
+- Export SHA-256: `c1fe020d7720d096cb1ff4bcb9ed7954e55973febdd717ab8c48b690e0290607`.
+- Zip hygiene: passed. No `.DS_Store`, `__MACOSX`, AppleDouble, editor backup files, `.bak-*`, lock files, temp files, scratch logs, or source-build files were present.
+- The package folder contains old backup files, but the export service correctly excluded them.
+
+Zip contents:
+
+- `zork-iii/game.yaml`.
+- `zork-iii/zork3.z3`.
+- `zork-iii/LICENSE-upstream.txt`.
+- `zork-iii/provenance.md`.
+- `zork-iii/how-to-play.md`.
+- `zork-iii/hints.md`.
+- `zork-iii/walkthrough.md`.
+- `zork-iii/cover.jpg`.
+- `zork-iii/small-cover.jpg`.
+- `zork-iii/hero.jpg`.
+- `zork-iii/screenshots/01.png`.
+- `zork-iii/screenshots/02.png`.
+- `zork-iii/feelies/frobozzco-annual-report.pdf`.
+- `zork-iii/feelies/shareholder-letter.pdf`.
+- `zork-iii/feelies/stock-certificate.pdf`.
+- `zork-iii/feelies/zork-iii-map.pdf`.
+- `zork-iii/feelies/zug-map-inside.jpg`.
+- `zork-iii/feelies/zug-map-outside.jpg`.
+
+Extract verification:
+
+- Extract scratch path inside DDEV container: `/tmp/zork-iii-export-inspect-20260531`.
+- Extracted story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Extracted feelie SHA-256 values matched the canonical package copies:
+  - `frobozzco-annual-report.pdf`: `a470dccd170d208ba957e8a2ce77399f11628eb0ab985352d5ac4b83fbc59ab5`.
+  - `shareholder-letter.pdf`: `7f9dc53c0d32756030f9b08cf527f38d7eeab6ef7d0229a6ef3ebe1d54e2e89f`.
+  - `stock-certificate.pdf`: `2a2f2ff59658e525ba35a1c1b607ae3f9f9149066707fbd21571740a25893266`.
+  - `zork-iii-map.pdf`: `588a461158932c977f0fbd4df5dddf0998713f1237d42146a83fb5850f4175bc`.
+  - `zug-map-inside.jpg`: `9d453239ea484ee626b39c0021b53efa037a92c29a5039debbd1c7eb527e5f7e`.
+  - `zug-map-outside.jpg`: `0b5e0db2504d6592e2d25fe379eb791752bf857827f2ae21c90a43fa5623c845`.
+
+Import inspect result:
+
+- Result: ok.
+- Fatal errors: none.
+- Ignored files: none.
+- Included package files: 18.
+- Candidate slug from the zip: `zork-iii`.
+- Expected warnings:
+  - Existing package folder collision for `zork-iii`; import commit required a new slug.
+  - Future import commit should force imported packages to draft status.
+
+Import commit result:
+
+- Preferred throwaway slug `zork-iii-import-test` already existed, so it was not overwritten.
+- Imported throwaway slug: `zork-iii-import-test-20260531`.
+- Imported package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii-import-test-20260531`.
+- Import result: ok.
+- Import was forced to `draft` and `featured: false`.
+- Imported story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Imported helper docs, images, screenshots, feelies, `LICENSE-upstream.txt`, and `provenance.md` were present.
+- Imported manifest status after cache clear: `draft`, `has_story_file: true`, warning count `1`, error count `0`.
+- Only expected imported manifest warning: missing IFID.
+
+Temporary publish check for imported package:
+
+- Detail route: `200 text/html; charset=utf-8`, 40057 bytes.
+- Play route: `200 text/html; charset=utf-8`, 18263 bytes.
+- Story route: `200 application/octet-stream`, 87858 bytes.
+- Story route SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Cover asset route: `200 image/jpeg`, 263156 bytes.
+- Annual-report feelie route: `200 application/pdf`, 584120 bytes.
+- Imported package was restored to `draft` and cache was cleared after route testing.
+
+Cleanup decision:
+
+- The throwaway package `zork-iii-import-test-20260531` was left in the DDEV package library as `draft` for inspection.
+- The canonical `zork-iii` package remains `draft`.
+
 Story artifact:
 
 - Source scratch artifact: `/tmp/terpvault-zork3-verify-20260529/zork3-release25-serial860811.z3`.
@@ -549,7 +642,7 @@ Container-internal curl note:
 - Use [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md) as the docs-only materials checklist for `game.yaml`, provenance, upstream license, iFiction metadata, helper docs, art, screenshots, and optional feelies.
 - Recommended eventual package artifact remains the source-built `zork3-release25-serial860811.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
 - Do not bundle `zork3.zip` or `COMPILED/zork3.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
-- Do not mark Zork III package-ready until package metadata, provenance notes, full TerpVault/Parchment playback, export/import, original art, screenshots, helper docs, maps, and feelies are complete.
+- Do not mark Zork III package-ready until final package metadata/provenance review, full TerpVault/Parchment playback, full walkthrough verification, final audit, and approval are complete.
 - Do not use commercial packaging, manual, map, ad, logo, trade-dress, or scan assets.
 - Use Craig-created art, screenshots, helper docs, maps, and feelies later.
 
@@ -560,8 +653,7 @@ Container-internal curl note:
 - Verify full TerpVault/Parchment browser playback behavior.
 - Create package metadata and package-local provenance notes.
 - Create original package art, screenshots, helper docs, maps, and feelies.
-- Package export/import smoke testing has passed only for DDEV-only temporary packages; a final package export/import test remains pending once real package metadata/assets/docs exist.
-- Run package export/import smoke tests once a package exists.
+- Complete-package export/import smoke testing passed for the DDEV-only candidate package on 2026-05-31.
 
 ## Recommended next action
 
