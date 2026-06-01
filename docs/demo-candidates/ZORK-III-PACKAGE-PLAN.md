@@ -10,7 +10,8 @@
 - Craig-created/original package-local feelies were added to the DDEV-only draft package on 2026-05-31.
 - Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` was later expanded into a Zork I-style guide using local solution files as route references, then transcript-verified against the exact package story artifact.
 - Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
-- Package promotion remains blocked until final audit, final route/playback recheck, and Craig approval are complete.
+- Final audit and final route/playback recheck passed on 2026-05-31.
+- Package promotion remains blocked on Craig approval and the later `_demo` promotion pass.
 
 This document records the likely package shape for a future Zork III TerpVault demo candidate. It is a planning artifact, not a packaging approval.
 
@@ -44,6 +45,7 @@ A real candidate package now exists only in the local DDEV data library:
   walkthrough.md
   LICENSE-upstream.txt
   provenance.md
+  metadata.iFiction.xml
 ```
 
 The DDEV package uses the selected source-built artifact as `zork3.z3`:
@@ -52,7 +54,7 @@ The DDEV package uses the selected source-built artifact as `zork3.z3`:
 - SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - File identification: `Infocom (Z-machine 3, Release 25, Serial 860811)`.
 
-The package includes an upstream license copy, package-local provenance, revised original helper docs, Craig-created/original image assets, and Craig-created/original package-local feelies from `/Users/cdaters/Downloads/for-Zork3`. `walkthrough.md` now contains a verified full-potential route for this exact story artifact.
+The package includes an upstream license copy, package-local provenance, package-local iFiction metadata, revised original helper docs, Craig-created/original image assets, and Craig-created/original package-local feelies from `/Users/cdaters/Downloads/for-Zork3`. `walkthrough.md` now contains a verified full-potential route for this exact story artifact.
 
 DDEV-only feelies added on 2026-05-31:
 
@@ -69,7 +71,7 @@ DDEV-only feelies added on 2026-05-31:
 - `feelies/zug-map-outside.jpg`.
   - SHA-256: `0b5e0db2504d6592e2d25fe379eb791752bf857827f2ae21c90a43fa5623c845`.
 
-The feelies are treated as Craig-created/original package-local materials. No historical Infocom commercial scans/assets, manuals, maps, Invisiclues, packaging, logos, or trade dress were used for this feelies pass. Redistribution remains pending final audit.
+The feelies are treated as Craig-created/original package-local materials. No historical Infocom commercial scans/assets, manuals, maps, Invisiclues, packaging, logos, or trade dress were used for this feelies pass. Final audit passed, and `_demo` use remains pending Craig approval.
 
 Verification status:
 
@@ -90,7 +92,7 @@ Verification status:
 - Walkthrough transcript verification: `dfrotz` / Frotz 2.55 dumb interface, exact command `/opt/homebrew/bin/dfrotz -p -m -s 41 /Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii/zork3.z3 < /private/tmp/zork3-route-working-20260531.txt > /private/tmp/zork3-transcript-working-20260531.txt`.
 - Walkthrough result: ending reached. The verified transcript reached the Treasury ending and reported 7 of 7 in 330 moves after 15 recorded route-debug iterations.
 - Walkthrough scratch paths: route `/private/tmp/zork3-route-working-20260531.txt`, transcript `/private/tmp/zork3-transcript-working-20260531.txt`, debug notes `/private/tmp/zork3-route-debug-notes-20260531.md`.
-- Post-walkthrough manifest check: `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
+- Post-walkthrough manifest check before the later metadata pass: `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Post-walkthrough temporary publish check: play route, walkthrough asset route, and story route returned `200`; story route returned `application/octet-stream`, 87858 bytes, with SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - The same temporary publish detail route returned `200` with a 224-byte Grav compiled-cache parse-error body from a compiled YAML cache file, consistent with the known local Grav cache issue. Canonical `zork-iii` was restored to `draft` and cache was cleared.
 - IFID/iFiction review on 2026-05-31: local extraction tools were unavailable and story-string inspection found no embedded IFID, but follow-up public metadata research checked IFDB, IFWiki, IF Archive search/index pages, the Treaty of Babel, the local story file, and the documented upstream source repository.
@@ -99,10 +101,13 @@ Verification status:
 - Package-local `metadata.iFiction.xml` was created from verified fields only.
 - Post-metadata manifest check: canonical `zork-iii` remained `draft`, IFID `ZCODE-25-860811` and catalog links were exposed, `metadata.iFiction.xml` was detected, warning count was zero, and error count was zero.
 - Post-metadata temporary publish check: detail, play, and story routes returned `200`; story route returned `application/octet-stream`, 87858 bytes, with the expected SHA-256. Canonical `zork-iii` was restored to `draft` and cache was cleared.
-- After the walkthrough rewrite, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
+- After the walkthrough rewrite, and before the later metadata pass, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
+- Final audit on 2026-05-31: expected files were present, stale local `.bak-*` cruft was removed from the DDEV-only package, `game.yaml` parsed, `metadata.iFiction.xml` passed `xmllint --noout`, the final draft manifest returned warning count zero and error count zero, and canonical `zork-iii` remained `draft`.
+- Final route/playback recheck on 2026-05-31: after one cache clear resolved a local Grav compiled-YAML cache parse error on the play route, detail, play, story, walkthrough, cover, and one PDF feelie route returned `200`. The story route returned `application/octet-stream`, 87858 bytes, with SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Final audit recommendation: ready for Craig approval and subsequent `_demo` promotion planning; not yet copied to `_demo`.
 
-Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again as part of any final `_demo` promotion audit.
+Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again as part of any final `_demo` promotion pass.
 
 Complete-package export/import smoke test:
 
@@ -231,7 +236,7 @@ zork-iii/
   provenance.md
 ```
 
-All feelies must remain original or otherwise clearly licensed for redistribution. The current package-local feelies are Craig-created/original materials pending final audit.
+All feelies must remain original or otherwise clearly licensed for redistribution. The current package-local feelies are Craig-created/original materials; final audit passed, and `_demo` use remains pending Craig approval.
 
 ## Draft Metadata Plan
 
@@ -324,7 +329,7 @@ player:
   autosave: true
 ```
 
-Release-specific IFID and IFDB/IFWiki catalog fields have been recorded for the DDEV-only package. Final attribution wording and selected artifact notes still need final audit before any `_demo` promotion.
+Release-specific IFID and IFDB/IFWiki catalog fields have been recorded for the DDEV-only package. Final audit passed on 2026-05-31; selected artifact and attribution notes should be rechecked during the later `_demo` promotion pass.
 
 ## Required Provenance Files
 

@@ -14,13 +14,15 @@
 - The DDEV-only candidate package includes the verified story artifact, `game.yaml`, upstream license copy, provenance, revised original helper docs, Craig-created/original image assets, two screenshots, and Craig-created/original package-local feelies.
 - Craig-created/original feelies were added to the DDEV-only draft package on 2026-05-31 and documented in package provenance.
 - `walkthrough.md` was expanded on 2026-05-31 into a Zork I-style, human-readable route guide using local solution files as route references; full end-to-end transcript verification passed with `dfrotz -p -m -s 41`, reaching 7 of 7 in 330 moves.
+- Release-specific IFID/catalog metadata was resolved and package-local `metadata.iFiction.xml` was created on 2026-05-31.
+- Final audit and final route/playback recheck passed on 2026-05-31.
 - Not approved for bundled demo.
-- Requires final package audit, final route/playback recheck, and Craig approval before any `_demo` promotion.
+- Requires Craig approval and a dedicated `_demo` promotion pass before any bundled demo copy.
 - Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
 - Candidate asset/materials plan: [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md).
-- Next state: complete final package verification without copying anything into `_demo`.
+- Next state: Craig approval review without copying anything into `_demo`.
 
-Zork III must not be treated as ready to bundle until the source, license, build output, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
+Zork III should not be copied to `_demo` until Craig approves the final-audited DDEV package and a dedicated promotion pass reruns the route/checksum checks from the bundled location.
 
 ## Upstream source verified
 
@@ -297,7 +299,7 @@ Feelies copied into the DDEV-only package:
 - `Zork 3 - ZUG Map Outside.jpg` to `feelies/zug-map-outside.jpg`.
   - SHA-256: `0b5e0db2504d6592e2d25fe379eb791752bf857827f2ae21c90a43fa5623c845`.
 
-The feelies are treated as Craig-created/original package-local materials. No historical Infocom commercial scans/assets, manuals, maps, Invisiclues, packaging, logos, or trade dress were used for this feelies pass. Redistribution remains pending final audit; these files are not approved for `_demo` or public/GPM distribution.
+The feelies are treated as Craig-created/original package-local materials. No historical Infocom commercial scans/assets, manuals, maps, Invisiclues, packaging, logos, or trade dress were used for this feelies pass. Final audit passed; these files are still not approved for `_demo` or public/GPM distribution until Craig approval and a dedicated promotion pass.
 
 `game.yaml` was updated with `resources.feelies` entries for the six package-local feelies. `provenance.md` now records source folder, copied package paths, checksums, authorship, exclusion notes, and redistribution status.
 
@@ -353,6 +355,26 @@ IFID/iFiction metadata review on 2026-05-31:
 - Post-metadata temporary publish check returned `200` for detail, play, and story routes; story route returned `application/octet-stream`, 87858 bytes, with SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`. Canonical `zork-iii` was restored to `draft` and cache was cleared.
 
 Package status after this pass: `draft`.
+
+## Final audit
+
+Final audit date: 2026-05-31.
+
+Result: passed for Craig approval review and later `_demo` promotion planning. The package remains candidate-only and draft in DDEV; it has not been copied to `_demo`.
+
+Audit evidence:
+
+- Expected package files are present, including `metadata.iFiction.xml`, helper docs, screenshots, and six feelies.
+- Stale local `.bak-*` backup files were found in the DDEV-only package and removed; the follow-up cruft scan found no `.DS_Store`, `__MACOSX`, AppleDouble, editor backup, temp, swap, or lock files.
+- `game.yaml` parsed successfully with DDEV PHP/YAML.
+- `metadata.iFiction.xml` validated with `xmllint --noout`.
+- Final draft manifest returned `200`, exposed IFID `ZCODE-25-860811`, detected `metadata.iFiction.xml`, and reported warning count `0`, error count `0`.
+- Final temporary publish route check returned `200` for detail, play, story, walkthrough, cover, and one PDF feelie route after one cache clear resolved a local Grav compiled-YAML cache parse error on the first play-route attempt.
+- Story route returned `200 application/octet-stream`, 87858 bytes, SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- The annual-report feelie route returned `200 application/pdf`, 584120 bytes, SHA-256 `a470dccd170d208ba957e8a2ce77399f11628eb0ab985352d5ac4b83fbc59ab5`.
+- The package was restored to `draft` and Grav cache was cleared after route testing.
+
+Final recommendation: ready for Craig approval. After approval, run a separate `_demo` promotion pass and recheck routes/checksums from the bundled location.
 
 ## Story route delivery diagnosis
 
@@ -676,32 +698,25 @@ Container-internal curl note:
 - Use [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md) as the docs-only materials checklist for `game.yaml`, provenance, upstream license, iFiction metadata, helper docs, art, screenshots, and optional feelies.
 - Recommended eventual package artifact remains the source-built `zork3-release25-serial860811.z3`, not the `-N` no-creator variant, unless a later decision says otherwise.
 - Do not bundle `zork3.zip` or `COMPILED/zork3.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
-- Do not mark Zork III package-ready until final package metadata/provenance review, final TerpVault/Parchment playback recheck, final audit, and approval are complete.
+- The DDEV-only package is ready for Craig approval after final package metadata/provenance review, final TerpVault/Parchment route checks, and final audit passed on 2026-05-31.
 - Do not use commercial packaging, manual, map, ad, logo, trade-dress, or scan assets.
 - Use Craig-created art, screenshots, helper docs, maps, and feelies later.
 
 ## Remaining blockers
 
-- Decide whether the source-built `zork3-release25-serial860811.z3`, source provenance, or some combination is appropriate for the package.
-- Record selected artifact filename, file identification, checksum, and redistribution basis in package-local provenance notes.
-- Recheck full TerpVault/Parchment browser playback behavior during final audit.
-- Recheck route delivery/playback during final audit.
-- Complete final package metadata/provenance review.
-- Complete-package export/import smoke testing passed for the DDEV-only candidate package on 2026-05-31.
+- Craig approval.
+- Actual `_demo` promotion pass after approval.
+- Re-run route/playback and package checksum checks during the eventual `_demo` promotion pass.
 
 ## Recommended next action
 
-Keep Zork III candidate-only and use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) for the remaining audit checklist. The DDEV-only package now has verified story delivery, export/import smoke coverage, feelies, helper docs, a verified walkthrough route, release-specific IFID/catalog metadata, and package-local iFiction XML, but it still needs final route/playback recheck, final audit, and Craig approval before any `_demo` copy.
+Keep Zork III candidate-only until Craig approves it. The DDEV-only package now has verified story delivery, export/import smoke coverage, feelies, helper docs, a verified walkthrough route, release-specific IFID/catalog metadata, package-local iFiction XML, and a passed final audit. It is ready for Craig approval and later `_demo` promotion planning, but it has not been copied to `_demo`.
 
 ## Promotion checklist against Zork I standard
 
 Before Zork III can move from candidate to bundled demo review, it still needs:
 
-- Final decision on source-built artifact versus upstream prebuilt artifact.
-- Source/provenance and license basis documented for the selected artifact.
-- Playable story file verified against the selected basis.
-- Final TerpVault/Parchment playback recheck for the selected package candidate.
-- Final route/playback recheck and package metadata/provenance review.
-- Final audit of original art, screenshots, helper docs, maps, and feelies.
+- Craig approval.
+- A dedicated `_demo` promotion pass that copies the approved package and reruns route/playback checks from the bundled location.
 - Explicit exclusion of historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, `invisicluesiii.mss`, and other commercial helper material unless separately licensed.
-- Package-local audit notes, upstream license text, export/import smoke tests, and final review.
+- Package-local audit notes, upstream license text, export/import smoke tests, and final review are already present in the DDEV-only package.

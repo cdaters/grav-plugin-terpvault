@@ -9,7 +9,8 @@
 - Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
 - Do not create `_demo` package contents from this plan yet.
 - Do not add story files, compiled artifacts, package folders, art, screenshots, helper docs, or feelies in this pass.
-- Package promotion remains blocked until final audit, final route/playback recheck, and Craig approval are complete.
+- Final audit and final route/playback recheck passed on 2026-05-31.
+- Package promotion remains blocked on Craig approval and the later `_demo` promotion pass.
 
 This document expands [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) into a materials checklist for eventual package assembly. It does not approve bundling.
 
@@ -38,6 +39,7 @@ Files present in the DDEV-only package:
 - `hero.jpg`.
 - `screenshots/01.png`.
 - `screenshots/02.png`.
+- `metadata.iFiction.xml`.
 - `feelies/frobozzco-annual-report.pdf`.
 - `feelies/shareholder-letter.pdf`.
 - `feelies/stock-certificate.pdf`.
@@ -61,7 +63,7 @@ Assets and helper docs:
 - `how-to-play.md`, `hints.md`, and `walkthrough.md` were written as original package-local helper docs and refreshed on 2026-05-31 for readability and player usefulness.
 - `walkthrough.md` was later expanded into a fuller Zork I-style route guide using `/Users/cdaters/Downloads/for-Zork3/zork3.sol1.txt` and `/Users/cdaters/Downloads/for-Zork3/zork3.sol2.txt` as route references only.
 - `walkthrough.md` now includes the verified command route for the exact package artifact.
-- The six package-local feelies were copied from `/Users/cdaters/Downloads/for-Zork3` and are treated as Craig-created/original materials pending final audit.
+- The six package-local feelies were copied from `/Users/cdaters/Downloads/for-Zork3` and are treated as Craig-created/original materials; final audit passed, and `_demo` use remains pending Craig approval.
 
 Feelie checksums:
 
@@ -95,7 +97,7 @@ Verification results:
 - Exact command: `/opt/homebrew/bin/dfrotz -p -m -s 41 /Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii/zork3.z3 < /private/tmp/zork3-route-working-20260531.txt > /private/tmp/zork3-transcript-working-20260531.txt`.
 - Scratch paths: route `/private/tmp/zork3-route-working-20260531.txt`, transcript `/private/tmp/zork3-transcript-working-20260531.txt`, debug notes `/private/tmp/zork3-route-debug-notes-20260531.md`.
 - Result: ending reached. The verified transcript reached the Treasury ending and reported 7 of 7 in 330 moves after 15 recorded route-debug iterations.
-- Post-walkthrough manifest check returned `200`; canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
+- Post-walkthrough manifest check before the later metadata pass returned `200`; canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Post-walkthrough temporary publish check returned `200` for play, `/if/_asset/zork-iii/walkthrough.md`, and `/if/_story/zork-iii/zork3.z3`; the story route returned 87858 bytes with the expected SHA-256.
 - The same temporary publish detail route returned `200` with a 224-byte Grav compiled-cache parse-error body from a compiled YAML cache file, consistent with the known local Grav cache issue. Canonical `zork-iii` was restored to `draft` and cache was cleared.
 - IFID/iFiction review on 2026-05-31 first found no authoritative IFID locally because no Treaty/Babel extractor was available and no embedded IFID string appeared in the story file.
@@ -104,8 +106,11 @@ Verification results:
 - `game.yaml` now records the IFID, IFDB TUID/URL, IFWiki URL, and a cleaner verified author field. `metadata.iFiction.xml` was created from verified fields only.
 - Post-metadata manifest check returned `200`; canonical `zork-iii` remained `draft`, warning count was zero, and error count was zero.
 - Post-metadata temporary publish check returned `200` for detail, play, and story routes; story route returned 87858 bytes with the expected SHA-256. Canonical `zork-iii` was restored to `draft` and cache was cleared.
-- After the walkthrough rewrite, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
+- After the walkthrough rewrite, and before the later metadata pass, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
+- Final audit on 2026-05-31 confirmed expected files, valid YAML, valid package-local iFiction XML, zero manifest warnings, zero manifest errors, and no remaining local cruft after stale `.bak-*` backups were removed from the DDEV-only package.
+- Final route/playback recheck on 2026-05-31 temporarily published the package, cleared cache, and verified detail, play, story, walkthrough, cover, and one PDF feelie route. A first play-route attempt hit the known local Grav compiled-YAML cache issue; one cache clear resolved it. Story delivery returned `200 application/octet-stream`, 87858 bytes, SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Final audit recommendation: ready for Craig approval and later `_demo` promotion planning; no `_demo` contents were created or modified.
 
 Complete-package export/import smoke test:
 
@@ -169,7 +174,7 @@ zork-iii/
     zug-map-outside.jpg
 ```
 
-`metadata.iFiction.xml` is present in the DDEV-only package. Feelies are present but remain pending final audit and are not approved for `_demo` or public/GPM distribution.
+`metadata.iFiction.xml` is present in the DDEV-only package. Feelies are present, final audit passed, and `_demo` or public/GPM distribution remains pending Craig approval and a dedicated promotion pass.
 
 ## game.yaml Materials Plan
 
@@ -264,8 +269,8 @@ player:
 
 Required before final package review:
 
-- Confirm final attribution wording.
-- Confirm IFID and catalog links during final audit. Current package provenance records that IFDB plus the Treaty legacy Z-code rule support `ZCODE-25-860811` for the Release 25 / Serial 860811 artifact.
+- Confirm final attribution wording again during the later `_demo` promotion pass.
+- IFID and catalog links were confirmed during final audit. Current package provenance records that IFDB plus the Treaty legacy Z-code rule support `ZCODE-25-860811` for the Release 25 / Serial 860811 artifact.
 - Keep `terpvault.status: draft` during package assembly.
 - Keep `terpvault.featured: false` until final review.
 - Confirm every `resources.*` path exists before export/import smoke testing. Completed for the DDEV-only package on 2026-05-31.
