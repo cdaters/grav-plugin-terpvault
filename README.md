@@ -403,7 +403,7 @@ user/plugins/terpvault/_demo/data/terpvault/games/
   grue/
 ```
 
-`zork-i` and `zork-iii` are bundled starter packages approved for this development demo tree. They use source-built Z-machine story files from verified MIT-licensed historical source releases, include package-local provenance and upstream license text, and use original package art, helper docs, screenshots, and feelies. Their walkthrough routes have been verified with `dfrotz` against the bundled story files.
+`zork-i` and `zork-iii` are bundled starter packages approved for this development demo tree. They use source-built Z-machine story files from verified MIT-licensed historical source releases, include package-local provenance and upstream license text, and use original package art, helper docs, screenshots, and feelies. Their walkthrough routes have been verified with `dfrotz` against the bundled story files. The committed `_demo` Zork III package was seeded into DDEV and route/checksum verified on 2026-05-31.
 
 `sample-cave` is original placeholder/demo content intended for public-safe structure testing. It is not a playable game. `adventure`, `you-are-standing`, and `grue` are real IF development starter packages with source/license notes in their manifests. Review their provenance before broad redistribution or before including them in a public plugin release.
 

@@ -10,7 +10,7 @@
 - Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` was later expanded into a Zork I-style guide using local solution files as route references, then transcript-verified against the exact package story artifact.
 - Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
 - Final audit and final route/playback recheck passed on 2026-05-31.
-- `_demo` promotion passed on 2026-05-31; clean demo-seed route/checksum recheck remains a follow-up before release packaging.
+- `_demo` promotion and clean DDEV demo-seed route/checksum verification passed on 2026-05-31.
 
 This document records the package shape and audit trail for the bundled Zork III TerpVault demo package.
 
@@ -106,7 +106,7 @@ Verification status:
 - Final route/playback recheck on 2026-05-31: after one cache clear resolved a local Grav compiled-YAML cache parse error on the play route, detail, play, story, walkthrough, cover, and one PDF feelie route returned `200`. The story route returned `application/octet-stream`, 87858 bytes, with SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - Final audit recommendation: ready for Craig approval and subsequent `_demo` promotion planning. Craig later approved promotion, and the package was copied into `_demo`.
 
-Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again after installing or seeding the `_demo` package into a clean Grav site.
+Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Route delivery was rechecked again after seeding the committed `_demo` package into DDEV.
 
 Bundled `_demo` promotion:
 
@@ -117,7 +117,8 @@ Bundled `_demo` promotion:
 - Story checksum in `_demo`: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - `game.yaml` parsed with Ruby YAML and `metadata.iFiction.xml` passed `xmllint --noout`.
 - Target cruft check passed after filtered copy.
-- Live route/playback from the promoted `_demo` package was deferred until a clean demo-seed install because no non-destructive starter-package seed command exists yet.
+- Clean DDEV demo-seed verification later passed on 2026-05-31: existing DDEV `zork-iii` was moved aside to `/tmp/terpvault-zork3-seed-backup-20260531-234849/zork-iii`, the committed `_demo` package was copied into `user/data/terpvault/games/zork-iii`, manifest returned `200` with `status: published`, warning count zero, and error count zero, and detail/play/story/walkthrough/cover/annual-report routes returned `200`.
+- Seeded story route returned `application/octet-stream`, 87858 bytes, SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 
 Complete-package export/import smoke test:
 

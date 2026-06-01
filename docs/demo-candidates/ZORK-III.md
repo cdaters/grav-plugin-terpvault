@@ -18,12 +18,13 @@
 - Final audit and final route/playback recheck passed on 2026-05-31.
 - Craig approved `_demo` promotion.
 - Copied into `_demo/data/terpvault/games/zork-iii` on 2026-05-31.
+- Clean DDEV demo-seed route/checksum verification passed on 2026-05-31.
 - Approved for bundled demo.
 - Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
 - Candidate asset/materials plan: [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md).
-- Next state: clean demo-seed route/checksum recheck before release packaging.
+- Next state: keep bundled package stable; re-run route/checksum checks if package files or installer behavior change.
 
-Zork III is now present in `_demo` as a reviewed starter package. Recheck it after installing or seeding the demo package into a clean Grav site before release packaging.
+Zork III is now present in `_demo` as a reviewed starter package. The committed `_demo` package was seeded into DDEV and route/checksum verified on 2026-05-31.
 
 ## Upstream source verified
 
@@ -375,7 +376,7 @@ Audit evidence:
 - The annual-report feelie route returned `200 application/pdf`, 584120 bytes, SHA-256 `a470dccd170d208ba957e8a2ce77399f11628eb0ab985352d5ac4b83fbc59ab5`.
 - The package was restored to `draft` and Grav cache was cleared after route testing.
 
-Final recommendation from this audit was ready for Craig approval. Craig later approved promotion, and the package was copied into `_demo`; recheck routes/checksums from a clean seeded demo install before release packaging.
+Final recommendation from this audit was ready for Craig approval. Craig later approved promotion, the package was copied into `_demo`, and clean DDEV demo-seed route/checksum verification passed.
 
 ## Bundled `_demo` package
 
@@ -396,7 +397,39 @@ Promotion details:
 - Target cruft check passed for `.DS_Store`, `__MACOSX`, AppleDouble, `.bak-*`, temp, swap, and lock files.
 - Image assets and feelies were recognized by `file`; helper docs, upstream license, and provenance are non-empty.
 
-Live route/playback from the promoted `_demo` location was deferred because the project currently documents manual `cp -R` starter-package installation rather than a non-destructive seed command. Recheck detail, play, story, walkthrough, cover, and feelie routes after installing or seeding this `_demo` package into a clean Grav site.
+Live route/playback from the promoted `_demo` location was later verified by seeding the committed package into DDEV. See "Clean demo-seed verification" below.
+
+## Clean demo-seed verification
+
+Verification date: 2026-05-31.
+
+The committed `_demo` package was seeded into the DDEV TerpVault library and verified from the public routes.
+
+Seed details:
+
+- Seed source: `/Users/cdaters/Code/grav-plugin-terpvault/_demo/data/terpvault/games/zork-iii`.
+- DDEV target: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
+- Existing DDEV package moved aside before seeding: `/tmp/terpvault-zork3-seed-backup-20260531-234849/zork-iii`.
+- Seeded package status: `published`.
+- Seeded story SHA-256: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- Seeded `metadata.iFiction.xml` passed `xmllint --noout`.
+- Seeded cruft check found no `.DS_Store`, `__MACOSX`, AppleDouble, `.bak-*`, temp, swap, or lock files.
+
+Manifest result:
+
+- `/if/_manifest`: `200`, 60077 bytes.
+- `zork-iii` present with `status: published`, `has_story_file: true`, IFID `ZCODE-25-860811`, `metadata.iFiction.xml` detected, resources present, warnings `0`, errors `0`.
+
+Route results:
+
+- `/if/zork-iii`: `200 text/html; charset=utf-8`, 41813 bytes.
+- `/if/zork-iii/play`: `200 text/html; charset=utf-8`, 18137 bytes.
+- `/if/_story/zork-iii/zork3.z3`: `200 application/octet-stream`, 87858 bytes, SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- `/if/_asset/zork-iii/walkthrough.md`: `200 text/markdown; charset=utf-8`, 8169 bytes.
+- `/if/_asset/zork-iii/cover.jpg`: `200 image/jpeg`, 263156 bytes.
+- `/if/_asset/zork-iii/feelies/frobozzco-annual-report.pdf`: `200 application/pdf`, 584120 bytes, SHA-256 `a470dccd170d208ba957e8a2ce77399f11628eb0ab985352d5ac4b83fbc59ab5`.
+
+Detail and play responses were normal Grav HTML pages, not compiled-cache parse-error pages. No cache retry was required after the initial cache clear.
 
 ## Story route delivery diagnosis
 
@@ -724,16 +757,16 @@ Container-internal curl note:
 
 ## Remaining blockers
 
-- Clean demo-seed route/checksum recheck before release packaging.
+- Re-run route/checksum checks if package files or installer behavior change.
 
 ## Recommended next action
 
-Keep Zork III in `_demo` and recheck it from a clean seeded demo install before release packaging. The bundled package has verified story delivery, export/import smoke coverage, feelies, helper docs, a verified walkthrough route, release-specific IFID/catalog metadata, package-local iFiction XML, a passed final audit, and Craig approval.
+Keep Zork III in `_demo`. The bundled package has verified story delivery, export/import smoke coverage, feelies, helper docs, a verified walkthrough route, release-specific IFID/catalog metadata, package-local iFiction XML, a passed final audit, Craig approval, and clean DDEV demo-seed route/checksum verification.
 
 ## Promotion checklist against Zork I standard
 
-Before Zork III is used for release packaging, it still needs:
+Before Zork III is changed for release packaging, it still needs:
 
-- A clean demo-seed route/checksum recheck from the bundled location.
+- A route/checksum recheck if package files or installer behavior change.
 - Explicit exclusion of historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, `invisicluesiii.mss`, and other commercial helper material unless separately licensed.
 - Package-local audit notes, upstream license text, export/import smoke tests, and final review are present in the bundled `_demo` package.

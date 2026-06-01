@@ -112,7 +112,8 @@ Verification results:
 - Final audit recommendation: ready for Craig approval and later `_demo` promotion planning. Craig later approved promotion, and the package was copied into `_demo`.
 - `_demo` promotion on 2026-05-31 copied the approved package into `_demo/data/terpvault/games/zork-iii`; target `game.yaml` status is `published`, matching Zork I's `_demo` convention, and `featured` remains `false`.
 - Promoted package validation passed: story checksum matched, file identification matched Release 25 / Serial 860811, `game.yaml` parsed, `metadata.iFiction.xml` passed `xmllint --noout`, helper docs/license/provenance were non-empty, image/PDF assets were recognized, and target cruft check passed.
-- Live route/playback from the promoted `_demo` package was deferred until a clean demo-seed install because no non-destructive starter-package seed command exists yet.
+- Clean DDEV demo-seed verification later passed on 2026-05-31: existing DDEV `zork-iii` was moved aside to `/tmp/terpvault-zork3-seed-backup-20260531-234849/zork-iii`, the committed `_demo` package was copied into `user/data/terpvault/games/zork-iii`, manifest returned `200` with `status: published`, warning count zero, and error count zero, and detail/play/story/walkthrough/cover/annual-report routes returned `200`.
+- Seeded story route returned `application/octet-stream`, 87858 bytes, SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 
 Complete-package export/import smoke test:
 

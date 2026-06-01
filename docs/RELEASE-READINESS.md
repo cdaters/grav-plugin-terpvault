@@ -45,7 +45,7 @@ Before any future GPM-ready release, ship only public-safe original demo materia
 - `grue`: development starter package. IFDB lists Creative Commons, and the author's GitHub README identifies Creative Commons Attribution-ShareAlike 4.0 International.
 - `zork-i`: bundled demo package with verified source/provenance and original package assets; keep it audited and re-verify if the story file changes.
 - `zork-ii`: candidate only unless the source-build patch or prebuilt artifact basis, provenance, playback, helper docs, original/properly licensed assets, and package audit are complete.
-- `zork-iii`: bundled demo package with verified build/artifact basis, provenance, playback checks, helper docs, original package assets, package-local iFiction metadata, and package audit; recheck from a clean demo seed before release packaging.
+- `zork-iii`: bundled demo package with verified build/artifact basis, provenance, playback checks, helper docs, original package assets, package-local iFiction metadata, package audit, and clean DDEV demo-seed route/checksum verification.
 - Mainframe Zork / Dungeon: research-only candidate, separate from the Zork trilogy packages. Do not bundle story files, playable artifacts, draft package skeletons, package art, or demo claims until legal/provenance/build/playback/helper docs are complete.
 - Open Adventure / Colossal Cave: candidate only until exact source/release/license and playable package target are verified.
 
@@ -80,7 +80,7 @@ Before tagging:
 
 - Exclude development-only real IF packages unless redistribution review is complete.
 - Keep `sample-cave` if a structure demo is needed.
-- Keep Zork II, Mainframe Zork / Dungeon, Adventure / Colossal Cave, Grue, and You Are Standing out of any GPM-ready bundle unless each package has clean story-file provenance, license notes, original or properly licensed art/helper docs, and package-level audit notes. Zork III now has that package-level audit for the development `_demo` tree, but still needs a clean demo-seed recheck before release packaging.
+- Keep Zork II, Mainframe Zork / Dungeon, Adventure / Colossal Cave, Grue, and You Are Standing out of any GPM-ready bundle unless each package has clean story-file provenance, license notes, original or properly licensed art/helper docs, and package-level audit notes. Zork III now has that package-level audit for the development `_demo` tree and passed clean DDEV demo-seed route/checksum verification.
 - Preserve `docs/THIRD-PARTY-NOTICES.md`.
 - Preserve tracked bundled Parchment adapter assets under `assets/vendor/parchment/`; GitHub source/download ZIP installs must include the files served through `/if/_engine/parchment`.
 - Preserve Parchment's embedded bundled-license comment in `assets/vendor/parchment/index.html`.
