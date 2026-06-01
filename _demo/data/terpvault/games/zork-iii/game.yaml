@@ -1,0 +1,81 @@
+id: zork-iii
+slug: zork-iii
+identification:
+  format: zcode
+  ifids:
+    - ZCODE-25-860811
+bibliographic:
+  title: 'Zork III'
+  author: 'Marc Blank and Dave Lebling; source release by Microsoft/Open Source Programs Office/Xbox/Activision'
+  headline: 'The Dungeon Master'
+  first_published: '1982'
+  genre: 'Interactive Fiction'
+  language: en
+  description: "Zork III returns to the Great Underground Empire for a quieter, stranger final test. This TerpVault candidate package uses a source-built Z-machine story file from the verified MIT-licensed historical source release, with original package art and first-pass player notes prepared for review.\n\nThis is still a draft candidate package. The story artifact, provenance, playback behavior, helper docs, screenshots, and package materials need final audit before any bundled demo decision.\n"
+resources:
+  story_file: zork3.z3
+  cover: cover.jpg
+  small_cover: small-cover.jpg
+  hero: hero.jpg
+  screenshots:
+    - screenshots/01.png
+    - screenshots/02.png
+  feelies:
+    - title: FrobozzCo International Annual Report
+      path: feelies/frobozzco-annual-report.pdf
+      type: pdf
+      description: Original in-universe FrobozzCo annual-report style feelie created for the TerpVault Zork III package.
+    - title: Shareholder Letter
+      path: feelies/shareholder-letter.pdf
+      type: pdf
+      description: Original in-universe shareholder letter feelie created for the TerpVault Zork III package.
+    - title: Stock Certificate
+      path: feelies/stock-certificate.pdf
+      type: pdf
+      description: Original in-universe stock certificate feelie created for the TerpVault Zork III package.
+    - title: Zork III Map
+      path: feelies/zork-iii-map.pdf
+      type: pdf
+      description: Original map feelie created for the TerpVault Zork III package.
+    - title: ZUG Map, Inside
+      path: feelies/zug-map-inside.jpg
+      type: image
+      description: Original ZUG map inside artwork created for the TerpVault Zork III package.
+    - title: ZUG Map, Outside
+      path: feelies/zug-map-outside.jpg
+      type: image
+      description: Original ZUG map outside artwork created for the TerpVault Zork III package.
+  how_to_play: how-to-play.md
+  hints: hints.md
+  walkthrough: walkthrough.md
+catalog:
+  ifdb:
+    tuid: vrsot1zgy1wfcdru
+    url: 'https://ifdb.org/viewgame?id=vrsot1zgy1wfcdru'
+  ifwiki:
+    url: 'https://www.ifwiki.org/Zork_III'
+  ifarchive:
+    path: ''
+    url: ''
+release:
+  license:
+    name: 'MIT License'
+    url: 'https://github.com/historicalsource/zork3/blob/master/LICENSE'
+    notes: 'Observed upstream source license is MIT. Historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, Invisiclues, and commercial helper material are excluded from this draft.'
+  source:
+    url: 'https://github.com/historicalsource/zork3.git'
+    retrieved: '2026-05-29'
+    notes: 'Source commit 3ec9ed412b5f3cafe65d83c727d07db1fe4a86a8. Story file selected from scratch-built artifact /tmp/terpvault-zork3-verify-20260529/zork3-release25-serial860811.z3; SHA-256 2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260. Built with ZILF/ZAPF 1.8 and reassembled as Release 25 / Serial 860811.'
+terpvault:
+  status: published
+  featured: false
+  tags:
+    - candidate
+    - parser
+    - z-code
+    - classic
+    - zork
+player:
+  engine: parchment
+  theme: retro-terminal
+  autosave: true

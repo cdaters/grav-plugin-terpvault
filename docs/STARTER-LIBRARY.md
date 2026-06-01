@@ -11,7 +11,7 @@ For Craig's development branch, the `_demo` tree also includes real starter pack
 ## v0.4.x and v0.5.0 direction
 
 - Keep v0.4.x starter-library work incremental and evidence-driven.
-- Zork II and Zork III should remain candidates until their source build, playable artifact, Parchment playback, package metadata, helper docs, and provenance are clean.
+- Zork II should remain a candidate until its source build, playable artifact, Parchment playback, package metadata, helper docs, and provenance are clean. Zork III has completed that review path for this development demo tree and is bundled in `_demo`.
 - Mainframe Zork / Dungeon should remain a research-only candidate, separate from Zork I/II/III, until source selection, legal/provenance review, reference transcripts, build/reconstruction path, playback, and helper docs are clean.
 - Adventure / Colossal Cave should remain a candidate until the exact implementation, license, playable target, and TerpVault runtime strategy are verified.
 - Grue and You Are Standing should be polished only if the exact license and package provenance are clear enough for the intended distribution.
@@ -72,8 +72,8 @@ Current candidate notes:
 
 - Zork I is the verified bundled anchor demo.
 - Zork II remains candidate-only because the unmodified ZILF build failed and the scratch-only compatibility patch or prebuilt artifact basis has not been approved for packaging.
-- Zork III remains candidate-only even though scratch source build, Frotz smoke test, and DDEV-only Parchment smoke test passed; a docs-only package plan exists, but it still needs final package metadata, provenance, original helper docs, screenshots, original art, and package audit notes.
-- Do not add Zork II or Zork III to `_demo` until the selected artifact basis, license/provenance, playback behavior, helper docs, screenshots, original/properly licensed art, and export/import audit are complete.
+- Zork III is bundled in `_demo` after source build verification, DDEV playback checks, export/import smoke, verified walkthrough, metadata/iFiction review, final audit, and Craig approval.
+- Do not add Zork II to `_demo` until the selected artifact basis, license/provenance, playback behavior, helper docs, screenshots, original/properly licensed art, and export/import audit are complete.
 
 ### Mainframe Zork / Dungeon
 

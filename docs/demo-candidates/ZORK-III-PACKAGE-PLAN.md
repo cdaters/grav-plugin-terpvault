@@ -2,18 +2,17 @@
 
 ## Status
 
-- Candidate package plan only.
-- Not approved for bundled demo.
-- Do not create `_demo` package contents from this plan yet.
+- Bundled `_demo` package approved and present.
+- Copied into `_demo/data/terpvault/games/zork-iii` on 2026-05-31 after Craig approval.
 - Do not add story files, compiled artifacts, screenshots, art, feelies, helper docs, or package folders in this pass.
 - A real DDEV-only candidate package was assembled on 2026-05-29 under `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
 - Craig-created/original package-local feelies were added to the DDEV-only draft package on 2026-05-31.
 - Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` was later expanded into a Zork I-style guide using local solution files as route references, then transcript-verified against the exact package story artifact.
 - Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
 - Final audit and final route/playback recheck passed on 2026-05-31.
-- Package promotion remains blocked on Craig approval and the later `_demo` promotion pass.
+- `_demo` promotion passed on 2026-05-31; clean demo-seed route/checksum recheck remains a follow-up before release packaging.
 
-This document records the likely package shape for a future Zork III TerpVault demo candidate. It is a planning artifact, not a packaging approval.
+This document records the package shape and audit trail for the bundled Zork III TerpVault demo package.
 
 Use [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md) for the expanded docs-only materials checklist covering `game.yaml`, provenance, upstream license, iFiction metadata, helper docs, art, screenshots, optional feelies, and final audit requirements.
 
@@ -71,7 +70,7 @@ DDEV-only feelies added on 2026-05-31:
 - `feelies/zug-map-outside.jpg`.
   - SHA-256: `0b5e0db2504d6592e2d25fe379eb791752bf857827f2ae21c90a43fa5623c845`.
 
-The feelies are treated as Craig-created/original package-local materials. No historical Infocom commercial scans/assets, manuals, maps, Invisiclues, packaging, logos, or trade dress were used for this feelies pass. Final audit passed, and `_demo` use remains pending Craig approval.
+The feelies are treated as Craig-created/original package-local materials. No historical Infocom commercial scans/assets, manuals, maps, Invisiclues, packaging, logos, or trade dress were used for this feelies pass. Final audit passed, Craig approved `_demo` use, and the feelies are included in the bundled development demo package.
 
 Verification status:
 
@@ -105,9 +104,20 @@ Verification status:
 - Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
 - Final audit on 2026-05-31: expected files were present, stale local `.bak-*` cruft was removed from the DDEV-only package, `game.yaml` parsed, `metadata.iFiction.xml` passed `xmllint --noout`, the final draft manifest returned warning count zero and error count zero, and canonical `zork-iii` remained `draft`.
 - Final route/playback recheck on 2026-05-31: after one cache clear resolved a local Grav compiled-YAML cache parse error on the play route, detail, play, story, walkthrough, cover, and one PDF feelie route returned `200`. The story route returned `application/octet-stream`, 87858 bytes, with SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
-- Final audit recommendation: ready for Craig approval and subsequent `_demo` promotion planning; not yet copied to `_demo`.
+- Final audit recommendation: ready for Craig approval and subsequent `_demo` promotion planning. Craig later approved promotion, and the package was copied into `_demo`.
 
-Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again as part of any final `_demo` promotion pass.
+Host-side story delivery was rechecked after cache clear and matched the selected artifact checksum. Recheck route delivery again after installing or seeding the `_demo` package into a clean Grav site.
+
+Bundled `_demo` promotion:
+
+- Promotion date: 2026-05-31.
+- Source package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
+- Target package path: `_demo/data/terpvault/games/zork-iii`.
+- Target status: `published`, matching the existing Zork I `_demo` convention; `featured: false`.
+- Story checksum in `_demo`: `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
+- `game.yaml` parsed with Ruby YAML and `metadata.iFiction.xml` passed `xmllint --noout`.
+- Target cruft check passed after filtered copy.
+- Live route/playback from the promoted `_demo` package was deferred until a clean demo-seed install because no non-destructive starter-package seed command exists yet.
 
 Complete-package export/import smoke test:
 
@@ -236,7 +246,7 @@ zork-iii/
   provenance.md
 ```
 
-All feelies must remain original or otherwise clearly licensed for redistribution. The current package-local feelies are Craig-created/original materials; final audit passed, and `_demo` use remains pending Craig approval.
+All feelies must remain original or otherwise clearly licensed for redistribution. The current package-local feelies are Craig-created/original materials; final audit passed, Craig approved `_demo` use, and they are included in the bundled development demo package.
 
 ## Draft Metadata Plan
 
@@ -451,4 +461,4 @@ Zork III can move from candidate package plan to bundled-demo review only after:
 - No historical commercial assets are included without separate license review.
 - Recheck IFID/catalog/iFiction metadata during final audit if the story artifact changes.
 - Final package audit notes are complete.
-- Craig explicitly approves copying the finished package into `_demo`.
+- Craig explicitly approved copying the finished package into `_demo`; completed on 2026-05-31.

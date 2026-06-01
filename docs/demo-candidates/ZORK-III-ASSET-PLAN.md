@@ -2,17 +2,16 @@
 
 ## Status
 
-- Zork III remains candidate-only.
+- Zork III is now bundled in `_demo`.
 - This began as a docs-only materials plan; a real DDEV-only candidate package was assembled on 2026-05-29 from this plan.
 - Craig-created/original package-local feelies were added to the DDEV-only draft package on 2026-05-31.
 - Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` was later expanded into a Zork I-style guide using local solution files as route references, then transcript-verified against the exact package story artifact.
 - Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
-- Do not create `_demo` package contents from this plan yet.
 - Do not add story files, compiled artifacts, package folders, art, screenshots, helper docs, or feelies in this pass.
 - Final audit and final route/playback recheck passed on 2026-05-31.
-- Package promotion remains blocked on Craig approval and the later `_demo` promotion pass.
+- Craig approved `_demo` promotion, and the package was copied into `_demo/data/terpvault/games/zork-iii` on 2026-05-31.
 
-This document expands [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) into a materials checklist for eventual package assembly. It does not approve bundling.
+This document expands [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) into the materials checklist and audit record for the bundled package.
 
 ## DDEV-Only Assembly Result
 
@@ -22,7 +21,7 @@ A real candidate package was assembled only in the local DDEV data library:
 
 - Package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`.
 - Package status after verification: `draft`.
-- No `_demo` contents were created or modified.
+- The audited package was later copied into `_demo/data/terpvault/games/zork-iii` after Craig approval.
 - No story files, compiled artifacts, package folders, images, screenshots, helper docs, runtime code, Parchment files, or release metadata were added to the TerpVault plugin repository.
 
 Files present in the DDEV-only package:
@@ -63,7 +62,7 @@ Assets and helper docs:
 - `how-to-play.md`, `hints.md`, and `walkthrough.md` were written as original package-local helper docs and refreshed on 2026-05-31 for readability and player usefulness.
 - `walkthrough.md` was later expanded into a fuller Zork I-style route guide using `/Users/cdaters/Downloads/for-Zork3/zork3.sol1.txt` and `/Users/cdaters/Downloads/for-Zork3/zork3.sol2.txt` as route references only.
 - `walkthrough.md` now includes the verified command route for the exact package artifact.
-- The six package-local feelies were copied from `/Users/cdaters/Downloads/for-Zork3` and are treated as Craig-created/original materials; final audit passed, and `_demo` use remains pending Craig approval.
+- The six package-local feelies were copied from `/Users/cdaters/Downloads/for-Zork3` and are treated as Craig-created/original materials; final audit passed, Craig approved `_demo` use, and they are included in the bundled development demo package.
 
 Feelie checksums:
 
@@ -110,7 +109,10 @@ Verification results:
 - Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
 - Final audit on 2026-05-31 confirmed expected files, valid YAML, valid package-local iFiction XML, zero manifest warnings, zero manifest errors, and no remaining local cruft after stale `.bak-*` backups were removed from the DDEV-only package.
 - Final route/playback recheck on 2026-05-31 temporarily published the package, cleared cache, and verified detail, play, story, walkthrough, cover, and one PDF feelie route. A first play-route attempt hit the known local Grav compiled-YAML cache issue; one cache clear resolved it. Story delivery returned `200 application/octet-stream`, 87858 bytes, SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
-- Final audit recommendation: ready for Craig approval and later `_demo` promotion planning; no `_demo` contents were created or modified.
+- Final audit recommendation: ready for Craig approval and later `_demo` promotion planning. Craig later approved promotion, and the package was copied into `_demo`.
+- `_demo` promotion on 2026-05-31 copied the approved package into `_demo/data/terpvault/games/zork-iii`; target `game.yaml` status is `published`, matching Zork I's `_demo` convention, and `featured` remains `false`.
+- Promoted package validation passed: story checksum matched, file identification matched Release 25 / Serial 860811, `game.yaml` parsed, `metadata.iFiction.xml` passed `xmllint --noout`, helper docs/license/provenance were non-empty, image/PDF assets were recognized, and target cruft check passed.
+- Live route/playback from the promoted `_demo` package was deferred until a clean demo-seed install because no non-destructive starter-package seed command exists yet.
 
 Complete-package export/import smoke test:
 
@@ -174,7 +176,7 @@ zork-iii/
     zug-map-outside.jpg
 ```
 
-`metadata.iFiction.xml` is present in the DDEV-only package. Feelies are present, final audit passed, and `_demo` or public/GPM distribution remains pending Craig approval and a dedicated promotion pass.
+`metadata.iFiction.xml` is present in the bundled package. Feelies are present, final audit passed, and `_demo` promotion completed after Craig approval. Public/GPM distribution still needs the broader release-readiness review.
 
 ## game.yaml Materials Plan
 
@@ -489,7 +491,7 @@ Before package assembly can move toward bundled-demo review:
 - Import commit creates a draft package under a throwaway slug.
 - Imported story checksum matches the selected artifact.
 - No historical commercial assets are included.
-- Craig explicitly approves copying the finished package into `_demo`.
+- Craig explicitly approved copying the finished package into `_demo`; completed on 2026-05-31.
 
 ## Open Questions
 
