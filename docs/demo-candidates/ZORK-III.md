@@ -15,7 +15,7 @@
 - Craig-created/original feelies were added to the DDEV-only draft package on 2026-05-31 and documented in package provenance.
 - `walkthrough.md` was expanded on 2026-05-31 into a Zork I-style, human-readable route guide using local solution files as route references; full end-to-end transcript verification passed with `dfrotz -p -m -s 41`, reaching 7 of 7 in 330 moves.
 - Not approved for bundled demo.
-- Requires final package audit, IFID/catalog/iFiction decisions, final route/playback recheck, and Craig approval before any `_demo` promotion.
+- Requires final package audit, final route/playback recheck, and Craig approval before any `_demo` promotion.
 - Candidate package plan: [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md).
 - Candidate asset/materials plan: [ZORK-III-ASSET-PLAN.md](ZORK-III-ASSET-PLAN.md).
 - Next state: complete final package verification without copying anything into `_demo`.
@@ -343,10 +343,14 @@ IFID/iFiction metadata review on 2026-05-31:
 - Local extractor tools checked: `babel`, `treaty`, `rezrov`, `txd`, `ztools`, plus Homebrew binary-name search for Babel/Treaty/IFID/Z-code tooling.
 - Result: no local Treaty/Babel-compatible IFID extraction tool was available.
 - Story-string inspection found the serial string `860811`, but no IFID, UUID, iFiction, Treaty, or other authoritative IFID metadata string.
-- No remote metadata lookup was performed.
-- `game.yaml` was not changed; `identification.ifids` remains empty.
-- `metadata.iFiction.xml` was not created. It remains deferred until an authoritative IFID/catalog source is available.
-- Package provenance records the commands, observed output, and recommended next action.
+- Follow-up public metadata research checked IFDB, IFWiki, IF Archive search/index pages, the Treaty of Babel, the local story file, and the already documented upstream source repository.
+- IFDB lists multiple Zork III IFIDs, including `ZCODE-25-860811`; the local package artifact is Release 25 / Serial 860811; the Treaty of Babel legacy Z-code rule maps pre-1990 Z-code IFIDs as `ZCODE-{release}-{serial}`.
+- IFID accepted for this package artifact: `ZCODE-25-860811`.
+- IFWiki and IFDB also emphasize Release 17 / Serial 840727 and IFID `ZCODE-17-840727` as current/final public metadata; that applies to a different Zork III release and was not written into this Release 25 package.
+- `game.yaml` now records `identification.ifids: [ZCODE-25-860811]`, IFDB TUID/URL, IFWiki URL, and a cleaner verified author field.
+- Package-local `metadata.iFiction.xml` was created from verified fields only.
+- Post-metadata manifest check returned `200`; `zork-iii` remained `draft`, IFID `ZCODE-25-860811` and catalog links were exposed, `metadata.iFiction.xml` was detected, warning count was zero, and error count was zero.
+- Post-metadata temporary publish check returned `200` for detail, play, and story routes; story route returned `application/octet-stream`, 87858 bytes, with SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`. Canonical `zork-iii` was restored to `draft` and cache was cleared.
 
 Package status after this pass: `draft`.
 
@@ -516,6 +520,7 @@ Package materials:
 - `provenance.md` records the source repo, commit, toolchain, build commands, artifact checksum/file ID, upstream prebuilt difference, smoke checks, DDEV package status, image/feelie/helper-doc authorship notes, and excluded commercial/historical assets.
 - `how-to-play.md`, `hints.md`, and `walkthrough.md` were written as original package-local helper docs and refreshed on 2026-05-31.
 - `walkthrough.md` now includes a verified command route for the exact DDEV package story artifact: `dfrotz -p -m -s 41` reached the Treasury ending and reported 7 of 7 in 330 moves.
+- Metadata pass on 2026-05-31 added IFID `ZCODE-25-860811`, IFDB TUID/URL, IFWiki URL, and package-local `metadata.iFiction.xml`.
 - Images were copied from `/Users/cdaters/Downloads/for-Zork3` and treated as Craig-created/original package art/screenshots for this candidate pass.
 
 Manifest and route checks:
@@ -523,7 +528,7 @@ Manifest and route checks:
 - Manifest route `https://grav20.ddev.site/if/_manifest` returned `200 application/json`.
 - Manifest includes `zork-iii` with `status: draft`, `format: zcode`, `story_file: zork3.z3`, `has_story_file: true`, and `player.engine: parchment`.
 - Manifest exposes declared resources for cover, small cover, hero, screenshots, how-to-play, hints, and walkthrough.
-- Manifest warnings: one expected `missing-ifid` warning because IFID remains unverified.
+- Manifest warning after the earlier assembly pass: one expected `missing-ifid` warning before the later metadata pass resolved the release-specific IFID.
 - Manifest errors: none.
 - The package was temporarily changed to `published` only long enough to verify public routes, then restored to `draft` and cache was cleared.
 - Detail route `https://grav20.ddev.site/if/zork-iii` returned `200 text/html; charset=utf-8` during the temporary publish check.
@@ -680,13 +685,13 @@ Container-internal curl note:
 - Decide whether the source-built `zork3-release25-serial860811.z3`, source provenance, or some combination is appropriate for the package.
 - Record selected artifact filename, file identification, checksum, and redistribution basis in package-local provenance notes.
 - Recheck full TerpVault/Parchment browser playback behavior during final audit.
-- Resolve IFID/catalog/iFiction metadata decisions. Current status: local IFID extraction was attempted on 2026-05-31, but no extractor was installed and no IFID string was found in the story file.
+- Recheck route delivery/playback during final audit.
 - Complete final package metadata/provenance review.
 - Complete-package export/import smoke testing passed for the DDEV-only candidate package on 2026-05-31.
 
 ## Recommended next action
 
-Keep Zork III candidate-only and use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) for the remaining audit checklist. The DDEV-only package now has verified story delivery, export/import smoke coverage, feelies, helper docs, a verified walkthrough route, and a documented IFID/iFiction blocker, but it still needs authoritative IFID/catalog/iFiction resolution, final route/playback recheck, final audit, and Craig approval before any `_demo` copy.
+Keep Zork III candidate-only and use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) for the remaining audit checklist. The DDEV-only package now has verified story delivery, export/import smoke coverage, feelies, helper docs, a verified walkthrough route, release-specific IFID/catalog metadata, and package-local iFiction XML, but it still needs final route/playback recheck, final audit, and Craig approval before any `_demo` copy.
 
 ## Promotion checklist against Zork I standard
 
@@ -696,7 +701,7 @@ Before Zork III can move from candidate to bundled demo review, it still needs:
 - Source/provenance and license basis documented for the selected artifact.
 - Playable story file verified against the selected basis.
 - Final TerpVault/Parchment playback recheck for the selected package candidate.
-- IFID/catalog/iFiction decisions and package metadata finalization.
+- Final route/playback recheck and package metadata/provenance review.
 - Final audit of original art, screenshots, helper docs, maps, and feelies.
 - Explicit exclusion of historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, `invisicluesiii.mss`, and other commercial helper material unless separately licensed.
 - Package-local audit notes, upstream license text, export/import smoke tests, and final review.

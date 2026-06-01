@@ -9,7 +9,7 @@
 - Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
 - Do not create `_demo` package contents from this plan yet.
 - Do not add story files, compiled artifacts, package folders, art, screenshots, helper docs, or feelies in this pass.
-- Package promotion remains blocked until final audit, IFID/catalog/iFiction decisions, final route/playback recheck, and Craig approval are complete.
+- Package promotion remains blocked until final audit, final route/playback recheck, and Craig approval are complete.
 
 This document expands [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) into a materials checklist for eventual package assembly. It does not approve bundling.
 
@@ -79,7 +79,7 @@ Verification results:
 - Manifest includes `zork-iii` with `status: draft`, `format: zcode`, `story_file: zork3.z3`, `has_story_file: true`, and `player.engine: parchment`.
 - Manifest resources include cover, small cover, hero, screenshots, how-to-play, hints, and walkthrough paths.
 - After the 2026-05-31 refresh, manifest resources include six `resources.feelies` entries.
-- Manifest warnings: expected missing IFID warning.
+- IFID after metadata pass: `ZCODE-25-860811`.
 - Manifest errors: none.
 - Temporary publish check returned 200 for `/if/zork-iii` and `/if/zork-iii/play`.
 - The 2026-05-31 temporary publish check returned 200 for one PDF feelie asset, one JPG feelie asset, and `how-to-play.md`.
@@ -98,8 +98,12 @@ Verification results:
 - Post-walkthrough manifest check returned `200`; canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Post-walkthrough temporary publish check returned `200` for play, `/if/_asset/zork-iii/walkthrough.md`, and `/if/_story/zork-iii/zork3.z3`; the story route returned 87858 bytes with the expected SHA-256.
 - The same temporary publish detail route returned `200` with a 224-byte Grav compiled-cache parse-error body from a compiled YAML cache file, consistent with the known local Grav cache issue. Canonical `zork-iii` was restored to `draft` and cache was cleared.
-- IFID/iFiction review on 2026-05-31 found no authoritative IFID locally. No `babel`, `treaty`, `rezrov`, `txd`, or `ztools` executable was available; Homebrew binary-name search found no Babel/Treaty/IFID/Z-code extraction tool; story-string inspection found serial `860811` but no IFID/UUID/iFiction/Treaty metadata string.
-- `game.yaml` was not changed, `identification.ifids` remains empty, `metadata.iFiction.xml` was not created, and no remote metadata lookup was performed.
+- IFID/iFiction review on 2026-05-31 first found no authoritative IFID locally because no Treaty/Babel extractor was available and no embedded IFID string appeared in the story file.
+- Follow-up public metadata research checked IFDB, IFWiki, IF Archive search/index pages, the Treaty of Babel, the local story file, and the documented upstream source repository.
+- IFID accepted for this Release 25 / Serial 860811 artifact: `ZCODE-25-860811`.
+- `game.yaml` now records the IFID, IFDB TUID/URL, IFWiki URL, and a cleaner verified author field. `metadata.iFiction.xml` was created from verified fields only.
+- Post-metadata manifest check returned `200`; canonical `zork-iii` remained `draft`, warning count was zero, and error count was zero.
+- Post-metadata temporary publish check returned `200` for detail, play, and story routes; story route returned 87858 bytes with the expected SHA-256. Canonical `zork-iii` was restored to `draft` and cache was cleared.
 - After the walkthrough rewrite, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
 
@@ -165,7 +169,7 @@ zork-iii/
     zug-map-outside.jpg
 ```
 
-`metadata.iFiction.xml` remains optional/pending. Feelies are present in the DDEV-only package but remain pending final audit and are not approved for `_demo` or public/GPM distribution.
+`metadata.iFiction.xml` is present in the DDEV-only package. Feelies are present but remain pending final audit and are not approved for `_demo` or public/GPM distribution.
 
 ## game.yaml Materials Plan
 
@@ -261,7 +265,7 @@ player:
 Required before final package review:
 
 - Confirm final attribution wording.
-- Confirm IFID and catalog links, or explicitly record why they remain blank. Current package provenance records that local IFID extraction could not be completed because no local Treaty/Babel extractor was installed and no IFID string was found in the story file.
+- Confirm IFID and catalog links during final audit. Current package provenance records that IFDB plus the Treaty legacy Z-code rule support `ZCODE-25-860811` for the Release 25 / Serial 860811 artifact.
 - Keep `terpvault.status: draft` during package assembly.
 - Keep `terpvault.featured: false` until final review.
 - Confirm every `resources.*` path exists before export/import smoke testing. Completed for the DDEV-only package on 2026-05-31.
@@ -274,7 +278,7 @@ Options, in preferred order:
 2. Use local iFiction preview/apply tooling to compare XML fields against `game.yaml` without auto-applying values.
 3. Defer `metadata.iFiction.xml` until IFID/catalog data is verified, and document the omission in `provenance.md`.
 
-Current decision: option 3. `metadata.iFiction.xml` remains deferred after the 2026-05-31 local IFID review.
+Current decision: option 1. `metadata.iFiction.xml` was created after the 2026-05-31 public metadata review resolved the release-specific IFID.
 
 Do not hand-copy iFiction metadata from unverified sources. Do not use remote IFDB, IFWiki, or IF Archive metadata unless a later explicit metadata-source workflow verifies attribution, license, and field mapping.
 
@@ -468,7 +472,7 @@ Before package assembly can move toward bundled-demo review:
 - `game.yaml` is complete, draft, and not featured.
 - `LICENSE-upstream.txt` is present and exactly sourced from the selected upstream commit.
 - `provenance.md` records source, toolchain, build, artifact, playback, asset, helper-doc, screenshot, and exclusion notes.
-- `metadata.iFiction.xml` is generated/verified or explicitly deferred.
+- `metadata.iFiction.xml` is generated and package-local.
 - Original `how-to-play.md`, `hints.md`, and `walkthrough.md` are written.
 - Walkthrough is verified against the exact selected story artifact.
 - Original or properly licensed cover, small cover, hero, screenshots, and optional feelies are complete.
@@ -484,9 +488,8 @@ Before package assembly can move toward bundled-demo review:
 
 ## Open Questions
 
-- Exact IFID and catalog references.
+- Final audit approval for IFID/catalog references and package-local `metadata.iFiction.xml`.
 - Final attribution wording.
-- Whether `metadata.iFiction.xml` should be generated before first package assembly or after helper docs are complete.
 - Exact visual direction for cover, small cover, and hero art.
 - Whether optional feelies should ship in the first Zork III package pass or wait for later polish.
 - Whether the final package should install as draft or published in future demo-install workflows.

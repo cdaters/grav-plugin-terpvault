@@ -10,7 +10,7 @@
 - Craig-created/original package-local feelies were added to the DDEV-only draft package on 2026-05-31.
 - Player-facing helper docs were refreshed on 2026-05-31; `walkthrough.md` was later expanded into a Zork I-style guide using local solution files as route references, then transcript-verified against the exact package story artifact.
 - Complete-package export/import smoke testing passed on 2026-05-31 using a DDEV-only throwaway import package.
-- Package promotion remains blocked until final audit, IFID/catalog/iFiction decisions, final route/playback recheck, and Craig approval are complete.
+- Package promotion remains blocked until final audit, final route/playback recheck, and Craig approval are complete.
 
 This document records the likely package shape for a future Zork III TerpVault demo candidate. It is a planning artifact, not a packaging approval.
 
@@ -75,7 +75,7 @@ Verification status:
 
 - Manifest includes `zork-iii` as `draft`, `zcode`, `zork3.z3`, `has_story_file: true`, and `player.engine: parchment`.
 - Manifest includes the six `resources.feelies` entries after the 2026-05-31 refresh.
-- Expected manifest warning: missing IFID.
+- IFID after metadata pass: `ZCODE-25-860811`.
 - Manifest errors: none.
 - Temporary publish check returned 200 for the detail and play routes.
 - The 2026-05-31 temporary publish check returned 200 for one PDF feelie asset, one JPG feelie asset, and `how-to-play.md`.
@@ -93,8 +93,12 @@ Verification status:
 - Post-walkthrough manifest check: `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Post-walkthrough temporary publish check: play route, walkthrough asset route, and story route returned `200`; story route returned `application/octet-stream`, 87858 bytes, with SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - The same temporary publish detail route returned `200` with a 224-byte Grav compiled-cache parse-error body from a compiled YAML cache file, consistent with the known local Grav cache issue. Canonical `zork-iii` was restored to `draft` and cache was cleared.
-- IFID/iFiction review on 2026-05-31: no local `babel`, `treaty`, `rezrov`, `txd`, or `ztools` executable was available; Homebrew binary-name search found no Babel/Treaty/IFID/Z-code extraction tool; story-string inspection found serial `860811` but no IFID/UUID/iFiction/Treaty metadata string.
-- IFID result: unresolved. `game.yaml` was not changed, `identification.ifids` remains empty, and `metadata.iFiction.xml` was not created. No remote metadata lookup was performed.
+- IFID/iFiction review on 2026-05-31: local extraction tools were unavailable and story-string inspection found no embedded IFID, but follow-up public metadata research checked IFDB, IFWiki, IF Archive search/index pages, the Treaty of Babel, the local story file, and the documented upstream source repository.
+- IFID result: resolved for this package artifact as `ZCODE-25-860811`. IFDB lists that IFID, the local artifact is Release 25 / Serial 860811, and the Treaty of Babel legacy Z-code rule maps pre-1990 story files as `ZCODE-{release}-{serial}`.
+- Catalog metadata added: IFDB TUID/URL and IFWiki URL. IF Archive path/URL remains blank because the checked IF Archive Zork III result points to shipped documentation, not this source-built story artifact.
+- Package-local `metadata.iFiction.xml` was created from verified fields only.
+- Post-metadata manifest check: canonical `zork-iii` remained `draft`, IFID `ZCODE-25-860811` and catalog links were exposed, `metadata.iFiction.xml` was detected, warning count was zero, and error count was zero.
+- Post-metadata temporary publish check: detail, play, and story routes returned `200`; story route returned `application/octet-stream`, 87858 bytes, with the expected SHA-256. Canonical `zork-iii` was restored to `draft` and cache was cleared.
 - After the walkthrough rewrite, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
 
@@ -320,7 +324,7 @@ player:
   autosave: true
 ```
 
-Exact IFID, IFDB/IFWiki/catalog fields, final attribution wording, and selected artifact notes must be verified before final package assembly. The 2026-05-31 local IFID review did not find an authoritative IFID because no local Treaty/Babel extractor was installed and the story file did not expose an IFID string.
+Release-specific IFID and IFDB/IFWiki catalog fields have been recorded for the DDEV-only package. Final attribution wording and selected artifact notes still need final audit before any `_demo` promotion.
 
 ## Required Provenance Files
 
@@ -433,13 +437,13 @@ Zork III can move from candidate package plan to bundled-demo review only after:
 - Playable story file is verified.
 - DDEV TerpVault/Parchment playback passes.
 - `game.yaml` is drafted and reviewed.
-- `metadata.iFiction.xml` plan or source is resolved.
+- `metadata.iFiction.xml` plan/source is resolved for the DDEV-only candidate package.
 - `LICENSE-upstream.txt` and `provenance.md` are complete.
 - Original `how-to-play.md`, `hints.md`, and `walkthrough.md` are written.
 - Full route/walkthrough verification is complete against the selected artifact.
 - Original or properly licensed cover, small cover, hero art, screenshots, and optional feelies are complete.
 - Export/import smoke testing passes for the complete package. Completed for the DDEV-only candidate on 2026-05-31.
 - No historical commercial assets are included without separate license review.
-- IFID/catalog/iFiction resolution remains pending until an authoritative local extraction tool or documented metadata source is available.
+- Recheck IFID/catalog/iFiction metadata during final audit if the story artifact changes.
 - Final package audit notes are complete.
 - Craig explicitly approves copying the finished package into `_demo`.
