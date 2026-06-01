@@ -93,6 +93,8 @@ Verification status:
 - Post-walkthrough manifest check: `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Post-walkthrough temporary publish check: play route, walkthrough asset route, and story route returned `200`; story route returned `application/octet-stream`, 87858 bytes, with SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - The same temporary publish detail route returned `200` with a 224-byte Grav compiled-cache parse-error body from a compiled YAML cache file, consistent with the known local Grav cache issue. Canonical `zork-iii` was restored to `draft` and cache was cleared.
+- IFID/iFiction review on 2026-05-31: no local `babel`, `treaty`, `rezrov`, `txd`, or `ztools` executable was available; Homebrew binary-name search found no Babel/Treaty/IFID/Z-code extraction tool; story-string inspection found serial `860811` but no IFID/UUID/iFiction/Treaty metadata string.
+- IFID result: unresolved. `game.yaml` was not changed, `identification.ifids` remains empty, and `metadata.iFiction.xml` was not created. No remote metadata lookup was performed.
 - After the walkthrough rewrite, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
 
@@ -318,7 +320,7 @@ player:
   autosave: true
 ```
 
-Exact IFID, IFDB/IFWiki/catalog fields, final attribution wording, and selected artifact notes must be verified before final package assembly.
+Exact IFID, IFDB/IFWiki/catalog fields, final attribution wording, and selected artifact notes must be verified before final package assembly. The 2026-05-31 local IFID review did not find an authoritative IFID because no local Treaty/Babel extractor was installed and the story file did not expose an IFID string.
 
 ## Required Provenance Files
 
@@ -438,5 +440,6 @@ Zork III can move from candidate package plan to bundled-demo review only after:
 - Original or properly licensed cover, small cover, hero art, screenshots, and optional feelies are complete.
 - Export/import smoke testing passes for the complete package. Completed for the DDEV-only candidate on 2026-05-31.
 - No historical commercial assets are included without separate license review.
+- IFID/catalog/iFiction resolution remains pending until an authoritative local extraction tool or documented metadata source is available.
 - Final package audit notes are complete.
 - Craig explicitly approves copying the finished package into `_demo`.

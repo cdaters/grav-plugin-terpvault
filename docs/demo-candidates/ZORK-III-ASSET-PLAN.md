@@ -98,6 +98,8 @@ Verification results:
 - Post-walkthrough manifest check returned `200`; canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Post-walkthrough temporary publish check returned `200` for play, `/if/_asset/zork-iii/walkthrough.md`, and `/if/_story/zork-iii/zork3.z3`; the story route returned 87858 bytes with the expected SHA-256.
 - The same temporary publish detail route returned `200` with a 224-byte Grav compiled-cache parse-error body from a compiled YAML cache file, consistent with the known local Grav cache issue. Canonical `zork-iii` was restored to `draft` and cache was cleared.
+- IFID/iFiction review on 2026-05-31 found no authoritative IFID locally. No `babel`, `treaty`, `rezrov`, `txd`, or `ztools` executable was available; Homebrew binary-name search found no Babel/Treaty/IFID/Z-code extraction tool; story-string inspection found serial `860811` but no IFID/UUID/iFiction/Treaty metadata string.
+- `game.yaml` was not changed, `identification.ifids` remains empty, `metadata.iFiction.xml` was not created, and no remote metadata lookup was performed.
 - After the walkthrough rewrite, manifest returned `200`, canonical `zork-iii` remained `draft`, `walkthrough.md` was present, warning count remained one expected missing-IFID warning, and error count remained zero.
 - Temporary publish check after the walkthrough rewrite returned `200` for detail, play, and `/if/_asset/zork-iii/walkthrough.md`; canonical `zork-iii` was restored to `draft`.
 
@@ -259,7 +261,7 @@ player:
 Required before final package review:
 
 - Confirm final attribution wording.
-- Confirm IFID and catalog links, or explicitly record why they remain blank.
+- Confirm IFID and catalog links, or explicitly record why they remain blank. Current package provenance records that local IFID extraction could not be completed because no local Treaty/Babel extractor was installed and no IFID string was found in the story file.
 - Keep `terpvault.status: draft` during package assembly.
 - Keep `terpvault.featured: false` until final review.
 - Confirm every `resources.*` path exists before export/import smoke testing. Completed for the DDEV-only package on 2026-05-31.
@@ -271,6 +273,8 @@ Options, in preferred order:
 1. Generate a package-local `metadata.iFiction.xml` from verified `game.yaml` metadata after title, author, IFID, release, and catalog fields are final.
 2. Use local iFiction preview/apply tooling to compare XML fields against `game.yaml` without auto-applying values.
 3. Defer `metadata.iFiction.xml` until IFID/catalog data is verified, and document the omission in `provenance.md`.
+
+Current decision: option 3. `metadata.iFiction.xml` remains deferred after the 2026-05-31 local IFID review.
 
 Do not hand-copy iFiction metadata from unverified sources. Do not use remote IFDB, IFWiki, or IF Archive metadata unless a later explicit metadata-source workflow verifies attribution, license, and field mapping.
 

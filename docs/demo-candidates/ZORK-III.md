@@ -338,6 +338,16 @@ Route/manifest check after this pass:
 - A temporary publish check after the verified walkthrough update returned `200` for the play route, `200 text/markdown` for `/if/_asset/zork-iii/walkthrough.md`, and `200 application/octet-stream` for `/if/_story/zork-iii/zork3.z3`; the story bytes matched SHA-256 `2264d4f97d4d5812220c5278ee043f69aea583f9c4e4dca2b9d785ba16b9e260`.
 - The same temporary publish detail route returned `200` with a 224-byte Grav compiled-cache parse-error body from `/cache/compiled/files/7f545128d99067b0c61724e5611ef549.yaml.php`, consistent with the known local Grav compiled-YAML cache issue. The package was restored to `draft` and cache was cleared.
 
+IFID/iFiction metadata review on 2026-05-31:
+
+- Local extractor tools checked: `babel`, `treaty`, `rezrov`, `txd`, `ztools`, plus Homebrew binary-name search for Babel/Treaty/IFID/Z-code tooling.
+- Result: no local Treaty/Babel-compatible IFID extraction tool was available.
+- Story-string inspection found the serial string `860811`, but no IFID, UUID, iFiction, Treaty, or other authoritative IFID metadata string.
+- No remote metadata lookup was performed.
+- `game.yaml` was not changed; `identification.ifids` remains empty.
+- `metadata.iFiction.xml` was not created. It remains deferred until an authoritative IFID/catalog source is available.
+- Package provenance records the commands, observed output, and recommended next action.
+
 Package status after this pass: `draft`.
 
 ## Story route delivery diagnosis
@@ -670,13 +680,13 @@ Container-internal curl note:
 - Decide whether the source-built `zork3-release25-serial860811.z3`, source provenance, or some combination is appropriate for the package.
 - Record selected artifact filename, file identification, checksum, and redistribution basis in package-local provenance notes.
 - Recheck full TerpVault/Parchment browser playback behavior during final audit.
-- Resolve IFID/catalog/iFiction metadata decisions.
+- Resolve IFID/catalog/iFiction metadata decisions. Current status: local IFID extraction was attempted on 2026-05-31, but no extractor was installed and no IFID string was found in the story file.
 - Complete final package metadata/provenance review.
 - Complete-package export/import smoke testing passed for the DDEV-only candidate package on 2026-05-31.
 
 ## Recommended next action
 
-Keep Zork III candidate-only and use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) for the remaining audit checklist. The DDEV-only package now has verified story delivery, export/import smoke coverage, feelies, helper docs, and a verified walkthrough route, but it still needs IFID/catalog/iFiction decisions, final route/playback recheck, final audit, and Craig approval before any `_demo` copy.
+Keep Zork III candidate-only and use [ZORK-III-PACKAGE-PLAN.md](ZORK-III-PACKAGE-PLAN.md) for the remaining audit checklist. The DDEV-only package now has verified story delivery, export/import smoke coverage, feelies, helper docs, a verified walkthrough route, and a documented IFID/iFiction blocker, but it still needs authoritative IFID/catalog/iFiction resolution, final route/playback recheck, final audit, and Craig approval before any `_demo` copy.
 
 ## Promotion checklist against Zork I standard
 
