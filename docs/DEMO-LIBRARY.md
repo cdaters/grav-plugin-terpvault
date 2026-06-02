@@ -1,6 +1,6 @@
 # TerpVault Demo Library
 
-This document defines standards for a curated, legally clean TerpVault demo/starter library that can eventually live under:
+This document defines standards for a curated, rights-aware TerpVault demo/starter library that can eventually live under:
 
 ```text
 _demo/data/terpvault/games/
@@ -8,14 +8,14 @@ _demo/data/terpvault/games/
 
 The starter library should feel finished and distribution-ready, not like placeholder test data. Demo packages must be useful for real first-run evaluation while remaining conservative about licensing, provenance, and redistribution rights.
 
-Use `docs/DEMO-CANDIDATES.md` as the working verification worksheet for individual candidate packages before any package is bundled.
+Use `docs/DEMO-CANDIDATES.md` as the working verification worksheet for individual candidate packages before any package is bundled. Use `docs/DEMO-CONTENT-RIGHTS.md` as the shared demo-content rights/provenance policy.
 
 ## Goals
 
 - Provide a first-run starter library for new TerpVault installs.
 - Make demo packages useful for testing public library pages, detail pages, play pages, Admin2 media workflows, iFiction metadata preview/apply workflows, feelies/extras, helper docs, import/export, and future demo install workflows.
-- Keep packages legally clean and provenance-reviewed before bundling.
-- Prefer original/custom-created art and helper docs when historical assets are not clearly licensed for redistribution.
+- Keep packages provenance-reviewed before bundling.
+- Prefer original/custom-created art and helper docs when historical assets are not clearly documented for the intended use.
 - Keep demo package structure aligned with TerpVault package conventions so each package can also serve as a reference implementation.
 
 ## v0.4.x and v0.5.0 posture
@@ -25,8 +25,8 @@ Use `docs/DEMO-CANDIDATES.md` as the working verification worksheet for individu
 - Mainframe Zork / Dungeon may be tracked as a research-only candidate, separate from Zork I, Zork II, and Zork III. Do not add story files, playable artifacts, draft package skeletons, package art, or bundled-demo claims until source selection, license/provenance, reference transcripts, build/reconstruction, playback, and helper docs are complete.
 - Treat v0.5.0 as the first possible public milestone where the demo suite should feel coherent rather than ad hoc.
 - A v0.5.0 candidate demo suite may include Zork I as the verified anchor package. Zork II and Zork III may join only if they reach the same provenance/build/playback/helper-doc standard.
-- Adventure / Colossal Cave, Grue, and You Are Standing may be polished for public/demo use only when their exact rights, package notes, and original or properly licensed art/helper docs are complete.
-- Avoid questionable historical/commercial assets. Generated or Craig-created art/helper docs should be identified honestly and should not imitate restricted packaging, manuals, logos, or trade dress.
+- Adventure / Colossal Cave, Grue, and You Are Standing may be polished for public/demo use only when their exact rights, package notes, package-local original materials, and any reuse rights for non-original art/helper docs are complete.
+- Classify each package item under the shared rights/provenance policy. Generated or Craig-created art/helper docs should be identified honestly and should not imitate restricted packaging, manuals, logos, or trade dress.
 
 ## Package completeness checklist
 
@@ -51,7 +51,8 @@ Not every work needs every optional resource, but omissions should be intentiona
 ## Art and asset policy
 
 - Prefer original Craig-created artwork for cover, small cover, hero, maps, screenshots, and feelies.
-- Do not use historical commercial box art, manuals, maps, packaging, advertising, or scans unless explicitly licensed for redistribution.
+- Do not use historical commercial box art, manuals, maps, packaging, advertising, or scans unless item-level provenance and review support inclusion.
+- When selected historical reference/preservation materials are included, identify them separately from story/source-license material and package-local original material.
 - AI-assisted or hand-created art should avoid copying specific copyrighted packaging, trade dress, logos, typography, or advertising layouts.
 - Store package-local assets using TerpVault conventions from `docs/PACKAGE-CONVENTIONS.md`.
 - Use stable, lowercase, package-local paths where practical, such as `cover.jpg`, `small-cover.jpg`, `hero.jpg`, `screenshots/01.png`, and `feelies/map.png`.
@@ -70,18 +71,19 @@ Not every work needs every optional resource, but omissions should be intentiona
 
 | Candidate | Source/repository | License status | Story/package format concerns | Asset plan | Helper docs plan | Ready status |
 | --- | --- | --- | --- | --- | --- | --- |
-| Zork I | `https://github.com/historicalsource/zork1.git` at verified commit `97b7b3d68c075dd9af7da499c3e9690ada3471fd` | Approved for this bundled development demo tree from the verified MIT source release; package preserves upstream license/provenance notes; trademarks and historical commercial assets remain excluded | Bundled Z-machine starter package at `_demo/data/terpvault/games/zork-i`; source-built story checksum documented; DDEV playback/export/import smoke tests passed; walkthrough verified with `dfrotz` to 350/350 against the bundled story file | Original Craig-created cover, small cover, hero, screenshots, and poster-style feelie; no historical Infocom packaging or manual scans | Original TerpVault how-to-play, progressive hints, and clearly spoilery walkthrough with a verified full command route | Bundled starter/demo package |
-| Zork II | `https://github.com/historicalsource/zork2.git` rechecked on `master` at commit `3da9661098809788a99cef00f00c865c6c204f96`; no tags/releases observed | Observed `LICENSE` is MIT text with `Copyright (c) 2025 Microsoft`, but packaging, trademarks, marketing materials, and non-source assets require final review | Unmodified ZILF build failed; scratch-only compatibility patch produced Frotz-smoke-tested Z-machine artifacts; final artifact basis and TerpVault/Parchment package verification remain unresolved | Use original Craig-created artwork and package-local extras only; avoid historical commercial assets | Original helper docs only unless a reusable source is explicitly licensed | Candidate only; source-build patch/artifact decision required before redistribution |
-| Zork III | `https://github.com/historicalsource/zork3.git` rechecked on `master` at commit `3ec9ed412b5f3cafe65d83c727d07db1fe4a86a8`; no tags/releases observed | Approved for this bundled development demo tree from the verified MIT source release; package preserves upstream license/provenance notes; trademarks and historical commercial assets remain excluded | Scratch source build and `dfrotz` smoke were reverified on 2026-05-29; DDEV package assembly, story-route diagnosis, complete-package export/import smoke, full walkthrough transcript verification, release-specific IFID/catalog metadata review, final audit, final route/playback recheck, `_demo` promotion, and clean DDEV demo-seed route/checksum verification passed on 2026-05-31 | Craig-created/original cover, small cover, hero, screenshots, and package-local feelies are included in the bundled `_demo` package; avoid historical commercial assets | Original helper docs were refreshed on 2026-05-31; walkthrough is verified with `dfrotz -p -m -s 41` against the exact story, reaching 7 of 7 in 330 moves; IFID `ZCODE-25-860811`, IFDB TUID/URL, IFWiki URL, and package-local `metadata.iFiction.xml` are recorded; do not reuse `invisicluesiii.mss` or other commercial helper material without separate rights review | Bundled starter/demo package |
-| Mainframe Zork / Dungeon | Phase 0 research packet outside the repo; exact source basis not selected | Research only; license/provenance not verified for bundling; existing reconstructions are comparison witnesses, not automatically canonical | No playable TerpVault package; likely future Glulx/`.gblorb` first, `.z8` only if practical after source/build constraints are clear | No package art until the candidate is approved beyond research | Helper docs should wait until story/playback/provenance basis is clean | Research-only candidate; not approved for bundled demo |
+| Zork I | `https://github.com/historicalsource/zork1.git` at verified commit `97b7b3d68c075dd9af7da499c3e9690ada3471fd` | Reviewed for this bundled development demo tree from the verified MIT source release; package preserves upstream license/provenance notes; trademarks and supplemental materials remain separately classified | Bundled Z-machine starter package at `_demo/data/terpvault/games/zork-i`; source-built story checksum documented; DDEV playback/export/import smoke tests passed; walkthrough verified with `dfrotz` to 350/350 against the bundled story file | Package-local original Craig-created cover, small cover, hero, screenshots, and poster-style feelie; no historical Infocom packaging or manual scans currently included | Original TerpVault how-to-play, progressive hints, and clearly spoilery walkthrough with a verified full command route | Bundled starter/demo package |
+| Zork II | `https://github.com/historicalsource/zork2.git` rechecked on `master` at commit `3da9661098809788a99cef00f00c865c6c204f96`; no tags/releases observed | Observed `LICENSE` is MIT text with `Copyright (c) 2025 Microsoft`, but packaging, trademarks, marketing materials, and non-source assets require final review | Unmodified ZILF build failed; scratch-only compatibility patch produced Frotz-smoke-tested Z-machine artifacts; final artifact basis and TerpVault/Parchment package verification remain unresolved | Use original Craig-created artwork and package-local extras only; avoid historical commercial assets unless item-level review supports inclusion | Original helper docs only unless a reusable source has documented reuse rights | Candidate only; source-build patch/artifact decision required before redistribution |
+| Zork III | `https://github.com/historicalsource/zork3.git` rechecked on `master` at commit `3ec9ed412b5f3cafe65d83c727d07db1fe4a86a8`; no tags/releases observed | Reviewed for this bundled development demo tree from the verified MIT source release; package preserves upstream license/provenance notes; trademarks and supplemental materials remain separately classified | Scratch source build and `dfrotz` smoke were reverified on 2026-05-29; DDEV package assembly, story-route diagnosis, complete-package export/import smoke, full walkthrough transcript verification, release-specific IFID/catalog metadata review, final audit, final route/playback recheck, `_demo` promotion, and clean DDEV demo-seed route/checksum verification passed on 2026-05-31 | Package-local cover, small cover, hero, screenshots, and feelies are included in the bundled `_demo` package with package-level provenance; do not treat source license as covering historical commercial assets | Original helper docs were refreshed on 2026-05-31; walkthrough is verified with `dfrotz -p -m -s 41` against the exact story, reaching 7 of 7 in 330 moves; IFID `ZCODE-25-860811`, IFDB TUID/URL, IFWiki URL, and package-local `metadata.iFiction.xml` are recorded; do not reuse `invisicluesiii.mss` or other commercial helper material without separate rights review | Bundled starter/demo package |
+| Mainframe Zork / Dungeon | Phase 0 research packet outside the repo; exact source basis not selected | Research only; license/provenance not verified for bundling; existing reconstructions are comparison witnesses, not automatically canonical | No playable TerpVault package; likely future Glulx/`.gblorb` first, `.z8` only if practical after source/build constraints are clear | No package art until the candidate is reviewed beyond research | Helper docs should wait until story/playback/provenance basis is clean | Research-only candidate; not reviewed for bundled demo |
 | Open Adventure / Colossal Cave | Open Adventure project/release source; exact upstream repository, release version, and artifact to record during review | Requires final license/provenance review for the selected source and any compiled artifact | Resolve exact playable target format before bundling; may be better as a source/provenance demo until a web-playable story package is confirmed | Use original Craig-created cave-themed artwork, screenshots from the selected playable version, and optional original maps/notes | Original command primer, spoiler-light hints, and spoilery walkthrough if written from the selected playable version | Candidate only; verify before redistribution |
 | Modern permissively licensed IF candidate A | TBD | TBD; require explicit permissive license and redistribution rights | Confirm supported story format, IFID/iFiction metadata, and browser playability | Prefer original package art unless upstream art is clearly licensed | Prefer original helper docs; preserve upstream attribution if reused | TBD |
 | Modern permissively licensed IF candidate B | TBD | TBD; require explicit permissive license and redistribution rights | Confirm supported story format, IFID/iFiction metadata, and browser playability | Prefer original package art unless upstream art is clearly licensed | Prefer original helper docs; preserve upstream attribution if reused | TBD |
 
-Zork I and Zork III are now bundled as reviewed starter/demo packages in `_demo`. Zork II, Mainframe Zork / Dungeon, and Open Adventure / Colossal Cave remain candidates only; they require local build/package verification and final license/provenance review before bundling. Mainframe Zork / Dungeon is research-only and should not get `_demo` package contents until it is explicitly approved beyond that status.
+Zork I and Zork III are now bundled as reviewed starter/demo packages in `_demo`. Zork II, Mainframe Zork / Dungeon, and Open Adventure / Colossal Cave remain candidates only; they require local build/package verification and final license/provenance review before bundling. Mainframe Zork / Dungeon is research-only and should not get `_demo` package contents until it is explicitly reviewed beyond that status.
 
 ## Legal/provenance rules
 
+- Follow the shared policy in `docs/DEMO-CONTENT-RIGHTS.md`.
 - Do not assume "on IF Archive" means freely redistributable in TerpVault.
 - Track license source and retrieval date in `game.yaml` or package-local provenance notes.
 - Preserve upstream license files when required.
@@ -91,6 +93,7 @@ Zork I and Zork III are now bundled as reviewed starter/demo packages in `_demo`
 - Keep source/provenance notes close to the package so future maintainers can audit why each file is present.
 - Record separate provenance for story files, artwork, helper docs, screenshots, iFiction metadata, and feelies/extras when they come from different sources.
 - Treat trademarks and branding separately from copyright license status.
+- Include package-level "Rights-Holder Removal Requests / DMCA" language for bundled demo packages.
 
 ## Future Admin2 feature: Install Demo Packages
 

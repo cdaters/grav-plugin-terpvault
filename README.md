@@ -42,8 +42,8 @@ The v0.4.x line is intentionally incremental. The next larger public milestone t
 - Public virtual routes and Admin2 API routes are separate integration surfaces. Admin2 API routes are registered only when the Admin2 Library Manager is enabled.
 - `.terpvault.zip` export and draft-only import are available through Admin2. Import overwrite/replace is not implemented.
 - Parchment save/restore is interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
-- The `_demo` tree includes development starter packages for testing. Real IF packages need license/provenance review before broad redistribution.
-- `zork-i` and `zork-iii` are provenance-reviewed bundled starter packages, with source-built story files, package-local provenance, upstream license text, original art/helper docs/screenshots, and package-local feelies.
+- The `_demo` tree includes development starter packages for testing. Real IF packages need package-level rights/provenance review before broad redistribution; see [docs/DEMO-CONTENT-RIGHTS.md](docs/DEMO-CONTENT-RIGHTS.md).
+- `zork-i` and `zork-iii` are provenance-reviewed bundled starter packages, with source-built story files, package-local provenance, upstream license text, original package materials, and selected package-local feelies/extras. The story/source license notes are separate from package-local original materials and any historical reference/preservation materials.
 - `sample-cave` is the public-safe original structure demo, but its placeholder `game.z5` is not a playable story file.
 
 ## Installation for local development
@@ -403,7 +403,9 @@ user/plugins/terpvault/_demo/data/terpvault/games/
   grue/
 ```
 
-`zork-i` and `zork-iii` are bundled starter packages approved for this development demo tree. They use source-built Z-machine story files from verified MIT-licensed historical source releases, include package-local provenance and upstream license text, and use original package art, helper docs, screenshots, and feelies. Their walkthrough routes have been verified with `dfrotz` against the bundled story files. The committed `_demo` Zork III package was seeded into DDEV and route/checksum verified on 2026-05-31.
+`zork-i` and `zork-iii` are bundled starter packages reviewed for this development demo tree. They use source-built Z-machine story files from verified MIT-licensed historical source releases and include package-local provenance and upstream license text. Their package materials are documented at package level and may include original TerpVault/Craig-created assets plus selected historical reference/preservation materials only when separately reviewed. Their walkthrough routes have been verified with `dfrotz` against the bundled story files. The committed `_demo` Zork III package was seeded into DDEV and route/checksum verified on 2026-05-31.
+
+Demo content rights/provenance policy: [docs/DEMO-CONTENT-RIGHTS.md](docs/DEMO-CONTENT-RIGHTS.md). Inclusion in a demo package is not a claim that supplemental material is newly licensed, public domain, official, endorsed, or copyright-free unless that status is separately documented.
 
 `sample-cave` is original placeholder/demo content intended for public-safe structure testing. It is not a playable game. `adventure`, `you-are-standing`, and `grue` are real IF development starter packages with source/license notes in their manifests. Review their provenance before broad redistribution or before including them in a public plugin release.
 
@@ -443,7 +445,7 @@ Then visit:
 
 ## Future GPM packaging notes
 
-Before any future GPM-ready package, re-check bundled Parchment notices and the provenance for each `_demo` starter package. `zork-i` and `zork-iii` have package-local source/license/provenance notes, original package assets, and verified walkthrough routes. Keep other real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, and metadata source.
+Before any future GPM-ready package, re-check bundled Parchment notices and the provenance for each `_demo` starter package. `zork-i` and `zork-iii` have package-local source/license/provenance notes and verified walkthrough routes. Keep original package materials, historical reference/preservation materials, and third-party materials classified separately under [docs/DEMO-CONTENT-RIGHTS.md](docs/DEMO-CONTENT-RIGHTS.md). Keep other real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, supplemental material, and metadata source.
 
 ## Admin2 Library Manager
 

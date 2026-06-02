@@ -29,7 +29,7 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - Admin2 Library Manager is stable enough for beta use: package create, metadata edit, helper Markdown edit, media/screenshots management, story replacement, export, import inspect, draft-only import commit, version visibility, and any completed large-library search/filter/sort basics.
 - Metadata/iFiction behavior is clear: local `metadata.iFiction.xml` preview/apply is documented, and IFDB/IFWiki/IF Archive remote lookup remains roadmap unless implemented.
 - Security/destructive boundaries are clear: no package delete unless a safe workflow exists, no silent physical file deletion, no arbitrary package browser, and import remains draft-only and non-overwriting.
-- Demo package posture is credible: Zork I and Zork III are fully bundled and verified; Zork II is added only if provenance/build/playback/helper docs are clean; Adventure / Colossal Cave, Grue, and You Are Standing are polished only if included and properly licensed.
+- Demo package posture is credible: Zork I and Zork III are fully bundled and verified; `docs/DEMO-CONTENT-RIGHTS.md` is followed; Zork II is added only if provenance/build/playback/helper docs are complete; Adventure / Colossal Cave, Grue, and You Are Standing are polished only if story-file licensing and package-level provenance are complete for the intended distribution.
 - Mainframe Zork / Dungeon remains research-only unless its source basis, license/provenance, reference transcripts, build/reconstruction path, playable artifact, playback behavior, and helper docs are complete and separately approved.
 - Player presentation is readable across common themes. If Inline Play Mode or terminal themes are implemented before v0.5.0, they must preserve `/if/{slug}/play`, support admin defaults, keep public controls optional, and document Parchment iframe/internal styling limits.
 - Release artifacts contain no dev-only paths, accidental test/private artifacts, platform cruft, or questionable historical/commercial assets.
@@ -39,17 +39,19 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 
 Before any future GPM-ready release, ship only public-safe original demo material unless real IF redistribution review is complete.
 
+Follow `docs/DEMO-CONTENT-RIGHTS.md` for demo package rights/provenance. Package records should distinguish story/source license material, package-local original materials, historical reference/preservation materials, third-party materials requiring caution, rights-holder removal requests, and uncertain provenance / pending review.
+
 - `sample-cave`: original TerpVault structure demo; public-safe, but not a playable story.
 - `adventure`: development starter package for playback testing; keep cautious redistribution/provenance notes.
 - `you-are-standing`: development starter package. IFDB lists Creative Commons, but the exact CC variant is not confirmed in package metadata; do not overclaim specificity.
 - `grue`: development starter package. IFDB lists Creative Commons, and the author's GitHub README identifies Creative Commons Attribution-ShareAlike 4.0 International.
-- `zork-i`: bundled demo package with verified source/provenance and original package assets; keep it audited and re-verify if the story file changes.
-- `zork-ii`: candidate only unless the source-build patch or prebuilt artifact basis, provenance, playback, helper docs, original/properly licensed assets, and package audit are complete.
-- `zork-iii`: bundled demo package with verified build/artifact basis, provenance, playback checks, helper docs, original package assets, package-local iFiction metadata, package audit, and clean DDEV demo-seed route/checksum verification.
+- `zork-i`: bundled demo package with verified source/provenance and package-local original materials; keep it audited and re-verify if the story file changes.
+- `zork-ii`: candidate only unless the source-build patch or prebuilt artifact basis, provenance, playback, helper docs, package-local original materials, any historical reference/preservation materials, and package audit are complete.
+- `zork-iii`: bundled demo package with verified build/artifact basis, provenance, playback checks, helper docs, package-local materials, package-local iFiction metadata, package audit, and clean DDEV demo-seed route/checksum verification.
 - Mainframe Zork / Dungeon: research-only candidate, separate from the Zork trilogy packages. Do not bundle story files, playable artifacts, draft package skeletons, package art, or demo claims until legal/provenance/build/playback/helper docs are complete.
 - Open Adventure / Colossal Cave: candidate only until exact source/release/license and playable package target are verified.
 
-Generated placeholder art and curator-created helper notes should be described as TerpVault starter-package material, not original cover art or official game documentation.
+Generated placeholder art and curator-created helper notes should be described as TerpVault starter-package material, not official game documentation. Inclusion of supplemental material should not be described as licensed, public domain, official, endorsed, or copyright-free unless that status is separately documented.
 
 ## Install/update checks
 
@@ -80,7 +82,7 @@ Before tagging:
 
 - Exclude development-only real IF packages unless redistribution review is complete.
 - Keep `sample-cave` if a structure demo is needed.
-- Keep Zork II, Mainframe Zork / Dungeon, Adventure / Colossal Cave, Grue, and You Are Standing out of any GPM-ready bundle unless each package has clean story-file provenance, license notes, original or properly licensed art/helper docs, and package-level audit notes. Zork III now has that package-level audit for the development `_demo` tree and passed clean DDEV demo-seed route/checksum verification.
+- Keep Zork II, Mainframe Zork / Dungeon, Adventure / Colossal Cave, Grue, and You Are Standing out of any GPM-ready bundle unless each package has story-file provenance, license notes, package-local original material notes, supplemental material classification, Rights-Holder Removal Requests / DMCA language, and package-level audit notes. Zork III now has that package-level audit for the development `_demo` tree and passed clean DDEV demo-seed route/checksum verification.
 - Preserve `docs/THIRD-PARTY-NOTICES.md`.
 - Preserve tracked bundled Parchment adapter assets under `assets/vendor/parchment/`; GitHub source/download ZIP installs must include the files served through `/if/_engine/parchment`.
 - Preserve Parchment's embedded bundled-license comment in `assets/vendor/parchment/index.html`.

@@ -1,6 +1,6 @@
 # Zork I Provenance
 
-This is a DDEV-only TerpVault draft package. It is not approved for bundled demo use and should not be copied into `_demo` until final package review is complete.
+This is a bundled TerpVault `_demo` package. It is not official Infocom packaging and should be reviewed under `docs/DEMO-CONTENT-RIGHTS.md` before any broader public/GPM distribution.
 
 ## Source
 
@@ -36,10 +36,25 @@ The selected source-built artifact does not match the upstream prebuilt `COMPILE
 
 ## Exclusions
 
-Historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, and marketing art are excluded from this draft package unless separately licensed later.
+Historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, and marketing art are excluded from this demo package unless item-level review later supports inclusion.
 
-Final art, screenshots, helper docs, maps, and feelies should be Craig-created/original unless a separate license review explicitly allows reuse of another source.
+Future art, screenshots, helper docs, maps, and feelies should be classified before inclusion. A source/story-file license should not be treated as covering supplemental materials unless that status is separately documented.
+
+## Supplemental Material Classification
+
+Future supplemental materials should be classified in package provenance as one of:
+
+- Story/source license material.
+- Craig-created/original package-local material.
+- Historical reference/preservation material.
+- Uncertain provenance / pending review.
+
+Historical reference/preservation material, if added later, should be identified separately from source-license material and package-local original material. Inclusion should be framed as historical preservation, documentation, research, commentary, and educational context, subject to item-level review; it should not be described as newly licensed, public domain, official, endorsed, copyright-free, or automatically fair use unless that status is specifically documented for the item.
 
 ## Package-local original feelies
 
 - `feelies/feelie-01-poster.png`: original Craig Daters 2026 poster art inspired by the retail-era tradition of adventure-game feelies. It is not copied from Infocom packaging, manuals, maps, ads, logos, trade dress, scans, or commercial feelies.
+
+## Rights-Holder Removal Requests / DMCA
+
+If you are a rights holder and believe specific material should not be included, please contact [dmca@retrorealm.org](mailto:dmca@retrorealm.org) with the item name, the location of the material, and the basis for the request. Disputed material will be reviewed promptly and removed or restricted where appropriate.

@@ -1,6 +1,6 @@
 # Zork III Provenance
 
-This is a DDEV-only TerpVault draft candidate package. It is not official Infocom packaging, is not approved for bundled demo use, and should not be copied into `_demo` until final package review is complete.
+This is a bundled TerpVault `_demo` package. It is not official Infocom packaging and should be reviewed under `docs/DEMO-CONTENT-RIGHTS.md` before any broader public/GPM distribution.
 
 ## Source
 
@@ -89,7 +89,7 @@ Files copied:
 - `01.png` to `screenshots/01.png`
 - `02.png` to `screenshots/02.png`
 
-These images are treated as Craig-created/original TerpVault package art and screenshots for this draft package pass. They are not scans or reproductions of historical commercial packaging, manuals, maps, advertisements, logos, trade dress, Invisiclues, or commercial feelies.
+These images are treated as Craig-created/original TerpVault package art and screenshots for this demo package pass. They are not scans or reproductions of historical commercial packaging, manuals, maps, advertisements, logos, trade dress, Invisiclues, or commercial feelies.
 
 ## Feelies
 
@@ -114,9 +114,9 @@ Files copied:
 - `Zork 3 - ZUG Map Outside.jpg` to `feelies/zug-map-outside.jpg`
   - SHA-256: `0b5e0db2504d6592e2d25fe379eb791752bf857827f2ae21c90a43fa5623c845`
 
-These files are treated as Craig-created/original package-local feelies for this TerpVault Zork III candidate package. No historical Infocom commercial scans, commercial package assets, maps, manuals, Invisiclues, or trade dress were used for this feelies pass.
+These files are package-local Zork III supplemental materials included with package-level provenance for this TerpVault demo package. They should be reviewed and classified item by item before any broader public/GPM distribution. Do not treat the story/source MIT license as covering these feelies unless that status is separately documented.
 
-Redistribution status: intended for this TerpVault package pending final audit. They are not approved for `_demo`, bundled public/GPM distribution, or any broader redistribution until that audit is complete.
+Current bundled-demo status: included in `_demo` after the final audit and promotion recorded below. Broader redistribution should follow `docs/DEMO-CONTENT-RIGHTS.md`.
 
 ## Helper Docs
 
@@ -242,15 +242,30 @@ Package updates from this metadata pass:
 
 ## Exclusions
 
-This draft package excludes historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, Invisiclues, clue sheets, `invisicluesiii.mss`, commercial helper files, online walkthroughs, catalog prose, and marketing text unless a later review documents explicit redistribution rights.
+This demo package excludes historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, Invisiclues, clue sheets, `invisicluesiii.mss`, commercial helper files, online walkthroughs, catalog prose, and marketing text unless item-level review later supports inclusion.
+
+## Supplemental Material Classification
+
+Future supplemental materials should be classified in package provenance as one of:
+
+- Story/source license material.
+- Craig-created/original package-local material.
+- Historical reference/preservation material.
+- Uncertain provenance / pending review.
+
+Historical reference/preservation material, if added later, should be identified separately from source-license material and package-local original material. Inclusion should be framed as historical preservation, documentation, research, commentary, and educational context, subject to item-level review; it should not be described as newly licensed, public domain, official, endorsed, copyright-free, or automatically fair use unless that status is specifically documented for the item.
+
+## Rights-Holder Removal Requests / DMCA
+
+If you are a rights holder and believe specific material should not be included, please contact [dmca@retrorealm.org](mailto:dmca@retrorealm.org) with the item name, the location of the material, and the basis for the request. Disputed material will be reviewed promptly and removed or restricted where appropriate.
 
 ## Current Package Status
 
-- DDEV package path: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`
-- Package status: draft
+- Bundled `_demo` package path: `_demo/data/terpvault/games/zork-iii`
+- Source DDEV package path used for promotion: `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-iii`
+- Package status in `_demo`: published
 - Featured: false
-- Not approved for `_demo`
-- Not approved for bundled public/GPM distribution
+- Broader public/GPM distribution remains subject to final release packaging and demo-content rights/provenance review.
 
 ## Final Audit
 
