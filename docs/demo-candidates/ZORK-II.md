@@ -6,19 +6,21 @@
 - Upstream repo verified on 2026-05-25.
 - Upstream repo rechecked on 2026-05-29 for branch, commit, tags/releases, license, source layout, and prebuilt artifacts.
 - Artifact basis rechecked on 2026-06-02 in scratch at `/private/tmp/terpvault-zork2-source-20260602`.
+- DDEV-only draft package assembled and route-checked on 2026-06-02 at `~/Sites/grav2.0-ddev/user/data/terpvault/games/zork-ii`.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
 - Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
+- DDEV package dfrotz smoke passed against the selected story file.
 - Not approved for bundled demo.
-- Requires package verification, TerpVault/Parchment playback verification, original package assets, helper docs, screenshots, and provenance notes.
-- Next state: use the documented patched source-built historical-header artifact as the next DDEV package-basis candidate, then verify TerpVault/Parchment playback and package provenance before any `_demo` work.
+- Requires original package assets, final helper docs, screenshots, IFID/catalog/iFiction metadata, export/import smoke, final audit, and provenance review before any `_demo` work.
+- Next state: classify/copy approved supplemental materials or begin helper-doc/walkthrough/metadata passes while keeping the DDEV package draft and candidate-only.
 
 Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
 ## Artifact basis recheck - 2026-06-02
 
-This pass rechecked the Zork II artifact basis only. It did not create a Zork II `_demo` package, did not create a DDEV package, did not copy feelies, and did not copy any story file into the TerpVault repository.
+This artifact-basis pass rechecked the Zork II artifact basis only. At that point it did not create a Zork II `_demo` package, did not create a DDEV package, did not copy feelies, and did not copy any story file into the TerpVault repository.
 
 Scratch path used:
 
@@ -135,11 +137,84 @@ Artifact candidates:
 | Scratch patched historical-header no-creator build | Same patched source, reassembled with `-r 63 -s 860811 -N` | `f6843b07941792589eebfd54bcd640b327812f85ac46b688f6c530c8feb72911` | `Infocom (Z-machine 3, Release 63, Serial 860811)` | Passed | Directly source-derived and explicit no-creator variant is reproducible | No clear package advantage over the non-`-N` artifact | Alternative only if later package review prefers `-N` |
 | Upstream prebuilt artifact | `COMPILED/zork2.z3` or top-level `zork2.zip` in upstream repo at verified commit | `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac` | `Infocom (Z-machine 3, Release 63, Serial 860811)` | Passed | Directly traceable to upstream repo and has historical release/serial | Not produced by the reproduced source build; README notes original build process uncertainty | Viable fallback only if explicitly selected and documented |
 
-Recommendation:
+Artifact-basis recommendation:
 
-- Use the documented scratch-patched source-built historical-header artifact, `zork2-release63-serial860811.z3`, as the next DDEV package-basis candidate.
-- Keep Zork II candidate-only until that artifact is copied into a temporary DDEV package, TerpVault/Parchment playback is verified, package-local provenance records the patch and checksum, and helper docs/assets/metadata are completed.
+- Use the documented scratch-patched source-built historical-header artifact, `zork2-release63-serial860811.z3`, as the DDEV package-basis candidate.
+- Keep Zork II candidate-only after initial DDEV package assembly until final TerpVault/Parchment coverage, package-local provenance, helper docs, assets, metadata, export/import smoke, audit, and approval are completed.
 - Do not use `COMPILED/zork2.z3` or `zork2.zip` unless a later explicit decision selects the upstream prebuilt artifact and documents why the source-built patched artifact is not being used.
+
+## DDEV draft package assembly - 2026-06-02
+
+This pass assembled a DDEV-only Zork II draft package for local TerpVault/Parchment verification. It did not copy any Zork II files into `_demo`, did not copy feelies, and did not add story files to the TerpVault plugin repository.
+
+Package target:
+
+```text
+~/Sites/grav2.0-ddev/user/data/terpvault/games/zork-ii
+```
+
+Package files created in DDEV:
+
+- `game.yaml`
+- `zork2.z3`
+- `LICENSE-upstream.txt`
+- `provenance.md`
+- `how-to-play.md`
+- `hints.md`
+- `walkthrough.md`
+- Empty `screenshots/` and `feelies/` directories
+
+Selected story artifact:
+
+- Source path: `/private/tmp/terpvault-zork2-source-20260602/zork2-release63-serial860811.z3`.
+- DDEV target path: `~/Sites/grav2.0-ddev/user/data/terpvault/games/zork-ii/zork2.z3`.
+- Size: 92412 bytes.
+- SHA-256: `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- File identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
+- Upstream `COMPILED/zork2.z3` and top-level `zork2.zip` were not selected for this DDEV package.
+
+Package metadata/provenance state:
+
+- `terpvault.status`: restored to `draft` after route checks.
+- `terpvault.featured`: `false`.
+- `identification.ifids`: intentionally empty pending IFID/catalog/iFiction enrichment.
+- `resources.feelies`: empty; no support files from `~/Downloads/for-Zork2` were copied.
+- `how-to-play.md`, `hints.md`, and `walkthrough.md` are placeholders only, not final package docs.
+- `provenance.md` records the selected story artifact, patch/build basis, upstream source, license summary, shared rights/provenance policy, and Rights-Holder Removal Requests / DMCA contact.
+
+Local package validation:
+
+- YAML parse: passed.
+- Story checksum: matched expected SHA-256.
+- Story file identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
+- `LICENSE-upstream.txt`, `provenance.md`, and helper docs: non-empty.
+- Cruft check for `.DS_Store`, `__MACOSX`, AppleDouble files, backups, temp files, swap files, and lock files: clean.
+
+DDEV manifest check while draft:
+
+- Manifest route: `https://grav20.ddev.site/if/_manifest`.
+- HTTP result: `200`.
+- `zork-ii` present: yes.
+- Status: `draft`.
+- `has_story_file`: `true`.
+- Warnings: `missing-ifid`, `missing-cover`, `missing-small-cover`.
+- Errors: none.
+
+Temporary published route checks:
+
+- `/if/zork-ii`: `200`, `text/html`.
+- `/if/zork-ii/play`: `200`, `text/html`.
+- `/if/_story/zork-ii/zork2.z3`: `200`, `application/octet-stream`, 92412 bytes, SHA-256 matched `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- `/if/_asset/zork-ii/how-to-play.md`: `200`, `text/markdown`.
+- `/if/_asset/zork-ii/hints.md`: initially returned a Grav compiled-cache parse error; after one `ddev exec bin/grav clearcache`, retry passed with `200`, `text/markdown`.
+- `/if/_asset/zork-ii/walkthrough.md`: `200`, `text/markdown`.
+
+dfrotz smoke from DDEV package file:
+
+- Command sequence: `look`, `inventory`, `quit`, `y`.
+- Result: passed. The story launched, displayed Release 63 / Serial 860811, accepted commands, and quit cleanly.
+
+The package was restored to draft and cache was cleared after the temporary route checks.
 
 ## Upstream source verified
 
@@ -347,7 +422,7 @@ Result:
 - Not approved for bundled demo.
 - Do not create `_demo` package contents yet.
 - Do not bundle `zork2.zip` or `COMPILED/zork2.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
-- Prefer a source-built artifact only if the scratch-only compatibility patch is accepted, recorded in package-local provenance, and TerpVault/Parchment playback is verified.
+- Continue with the source-built artifact only because the scratch-only compatibility patch is recorded in package-local provenance and initial DDEV route/playback verification has passed; final package audit is still required before `_demo` promotion.
 - Do not use commercial packaging, manual, map, ad, logo, trade-dress, or scan assets.
 - Use Craig-created art, screenshots, helper docs, maps, and feelies later.
 
@@ -363,7 +438,7 @@ Result:
 
 ## Recommended next action
 
-Review the scratch-only `DREARY-ROOM-FCN` bracket fix as a source compatibility patch candidate, preferably against upstream history or ZILF maintainers before treating it as a packaging input. Keep Zork II candidate-only until the selected artifact and patch/provenance basis are documented and TerpVault/Parchment playback is verified.
+Keep reviewing the scratch-only `DREARY-ROOM-FCN` bracket fix as a source compatibility patch candidate, preferably against upstream history or ZILF maintainers before treating it as final bundled-demo provenance. Keep Zork II candidate-only until final package docs, metadata, materials, export/import smoke, audit, and approval are complete.
 
 ## Promotion checklist against Zork I standard
 
