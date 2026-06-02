@@ -5,15 +5,141 @@
 - Candidate only.
 - Upstream repo verified on 2026-05-25.
 - Upstream repo rechecked on 2026-05-29 for branch, commit, tags/releases, license, source layout, and prebuilt artifacts.
+- Artifact basis rechecked on 2026-06-02 in scratch at `/private/tmp/terpvault-zork2-source-20260602`.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
-- Unmodified source build failed; scratch-only compatibility patch produced a playable artifact.
-- Frotz smoke test passed for scratch-patched source-built historical-header variants.
+- Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
+- Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
 - Not approved for bundled demo.
 - Requires package verification, TerpVault/Parchment playback verification, original package assets, helper docs, screenshots, and provenance notes.
-- Next state: package/provenance/playback verification needed after deciding how to handle the scratch-only source compatibility patch.
+- Next state: use the documented patched source-built historical-header artifact as the next DDEV package-basis candidate, then verify TerpVault/Parchment playback and package provenance before any `_demo` work.
 
 Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
+
+## Artifact basis recheck - 2026-06-02
+
+This pass rechecked the Zork II artifact basis only. It did not create a Zork II `_demo` package, did not create a DDEV package, did not copy feelies, and did not copy any story file into the TerpVault repository.
+
+Scratch path used:
+
+```text
+/private/tmp/terpvault-zork2-source-20260602
+```
+
+Repository state:
+
+- Remote URL: `https://github.com/historicalsource/zork2.git`.
+- Branch: `master`.
+- Commit: `3da9661098809788a99cef00f00c865c6c204f96`.
+- Tags/releases observed: no tags from `git tag --list` and no remote tags from `git ls-remote --heads --tags`.
+- License file observed: `LICENSE`, MIT License text with `Copyright (c) 2025 Microsoft`.
+- Build instructions: repository README states there is currently no known original-process way to compile the source into a final ZIP file; no TerpVault-ready build recipe is documented upstream.
+- Prebuilt story artifacts observed: `COMPILED/zork2.z3` and `zork2.zip`.
+
+Local toolchain used:
+
+- ZILF: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf`, version `1.8`.
+- ZAPF: `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf`, version `1.8`.
+- dfrotz: `/opt/homebrew/bin/dfrotz`.
+
+Unmodified source build command:
+
+```sh
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf zork2.zil
+```
+
+Unmodified build result:
+
+- Failed.
+- Output banner: `Renovated ZORK II: The Wizard of Frobozz`.
+- Warnings: `26 warnings (26 suppressed)`.
+- Error:
+
+```text
+[error ZIL0123] /private/tmp/terpvault-zork2-source-20260602/2ACTIONS.zil:1560: expressions of type 'LIST' cannot be compiled
+    [info ZIL0124] /private/tmp/terpvault-zork2-source-20260602/2ACTIONS.zil:1551: misplaced bracket in COND or loop?
+```
+
+Scratch-only compatibility patch applied:
+
+```diff
+diff --git a/2actions.zil b/2actions.zil
+index bec062c..1dc1de8 100644
+--- a/2actions.zil
++++ b/2actions.zil
+@@ -1556,8 +1556,8 @@ an exit down a precarious climb. ">
+ emanating from a crack in one wall. The light falls upon a dusty wooden table
+ in the center of the room. ">
+        <P-DOOR "south" ,LID-2 ,KEYHOLE-2>
+-       <RTRUE>)>
+-          (T <PCHECK> <RFALSE>)>
++       <RTRUE>)
++          (T <PCHECK> <RFALSE>)>>
+```
+
+The patch keeps the default `T` branch inside `DREARY-ROOM-FCN`'s surrounding `COND`. It was applied only in scratch and was not copied into the TerpVault repository.
+
+Patched source build command:
+
+```sh
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zilf zork2.zil
+```
+
+Patched source build result:
+
+- Succeeded.
+- Output: `zork2.z3`.
+- Size: 92412 bytes.
+- File identification: `Infocom (Z-machine 3, Release 0, Serial 260601)`.
+- SHA-256: `845f2abefc996d095ab56faf70a6be1db3e76113311eb1311e38cf7376b2588e`.
+
+Historical release/serial reassembly command:
+
+```sh
+/tmp/terpvault-zilf-verification/bin/Debug/net10.0/zapf zork2.zap zork2-release63-serial860811.z3 -r 63 -s 860811
+```
+
+Historical release/serial reassembly result:
+
+- Succeeded.
+- Output: `zork2-release63-serial860811.z3`.
+- Size: 92412 bytes.
+- File identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
+- SHA-256: `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- dfrotz smoke: passed with `look`, `inventory`, `quit`, `y`.
+
+Historical release/serial no-creator reassembly result:
+
+- Command included `-N`.
+- Output: `zork2-release63-serial860811-nocreator.z3`.
+- Size: 92412 bytes.
+- File identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
+- SHA-256: `f6843b07941792589eebfd54bcd640b327812f85ac46b688f6c530c8feb72911`.
+- dfrotz smoke: passed with `look`, `inventory`, `quit`, `y`.
+
+Upstream prebuilt artifact result:
+
+- `COMPILED/zork2.z3` and `zork2.zip` are byte-identical.
+- Size: 92524 bytes.
+- File identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
+- SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
+- dfrotz smoke: passed for `COMPILED/zork2.z3` with `look`, `inventory`, `quit`, `y`.
+
+Artifact candidates:
+
+| Candidate | Origin / method | SHA-256 | File identification | Smoke result | Pros | Cons / provenance risk | Package suitability |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Unmodified source build | Fresh clone of upstream source at `3da9661098809788a99cef00f00c865c6c204f96`; `zilf zork2.zil` | None | None | Not runnable | Cleanest source story if it worked | Build fails at `2ACTIONS.zil:1560` | Not suitable |
+| Scratch patched source build | Same source plus documented `DREARY-ROOM-FCN` bracket compatibility patch; default ZILF/ZAPF output | `845f2abefc996d095ab56faf70a6be1db3e76113311eb1311e38cf7376b2588e` | `Infocom (Z-machine 3, Release 0, Serial 260601)` | Not separately smoke-tested in this pass | Directly source-derived and patch is minimal | Default generated release/serial is not the historical release header | Useful build evidence, but not preferred package basis |
+| Scratch patched historical-header build | Same patched source, reassembled with `-r 63 -s 860811` | `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019` | `Infocom (Z-machine 3, Release 63, Serial 860811)` | Passed | Directly source-derived, minimal documented patch, historical header matches known upstream prebuilt release/serial | Not byte-identical to upstream prebuilt; patch must be explicitly recorded in package provenance | Recommended next DDEV package-basis candidate |
+| Scratch patched historical-header no-creator build | Same patched source, reassembled with `-r 63 -s 860811 -N` | `f6843b07941792589eebfd54bcd640b327812f85ac46b688f6c530c8feb72911` | `Infocom (Z-machine 3, Release 63, Serial 860811)` | Passed | Directly source-derived and explicit no-creator variant is reproducible | No clear package advantage over the non-`-N` artifact | Alternative only if later package review prefers `-N` |
+| Upstream prebuilt artifact | `COMPILED/zork2.z3` or top-level `zork2.zip` in upstream repo at verified commit | `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac` | `Infocom (Z-machine 3, Release 63, Serial 860811)` | Passed | Directly traceable to upstream repo and has historical release/serial | Not produced by the reproduced source build; README notes original build process uncertainty | Viable fallback only if explicitly selected and documented |
+
+Recommendation:
+
+- Use the documented scratch-patched source-built historical-header artifact, `zork2-release63-serial860811.z3`, as the next DDEV package-basis candidate.
+- Keep Zork II candidate-only until that artifact is copied into a temporary DDEV package, TerpVault/Parchment playback is verified, package-local provenance records the patch and checksum, and helper docs/assets/metadata are completed.
+- Do not use `COMPILED/zork2.z3` or `zork2.zip` unless a later explicit decision selects the upstream prebuilt artifact and documents why the source-built patched artifact is not being used.
 
 ## Upstream source verified
 

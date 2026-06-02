@@ -13,7 +13,7 @@ For Craig's development branch, the `_demo` tree also includes real starter pack
 ## v0.4.x and v0.5.0 direction
 
 - Keep v0.4.x starter-library work incremental and evidence-driven.
-- Zork II should remain a candidate until its source build, playable artifact, Parchment playback, package metadata, helper docs, and package-level provenance are complete. Zork III has completed that review path for this development demo tree and is bundled in `_demo`.
+- Zork II should remain a candidate until its recommended patched source-built artifact basis, Parchment playback, package metadata, helper docs, and package-level provenance are complete. Zork III has completed that review path for this development demo tree and is bundled in `_demo`.
 - Mainframe Zork / Dungeon should remain a research-only candidate, separate from Zork I/II/III, until source selection, legal/provenance review, reference transcripts, build/reconstruction path, playback, and helper docs are clean.
 - Adventure / Colossal Cave should remain a candidate until the exact implementation, license, playable target, and TerpVault runtime strategy are verified.
 - Grue and You Are Standing should be polished only if the exact story-file license, package-local original material notes, and supplemental material provenance are clear enough for the intended distribution.
@@ -73,9 +73,9 @@ Microsoft/Open Source Programs Office announced Zork I, II, and III source code 
 Current candidate notes:
 
 - Zork I is the verified bundled anchor demo, with story/source provenance recorded separately from package-local original materials and selected historical reference/preservation feelies. It records release-specific IFID `ZCODE-119-880429`, IFDB/IFWiki catalog links, and package-local `metadata.iFiction.xml`.
-- Zork II remains candidate-only because the unmodified ZILF build failed and the scratch-only compatibility patch or prebuilt artifact basis has not been selected for packaging.
+- Zork II remains candidate-only. The unmodified ZILF build still fails, but the 2026-06-02 artifact-basis recheck recommends the documented patched source-built historical-header artifact `zork2-release63-serial860811.z3` with SHA-256 `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019` as the next DDEV package-basis candidate.
 - Zork III is bundled in `_demo` after source build verification, DDEV playback checks, export/import smoke, verified walkthrough, metadata/iFiction review, final audit, Craig approval, and clean DDEV demo-seed route/checksum verification.
-- Do not add Zork II to `_demo` until the selected artifact basis, license/provenance, playback behavior, helper docs, screenshots, package-local original materials, any historical reference/preservation materials, and export/import audit are complete.
+- Do not add Zork II to `_demo` until the recommended artifact basis, license/provenance, playback behavior, helper docs, screenshots, package-local original materials, any historical reference/preservation materials, and export/import audit are complete.
 
 ### Mainframe Zork / Dungeon
 
