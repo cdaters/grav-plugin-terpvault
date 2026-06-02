@@ -7,14 +7,15 @@
 - Upstream repo rechecked on 2026-05-29 for branch, commit, tags/releases, license, source layout, and prebuilt artifacts.
 - Artifact basis rechecked on 2026-06-02 in scratch at `/private/tmp/terpvault-zork2-source-20260602`.
 - DDEV-only draft package assembled and route-checked on 2026-06-02 at `~/Sites/grav2.0-ddev/user/data/terpvault/games/zork-ii`.
+- DDEV-only package updated on 2026-06-02 with classified feelies and original draft helper docs.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
 - Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
 - DDEV package dfrotz smoke passed against the selected story file.
 - Not approved for bundled demo.
-- Requires original package assets, final helper docs, screenshots, IFID/catalog/iFiction metadata, export/import smoke, final audit, and provenance review before any `_demo` work.
-- Next state: classify/copy approved supplemental materials or begin helper-doc/walkthrough/metadata passes while keeping the DDEV package draft and candidate-only.
+- Requires cover/small-cover/hero assets, screenshots, IFID/catalog/iFiction metadata, walkthrough transcript verification, export/import smoke, final audit, and provenance review before any `_demo` work.
+- Next state: verify the walkthrough with dfrotz or complete metadata/iFiction enrichment while keeping the DDEV package draft and candidate-only.
 
 Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -178,8 +179,8 @@ Package metadata/provenance state:
 - `terpvault.status`: restored to `draft` after route checks.
 - `terpvault.featured`: `false`.
 - `identification.ifids`: intentionally empty pending IFID/catalog/iFiction enrichment.
-- `resources.feelies`: empty; no support files from `~/Downloads/for-Zork2` were copied.
-- `how-to-play.md`, `hints.md`, and `walkthrough.md` are placeholders only, not final package docs.
+- At initial assembly, `resources.feelies` was empty and no support files from `~/Downloads/for-Zork2` were copied.
+- At initial assembly, `how-to-play.md`, `hints.md`, and `walkthrough.md` were placeholders only. They were replaced by original draft helper docs in the later materials update below.
 - `provenance.md` records the selected story artifact, patch/build basis, upstream source, license summary, shared rights/provenance policy, and Rights-Holder Removal Requests / DMCA contact.
 
 Local package validation:
@@ -215,6 +216,51 @@ dfrotz smoke from DDEV package file:
 - Result: passed. The story launched, displayed Release 63 / Serial 860811, accepted commands, and quit cleanly.
 
 The package was restored to draft and cache was cleared after the temporary route checks.
+
+## DDEV materials and helper docs update - 2026-06-02
+
+This pass updated the DDEV-only Zork II draft package with classified feelies and original TerpVault helper docs. It did not copy any Zork II files into `_demo` and did not add story files, support files, PDFs, images, or solution files to the TerpVault plugin repository.
+
+Source/reference folder:
+
+```text
+~/Downloads/for-Zork2
+```
+
+Feelies copied into DDEV:
+
+| Target path | SHA-256 | Classification |
+| --- | --- | --- |
+| `feelies/bozbarland-flyer.pdf` | `eff3f0ad8bc8a85b80332efc561047881058ccb9ed5cf594fa52ccacad917693` | Historically circulating reference/preservation material |
+| `feelies/gue-nine-zorkminds.pdf` | `c411dc9e1235a7f3669dfb1d21aa917741195bf68fa29fdb0aac8f63641d4b31` | Historically circulating reference/preservation material |
+| `feelies/grayslopes-brochure.pdf` | `1beb6526d5edefdbca2fac6aae56370ad68c21f80222aca115688482b1554a2e` | Historically circulating reference/preservation material |
+| `feelies/zork-ii-invisiclues-map.pdf` | `e8a9329e5b95cb112141ff25dba8d418d6aa4d3a9d38f08b15ee91ee12a365ae` | Historically circulating reference/preservation material requiring caution |
+| `feelies/zork-ii-poster.jpg` | `2a839c6e8c8b1585a9508aad68c2fed002b7dc8b396c3e9c37d8b16edfe8e0e1` | Likely commercial material requiring caution |
+| `feelies/zug-map-inside.jpg` | `7732ecb3f973e6e89ed8192c4450fa6cddd305ef8475b7795be3eb097bf68178` | Historically circulating reference/preservation material |
+| `feelies/zug-map-outside.jpg` | `59270b28e5fea2a2fea1ec75f6a5f52d824a9414598018b649d81fbcca929a14` | Historically circulating reference/preservation material |
+
+The materials are described under the shared policy in `docs/DEMO-CONTENT-RIGHTS.md`. They are not described as official, endorsed, newly licensed, public domain, copyright-free, or automatically fair use. Package provenance includes Rights-Holder Removal Requests / DMCA contact language for `dmca@retrorealm.org`.
+
+Helper docs:
+
+- `how-to-play.md` was rewritten as a Zork II parser guide for the draft package.
+- `hints.md` was rewritten with original progressive hints.
+- `walkthrough.md` was rewritten as an original TerpVault draft route using local `zork2.sol.txt` and `zork2.sol2.txt` as references only.
+- The solution text files were not copied into the DDEV package or the repo.
+- The walkthrough is explicitly pending dfrotz transcript verification and should not be treated as a verified route yet.
+
+Validation:
+
+- YAML parse: passed.
+- Story checksum remained `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- Feelie `file` and SHA-256 checks passed.
+- Helper docs, provenance, and upstream license were non-empty.
+- Cruft check was clean.
+- Draft manifest route returned HTTP `200`; `zork-ii` status `draft`, `has_story_file` true, seven feelies visible, warnings `missing-ifid`, `missing-cover`, and `missing-small-cover`, errors none.
+- Temporary published route checks passed for `/if/zork-ii`, `/if/zork-ii/play`, `/if/_story/zork-ii/zork2.z3`, helper Markdown assets, `feelies/zug-map-inside.jpg`, and `feelies/zork-ii-poster.jpg`.
+- `feelies/zork-ii-invisiclues-map.pdf` initially hit a Grav compiled-cache parse error; after one `ddev exec bin/grav clearcache`, retry passed with HTTP `200`, `application/pdf`, size 1745245, and matching SHA-256.
+
+The package was restored to draft and cache was cleared after the temporary route checks. IFID/catalog/iFiction metadata remains pending.
 
 ## Upstream source verified
 
