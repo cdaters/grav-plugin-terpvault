@@ -9,14 +9,15 @@
 - DDEV-only draft package assembled and route-checked on 2026-06-02 at `~/Sites/grav2.0-ddev/user/data/terpvault/games/zork-ii`.
 - DDEV-only package updated on 2026-06-02 with classified feelies and original draft helper docs.
 - DDEV-only package updated on 2026-06-02 with package-local cover/small-cover/hero art and gameplay screenshots.
+- DDEV-only package updated on 2026-06-02 with release-specific IFID, IFDB/IFWiki catalog fields, and package-local `metadata.iFiction.xml`.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
 - Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
 - DDEV package dfrotz smoke passed against the selected story file.
 - Not approved for bundled demo.
-- Requires IFID/catalog/iFiction metadata, walkthrough transcript verification, export/import smoke, final audit, and provenance review before any `_demo` work.
-- Next state: verify the walkthrough with dfrotz or complete metadata/iFiction enrichment while keeping the DDEV package draft and candidate-only.
+- Requires walkthrough transcript verification, export/import smoke, final audit, and provenance review before any `_demo` work.
+- Next state: verify the walkthrough with dfrotz while keeping the DDEV package draft and candidate-only.
 
 Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -179,7 +180,7 @@ Package metadata/provenance state:
 
 - `terpvault.status`: restored to `draft` after route checks.
 - `terpvault.featured`: `false`.
-- `identification.ifids`: intentionally empty pending IFID/catalog/iFiction enrichment.
+- `identification.ifids`: initially empty pending IFID/catalog/iFiction enrichment; later updated to `ZCODE-63-860811` in the metadata review below.
 - At initial assembly, `resources.feelies` was empty and no support files from `~/Downloads/for-Zork2` were copied.
 - At initial assembly, `how-to-play.md`, `hints.md`, and `walkthrough.md` were placeholders only. They were replaced by original draft helper docs in the later materials update below.
 - `provenance.md` records the selected story artifact, patch/build basis, upstream source, license summary, shared rights/provenance policy, and Rights-Holder Removal Requests / DMCA contact.
@@ -261,7 +262,7 @@ Validation:
 - Temporary published route checks passed for `/if/zork-ii`, `/if/zork-ii/play`, `/if/_story/zork-ii/zork2.z3`, helper Markdown assets, `feelies/zug-map-inside.jpg`, and `feelies/zork-ii-poster.jpg`.
 - `feelies/zork-ii-invisiclues-map.pdf` initially hit a Grav compiled-cache parse error; after one `ddev exec bin/grav clearcache`, retry passed with HTTP `200`, `application/pdf`, size 1745245, and matching SHA-256.
 
-The package was restored to draft and cache was cleared after the temporary route checks. IFID/catalog/iFiction metadata remains pending.
+The package was restored to draft and cache was cleared after the temporary route checks. IFID/catalog/iFiction metadata was added in the later metadata review below.
 
 ## DDEV art and screenshots update - 2026-06-02
 
@@ -298,7 +299,52 @@ Validation:
 - Temporary published route checks passed for `/if/zork-ii`, `/if/zork-ii/play`, `/if/_story/zork-ii/zork2.z3`, `/if/_asset/zork-ii/cover.jpg`, `/if/_asset/zork-ii/small-cover.jpg`, `/if/_asset/zork-ii/hero.jpg`, `/if/_asset/zork-ii/screenshots/01.png`, and `/if/_asset/zork-ii/screenshots/02.png`.
 - Route-served story and visual assets matched expected SHA-256 checksums.
 
-The package was restored to draft and cache was cleared after the temporary route checks. Walkthrough transcript verification and IFID/catalog/iFiction metadata remain pending.
+The package was restored to draft and cache was cleared after the temporary route checks. Walkthrough transcript verification remained pending; IFID/catalog/iFiction metadata was added in the later metadata review below.
+
+## DDEV metadata and iFiction update - 2026-06-02
+
+This pass added release-specific identification and selected public catalog metadata to the DDEV-only Zork II draft package. It did not copy any Zork II files into `_demo`, did not change the selected story artifact, and did not run walkthrough transcript verification or export/import smoke.
+
+Accepted metadata:
+
+| Field | Value |
+| --- | --- |
+| Story SHA-256 | `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019` |
+| File identification | `Infocom (Z-machine 3, Release 63, Serial 860811)` |
+| Release / serial | `63` / `860811` |
+| IFID | `ZCODE-63-860811` |
+| IFDB TUID | `yzzm4puxyjakk8c4` |
+| IFDB URL | `https://ifdb.org/viewgame?id=yzzm4puxyjakk8c4` |
+| IFWiki URL | `https://www.ifwiki.org/Zork_II` |
+| IF Archive | Left blank; shipped documentation was checked, but no story-artifact catalog path was accepted for this selected package artifact. |
+
+IFID basis:
+
+- The local DDEV story file identifies as Release 63 / Serial 860811.
+- The Treaty of Babel legacy Z-code convention supports `ZCODE-{release}-{serial}` for pre-1990 Z-code story files.
+- IFDB lists `ZCODE-63-860811` among Zork II IFIDs.
+- IFWiki was checked for title/context but was not used to replace this package's release-specific IFID with another release's IFID.
+
+Package updates:
+
+- `game.yaml` now records `identification.ifids: [ZCODE-63-860811]`.
+- `game.yaml` now records IFDB TUID/URL and IFWiki URL.
+- `metadata.iFiction.xml` was created with verified/careful metadata only and validated with `xmllint --noout`.
+- `provenance.md` now records the IFID basis, catalog sources checked, retrieval date, accepted fields, and remaining pending work.
+
+Validation:
+
+- YAML parse: passed.
+- `metadata.iFiction.xml` validation: passed.
+- Story checksum remained `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- Non-empty provenance, helper docs, upstream license, and iFiction files were confirmed.
+- Cruft check was clean after removing one DDEV `.DS_Store`.
+- Draft manifest route returned HTTP `200`; `zork-ii` status `draft`, `has_story_file` true, `has_ifiction` true, `ifiction_path` `metadata.iFiction.xml`, IFID present, cover/small-cover/hero/screenshots/feelies visible, warnings `[]`, and errors none.
+- Temporary published checks passed for `/if/zork-ii`, `/if/zork-ii/play`, `/if/_story/zork-ii/zork2.z3`, `/if/_asset/zork-ii/cover.jpg`, and `/if/_asset/zork-ii/hero.jpg`.
+- The route-served story returned HTTP `200`, `application/octet-stream`, 92412 bytes, and the expected SHA-256.
+- `/if/_asset/zork-ii/metadata.iFiction.xml` returned HTTP `404` because XML is not a public asset extension under the current TerpVault asset-serving policy; the manifest still detects `metadata.iFiction.xml` via `has_ifiction` and `ifiction_path`.
+
+The package was restored to draft and cache was cleared after the temporary route checks. Walkthrough transcript verification, export/import smoke, final audit, and `_demo` promotion remain pending.
 
 ## Upstream source verified
 
@@ -491,7 +537,7 @@ Result:
 - Comparison with upstream `COMPILED/zork2.z3`: neither scratch-patched source-built historical-header artifact matched the upstream prebuilt checksum.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` file identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
-- TerpVault/Parchment playback testing: pending.
+- TerpVault/Parchment playback testing: passed for initial DDEV route/playback smoke; full walkthrough transcript verification remains pending.
 
 ## Frotz smoke test
 
@@ -516,8 +562,8 @@ Result:
 - Produce a successful source-built playable artifact from a documented build source, or make and document an explicit later decision to use a prebuilt artifact.
 - Record selected artifact filename, file identification, checksum, and redistribution basis.
 - Verify TerpVault/Parchment playback for the selected artifact.
-- Create package metadata and package-local provenance notes.
-- Create original package art, screenshots, helper docs, maps, and feelies.
+- Package metadata and package-local provenance notes created for the DDEV draft package; final audit remains pending.
+- Package-local art, screenshots, helper docs, and classified feelies added to the DDEV draft package; walkthrough transcript verification remains pending.
 - Run package export/import smoke tests once a package exists.
 
 ## Recommended next action
@@ -532,7 +578,7 @@ Before Zork II can move from candidate to bundled demo review, it still needs:
 - Source/provenance and license basis documented for the selected artifact.
 - Playable story file verified without adding it to the repo during research.
 - TerpVault/Parchment playback verification for the selected artifact.
-- Package metadata drafted.
+- Package metadata, release-specific IFID/catalog fields, and package-local `metadata.iFiction.xml` drafted for the DDEV package.
 - Original how-to-play, hints, and walkthrough text.
 - Screenshots captured from the selected bundled playable version.
 - Original or properly licensed cover, small cover, hero art, and any feelies.
