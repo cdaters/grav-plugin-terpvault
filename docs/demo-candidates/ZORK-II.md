@@ -11,14 +11,15 @@
 - DDEV-only package updated on 2026-06-02 with package-local cover/small-cover/hero art and gameplay screenshots.
 - DDEV-only package updated on 2026-06-02 with release-specific IFID, IFDB/IFWiki catalog fields, and package-local `metadata.iFiction.xml`.
 - Admin2 Library Manager draft-preview handling was fixed on 2026-06-02 so the correct DDEV package metadata and draft package thumbnails can be displayed without publishing Zork II.
+- Walkthrough transcript verification was attempted on 2026-06-02 and is blocked by a dfrotz `Fatal error: Store out of dynamic memory` during the post-crown balloon descent.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
 - Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
 - DDEV package dfrotz smoke passed against the selected story file.
 - Not approved for bundled demo.
-- Requires walkthrough transcript verification, export/import smoke, final audit, and provenance review before any `_demo` work.
-- Next state: verify the walkthrough with dfrotz while keeping the DDEV package draft and candidate-only.
+- Requires resolution of the dfrotz walkthrough blocker, export/import smoke, final audit, and provenance review before any `_demo` work.
+- Next state: resolve or explicitly reopen the walkthrough verification basis while keeping the DDEV package draft and candidate-only.
 
 Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -347,6 +348,46 @@ Validation:
 
 The package was restored to draft and cache was cleared after the temporary route checks. Walkthrough transcript verification, export/import smoke, final audit, and `_demo` promotion remain pending.
 
+## DDEV walkthrough verification attempt - 2026-06-02
+
+This pass attempted to verify the package-local Zork II walkthrough against the exact selected DDEV story artifact. It did not copy any Zork II files into `_demo`, did not change the selected story artifact, and did not run export/import smoke.
+
+Selected story artifact:
+
+- Path: `~/Sites/grav2.0-ddev/user/data/terpvault/games/zork-ii/zork2.z3`.
+- SHA-256: `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- File identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
+- IFID: `ZCODE-63-860811`.
+
+Best selected-artifact dfrotz command:
+
+```sh
+/opt/homebrew/bin/dfrotz -p -s 41 user/data/terpvault/games/zork-ii/zork2.z3 < /private/tmp/terpvault-zork2-walkthrough-commands-v17.txt > /private/tmp/terpvault-zork2-walkthrough-transcript-v17.txt 2>&1
+```
+
+Scratch files:
+
+- Command file: `/private/tmp/terpvault-zork2-walkthrough-commands-v17.txt`.
+- Transcript: `/private/tmp/terpvault-zork2-walkthrough-transcript-v17.txt`.
+
+Result:
+
+- Verification failed / blocked.
+- The iterated route reaches the crown and `Score: 175`.
+- The route then blocks during the expected post-crown balloon descent after closing the receptacle.
+- dfrotz reports `Fatal error: Store out of dynamic memory` while entering the Volcano Core transition.
+- No final score, move count, or rank is claimed.
+
+Rejected route-level workarounds included taking the balloon label, changing close/untie ordering, dropping the crown, landing on the narrow ledge, waiting for the newspaper to burn out, and trying to extinguish the burning newspaper after opening the receptacle.
+
+A scratch control against upstream `COMPILED/zork2.z3` reproduced the same post-crown descent crash under dfrotz:
+
+- Path: `/private/tmp/terpvault-zork2-source-20260602/COMPILED/zork2.z3`.
+- SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
+- Transcript: `/private/tmp/terpvault-zork2-walkthrough-transcript-upstream-prebuilt-v8.txt`.
+
+DDEV helper docs were updated to keep the walkthrough explicitly unverified and to document the blocker in package provenance. The package remains draft. Export/import smoke, final audit, Craig approval, and `_demo` promotion remain pending.
+
 ## Admin2 draft package preview fix - 2026-06-02
 
 The active DDEV Zork II package files were already correct: `terpvault.status` was `draft`, cover/small-cover/hero/screenshot files existed, `metadata.iFiction.xml` existed, `identification.ifids` included `ZCODE-63-860811`, and `/if/_manifest` reported `has_ifiction: true`, warnings `[]`, and errors `null`.
@@ -561,7 +602,7 @@ Result:
 - Comparison with upstream `COMPILED/zork2.z3`: neither scratch-patched source-built historical-header artifact matched the upstream prebuilt checksum.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` file identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
-- TerpVault/Parchment playback testing: passed for initial DDEV route/playback smoke; full walkthrough transcript verification remains pending.
+- TerpVault/Parchment playback testing: passed for initial DDEV route/playback smoke; full walkthrough transcript verification was attempted and remains blocked at the post-crown balloon descent under dfrotz.
 
 ## Frotz smoke test
 
@@ -587,12 +628,12 @@ Result:
 - Record selected artifact filename, file identification, checksum, and redistribution basis.
 - Verify TerpVault/Parchment playback for the selected artifact.
 - Package metadata and package-local provenance notes created for the DDEV draft package; final audit remains pending.
-- Package-local art, screenshots, helper docs, and classified feelies added to the DDEV draft package; walkthrough transcript verification remains pending.
-- Run package export/import smoke tests once a package exists.
+- Package-local art, screenshots, helper docs, and classified feelies added to the DDEV draft package; walkthrough transcript verification was attempted and remains blocked at the post-crown balloon descent under dfrotz.
+- Resolve or reopen the walkthrough verification basis, then run package export/import smoke tests.
 
 ## Recommended next action
 
-Keep reviewing the scratch-only `DREARY-ROOM-FCN` bracket fix as a source compatibility patch candidate, preferably against upstream history or ZILF maintainers before treating it as final bundled-demo provenance. Keep Zork II candidate-only until final package docs, metadata, materials, export/import smoke, audit, and approval are complete.
+Keep reviewing the scratch-only `DREARY-ROOM-FCN` bracket fix as a source compatibility patch candidate, preferably against upstream history or ZILF maintainers before treating it as final bundled-demo provenance. Keep Zork II candidate-only until the dfrotz walkthrough blocker is resolved or the verification basis is explicitly reopened, and until final package docs, metadata, materials, export/import smoke, audit, and approval are complete.
 
 ## Promotion checklist against Zork I standard
 
