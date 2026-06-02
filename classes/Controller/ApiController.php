@@ -302,6 +302,33 @@ class ApiController extends AbstractApiController
         }
     }
 
+    public function previewMedia(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $slug = (string) $this->getRouteParam($request, 'slug');
+        $query = $request->getQueryParams();
+        $relativePath = (string)($query['path'] ?? '');
+
+        try {
+            $asset = $this->mediaService()->previewImage($slug, $relativePath);
+            $stream = fopen((string)$asset['path'], 'rb');
+            if ($stream === false) {
+                throw new RuntimeException('Unable to read media preview file.');
+            }
+
+            return new Response(200, [
+                'Content-Type' => (string)$asset['mime'],
+                'Content-Length' => (string)$asset['size'],
+                'Cache-Control' => 'private, max-age=0, must-revalidate',
+                'X-Content-Type-Options' => 'nosniff',
+            ], $stream);
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
     public function uploadMedia(ServerRequestInterface $request): ResponseInterface
     {
         $this->requireAdminApiSuper($request);

@@ -22,6 +22,15 @@ class PackageMediaService
         'gif' => 'image/gif',
     ];
 
+    private const PREVIEW_EXTENSIONS = [
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml',
+    ];
+
     /** @var Grav */
     private $grav;
 
@@ -57,6 +66,34 @@ class PackageMediaService
             ],
             'allowed_types' => self::TYPES,
             'allowed_extensions' => array_keys(self::EXTENSIONS),
+        ];
+    }
+
+    public function previewImage(string $slug, string $relative): array
+    {
+        $paths = $this->packagePaths($slug);
+        $relative = $this->normalizeRelativePath($relative);
+        $extension = strtolower(pathinfo($relative, PATHINFO_EXTENSION));
+
+        if (!array_key_exists($extension, self::PREVIEW_EXTENSIONS)) {
+            throw new InvalidArgumentException('Only package-local image previews are available.');
+        }
+
+        $file = $paths['package'] . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+        if (!is_file($file)) {
+            throw new InvalidArgumentException('Media preview file not found.');
+        }
+
+        $real = realpath($file);
+        if ($real === false || !$this->isPathInside($real, $paths['package'])) {
+            throw new InvalidArgumentException('Media preview path is outside the package directory.');
+        }
+
+        return [
+            'path' => $real,
+            'relative_path' => $relative,
+            'mime' => self::PREVIEW_EXTENSIONS[$extension],
+            'size' => filesize($real) ?: 0,
         ];
     }
 

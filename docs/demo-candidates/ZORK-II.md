@@ -10,6 +10,7 @@
 - DDEV-only package updated on 2026-06-02 with classified feelies and original draft helper docs.
 - DDEV-only package updated on 2026-06-02 with package-local cover/small-cover/hero art and gameplay screenshots.
 - DDEV-only package updated on 2026-06-02 with release-specific IFID, IFDB/IFWiki catalog fields, and package-local `metadata.iFiction.xml`.
+- Admin2 Library Manager draft-preview handling was fixed on 2026-06-02 so the correct DDEV package metadata and draft package thumbnails can be displayed without publishing Zork II.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
@@ -345,6 +346,29 @@ Validation:
 - `/if/_asset/zork-ii/metadata.iFiction.xml` returned HTTP `404` because XML is not a public asset extension under the current TerpVault asset-serving policy; the manifest still detects `metadata.iFiction.xml` via `has_ifiction` and `ifiction_path`.
 
 The package was restored to draft and cache was cleared after the temporary route checks. Walkthrough transcript verification, export/import smoke, final audit, and `_demo` promotion remain pending.
+
+## Admin2 draft package preview fix - 2026-06-02
+
+The active DDEV Zork II package files were already correct: `terpvault.status` was `draft`, cover/small-cover/hero/screenshot files existed, `metadata.iFiction.xml` existed, `identification.ifids` included `ZCODE-63-860811`, and `/if/_manifest` reported `has_ifiction: true`, warnings `[]`, and errors `null`.
+
+Admin2 Library Manager displayed stale-looking health and a broken thumbnail because package rows used public `/if/_asset/...` image URLs. Those URLs are intentionally blocked for draft packages, so draft package thumbnails could not render even when package-local images existed.
+
+The fix adds an authenticated Admin/API image-preview route for package-local images only:
+
+```text
+/api/v1/terpvault/packages/{slug}/media/preview?path={package-local-image}
+```
+
+Admin2 now uses that route for cover, small-cover, hero, and screenshot previews when package-local paths are known. The route does not serve story files, XML, arbitrary package files, or non-image assets. Public draft visibility is unchanged: `/if/_asset/zork-ii/cover.jpg` remains blocked while Zork II is draft.
+
+Validation after the fix:
+
+- DDEV package status remained `draft`.
+- Public manifest still reported `has_ifiction: true`, `ifiction_path: metadata.iFiction.xml`, IFID `ZCODE-63-860811`, warnings `[]`, and errors `null`.
+- Public `/if/_asset/zork-ii/cover.jpg` returned HTTP `404` while draft.
+- Unauthenticated Admin API preview request returned HTTP `401`.
+- PHP lint passed for the changed plugin PHP files in DDEV.
+- Admin2 JS syntax check passed with `node --check`.
 
 ## Upstream source verified
 

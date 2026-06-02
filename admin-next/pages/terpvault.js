@@ -964,7 +964,8 @@ class TerpVaultPage extends HTMLElement {
     const storyBadge = game.has_story_file ? '<span class="badge ok">story found</span>' : '<span class="badge error">missing story</span>';
     const warningCount = Number(game.warning_count || 0);
     const errorCount = Number(game.error_count || 0);
-    const cover = urls.small_cover || urls.thumbnail || urls.cover || '';
+    const coverPath = game.resources?.small_cover || game.small_cover || game.resources?.cover || game.cover || '';
+    const cover = this._adminMediaPreviewUrl(slug, coverPath) || urls.small_cover || urls.thumbnail || urls.cover || '';
     const ifictionBadge = game.has_ifiction
       ? '<span class="badge ok">iFiction XML present</span>'
       : '<span class="badge warn">No iFiction XML</span>';
@@ -2844,7 +2845,10 @@ class TerpVaultPage extends HTMLElement {
     const media = this.state.editor.media || this._mediaFromGame(game);
     const urls = game.urls || {};
     const cacheKey = media.cacheKey || '';
-    const screenshots = Array.isArray(urls.screenshots) ? urls.screenshots : (Array.isArray(game.screenshots) ? game.screenshots : []);
+    const screenshotPaths = Array.isArray(media.resources?.screenshots) ? media.resources.screenshots : (Array.isArray(game.resources?.screenshots) ? game.resources.screenshots : []);
+    const screenshots = screenshotPaths.length
+      ? screenshotPaths.map(path => this._adminMediaPreviewUrl(slug, path)).filter(Boolean)
+      : (Array.isArray(urls.screenshots) ? urls.screenshots : (Array.isArray(game.screenshots) ? game.screenshots : []));
     const assetTypes = this._mediaAssetTypes();
     const selectedType = assetTypes.some(item => item.type === this.state.editor.selectedMediaType) ? this.state.editor.selectedMediaType : 'cover';
     const selectedAsset = this._mediaAssetData(selectedType, urls, media.resources || {}, cacheKey);
@@ -2863,7 +2867,7 @@ class TerpVaultPage extends HTMLElement {
         <div class="screenshot-list">
           <strong>Screenshots</strong>
           <p class="meta">Screenshots show representative play moments. Remove only updates <code>resources.screenshots</code>; it does not delete the underlying image file.</p>
-          ${screenshots.length ? screenshots.map((url, index) => this._screenshotRow(slug, this._cacheBustUrl(url, cacheKey), media.resources?.screenshots?.[index] || '', index, screenshots.length, media.saving === 'screenshots' || media.saving === `screenshot-${index}`)).join('') : '<p class="meta">No screenshots recorded.</p>'}
+          ${screenshots.length ? screenshots.map((url, index) => this._screenshotRow(slug, this._cacheBustUrl(url, cacheKey), screenshotPaths[index] || media.resources?.screenshots?.[index] || '', index, screenshots.length, media.saving === 'screenshots' || media.saving === `screenshot-${index}`)).join('') : '<p class="meta">No screenshots recorded.</p>'}
         </div>
         <div class="media-uploads">
           ${this._mediaUploadForm(slug, 'screenshot', 'Add screenshot', media.saving === 'screenshot')}
@@ -2918,16 +2922,17 @@ class TerpVaultPage extends HTMLElement {
 
   _mediaAssetData(type, urls, resources, cacheKey = '') {
     const asset = this._mediaAssetTypes().find(item => item.type === type) || this._mediaAssetTypes()[0];
+    const path = resources[asset.key] || '';
     const urlMap = {
-      cover: urls.cover || '',
-      'small-cover': urls.small_cover || urls.thumbnail || '',
-      hero: urls.hero || ''
+      cover: path ? this._mediaPreviewApiUrl(this.state.editingSlug || '', path) : (urls.cover || ''),
+      'small-cover': path ? this._mediaPreviewApiUrl(this.state.editingSlug || '', path) : (urls.small_cover || urls.thumbnail || ''),
+      hero: path ? this._mediaPreviewApiUrl(this.state.editingSlug || '', path) : (urls.hero || '')
     };
 
     return {
       ...asset,
       url: this._cacheBustUrl(urlMap[asset.type] || '', cacheKey),
-      path: resources[asset.key] || ''
+      path
     };
   }
 
@@ -3366,6 +3371,20 @@ class TerpVaultPage extends HTMLElement {
 
   _mediaApiUrl(slug) {
     return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(slug)}/media`;
+  }
+
+  _mediaPreviewApiUrl(slug, path) {
+    const safeSlug = String(slug || '').trim();
+    const safePath = String(path || '').trim();
+    if (!safeSlug || !safePath) {
+      return '';
+    }
+
+    return `${this._apiBase()}/terpvault/packages/${encodeURIComponent(safeSlug)}/media/preview?path=${encodeURIComponent(safePath)}`;
+  }
+
+  _adminMediaPreviewUrl(slug, path) {
+    return this._mediaPreviewApiUrl(slug, path);
   }
 
   _storyApiUrl(slug) {

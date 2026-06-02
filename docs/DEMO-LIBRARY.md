@@ -81,6 +81,8 @@ Not every work needs every optional resource, but omissions should be intentiona
 
 Zork I and Zork III are now bundled as reviewed starter/demo packages in `_demo`. Zork II, Mainframe Zork / Dungeon, and Open Adventure / Colossal Cave remain candidates only; they require local build/package verification and final license/provenance review before bundling. Zork II now has a DDEV-only draft package, classified feelies, draft helper docs, package-local art, gameplay screenshots, release-specific IFID/catalog/iFiction metadata, and initial playback/route verification, but it still needs walkthrough transcript verification, export/import, audit, and approval before `_demo` promotion. Mainframe Zork / Dungeon is research-only and should not get `_demo` package contents until it is explicitly reviewed beyond that status.
 
+Admin2 Library Manager can preview draft package cover, small-cover, hero, and screenshot images through authenticated Admin/API media-preview routes. This keeps candidate packages such as DDEV-only Zork II visible in Admin2 without changing public draft visibility; public `/if/_asset/...` routes for draft packages remain blocked.
+
 ## Legal/provenance rules
 
 - Follow the shared policy in `docs/DEMO-CONTENT-RIGHTS.md`.
