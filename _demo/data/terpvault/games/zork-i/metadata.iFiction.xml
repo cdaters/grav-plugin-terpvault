@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ifindex version="1.0" xmlns="http://babel.ifarchive.org/protocol/iFiction/">
+  <story>
+    <identification>
+      <ifid>ZCODE-119-880429</ifid>
+      <format>zcode</format>
+    </identification>
+    <bibliographic>
+      <title>Zork I</title>
+      <author>Marc Blank and Dave Lebling</author>
+      <headline>The Great Underground Empire</headline>
+      <firstpublished>1980</firstpublished>
+      <genre>Adventure</genre>
+      <language>en</language>
+      <description>A source-built TerpVault demo package for Zork I, using the verified Release 119 / Serial 880429 Z-code artifact.</description>
+    </bibliographic>
+  </story>
+</ifindex>

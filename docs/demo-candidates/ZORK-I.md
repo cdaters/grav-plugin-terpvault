@@ -14,8 +14,9 @@
 - Full `dfrotz` walkthrough transcript verification against the bundled `_demo` story file completed on 2026-05-26.
 - Copied into `_demo/data/terpvault/games/zork-i` on 2026-05-25.
 - Additional Zork I feelies added to `_demo` on 2026-06-02 under `docs/DEMO-CONTENT-RIGHTS.md`, with historical reference/preservation material and likely commercial material requiring caution classified in package provenance.
+- Release-specific IFID/catalog/iFiction metadata added on 2026-06-02: `ZCODE-119-880429`, IFDB TUID/URL, IFWiki URL, and package-local `metadata.iFiction.xml`.
 - Full walkthrough coverage is verified against the exact bundled story file.
-- Next state: review release metadata and, after Craig approval, commit/tag/release v0.4.6.
+- Next state: keep package metadata/provenance audited and re-check route/checksum behavior if package files change.
 
 Zork I is ready for this bundled development demo tree with source, license, build output, TerpVault package contents, assets, helper docs, provenance notes, and a full verified walkthrough route present. The verified `dfrotz` transcript reached the Stone Barrow and scored 350/350 in 348 moves against the exact bundled `_demo` story file.
 
@@ -47,6 +48,47 @@ Validation results:
 - DDEV seed check moved the prior DDEV package to `/private/tmp/terpvault-ddev-zork-i-backup-20260602`, copied the updated `_demo` package into `user/data/terpvault/games/zork-i`, and cleared cache.
 - DDEV detail and play routes returned `200`; story route returned `200 application/octet-stream`, 86928 bytes, SHA-256 `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
 - New DDEV feelie routes checked: `zork-i-invisiclues-map.pdf` returned `200 application/pdf`, `zug-map-inside.jpg` returned `200 image/jpeg` after a second cache clear, `zork-i-poster.jpg` returned `200 image/jpeg`, and `great-underground-empire.pdf` returned `200 application/pdf`.
+
+## `_demo` Zork I Metadata / iFiction Update
+
+Update date: 2026-06-02.
+
+Story artifact:
+
+- Path: `_demo/data/terpvault/games/zork-i/zork1.z3`.
+- SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- File identification: `Infocom (Z-machine 3, Release 119, Serial 880429)`.
+- Release/serial basis: Release 119 / Serial 880429 from the actual bundled story file.
+
+Local IFID tooling:
+
+- No local `babel`, `treaty`, `rezrov`, `txd`, `ztools`, or matching Homebrew utility was available, so no local extractor command was run.
+
+Sources checked:
+
+- Local story file.
+- IFDB: `https://ifdb.org/viewgame?id=0dbnusxunq7fw5ro`.
+- IFWiki: `https://www.ifwiki.org/Zork_I`.
+- IF Archive shipped-documentation index: `https://www.ifarchive.org/if-archive/infocom/shipped-documentation/`.
+- Treaty of Babel revision 10: `https://babel.ifarchive.org/babel_rev10.html`.
+- Upstream source repository already documented for this package: `https://github.com/historicalsource/zork1.git`.
+
+Accepted metadata:
+
+- IFID: `ZCODE-119-880429`.
+- Basis: IFDB lists `ZCODE-119-880429`; the local artifact is Release 119 / Serial 880429; the Treaty legacy Z-code rule maps pre-1990 story files as `ZCODE-{release}-{serial}`.
+- IFDB TUID/URL: `0dbnusxunq7fw5ro`, `https://ifdb.org/viewgame?id=0dbnusxunq7fw5ro`.
+- IFWiki URL: `https://www.ifwiki.org/Zork_I`.
+- IF Archive path/URL: left blank because the checked IF Archive result points to shipped documentation/transcripts, not this package's selected source-built story artifact.
+- `metadata.iFiction.xml`: created with verified fields only and validated with `xmllint --noout`.
+
+DDEV check:
+
+- The updated `_demo` package was seeded into DDEV after moving the previous DDEV package aside.
+- Manifest returned `200`; `zork-i` was present with `status: published`, `has_story_file: true`, IFID `ZCODE-119-880429`, `metadata.iFiction.xml` detected, warning count `0`, and error count `0`.
+- Detail and play routes returned `200`.
+- Story route returned `200 application/octet-stream`, 86928 bytes, with SHA-256 `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- Feelie route checks passed after clearing a transient compiled-YAML cache error.
 
 ## Upstream source to verify
 
@@ -546,6 +588,13 @@ Bundled files:
 - `screenshots/01.png`.
 - `screenshots/02.png`.
 - `feelies/feelie-01-poster.png`.
+- `feelies/great-underground-empire.pdf`.
+- `feelies/zork-i-invisiclues-map.pdf`.
+- `feelies/zork-i-map.jpg`.
+- `feelies/zork-i-poster.jpg`.
+- `feelies/zug-map-inside.jpg`.
+- `feelies/zug-map-outside.jpg`.
+- `metadata.iFiction.xml`.
 
 No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, `desktop.ini`, hidden/system-looking paths, or other cruft files were observed in the `_demo` copy.
 
@@ -555,11 +604,10 @@ No `.DS_Store`, `__MACOSX`, AppleDouble, `Thumbs.db`, `desktop.ini`, hidden/syst
 - The reported `ParsedownExtra::blockSetextHeader()` deprecation warning was not reproduced in this pass; keep it as a follow-up only if it becomes reproducible.
 - A transient compiled-language cache parse error appeared immediately after cache clear and disappeared on refresh; record as a DDEV/Grav cache follow-up if it becomes consistently reproducible.
 - Decide later whether public game tags should render on detail/card views.
-- Consider adding verified IFID/iFiction metadata in a later package polish pass.
 
 ## Recommended next action
 
-Review the prepared v0.4.6 changes, then commit, tag, and release only after Craig approval. Zork I is now present in `_demo`; future work should focus on optional metadata polish.
+Keep Zork I bundled in `_demo` and re-run package metadata, route, checksum, and walkthrough checks if package files change.
 
 Packaging recommendation:
 
@@ -567,12 +615,11 @@ Packaging recommendation:
 - Selected story artifact is the source-built `zork1-release119-serial880429.z3`, copied into the package as `zork1.z3`.
 - Do not bundle `zork1.zip` or `COMPILED/zork1.z3` unless an explicit later packaging decision selects the upstream prebuilt artifact and documents the basis.
 - Keep upstream MIT license text and package-local provenance notes in the package.
-- Use only Craig-created art/helper docs unless other assets have separately verified redistribution rights.
+- Keep package-local original materials and historical reference/preservation materials classified separately under `docs/DEMO-CONTENT-RIGHTS.md`.
 - Keep the walkthrough verification note tied to the exact bundled story file and transcript result.
 
 Remaining follow-ups:
 
-- Verify IFID/iFiction metadata if desired.
 - Re-run the full clean walkthrough transcript if the story file changes.
 - Re-test public tag rendering decisions in a later frontend polish pass.
 
@@ -651,7 +698,7 @@ Notes:
 
 - Should the source-built `zork1-release119-serial880429.z3` artifact be selected for eventual packaging?
 - Is the generated artifact clearly redistributable under the same license path?
-- What IFID should be recorded?
+- IFID recorded for the selected package artifact: `ZCODE-119-880429`.
 - Should Zork I install as draft or published in the future demo installer?
 - Should the package include upstream source license text in feelies, root package, or provenance metadata?
 - Should source provenance be represented only in `game.yaml`/`provenance.md`, or should source snapshots/build logs be kept outside bundled package contents?

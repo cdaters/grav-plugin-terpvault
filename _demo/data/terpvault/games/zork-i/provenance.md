@@ -34,6 +34,87 @@ Selected package artifact:
 
 The selected source-built artifact does not match the upstream prebuilt `COMPILED/zork1.z3` / `zork1.zip` checksum.
 
+## Metadata / IFID Review
+
+Metadata review date: 2026-06-02.
+
+Local story artifact:
+
+- Package story path: `_demo/data/terpvault/games/zork-i/zork1.z3`
+- SHA-256: `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`
+- File identification: `Infocom (Z-machine 3, Release 119, Serial 880429)`
+- Release: 119
+- Serial: 880429
+
+Local Treaty/Babel tooling check:
+
+```sh
+which babel || true
+which treaty || true
+which rezrov || true
+which txd || true
+which ztools || true
+ls /opt/homebrew/bin | grep -Ei 'babel|ifid|treaty|ztools|txd|infodump|zcode|zork' || true
+```
+
+Observed result: no local `babel`, `treaty`, `rezrov`, `txd`, `ztools`, or matching Homebrew utility was available, so no local extractor command was run.
+
+Sources checked:
+
+- Local story file listed above.
+- IFDB: `https://ifdb.org/viewgame?id=0dbnusxunq7fw5ro`
+- IFWiki: `https://www.ifwiki.org/Zork_I`
+- IF Archive shipped-documentation index: `https://www.ifarchive.org/if-archive/infocom/shipped-documentation/`
+- Treaty of Babel revision 10: `https://babel.ifarchive.org/babel_rev10.html`
+- Upstream source repository already documented for this package: `https://github.com/historicalsource/zork1.git`
+
+Accepted metadata:
+
+- IFID: `ZCODE-119-880429`
+  - IFDB lists `ZCODE-119-880429` among Zork I IFIDs.
+  - The local package artifact is Release 119 / Serial 880429.
+  - The Treaty of Babel legacy Z-code rule describes pre-1990 story-file IFIDs as `ZCODE-{release}-{serial}`.
+  - IFWiki's main technical box and final-release section emphasize Release 88 / Serial 840726 and IFID `ZCODE-88-840726`; that metadata applies to a different Zork I release than this source-built package artifact and was not written into `game.yaml`.
+- IFDB TUID: `0dbnusxunq7fw5ro`
+- IFDB URL: `https://ifdb.org/viewgame?id=0dbnusxunq7fw5ro`
+- IFWiki URL: `https://www.ifwiki.org/Zork_I`
+- Authors: Marc Blank and Dave Lebling
+- First publication year: 1980
+- Language: English
+- Format: Z-code / Z-machine, preserved in `game.yaml` as `zcode`
+
+Deferred metadata:
+
+- IF Archive package path/URL remains blank. The checked IF Archive result for Zork I points to shipped documentation and transcripts, not to this package's selected source-built story artifact.
+- Publisher/catalog wording beyond the existing package notes remains conservative because public sources describe the historical commercial game, while this package uses a 2025 MIT source release and separately classifies supplemental materials.
+
+Package updates from this metadata pass:
+
+- `game.yaml` now records `identification.ifids: [ZCODE-119-880429]`.
+- `game.yaml` now records IFDB TUID/URL and IFWiki URL.
+- `game.yaml` author field now records the verified original authors and keeps the source-release note.
+- Package-local `metadata.iFiction.xml` was created with the verified IFID, format, title, author, headline, first publication year, genre, language, and a short original TerpVault description.
+- No copied external prose, commercial marketing copy, manual text, InvisiClues text, packaging copy, catalog prose, or long external descriptions were used.
+- The shared demo-content rights policy remains applicable to supplemental materials and package provenance.
+
+Validation:
+
+- `game.yaml` parsed successfully with Ruby YAML.
+- `metadata.iFiction.xml` passed `xmllint --noout`.
+- Package cruft scan found no `.DS_Store`, `__MACOSX`, AppleDouble, backup, temp, swap, or lock files.
+
+DDEV seed and route check:
+
+- Existing DDEV package was moved to `/private/tmp/terpvault-ddev-zork-i-backup-metadata-20260602`.
+- Updated `_demo` package was copied to `/Users/cdaters/Sites/grav2.0-ddev/user/data/terpvault/games/zork-i`.
+- `bin/grav clearcache` was run through DDEV.
+- Manifest route `https://grav20.ddev.site/if/_manifest` returned `200`; the `zork-i` entry was present with `status: published`, `has_story_file: true`, IFID `ZCODE-119-880429`, `metadata.iFiction.xml` detected, warning count `0`, and error count `0`.
+- Detail route `https://grav20.ddev.site/if/zork-i` returned `200 text/html`.
+- Play route `https://grav20.ddev.site/if/zork-i/play` returned `200 text/html`.
+- Story route `https://grav20.ddev.site/if/_story/zork-i/zork1.z3` returned `200 application/octet-stream`, 86928 bytes, SHA-256 `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- Feelie route `https://grav20.ddev.site/if/_asset/zork-i/feelies/zork-i-invisiclues-map.pdf` returned `200 application/pdf`, 2924735 bytes after a cache clear resolved a transient compiled-YAML cache parse error.
+- Feelie route `https://grav20.ddev.site/if/_asset/zork-i/feelies/zug-map-inside.jpg` returned `200 image/jpeg`, 7553801 bytes.
+
 ## Exclusions
 
 Historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, and marketing art are excluded from this demo package unless item-level review later supports inclusion.

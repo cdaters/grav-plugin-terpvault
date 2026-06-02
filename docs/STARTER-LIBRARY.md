@@ -72,7 +72,7 @@ Microsoft/Open Source Programs Office announced Zork I, II, and III source code 
 
 Current candidate notes:
 
-- Zork I is the verified bundled anchor demo, with story/source provenance recorded separately from package-local original materials and selected historical reference/preservation feelies.
+- Zork I is the verified bundled anchor demo, with story/source provenance recorded separately from package-local original materials and selected historical reference/preservation feelies. It records release-specific IFID `ZCODE-119-880429`, IFDB/IFWiki catalog links, and package-local `metadata.iFiction.xml`.
 - Zork II remains candidate-only because the unmodified ZILF build failed and the scratch-only compatibility patch or prebuilt artifact basis has not been selected for packaging.
 - Zork III is bundled in `_demo` after source build verification, DDEV playback checks, export/import smoke, verified walkthrough, metadata/iFiction review, final audit, Craig approval, and clean DDEV demo-seed route/checksum verification.
 - Do not add Zork II to `_demo` until the selected artifact basis, license/provenance, playback behavior, helper docs, screenshots, package-local original materials, any historical reference/preservation materials, and export/import audit are complete.

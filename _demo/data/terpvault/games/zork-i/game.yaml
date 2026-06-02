@@ -2,10 +2,11 @@ id: zork-i
 slug: zork-i
 identification:
   format: zcode
-  ifids: []
+  ifids:
+    - ZCODE-119-880429
 bibliographic:
   title: Zork I
-  author: 'Infocom; source release by Microsoft/Open Source Programs Office/Xbox/Activision'
+  author: 'Marc Blank and Dave Lebling; source release by Microsoft/Open Source Programs Office/Xbox/Activision'
   headline: 'The Great Underground Empire'
   first_published: '1980'
   genre: 'Interactive Fiction'
@@ -54,10 +55,10 @@ resources:
       description: Historical reference map artwork included for preservation and play context.
 catalog:
   ifdb:
-    tuid: ''
-    url: ''
+    tuid: 0dbnusxunq7fw5ro
+    url: 'https://ifdb.org/viewgame?id=0dbnusxunq7fw5ro'
   ifwiki:
-    url: ''
+    url: 'https://www.ifwiki.org/Zork_I'
   ifarchive:
     path: ''
     url: ''
