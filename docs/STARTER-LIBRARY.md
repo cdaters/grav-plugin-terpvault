@@ -73,9 +73,9 @@ Microsoft/Open Source Programs Office announced Zork I, II, and III source code 
 Current candidate notes:
 
 - Zork I is the verified bundled anchor demo, with story/source provenance recorded separately from package-local original materials and selected historical reference/preservation feelies. It records release-specific IFID `ZCODE-119-880429`, IFDB/IFWiki catalog links, and package-local `metadata.iFiction.xml`.
-- Zork II remains candidate-only. A DDEV-only draft package now uses the documented patched source-built historical-header artifact `zork2-release63-serial860811.z3`; the DDEV story file has SHA-256 `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`, Release 63 / Serial 860811, and route/story/helper/selected-feelie/dfrotz smoke checks passed. Classified feelies and original draft helper docs are present, but the walkthrough still needs dfrotz transcript verification.
+- Zork II remains candidate-only. A DDEV-only draft package now uses the documented patched source-built historical-header artifact `zork2-release63-serial860811.z3`; the DDEV story file has SHA-256 `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`, Release 63 / Serial 860811, and route/story/helper/selected-feelie/art/screenshot/dfrotz smoke checks passed. Classified feelies, package-local art, gameplay screenshots, and original draft helper docs are present, but the walkthrough still needs dfrotz transcript verification.
 - Zork III is bundled in `_demo` after source build verification, DDEV playback checks, export/import smoke, verified walkthrough, metadata/iFiction review, final audit, Craig approval, and clean DDEV demo-seed route/checksum verification.
-- Do not add Zork II to `_demo` until license/provenance, playback behavior, walkthrough verification, IFID/catalog/iFiction metadata, screenshots/art, package-local original materials, historical reference/preservation material review, and export/import audit are complete.
+- Do not add Zork II to `_demo` until license/provenance, playback behavior, walkthrough verification, IFID/catalog/iFiction metadata, package-local original material review, historical reference/preservation material review, export/import audit, and final approval are complete.
 
 ### Mainframe Zork / Dungeon
 

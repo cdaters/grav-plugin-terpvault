@@ -8,13 +8,14 @@
 - Artifact basis rechecked on 2026-06-02 in scratch at `/private/tmp/terpvault-zork2-source-20260602`.
 - DDEV-only draft package assembled and route-checked on 2026-06-02 at `~/Sites/grav2.0-ddev/user/data/terpvault/games/zork-ii`.
 - DDEV-only package updated on 2026-06-02 with classified feelies and original draft helper docs.
+- DDEV-only package updated on 2026-06-02 with package-local cover/small-cover/hero art and gameplay screenshots.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
 - Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
 - DDEV package dfrotz smoke passed against the selected story file.
 - Not approved for bundled demo.
-- Requires cover/small-cover/hero assets, screenshots, IFID/catalog/iFiction metadata, walkthrough transcript verification, export/import smoke, final audit, and provenance review before any `_demo` work.
+- Requires IFID/catalog/iFiction metadata, walkthrough transcript verification, export/import smoke, final audit, and provenance review before any `_demo` work.
 - Next state: verify the walkthrough with dfrotz or complete metadata/iFiction enrichment while keeping the DDEV package draft and candidate-only.
 
 Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
@@ -261,6 +262,43 @@ Validation:
 - `feelies/zork-ii-invisiclues-map.pdf` initially hit a Grav compiled-cache parse error; after one `ddev exec bin/grav clearcache`, retry passed with HTTP `200`, `application/pdf`, size 1745245, and matching SHA-256.
 
 The package was restored to draft and cache was cleared after the temporary route checks. IFID/catalog/iFiction metadata remains pending.
+
+## DDEV art and screenshots update - 2026-06-02
+
+This pass added package-local visual art and gameplay screenshots to the DDEV-only Zork II draft package. It did not copy any Zork II files into `_demo`, did not copy source working files, and did not change the story artifact, feelies, or helper docs.
+
+Source folder:
+
+```text
+~/Downloads/for-Zork2
+```
+
+Copied assets:
+
+| Target path | SHA-256 | Dimensions | Classification |
+| --- | --- | --- | --- |
+| `cover.jpg` | `b757c982f0bfd1a35f21f7740b1c912b2cdccff94e00775cbe88d7b8de3590a0` | 920 x 920 | Craig-created/original package-local material |
+| `small-cover.jpg` | `b757c982f0bfd1a35f21f7740b1c912b2cdccff94e00775cbe88d7b8de3590a0` | 920 x 920 | Craig-created/original package-local material |
+| `hero.jpg` | `2e92ba19674705958c53ed8d980e7b36e1d3944a828985f8b8b5615fb93626ce` | 1920 x 1080 | Craig-created/original package-local material |
+| `screenshots/01.png` | `35e812de3f7e8d59f3bc6ebae7871c159887419533054e859971cbf58592d69f` | 1814 x 1072 | Gameplay screenshot from selected packaged artifact |
+| `screenshots/02.png` | `7504bd8daec8b1d5ba6c6f9f7fc28d3640008b4476edccad5fcd5cbeeb8a864f` | 1814 x 1218 | Gameplay screenshot from selected packaged artifact |
+
+The cover, small cover, and hero image are treated as package-local visual materials for this DDEV candidate package. They are not presented as official, endorsed, newly licensed, or historical commercial packaging. The screenshots are treated as gameplay screenshots from the selected packaged Zork II artifact.
+
+Skipped files included `hero-zork2.psd`, loose generated-image working files, existing feelies, solution/reference text files, `.DS_Store`, and source/cruft files.
+
+Validation:
+
+- YAML parse: passed.
+- Story checksum remained `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- Image `file`, SHA-256, and `sips` dimension checks passed.
+- Helper docs, provenance, and upstream license were non-empty.
+- Cruft check was clean after removing old DDEV `game.yaml.bak-*` files.
+- Draft manifest route returned HTTP `200`; `zork-ii` status `draft`, `has_story_file` true, cover/small-cover/hero/screenshots visible, warnings only `missing-ifid`, errors none.
+- Temporary published route checks passed for `/if/zork-ii`, `/if/zork-ii/play`, `/if/_story/zork-ii/zork2.z3`, `/if/_asset/zork-ii/cover.jpg`, `/if/_asset/zork-ii/small-cover.jpg`, `/if/_asset/zork-ii/hero.jpg`, `/if/_asset/zork-ii/screenshots/01.png`, and `/if/_asset/zork-ii/screenshots/02.png`.
+- Route-served story and visual assets matched expected SHA-256 checksums.
+
+The package was restored to draft and cache was cleared after the temporary route checks. Walkthrough transcript verification and IFID/catalog/iFiction metadata remain pending.
 
 ## Upstream source verified
 
