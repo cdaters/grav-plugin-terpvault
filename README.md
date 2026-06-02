@@ -403,7 +403,7 @@ user/plugins/terpvault/_demo/data/terpvault/games/
   grue/
 ```
 
-`zork-i` and `zork-iii` are bundled starter packages reviewed for this development demo tree. They use source-built Z-machine story files from verified MIT-licensed historical source releases and include package-local provenance and upstream license text. Their package materials are documented at package level and may include original TerpVault/Craig-created assets plus selected historical reference/preservation materials only when separately reviewed. Their walkthrough routes have been verified with `dfrotz` against the bundled story files. The committed `_demo` Zork III package was seeded into DDEV and route/checksum verified on 2026-05-31.
+`zork-i` and `zork-iii` are bundled starter packages reviewed for this development demo tree. They use source-built Z-machine story files from verified MIT-licensed historical source releases and include package-local provenance and upstream license text. Their package materials are documented at package level and may include original TerpVault/Craig-created assets plus selected historical reference/preservation materials only when separately reviewed. Zork I includes additional maps/documents/poster material classified in package provenance under the shared policy. Their walkthrough routes have been verified with `dfrotz` against the bundled story files. The committed `_demo` Zork III package was seeded into DDEV and route/checksum verified on 2026-05-31.
 
 Demo content rights/provenance policy: [docs/DEMO-CONTENT-RIGHTS.md](docs/DEMO-CONTENT-RIGHTS.md). Inclusion in a demo package is not a claim that supplemental material is newly licensed, public domain, official, endorsed, or copyright-free unless that status is separately documented.
 

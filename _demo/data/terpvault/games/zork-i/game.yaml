@@ -28,6 +28,30 @@ resources:
       path: feelies/feelie-01-poster.png
       type: poster
       description: Original Craig Daters 2026 poster art inspired by the retail-era tradition of adventure-game feelies; not a scan or reproduction of historical Infocom packaging.
+    - title: InvisiClues Map
+      path: feelies/zork-i-invisiclues-map.pdf
+      type: map
+      description: Historical reference map included for preservation and play context.
+    - title: Zork I Map
+      path: feelies/zork-i-map.jpg
+      type: map
+      description: Historical reference map included for preservation and play context.
+    - title: Zork I Poster
+      path: feelies/zork-i-poster.jpg
+      type: poster
+      description: Historical poster image included for preservation and visual context.
+    - title: The Great Underground Empire
+      path: feelies/great-underground-empire.pdf
+      type: document
+      description: Historical supplemental document included for preservation and research context.
+    - title: ZUG Map, Inside
+      path: feelies/zug-map-inside.jpg
+      type: map
+      description: Historical reference map artwork included for preservation and play context.
+    - title: ZUG Map, Outside
+      path: feelies/zug-map-outside.jpg
+      type: map
+      description: Historical reference map artwork included for preservation and play context.
 catalog:
   ifdb:
     tuid: ''
@@ -41,7 +65,7 @@ release:
   license:
     name: 'MIT License'
     url: 'https://github.com/historicalsource/zork1/blob/master/LICENSE'
-    notes: 'Observed upstream source license is MIT. Historical commercial packaging, manuals, maps, ads, logos, trade dress, and scans are excluded from this draft.'
+    notes: 'Observed upstream source license is MIT. Supplemental materials are classified separately in provenance and are not treated as covered by the story/source license unless documented item by item.'
   source:
     url: 'https://github.com/historicalsource/zork1.git'
     retrieved: '2026-05-24'

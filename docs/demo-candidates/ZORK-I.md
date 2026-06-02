@@ -2,7 +2,7 @@
 
 ## Status
 
-- Approved for bundled demo in `_demo`.
+- Reviewed for bundled demo in `_demo`.
 - Upstream repo verified on 2026-05-24.
 - License/provenance reviewed from observed repository files only.
 - Source build verified on 2026-05-25.
@@ -13,10 +13,40 @@
 - DDEV-only walkthrough expansion and partial Frotz route verification completed on 2026-05-25.
 - Full `dfrotz` walkthrough transcript verification against the bundled `_demo` story file completed on 2026-05-26.
 - Copied into `_demo/data/terpvault/games/zork-i` on 2026-05-25.
+- Additional Zork I feelies added to `_demo` on 2026-06-02 under `docs/DEMO-CONTENT-RIGHTS.md`, with historical reference/preservation material and likely commercial material requiring caution classified in package provenance.
 - Full walkthrough coverage is verified against the exact bundled story file.
 - Next state: review release metadata and, after Craig approval, commit/tag/release v0.4.6.
 
 Zork I is ready for this bundled development demo tree with source, license, build output, TerpVault package contents, assets, helper docs, provenance notes, and a full verified walkthrough route present. The verified `dfrotz` transcript reached the Stone Barrow and scored 350/350 in 348 moves against the exact bundled `_demo` story file.
+
+## `_demo` Zork I Feelies Update
+
+Update date: 2026-06-02.
+
+Source folder: `/Users/cdaters/Downloads/for-Zork1`.
+
+The bundled `_demo` Zork I package now includes these additional feelies:
+
+| Target path | Source filename | SHA-256 | Classification |
+| --- | --- | --- | --- |
+| `feelies/zork-i-invisiclues-map.pdf` | `Zork 1 - InvisiClues Map.pdf` | `f379b1c08788beba7933a38e0a0efe01ee170eb40979903fa927fb491057b2f4` | Historically circulating reference/preservation material requiring caution |
+| `feelies/zork-i-map.jpg` | `Zork 1 - Map.jpg` | `aeef787f5add2d14671e0cd22276e9fe54a9e6aeee6f18bed8eab1cf5eb55ed9` | Historically circulating reference/preservation material |
+| `feelies/zork-i-poster.jpg` | `Zork 1 - Poster.jpg` | `8c833877753b9a3de1441338cac9f0b35591ce6ffa97797a8ed3d80e2aedf459` | Likely commercial material requiring caution |
+| `feelies/great-underground-empire.pdf` | `Zork 1 - The Great Underground Empire.pdf` | `1094ffd0f09f65923f5ca5051bd2d7e985ba1b689e58c0434247b619ddc33a5b` | Historically circulating reference/preservation material |
+| `feelies/zug-map-inside.jpg` | `Zork 1 - ZUG Map Inside.jpg` | `65e454f4166aa3094a3e1885e452d6ee84c204bde6a1d6dae60970114eafa5ea` | Historically circulating reference/preservation material |
+| `feelies/zug-map-outside.jpg` | `Zork 1 - ZUG Map Outside.jpg` | `08637e1370e626b9299d12afc11d55252acad667cce2c6f8d56f02fb1b639df6` | Historically circulating reference/preservation material |
+
+No expected Zork I feelies were skipped. Non-target source-folder files and source-folder cruft were not copied. Package provenance references the shared policy and the Rights-Holder Removal Requests / DMCA contact at [dmca@retrorealm.org](mailto:dmca@retrorealm.org). These materials are not presented as official, endorsed, newly licensed, copyright-free, or commercial replacement content.
+
+Validation results:
+
+- `_demo/data/terpvault/games/zork-i/game.yaml` parsed successfully with Ruby YAML.
+- Copied feelies were recognized as PDF or JPEG files.
+- Copied feelie SHA-256 checksums matched the source files listed above.
+- Zork I package cruft scan found no `.DS_Store`, `__MACOSX`, AppleDouble, backup, temp, swap, or lock files after removing the existing package `.DS_Store`.
+- DDEV seed check moved the prior DDEV package to `/private/tmp/terpvault-ddev-zork-i-backup-20260602`, copied the updated `_demo` package into `user/data/terpvault/games/zork-i`, and cleared cache.
+- DDEV detail and play routes returned `200`; story route returned `200 application/octet-stream`, 86928 bytes, SHA-256 `973d3e5a21fba45077e01b1342e17d75db405f45948bca38ccfa9001b7d54917`.
+- New DDEV feelie routes checked: `zork-i-invisiclues-map.pdf` returned `200 application/pdf`, `zug-map-inside.jpg` returned `200 image/jpeg` after a second cache clear, `zork-i-poster.jpg` returned `200 image/jpeg`, and `great-underground-empire.pdf` returned `200 application/pdf`.
 
 ## Upstream source to verify
 
