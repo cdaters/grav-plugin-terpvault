@@ -13,15 +13,15 @@
 - Admin2 Library Manager draft-preview handling was fixed on 2026-06-02 so the correct DDEV package metadata and draft package thumbnails can be displayed without publishing Zork II.
 - Walkthrough transcript verification was attempted on 2026-06-02 and the selected DDEV artifact still fails under normal dfrotz output during the post-crown balloon descent.
 - A scratch source/playback repair pass on 2026-06-02 traced that crash to the Fantasize spell's `FANTASIES` `LTABLE` shape and built a scratch-only repair candidate that gets past the normal-output balloon descent without `SUPERBRIEF`; the selected DDEV story artifact was not replaced.
-- A repaired-artifact route verification pass later on 2026-06-02 reached `Score: 348` and the Cerberus Room under normal dfrotz output without `SUPERBRIEF`, but it did not complete. The remaining blocker is late-game route/payment ordering around the Bank of Zork, the Zurich gnome, and the demon's ten-treasure fee, not the repaired balloon descent.
+- A repaired-artifact route verification pass later on 2026-06-02 reached `Score: 348` and the Cerberus Room under normal dfrotz output without `SUPERBRIEF`, then a follow-up cleanup pass corrected the Bank of Zork treasure route and completed the repaired scratch artifact to `400/400` in `372` moves, rank `Master Adventurer`.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
 - Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
 - DDEV package dfrotz smoke passed against the selected story file.
 - Not approved for bundled demo.
-- Requires a decision on whether to reopen the selected source-built artifact basis for the `FANTASIES` repair, then complete walkthrough verification, export/import smoke, final audit, and provenance review before any `_demo` work.
-- Next state: continue route cleanup from the repaired-artifact `Score: 348` / Cerberus evidence while keeping the DDEV package draft and candidate-only.
+- Requires a decision on whether to reopen the selected source-built artifact basis for the `FANTASIES` repair, then package-level provenance updates, export/import smoke, final audit, and approval before any `_demo` work.
+- Next state: decide whether to reopen/adopt the repaired artifact basis while keeping the DDEV package draft and candidate-only.
 
 Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -442,7 +442,7 @@ diff --git a/2actions.zil b/2actions.zil
 - Scratch artifact SHA-256: `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`.
 - File identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
 
-The repaired-source normal-output route reaches `Volcano Bottom` after the post-crown descent, remains at `Score: 175`, and later reaches `Score: 215`. It then fails from downstream route/object-staging/navigation problems in the Oddly-angled Room area and eventually dies after the lamp goes out. No completed walkthrough is claimed.
+At this source-repair pass stage, the repaired-source normal-output route reached `Volcano Bottom` after the post-crown descent, remained at `Score: 175`, and later reached `Score: 215`. It then failed from downstream route/object-staging/navigation problems in the Oddly-angled Room area and eventually died after the lamp went out. The later repaired-artifact route pass below supersedes this route blocker with a complete transcript.
 
 `DREARY-ROOM-FCN` assessment:
 
@@ -469,17 +469,17 @@ Scratch repaired artifact:
 | SHA-256 | `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef` |
 | File identification | `Infocom (Z-machine 3, Release 63, Serial 860811)` |
 
-Best command and transcript paths from this pass:
+Best completed command and transcript paths from this pass:
 
 ```text
-/private/tmp/terpvault-zork2-repair-commands-fantasies-counter-v14.txt
-/private/tmp/terpvault-zork2-repair-transcript-fantasies-counter-v14.txt
+/private/tmp/terpvault-zork2-repair-commands-fantasies-counter-v17.txt
+/private/tmp/terpvault-zork2-repair-transcript-fantasies-counter-v17-nomore.txt
 ```
 
 Command used:
 
 ```sh
-/opt/homebrew/bin/dfrotz -p -s 41 /private/tmp/terpvault-zork2-source-repair-fantasies-counter/zork2-release63-serial860811-fantasies-counter.z3 < /private/tmp/terpvault-zork2-repair-commands-fantasies-counter-v14.txt > /private/tmp/terpvault-zork2-repair-transcript-fantasies-counter-v14.txt 2>&1
+/opt/homebrew/bin/dfrotz -p -m -s 41 /private/tmp/terpvault-zork2-source-repair-fantasies-counter/zork2-release63-serial860811-fantasies-counter.z3 < /private/tmp/terpvault-zork2-repair-commands-fantasies-counter-v17.txt > /private/tmp/terpvault-zork2-repair-transcript-fantasies-counter-v17-nomore.txt 2>&1
 ```
 
 Confirmed evidence:
@@ -487,24 +487,27 @@ Confirmed evidence:
 - Normal output works through the original post-crown balloon descent blocker with the repaired scratch artifact.
 - `SUPERBRIEF` was not used.
 - The repaired route reaches `Score: 215` after opening the Oddly-angled Room passage, exits the diamond maze with `west`, then `up`, and proceeds into the Wizard's Workshop route.
-- Later route cleanup reaches the Bank of Zork, collects Bank treasure, and reaches `Score: 348` in the Cerberus Room.
-- The route still does not complete. The current blocker is late-game treasure/payment ordering: the demon remains one counted treasure short unless both Bank treasures can be preserved for payment while still escaping the Zurich gnome sequence. Attempts that give either Bank treasure to the gnome preserve the route but leave the demon one treasure short; attempting to use the sword as the gnome handoff fails because the gnome rejects it as unsuitable for deposit.
-- No completed walkthrough, final score, move count, or rank is claimed.
+- The corrected Bank route preserves both Bank treasures without invoking the Zurich gnome by dropping the portrait in the Safety Depository, carrying the bills back through the north wall, dropping the bills, returning west twice to the Safety Depository, taking both treasures, entering the curtain to the West Viewing Room, and exiting south to the Bank Entrance.
+- The demon accepts the portrait as the ninth counted treasure and the stack of zorkmid bills as the tenth counted treasure, then gives the wand.
+- The transcript reaches the Landing and reports `Your score would be 400 (total of 400 points), in 372 moves.`
+- The final rank is `Master Adventurer`.
 
-Additional exploratory transcript:
+Earlier exploratory transcripts:
 
 ```text
+/private/tmp/terpvault-zork2-repair-commands-fantasies-counter-v14.txt
+/private/tmp/terpvault-zork2-repair-transcript-fantasies-counter-v14.txt
 /private/tmp/terpvault-zork2-repair-commands-fantasies-counter-v15.txt
 /private/tmp/terpvault-zork2-repair-transcript-fantasies-counter-v15.txt
 ```
 
-That run kept the sword out of the demon payment and tried to use it as the Zurich gnome handoff. The gnome rejected the sword as unsuitable for deposit, leaving the route trapped in the Small Room; this is not the best route transcript, but it documents the rejected sword-handoff idea.
+The v14 run reached `Score: 348` / Cerberus but left the demon one counted treasure short after giving the portrait to the Zurich gnome. The v15 run kept the sword out of the demon payment and tried to use it as the Zurich gnome handoff. The gnome rejected the sword as unsuitable for deposit, leaving the route trapped in the Small Room; v15 is not the best route transcript, but it documents the rejected sword-handoff idea.
 
 Recommendation:
 
 - Treat the `FANTASIES` repair as still credible for the original crash.
-- Continue route cleanup from the repaired-artifact `Score: 348` / Cerberus evidence, focusing on the Bank of Zork / Zurich gnome / demon payment ordering.
-- Do not replace the DDEV story artifact, export/import smoke test, or consider `_demo` promotion until a complete transcript exists and the artifact basis is explicitly reopened or confirmed.
+- Reopen the selected artifact basis before adopting the repaired scratch artifact in the DDEV package, because the currently selected DDEV artifact still has the normal-output balloon crash.
+- Do not replace the DDEV story artifact, export/import smoke test, or consider `_demo` promotion until the artifact basis is explicitly reopened or confirmed and package provenance is updated.
 
 ## Admin2 draft package preview fix - 2026-06-02
 
@@ -720,7 +723,7 @@ Result:
 - Comparison with upstream `COMPILED/zork2.z3`: neither scratch-patched source-built historical-header artifact matched the upstream prebuilt checksum.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` file identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
-- TerpVault/Parchment playback testing: passed for initial DDEV route/playback smoke; full walkthrough transcript verification was attempted against the selected DDEV artifact and remains incomplete. A later scratch source repair gets past the normal-output post-crown balloon descent under dfrotz, but the selected DDEV artifact has not been replaced and the route still fails after `Score: 215`.
+- TerpVault/Parchment playback testing: passed for initial DDEV route/playback smoke; full walkthrough transcript verification was attempted against the selected DDEV artifact and remains incomplete. A later scratch source repair gets past the normal-output post-crown balloon descent under dfrotz and now has a complete normal-output dfrotz transcript to `400/400` in `372` moves, but the selected DDEV artifact has not been replaced.
 
 ## Frotz smoke test
 
@@ -747,12 +750,12 @@ Result:
 - Record selected artifact filename, file identification, checksum, and redistribution basis.
 - Verify TerpVault/Parchment playback for the selected artifact.
 - Package metadata and package-local provenance notes created for the DDEV draft package; final audit remains pending.
-- Package-local art, screenshots, helper docs, and classified feelies added to the DDEV draft package; walkthrough transcript verification was attempted and remains incomplete. The selected artifact still reproduces the normal-output balloon crash, while a scratch repaired-source artifact gets past that crash and then exposes downstream route cleanup work after `Score: 215`.
-- Resolve or reopen the source/playback verification basis, complete a full route transcript, then run package export/import smoke tests.
+- Package-local art, screenshots, helper docs, and classified feelies added to the DDEV draft package; walkthrough transcript verification was attempted and remains incomplete for the selected artifact. The selected artifact still reproduces the normal-output balloon crash, while a scratch repaired-source artifact gets past that crash and now has a complete normal-output dfrotz transcript.
+- Resolve or reopen the source/playback verification basis, update package provenance if the repaired artifact is adopted, then run package export/import smoke tests.
 
 ## Recommended next action
 
-Keep reviewing the scratch-only `DREARY-ROOM-FCN` bracket fix and the scratch-only `FANTASIES` table-counter repair as source compatibility patch candidates, preferably against upstream history or ZILF maintainers before treating them as final bundled-demo provenance. Keep Zork II candidate-only until the selected artifact basis is resolved, a complete walkthrough transcript is verified, and final package docs, metadata, materials, export/import smoke, audit, and approval are complete.
+Keep reviewing the scratch-only `DREARY-ROOM-FCN` bracket fix and the scratch-only `FANTASIES` table-counter repair as source compatibility patch candidates, preferably against upstream history or ZILF maintainers before treating them as final bundled-demo provenance. Keep Zork II candidate-only until the selected artifact basis is resolved, package provenance is updated, and final package docs, metadata, materials, export/import smoke, audit, and approval are complete.
 
 ## Promotion checklist against Zork I standard
 

@@ -72,7 +72,7 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Treat future IFDB/IFWiki/IF Archive package-builder work as draft-only and license-aware: pasted URLs may seed metadata where allowed, but story files/assets should only be staged when legally and directly available.
 - Polish public library/detail/play rendering across light and dark Grav themes, with Quark2 and Typhoon as explicit verification targets.
 - Explore first-class future Ink package support as a complementary choice-based interactive narrative format, without disturbing current Z-code/Parchment playback.
-- Return to Zork II candidate work with a focused repaired-artifact route cleanup pass from the current `Score: 348` / Cerberus evidence, especially Bank of Zork / Zurich gnome / demon payment ordering. Keep reviewing both scratch-only source patches: `DREARY-ROOM-FCN` for ZILF compatibility and the `FANTASIES` table-counter repair for the normal-output balloon descent crash. Do not run export/import smoke or make a `_demo` decision until the selected artifact basis is resolved and a full transcript completes.
+- Return to Zork II candidate work with an artifact-basis/provenance decision now that the repaired scratch artifact completes under normal dfrotz output to `400/400` in `372` moves. Keep reviewing both scratch-only source patches: `DREARY-ROOM-FCN` for ZILF compatibility and the `FANTASIES` table-counter repair for the normal-output balloon descent crash. Do not run export/import smoke or make a `_demo` decision until the selected artifact basis is resolved and package provenance is updated.
 
 ## Player and format roadmap position
 
