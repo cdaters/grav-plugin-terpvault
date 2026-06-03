@@ -11,17 +11,18 @@
 - DDEV-only package updated on 2026-06-02 with package-local cover/small-cover/hero art and gameplay screenshots.
 - DDEV-only package updated on 2026-06-02 with release-specific IFID, IFDB/IFWiki catalog fields, and package-local `metadata.iFiction.xml`.
 - Admin2 Library Manager draft-preview handling was fixed on 2026-06-02 so the correct DDEV package metadata and draft package thumbnails can be displayed without publishing Zork II.
-- Walkthrough transcript verification was attempted on 2026-06-02 and the selected DDEV artifact still fails under normal dfrotz output during the post-crown balloon descent.
-- A scratch source/playback repair pass on 2026-06-02 traced that crash to the Fantasize spell's `FANTASIES` `LTABLE` shape and built a scratch-only repair candidate that gets past the normal-output balloon descent without `SUPERBRIEF`; the selected DDEV story artifact was not replaced.
+- Walkthrough transcript verification was attempted on 2026-06-02 against the earlier selected DDEV artifact, which failed under normal dfrotz output during the post-crown balloon descent.
+- A scratch source/playback repair pass on 2026-06-02 traced that crash to the Fantasize spell's `FANTASIES` `LTABLE` shape and built a repair candidate that gets past the normal-output balloon descent without `SUPERBRIEF`.
 - A repaired-artifact route verification pass later on 2026-06-02 reached `Score: 348` and the Cerberus Room under normal dfrotz output without `SUPERBRIEF`, then a follow-up cleanup pass corrected the Bank of Zork treasure route and completed the repaired scratch artifact to `400/400` in `372` moves, rank `Master Adventurer`.
+- The verified repaired artifact was adopted into the DDEV-only draft package on 2026-06-02 as `zork2.z3`, SHA-256 `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`; Release 63 / Serial 860811 and IFID `ZCODE-63-860811` are unchanged.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
 - Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
 - DDEV package dfrotz smoke passed against the selected story file.
 - Not approved for bundled demo.
-- Requires a decision on whether to reopen the selected source-built artifact basis for the `FANTASIES` repair, then package-level provenance updates, export/import smoke, final audit, and approval before any `_demo` work.
-- Next state: decide whether to reopen/adopt the repaired artifact basis while keeping the DDEV package draft and candidate-only.
+- Export/import smoke, final audit, and approval remain before any `_demo` work.
+- Next state: run export/import smoke and final package audit while keeping the DDEV package draft and candidate-only.
 
 Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -452,10 +453,9 @@ At this source-repair pass stage, the repaired-source normal-output route reache
 
 Recommendation:
 
-- Treat the `FANTASIES` repair as a credible source/build repair candidate, not as an adopted package artifact yet.
-- Reopen the selected artifact basis for review before replacing the DDEV story file.
+- The later adoption pass below supersedes this pre-adoption recommendation.
+- Keep both patches documented in package provenance for the adopted DDEV candidate artifact.
 - Keep the current DDEV package draft and candidate-only.
-- Continue route cleanup against a scratch repaired artifact, then decide whether to replace the DDEV artifact only after a complete transcript and provenance basis are documented.
 
 ## Repaired-artifact route verification pass - 2026-06-02
 
@@ -505,9 +505,44 @@ The v14 run reached `Score: 348` / Cerberus but left the demon one counted treas
 
 Recommendation:
 
-- Treat the `FANTASIES` repair as still credible for the original crash.
-- Reopen the selected artifact basis before adopting the repaired scratch artifact in the DDEV package, because the currently selected DDEV artifact still has the normal-output balloon crash.
-- Do not replace the DDEV story artifact, export/import smoke test, or consider `_demo` promotion until the artifact basis is explicitly reopened or confirmed and package provenance is updated.
+- Treat the `FANTASIES` repair as adopted for the DDEV-only candidate artifact, alongside the existing `DREARY-ROOM-FCN` build-compatibility patch.
+- Keep the DDEV package draft and candidate-only.
+- Do not run `_demo` promotion until export/import smoke, final package audit, and approval are complete.
+
+## Repaired artifact adoption - 2026-06-02
+
+This pass adopted the verified repaired artifact into the DDEV-only Zork II draft package. It did not copy anything into `_demo`, did not modify Zork I or Zork III, and did not change runtime/Admin2/Parchment code.
+
+Artifact replacement:
+
+| Field | Value |
+| --- | --- |
+| Previous selected DDEV artifact SHA-256 | `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019` |
+| Previous artifact backup path | `~/Sites/grav2.0-ddev/user/data/terpvault/games/zork-ii/zork2.z3.pre-repair-10015c-20260602-192833.bak` |
+| New selected DDEV artifact SHA-256 | `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef` |
+| File identification | `Infocom (Z-machine 3, Release 63, Serial 860811)` |
+| IFID | `ZCODE-63-860811` |
+
+Adopted source patches for this DDEV candidate:
+
+- `DREARY-ROOM-FCN` compatibility patch for ZILF/ZAPF build compatibility.
+- `FANTASIES` table-counter repair for the normal-output post-crown balloon descent crash.
+
+DDEV verification after adoption:
+
+- `dfrotz` completed the v17 route against `user/data/terpvault/games/zork-ii/zork2.z3`.
+- Final score: `400/400`.
+- Move count: `372`.
+- Rank: `Master Adventurer`.
+- Normal output worked; `SUPERBRIEF` was not used.
+- Temporary published route checks passed for `/if/zork-ii`, `/if/zork-ii/play`, story streaming, helper Markdown, cover, and hero assets.
+- Draft manifest check reported status `draft`, `has_story_file: true`, `has_ifiction: true`, IFID `ZCODE-63-860811`, warnings `[]`, and errors `null`.
+
+Remaining work:
+
+- Export/import smoke.
+- Final package audit.
+- Approval before any `_demo` promotion.
 
 ## Admin2 draft package preview fix - 2026-06-02
 
@@ -723,7 +758,7 @@ Result:
 - Comparison with upstream `COMPILED/zork2.z3`: neither scratch-patched source-built historical-header artifact matched the upstream prebuilt checksum.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` file identification: `Infocom (Z-machine 3, Release 63, Serial 860811)`.
 - Upstream prebuilt `COMPILED/zork2.z3` and `zork2.zip` SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
-- TerpVault/Parchment playback testing: passed for initial DDEV route/playback smoke; full walkthrough transcript verification was attempted against the selected DDEV artifact and remains incomplete. A later scratch source repair gets past the normal-output post-crown balloon descent under dfrotz and now has a complete normal-output dfrotz transcript to `400/400` in `372` moves, but the selected DDEV artifact has not been replaced.
+- TerpVault/Parchment playback testing: passed for initial DDEV route/playback smoke; full walkthrough transcript verification was attempted against the earlier selected DDEV artifact and failed at the post-crown balloon descent. The repaired artifact is now adopted in the DDEV package and has a complete normal-output dfrotz transcript to `400/400` in `372` moves.
 
 ## Frotz smoke test
 
@@ -744,28 +779,24 @@ Result:
 
 ## Remaining blockers
 
-- Decide whether to carry the scratch-only `DREARY-ROOM-FCN` compatibility patch into any future source-build provenance.
-- Decide whether to reopen the selected source-built artifact basis for the scratch-only `FANTASIES` table-counter repair.
-- Produce a successful source-built playable artifact from a documented build source, or make and document an explicit later decision to use a prebuilt artifact.
-- Record selected artifact filename, file identification, checksum, and redistribution basis.
-- Verify TerpVault/Parchment playback for the selected artifact.
+- Keep the `DREARY-ROOM-FCN` compatibility patch documented in source-build provenance.
+- Keep the `FANTASIES` table-counter repair documented in source-build provenance.
+- Preserve the adopted DDEV artifact filename, file identification, checksum, and redistribution basis.
+- Continue TerpVault/Parchment playback checks as part of final audit.
 - Package metadata and package-local provenance notes created for the DDEV draft package; final audit remains pending.
-- Package-local art, screenshots, helper docs, and classified feelies added to the DDEV draft package; walkthrough transcript verification was attempted and remains incomplete for the selected artifact. The selected artifact still reproduces the normal-output balloon crash, while a scratch repaired-source artifact gets past that crash and now has a complete normal-output dfrotz transcript.
-- Resolve or reopen the source/playback verification basis, update package provenance if the repaired artifact is adopted, then run package export/import smoke tests.
+- Package-local art, screenshots, helper docs, and classified feelies added to the DDEV draft package; walkthrough transcript verification now completes for the adopted repaired DDEV artifact.
+- Run package export/import smoke tests.
 
 ## Recommended next action
 
-Keep reviewing the scratch-only `DREARY-ROOM-FCN` bracket fix and the scratch-only `FANTASIES` table-counter repair as source compatibility patch candidates, preferably against upstream history or ZILF maintainers before treating them as final bundled-demo provenance. Keep Zork II candidate-only until the selected artifact basis is resolved, package provenance is updated, and final package docs, metadata, materials, export/import smoke, audit, and approval are complete.
+Keep reviewing the `DREARY-ROOM-FCN` bracket fix and `FANTASIES` table-counter repair as source compatibility patches, preferably against upstream history or ZILF maintainers before treating them as final bundled-demo provenance. Keep Zork II candidate-only until export/import smoke, final audit, and approval are complete.
 
 ## Promotion checklist against Zork I standard
 
 Before Zork II can move from candidate to bundled demo review, it still needs:
 
-- Final decision on source-built patched artifact versus upstream prebuilt artifact.
-- Final decision on whether the source-built artifact should include the scratch-only `FANTASIES` table-counter repair.
-- Source/provenance and license basis documented for the selected artifact.
-- Playable story file verified without adding it to the repo during research.
-- TerpVault/Parchment playback verification for the selected artifact.
+- Source/provenance and license basis final audit for the selected artifact.
+- TerpVault/Parchment playback final audit for the selected artifact.
 - Package metadata, release-specific IFID/catalog fields, and package-local `metadata.iFiction.xml` drafted for the DDEV package.
 - Original how-to-play, hints, and walkthrough text.
 - Screenshots captured from the selected bundled playable version.
