@@ -41,7 +41,7 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Use v0.4.x for Admin2 large-library basics. Search, sort, simple filters, metadata-completeness filters, and `localStorage` state preservation are now baseline; pagination or virtual scrolling remains future work.
 - Use v0.4.x for Metadata Assistant Phase 1 work. Local `metadata.iFiction.xml` status, upload/replace, XML present/missing filters, import inspection awareness, and preview/apply polish are now baseline; package creation awareness remains future polish where practical.
 - Continue safe delete/remove design before implementation. Do not add physical package delete until guardrails are reviewed; keep manifest removal distinct from physical package deletion; prefer trash/quarantine before permanent deletion.
-- Continue demo package preparation incrementally. Zork I and Zork III are the stronger bundled/demo anchors for the current development tree. Zork II remains candidate-only until the walkthrough verification basis, source compatibility patch posture, provenance, playback coverage, export/import smoke, audit, and approval are resolved.
+- Continue demo package preparation incrementally. Zork I and Zork III are the stronger bundled/demo anchors for the current development tree. Zork II remains candidate-only until the selected artifact basis, source compatibility patch posture, full walkthrough verification, provenance, playback coverage, export/import smoke, audit, and approval are resolved.
 - Add a stable ZILF/ZAPF tooling note or helper later. The current scratch-built ZILF/ZAPF 1.8 executables live under `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/`, but `/tmp` is volatile and `zilf` is not on `PATH`.
 - Track Mainframe Zork / Dungeon as a research-only demo candidate. Do not create a playable package or bundle artifacts until source selection, license/provenance, reference transcripts, build/reconstruction path, playback behavior, and helper docs are complete.
 - Polish public/demo suite candidates such as Adventure / Colossal Cave, Grue, and You Are Standing only when story files, art, helper docs, and license notes are original or properly licensed.
@@ -72,7 +72,7 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Treat future IFDB/IFWiki/IF Archive package-builder work as draft-only and license-aware: pasted URLs may seed metadata where allowed, but story files/assets should only be staged when legally and directly available.
 - Polish public library/detail/play rendering across light and dark Grav themes, with Quark2 and Typhoon as explicit verification targets.
 - Explore first-class future Ink package support as a complementary choice-based interactive narrative format, without disturbing current Z-code/Parchment playback.
-- Return to Zork II candidate work only after this docs alignment, with a focused source/playback verification pass that resolves or reopens the dfrotz post-crown balloon descent blocker and reviews the scratch-only `DREARY-ROOM-FCN` compatibility patch before any export/import or `_demo` decision.
+- Return to Zork II candidate work with a focused source/playback verification pass that reviews both scratch-only source patches: `DREARY-ROOM-FCN` for ZILF compatibility and the `FANTASIES` table-counter repair for the normal-output balloon descent crash. Do not run export/import smoke or make a `_demo` decision until the selected artifact basis is resolved and a full transcript completes.
 
 ## Player and format roadmap position
 
