@@ -435,6 +435,8 @@ Demo content rights/provenance policy: [docs/DEMO-CONTENT-RIGHTS.md](docs/DEMO-C
 
 `sample-cave` is original placeholder/demo content intended for public-safe structure testing. It is not a playable game. `adventure`, `you-are-standing`, and `grue` are real IF development starter packages with source/license notes in their manifests. Review their provenance before broad redistribution or before including them in a public plugin release.
 
+`open-adventure` is currently a research candidate only. Its local native build baseline is documented in `docs/demo-candidates/OPEN-ADVENTURE.md` and remains excluded from this starter/demo set until a playable format and redistribution path are confirmed.
+
 To install the real development starter packages into a local Grav site:
 
 ```bash

@@ -15,7 +15,7 @@ For Craig's development branch, the `_demo` tree also includes real starter pack
 - Keep v0.4.x starter-library work incremental and evidence-driven.
 - Zork II has completed approval, helper-doc polish, final audit, `_demo` promotion, and clean DDEV seed verification for this development demo tree. Zork III has completed that review path for this development demo tree and is bundled in `_demo`.
 - Mainframe Zork / Dungeon should remain a research-only candidate, separate from Zork I/II/III, until source selection, legal/provenance review, reference transcripts, build/reconstruction path, playback, and helper docs are clean.
-- Adventure / Colossal Cave should remain a candidate until the exact implementation, license, playable target, and TerpVault runtime strategy are verified.
+- Open Adventure / Colossal Cave should remain a candidate until the exact implementation, license/distribution scope, playable target, and TerpVault runtime strategy are verified.
 - Grue and You Are Standing should be polished only if the exact story-file license, package-local original material notes, and supplemental material provenance are clear enough for the intended distribution.
 - v0.5.0 may become a public/GPM-readiness candidate only if the included starter/demo set is conservative, well documented, and free of questionable historical/commercial assets.
 - Demo art and helper docs should be original or have documented reuse rights, with package-local notes explaining source, classification, and license/provenance status.
