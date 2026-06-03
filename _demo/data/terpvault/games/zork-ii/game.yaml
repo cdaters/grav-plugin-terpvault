@@ -1,0 +1,92 @@
+id: zork-ii
+slug: zork-ii
+identification:
+  format: zcode
+  ifids:
+    - ZCODE-63-860811
+bibliographic:
+  title: 'Zork II'
+  author: 'Marc Blank, Dave Lebling, Bruce Daniels, and Tim Anderson; source release by Microsoft/Open Source Programs Office/Xbox/Activision'
+  headline: 'The Wizard of Frobozz'
+  first_published: '1981'
+  genre: 'Interactive Fiction'
+  language: en
+  description: "Zork II continues the Great Underground Empire trilogy with a new parser-based expedition beneath the surface. This DDEV-only TerpVault draft package uses a patched source-built Z-machine artifact from the verified historical source release so playback and package behavior can be tested before any bundled-demo decision.\n"
+resources:
+  story_file: zork2.z3
+  cover: cover.jpg
+  small_cover: small-cover.jpg
+  hero: hero.jpg
+  screenshots:
+    - screenshots/01.png
+    - screenshots/02.png
+  how_to_play: how-to-play.md
+  hints: hints.md
+  walkthrough: walkthrough.md
+  feelies:
+    -
+      title: 'Bozbarland Flyer'
+      path: feelies/bozbarland-flyer.pdf
+      type: document
+      description: 'Historical supplemental document included for preservation and research context.'
+    -
+      title: 'G.U.E. on Nine Zorkminds a Day'
+      path: feelies/gue-nine-zorkminds.pdf
+      type: document
+      description: 'Historical supplemental document included for preservation and research context.'
+    -
+      title: 'Grayslopes Brochure'
+      path: feelies/grayslopes-brochure.pdf
+      type: document
+      description: 'Historical supplemental document included for preservation and research context.'
+    -
+      title: 'InvisiClues Map'
+      path: feelies/zork-ii-invisiclues-map.pdf
+      type: map
+      description: 'Historical reference map included for preservation and play context.'
+    -
+      title: 'Zork II Poster'
+      path: feelies/zork-ii-poster.jpg
+      type: poster
+      description: 'Historical poster image included for preservation and visual context.'
+    -
+      title: 'ZUG Map, Inside'
+      path: feelies/zug-map-inside.jpg
+      type: map
+      description: 'Historical reference map artwork included for preservation and play context.'
+    -
+      title: 'ZUG Map, Outside'
+      path: feelies/zug-map-outside.jpg
+      type: map
+      description: 'Historical reference map artwork included for preservation and play context.'
+catalog:
+  ifdb:
+    tuid: yzzm4puxyjakk8c4
+    url: 'https://ifdb.org/viewgame?id=yzzm4puxyjakk8c4'
+  ifwiki:
+    url: 'https://www.ifwiki.org/Zork_II'
+  ifarchive:
+    path: ''
+    url: ''
+release:
+  license:
+    name: 'MIT License'
+    url: 'https://github.com/historicalsource/zork2/blob/master/LICENSE'
+    notes: 'Observed upstream source license is MIT. This DDEV-only package uses a patched source-built story artifact for local verification. Supplemental materials are classified separately in provenance and are not treated as covered by the story/source license unless documented item by item.'
+  source:
+    url: 'https://github.com/historicalsource/zork2.git'
+    retrieved: '2026-06-02'
+    notes: 'Source commit 3da9661098809788a99cef00f00c865c6c204f96. Story file selected from repaired scratch-built artifact /private/tmp/terpvault-zork2-source-repair-fantasies-counter/zork2-release63-serial860811-fantasies-counter.z3; SHA-256 02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef. Built with the documented DREARY-ROOM-FCN bracket compatibility patch and FANTASIES table-counter repair, then reassembled with ZAPF 1.8 as Release 63 / Serial 860811.'
+terpvault:
+  status: published
+  featured: false
+  tags:
+    - candidate
+    - parser
+    - z-code
+    - classic
+    - zork
+player:
+  engine: parchment
+  theme: retro-terminal
+  autosave: true

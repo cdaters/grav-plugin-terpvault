@@ -421,6 +421,7 @@ This development package includes starter packages under:
 ```text
 user/plugins/terpvault/_demo/data/terpvault/games/
   zork-i/
+  zork-ii/
   zork-iii/
   sample-cave/
   adventure/
@@ -428,7 +429,7 @@ user/plugins/terpvault/_demo/data/terpvault/games/
   grue/
 ```
 
-`zork-i` and `zork-iii` are bundled starter packages reviewed for this development demo tree. They use source-built Z-machine story files from verified MIT-licensed historical source releases and include package-local provenance and upstream license text. Their package materials are documented at package level and may include original TerpVault/Craig-created assets plus selected historical reference/preservation materials only when separately reviewed. Zork I includes additional maps/documents/poster material classified in package provenance under the shared policy, release-specific IFID `ZCODE-119-880429`, IFDB/IFWiki catalog links, and package-local `metadata.iFiction.xml`. Their walkthrough routes have been verified with `dfrotz` against the bundled story files. The committed `_demo` Zork III package was seeded into DDEV and route/checksum verified on 2026-05-31.
+`zork-i`, `zork-ii`, and `zork-iii` are bundled starter packages reviewed for this development demo tree. They use source-built Z-machine story files from verified MIT-licensed historical source releases and include package-local provenance and upstream license text. Their package materials are documented at package level and may include original TerpVault/Craig-created assets plus selected historical reference/preservation materials only when separately reviewed. Zork II uses the repaired Release 63 / Serial 860811 artifact with IFID `ZCODE-63-860811`, SHA-256 `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`, and documented source patches in package provenance. Their walkthrough routes have been verified with `dfrotz` against the bundled story files. The committed `_demo` Zork II package was seeded into DDEV and route/checksum verified on 2026-06-02.
 
 Demo content rights/provenance policy: [docs/DEMO-CONTENT-RIGHTS.md](docs/DEMO-CONTENT-RIGHTS.md). Inclusion in a demo package is not a claim that supplemental material is newly licensed, public domain, official, endorsed, or copyright-free unless that status is separately documented.
 
@@ -439,6 +440,7 @@ To install the real development starter packages into a local Grav site:
 ```bash
 mkdir -p user/data/terpvault/games
 cp -R user/plugins/terpvault/_demo/data/terpvault/games/zork-i user/data/terpvault/games/
+cp -R user/plugins/terpvault/_demo/data/terpvault/games/zork-ii user/data/terpvault/games/
 cp -R user/plugins/terpvault/_demo/data/terpvault/games/zork-iii user/data/terpvault/games/
 cp -R user/plugins/terpvault/_demo/data/terpvault/games/adventure user/data/terpvault/games/
 cp -R user/plugins/terpvault/_demo/data/terpvault/games/you-are-standing user/data/terpvault/games/
@@ -451,6 +453,7 @@ Then visit:
 ```text
 /if
 /if/zork-i
+/if/zork-ii
 /if/adventure
 /if/you-are-standing
 /if/grue
@@ -470,7 +473,7 @@ Then visit:
 
 ## Future GPM packaging notes
 
-Before any future GPM-ready package, re-check bundled Parchment notices and the provenance for each `_demo` starter package. `zork-i` and `zork-iii` have package-local source/license/provenance notes, release-specific IFID/catalog/iFiction metadata, and verified walkthrough routes. Keep original package materials, historical reference/preservation materials, and third-party materials classified separately under [docs/DEMO-CONTENT-RIGHTS.md](docs/DEMO-CONTENT-RIGHTS.md). Keep other real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, supplemental material, and metadata source.
+Before any future GPM-ready package, re-check bundled Parchment notices and the provenance for each `_demo` starter package. `zork-i`, `zork-ii`, and `zork-iii` have package-local source/license/provenance notes, release-specific IFID/catalog/iFiction metadata, and verified walkthrough routes. Keep original package materials, historical reference/preservation materials, and third-party materials classified separately under [docs/DEMO-CONTENT-RIGHTS.md](docs/DEMO-CONTENT-RIGHTS.md). Keep other real IF starter packages such as `adventure`, `you-are-standing`, and `grue` development/demo-only unless redistribution review is completed for each story file, cover, helper document, supplemental material, and metadata source.
 
 ## Admin2 Library Manager
 

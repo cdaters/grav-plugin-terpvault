@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ifindex version="1.0" xmlns="http://babel.ifarchive.org/protocol/iFiction/">
+  <story>
+    <identification>
+      <ifid>ZCODE-63-860811</ifid>
+      <format>zcode</format>
+    </identification>
+    <bibliographic>
+      <title>Zork II</title>
+      <author>Marc Blank, Dave Lebling, Bruce Daniels, and Tim Anderson</author>
+      <headline>The Wizard of Frobozz</headline>
+      <firstpublished>1981</firstpublished>
+      <genre>Adventure</genre>
+      <language>en</language>
+      <description>A source-built TerpVault candidate package for Zork II, using the verified Release 63 / Serial 860811 Z-code artifact.</description>
+    </bibliographic>
+  </story>
+</ifindex>
