@@ -17,6 +17,7 @@ A package can contain:
 - walkthroughs
 - proposed feelies/extras
 - license/provenance notes
+- optional discovery tags, content notes, theme notes, and audience guidance
 
 ## Storage model
 
@@ -89,6 +90,23 @@ Future adapters could include:
 
 The current adapter family is parser IF. Ink support should be treated as a complementary future web-playable narrative adapter, not as a replacement for Z-code, Glulx, TADS, Parchment, Quixe, or parser IF.
 
+## Player presentation model
+
+The current stable play route is:
+
+```text
+/if/{slug}/play
+```
+
+Future player presentation work should separate player placement from story boot behavior:
+
+- `placement`: where the player appears, such as `focused`, `inline`, or `inline_autostart`.
+- `boot`: whether the story loads automatically when the player view opens, such as `autoload` or `manual`.
+
+The default/safe model should remain `placement: focused`, where `/if/{slug}` shows a Play button and `/if/{slug}/play` is the focused play page. When a user reaches the focused play page from the detail-page Play button, the desired future behavior is `boot: autoload`: Parchment should be loaded and ready at the story prompt without requiring a redundant second Play click, unless there is a technical or accessibility reason to require manual boot.
+
+Inline detail-page embedding is a separate future enhancement. See `docs/PLAYER-PRESENTATION.md`.
+
 ## Public theme integration future
 
 TerpVault should continue owning the Grav-facing shell around the interpreter iframe. A future theme-polish pass should:
@@ -101,6 +119,27 @@ TerpVault should continue owning the Grav-facing shell around the interpreter if
 
 The bundled Parchment `index.html` should not be edited for normal theme polish. Prefer TerpVault-controlled wrapping, configuration, and supported Parchment URL/config parameters.
 
+Future terminal theme presets should be CSS-based TerpVault shell presets such as `default`, `retro-terminal`, `cit101`, `green-screen`, `amber-crt`, `light-paper`, or `parchment-classic`. They should be configurable through Admin2 global settings, package overrides, or both, with package overrides winning when present. Terminal themes must remain optional and accessible.
+
+## Oracle hint architecture
+
+The Oracle is the future spoiler-safe hint/help UX. It should scaffold into the existing Help & Reference area and preserve the current simple helper-file path:
+
+```yaml
+resources:
+  hints: hints.md
+```
+
+Future Oracle source adapters should normalize supported package-local sources into:
+
+```text
+Section -> Question -> Hint steps
+```
+
+Candidate adapters include Markdown, structured YAML, structured JSON, ROT13 Markdown/text, legacy `.inv` files, and future Ink-guided flows. `.inv` support should parse or import package-local files into the normalized model without a runtime dependency on external converters. Ink-guided Oracle flows are complementary future guided help; they should not replace static hints or parser IF support.
+
+See `docs/ORACLE-HINTS.md`.
+
 ## Ink roadmap architecture
 
 Ink support should land in phases:
@@ -110,6 +149,17 @@ Ink support should land in phases:
 3. Interactive Grav pages powered by Ink for onboarding, guided tutorials, narrative documentation, and RetroRealm/TerpVault page experiences.
 
 The package/runtime boundary should stay clear: TerpVault owns package metadata, routing, permissions, assets, and Grav integration; the Ink runtime should be an adapter such as `inkjs` or a TerpVault-hosted web player added in a later implementation pass.
+
+## Content transparency architecture
+
+TerpVault should support neutral discovery and transparency fields without hiding, blocking, endorsing, or morally ranking works by default:
+
+- `tags`: format, genre, tone, and play-style discovery labels.
+- `content_notes`: potentially sensitive or mature material.
+- `theme_notes`: major themes, not warnings by default.
+- `audience`: optional descriptive rating and note.
+
+Package metadata should remain plain YAML and export/import friendly. Future frontend/search work should map appropriate fields into Grav-compatible taxonomy/search structures where practical, while preserving richer package-local fields. See `docs/CONTENT-TRANSPARENCY.md`.
 
 ## Admin2 model
 
@@ -134,6 +184,8 @@ When explicitly enabled, TerpVault registers the Admin2 sidebar/page and control
 The Admin2 Library Manager currently receives the full package list and renders it as collapsible rows in one page. It preserves active tab and expanded row state in browser `localStorage`, but search, filters, sorting controls, pagination, and virtual scrolling are future work. Large-library architecture should add a query/state layer before bulk actions, defer heavy media previews, and preserve search/filter/sort/page state in `localStorage` where practical.
 
 Admin2/API routes are deliberately separate from the public virtual page routes under `/if`, and write operations require authenticated Admin2/API access.
+
+A future Admin2 Guide/Help tab should be in-product, read-only documentation rendered from local bundled docs. It should remain separate from Settings and from contextual field help. It should cover package lifecycle, metadata, iFiction XML, media, helper Markdown, The Oracle, player presentation, content transparency, safety boundaries, troubleshooting, and glossary terms. See `docs/ADMIN2-GUIDE.md`.
 
 ## Save/restore plan
 

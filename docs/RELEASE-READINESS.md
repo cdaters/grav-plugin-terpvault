@@ -17,7 +17,10 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - Imported packages are forced to draft, forced to not featured, and never overwrite existing package folders.
 - TerpVault is not GPM-ready yet.
 - The v0.4.x line should remain incremental: focused Admin2/library improvements, metadata/iFiction polish, safe delete design, demo candidate preparation, and player/theme checks.
-- Inline Play Mode, autostart, terminal theme presets, and public theme pickers are roadmap-only unless a future build explicitly implements and documents them.
+- Player placement, boot behavior, Inline Play Mode, terminal theme presets, and public theme pickers are roadmap-only unless a future build explicitly implements and documents them.
+- The Oracle/progressive hint system is roadmap-only; simple package-local `resources.hints: hints.md` remains the current compatible hint path.
+- Content transparency filtering and Admin2 controls are roadmap-only; content notes should describe works neutrally and should not hide, block, endorse, or morally rank works by default.
+- A future Admin2 Guide/Help tab is roadmap-only; no runtime Guide tab is implemented yet.
 - v0.5.0 is the intended public milestone/GPM-readiness candidate line, pending a full audit and a credible demo/support posture.
 
 ## v0.5.0 milestone criteria
@@ -31,7 +34,10 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - Security/destructive boundaries are clear: no package delete unless a safe workflow exists, no silent physical file deletion, no arbitrary package browser, and import remains draft-only and non-overwriting.
 - Demo package posture is credible: Zork I and Zork III are fully bundled and verified; `docs/DEMO-CONTENT-RIGHTS.md` is followed; Zork II is added only if its DDEV-only patched source-built draft package resolves the current dfrotz walkthrough blocker and completes provenance, playback, package audit, export/import, and final helper docs; Adventure / Colossal Cave, Grue, and You Are Standing are polished only if story-file licensing and package-level provenance are complete for the intended distribution.
 - Mainframe Zork / Dungeon remains research-only unless its source basis, license/provenance, reference transcripts, build/reconstruction path, playable artifact, playback behavior, and helper docs are complete and separately approved.
-- Player presentation is readable across common themes. If Inline Play Mode or terminal themes are implemented before v0.5.0, they must preserve `/if/{slug}/play`, support admin defaults, keep public controls optional, and document Parchment iframe/internal styling limits.
+- Player presentation is readable across common themes. If player placement/boot controls, Inline Play Mode, or terminal themes are implemented before v0.5.0, they must preserve `/if/{slug}/play`, support admin defaults and package overrides, keep public controls optional, avoid redundant second Play clicks on the focused play page where practical, and document Parchment iframe/internal styling limits.
+- If Oracle/progressive hints are implemented before v0.5.0, they must preserve simple `resources.hints: hints.md`, keep package imports/exports backwards compatible, and avoid adding an Ink runtime unless that work is separately scoped.
+- If content transparency/search filtering is implemented before v0.5.0, it must preserve packages with simple/no tags, align with Grav-compatible taxonomy/search structures where practical, and keep filtering descriptive rather than punitive.
+- If an Admin2 Guide/Help tab is implemented before v0.5.0, it must render local/read-only docs, avoid remote fetches, remain separate from Settings, and reinforce current safety boundaries.
 - Release artifacts contain no dev-only paths, accidental test/private artifacts, platform cruft, or questionable historical/commercial assets.
 - A GitHub release/download ZIP sanity check has been completed before any GPM submission.
 
@@ -76,7 +82,10 @@ Before tagging:
 - For future delete/remove work, confirm destructive actions are absent until a reviewed design exists with package title/slug confirmation, manifest-vs-physical-delete distinction, trash/quarantine or backup behavior, CSRF/token and permission guardrails, package containment checks, and audit/result feedback.
 - For large-library work, confirm Admin2 search/filter/sort controls preserve state, show accurate result counts, keep expanded row state intact, and still handle small libraries normally. Pagination or virtual scrolling remains future work for very large libraries.
 - For metadata-assistant work, confirm local iFiction status/upload/import-awareness/preview/apply remains preview-driven, upload writes only package-root `metadata.iFiction.xml`, import commit preserves XML without auto-applying it, `game.yaml` is backed up before selected-field writes, remote lookup requires explicit action, and metadata enrichment remains separate from story-file/package download or asset redistribution.
-- For future Inline Play Mode or terminal theme work, confirm detail-page inline playback is optional, `/if/{slug}/play` still works, autostart behavior lands directly at the story prompt only when safe, public controls can be hidden, contrast is acceptable, scanline/CRT effects can be disabled, reduced-motion preferences are respected, font fallbacks are readable, and Quark2/Typhoon light/dark modes do not break the player.
+- For future player placement/boot or terminal theme work, confirm detail-page inline playback is optional, `/if/{slug}/play` still works, focused-page `boot: autoload` lands directly at the story prompt when safe, public controls can be hidden, contrast is acceptable, scanline/CRT effects can be disabled, reduced-motion preferences are respected, font fallbacks are readable, and Quark2/Typhoon light/dark modes do not break the player.
+- For future Oracle work, confirm existing Markdown hints still render, `resources.hints: hints.md` packages remain valid, richer source adapters normalize into the same model, and Ink-guided hints remain future/complementary unless intentionally implemented.
+- For future content transparency work, confirm ordinary tags, content notes, theme notes, and audience guidance are neutral, searchable/filterable where implemented, and do not hide or rank works by default.
+- For a future Admin2 Guide/Help tab, confirm bundled local docs render read-only, screenshots are current or omitted, safety boundaries are stated, and contextual field help remains available separately.
 
 ## GPM/public-release checklist
 

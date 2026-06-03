@@ -72,7 +72,9 @@
 - Prioritize large-library basics before bulk mutation: search, sort, simple filters, metadata-completeness filters, `localStorage` state preservation, and then pagination or virtual scrolling.
 - Treat Metadata Assistant Phase 1 as local-first: better `metadata.iFiction.xml` presence/status, safe upload/replace planning or implementation, preview/apply polish, and package creation/import awareness where possible.
 - Keep safe delete/remove in design until destructive guardrails are reviewed. No physical package delete should ship until manifest removal, package folder deletion, trash/quarantine, confirmation, audit feedback, containment, permission, and CSRF/token behavior are clear.
-- Keep player/theme work additive and scoped to the TerpVault shell unless Parchment exposes a supported theme-hint path. Inline Play Mode and terminal theme controls are roadmap-only until the Parchment integration path is documented.
+- Keep Oracle/progressive hint work additive and backwards compatible with `resources.hints: hints.md`.
+- Keep content transparency work descriptive and neutral; it should improve discovery/filtering without hiding, blocking, endorsing, or morally ranking works by default.
+- Keep player/theme work additive and scoped to the TerpVault shell unless Parchment exposes a supported theme-hint path. Player placement, boot behavior, inline play, and terminal theme controls are roadmap-only until the Parchment integration path is documented.
 
 ### v0.5.0 Admin2/public milestone target
 
@@ -91,6 +93,43 @@
 - Add lightweight contextual help for users unfamiliar with interactive fiction terminology and TerpVault package conventions.
 - Cover jargon-heavy fields and concepts such as IFID, iFiction, IFDB, IFWiki, IF Archive, TUID, cover, small cover, hero image, feelies, story file formats, catalog identifiers, import/export, and player settings.
 - Keep help unobtrusive for experienced curators but discoverable for users who need terminology support.
+
+### Future Admin2 Guide / Help tab
+
+- Add a dedicated top-level Admin2 tab for in-product documentation, using a short label such as `Guide`, `Help`, or `Help & Docs`.
+- Use a descriptive page heading such as `TerpVault Admin Guide & How-To`, `TerpVault Package Management Guide`, or `Admin Guide & Package Help`.
+- Keep the Guide tab read-only, local/offline-friendly, and separate from Settings.
+- Render local bundled Markdown documentation if practical; do not fetch remote documentation.
+- Cover package management, package creation, import inspection, draft-only import install, export, publication status, metadata editing, iFiction XML preview/apply, media, screenshots, feelies/extras, helper Markdown, story-file replacement, format detection, validation warnings, and publication readiness.
+- Reinforce safety boundaries: no package delete yet, no arbitrary package file browser, no destructive overwrite workflow, import remains draft-only and non-overwriting, Metadata Assistant remains local-first and preview/apply, and remote lookup is not implemented.
+- Include glossary coverage for IFID, iFiction, Treaty of Babel, IFDB, IFWiki, IF Archive, Z-machine, Glulx, TADS, ADRIFT, Ink, feelies, helper Markdown, hints, walkthroughs, and story files.
+- Keep this separate from contextual help notes/icons near individual fields.
+- Do not invent screenshots. Future Admin2 screenshots should live under a future-friendly path such as `docs/images/admin2/` and should be refreshed when Admin2 UI changes.
+- See `docs/ADMIN2-GUIDE.md`.
+
+### The Oracle / Progressive Hints
+
+- Keep current helper Markdown editing for `how-to-play.md`, `hints.md`, and `walkthrough.md`.
+- Preserve the existing simple `resources.hints: hints.md` path.
+- Plan a richer spoiler-safe Oracle UI inside the existing Help & Reference area, with public label `The Oracle` and optional subtitle `Are you lost and need a hand?`.
+- Normalize future hint sources into `Section -> Question -> Hint steps`.
+- Candidate package-local source adapters include Markdown, structured YAML, structured JSON, ROT13 Markdown/text, legacy `.inv`, and future Ink-guided flows.
+- Treat `.inv` as a legacy/classic IF compatibility source parsed or imported into TerpVault's model; do not depend on external converters at runtime.
+- Keep Ink-guided hints future/complementary and separate from parser IF/Parchment support.
+- See `docs/ORACLE-HINTS.md`.
+
+### Content transparency and catalog discovery
+
+- Add future Admin2 controls for `tags`, `content_notes`, `theme_notes`, and `audience` guidance.
+- Keep ordinary tags focused on format, genre, tone, and play style.
+- Use content notes for potentially sensitive or mature material.
+- Use theme notes for major themes without treating them as warnings by default.
+- Keep audience guidance optional and descriptive.
+- Do not hide works by default based on content notes.
+- Avoid loaded labels such as "problematic", "approved", "unsafe", or "forbidden".
+- Align frontend search/filter work with Grav-compatible taxonomy/search structures where practical while keeping package YAML plain and export/import friendly.
+- Preserve backwards compatibility with packages that only use simple tags or no tags.
+- See `docs/CONTENT-TRANSPARENCY.md`.
 
 ### Actionable media cards
 
@@ -186,28 +225,34 @@
 
 ### Inline Play Mode and player terminal themes
 
-- Plan a future launch model where game detail pages can optionally embed the Parchment player directly on `/if/{slug}`.
+- Plan a future presentation model where game detail pages can optionally embed the Parchment player directly on `/if/{slug}`.
 - Keep the existing focused `/if/{slug}/play` route supported for packages, themes, and users that prefer a separate play page.
-- Candidate launch settings should support global defaults and package overrides:
+- Separate player placement from story boot behavior.
+- Candidate settings should support global defaults and package overrides:
 
 ```yaml
 player:
-  launch_mode: detail_button
-  autostart: false
-  theme: default
-  allow_theme_picker: false
+  engine: parchment
+  placement: focused
+  boot: autoload
+  theme: retro-terminal
+  inline:
+    height: 720
+    allow_fullscreen: true
 ```
 
-- Candidate `player.launch_mode` values: `detail_button`, `play_page`, and `inline`.
-- Candidate `player.theme` values: `default`, `cit101`, `green-screen`, `amber-crt`, and `retro-terminal`.
-- Admin should be able to choose a default player theme. Per-package theme and launch overrides can come later if they do not complicate package validation.
+- Candidate `player.placement` values: `focused`, `inline`, and `inline_autostart`.
+- Candidate `player.boot` values: `autoload` and `manual`.
+- Candidate `player.theme` values: `default`, `retro-terminal`, `cit101`, `green-screen`, `amber-crt`, `light-paper`, and `parchment-classic`.
+- Admin should be able to choose a default player theme. Per-package theme, placement, and boot overrides can come later if they do not complicate package validation.
 - A public theme picker should be optional. Public pages should be able to hide player controls when the curator wants a locked presentation.
-- Inline autostart should mean the player loads directly into the story prompt when safe, not that TerpVault bypasses interpreter consent, browser restrictions, or accessibility expectations.
+- When a user clicks Play from `/if/{slug}` and reaches `/if/{slug}/play`, the focused page should ideally load Parchment ready at the prompt without a redundant second Play click unless a technical or accessibility reason requires manual boot.
 - Terminal themes should include a CIT101-style pale blue phosphor option, green monochrome, amber/orange monochrome, and retro terminal chrome.
 - Scanline or CRT overlays should be optional and disableable. Reduced-motion preferences and readability must take priority over visual nostalgia.
 - Use font stacks or licensed bundled fonts only. Do not bundle questionable terminal fonts; if custom fonts are added later, verify license and notice requirements first.
 - Scope theme CSS to TerpVault/Parchment player containers so parent Grav themes, Quark2/Typhoon light/dark modes, and site-level CSS do not break player readability.
 - Document Parchment iframe/internal styling limits before implementation, especially which styling can be controlled by TerpVault wrapper CSS versus Parchment-supported options or query/config parameters.
+- See `docs/PLAYER-PRESENTATION.md`.
 
 ### Ink package support
 

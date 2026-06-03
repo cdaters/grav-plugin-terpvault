@@ -65,19 +65,36 @@ Verification should cover Quark2 light mode, Quark2 dark mode, Typhoon light mod
 
 ## Inline play and terminal theme roadmap
 
-TerpVault may later support Inline Play Mode, where selected game detail pages embed the player directly on `/if/{slug}` and can optionally autostart into the story prompt. This should be additive: the separate `/if/{slug}/play` page remains supported.
+TerpVault may later support inline player placement, where selected game detail pages embed the player directly on `/if/{slug}`. This should be additive: the separate `/if/{slug}/play` page remains supported.
+
+Keep player placement separate from story boot behavior:
+
+- `focused`: default/safe mode; `/if/{slug}` shows a Play button linking to `/if/{slug}/play`.
+- `inline`: embed the player on `/if/{slug}`, but do not necessarily load the story immediately.
+- `inline_autostart`: embed the player on `/if/{slug}` and load the story immediately.
+- `autoload`: load the story as soon as the player view opens.
+- `manual`: require an explicit Play/Start action before loading the story.
+
+When the user clicks Play on `/if/{slug}` and lands on `/if/{slug}/play`, the focused page should ideally load Parchment ready at the story prompt. Avoid a second Play click inside the focused play page unless a technical or accessibility reason requires it.
+
+The Frayedwire "Dungeon / Zork Revisited" page is a visual/UX reference only for embedded Parchment-style presentation, retro terminal/CIT101-like styling, and ready-to-play prompt behavior. Do not copy, scrape, vendor, or depend on that site's code or assets.
 
 Candidate configuration concepts:
 
 ```yaml
 player:
-  launch_mode: detail_button
-  autostart: false
-  theme: default
-  allow_theme_picker: false
+  engine: parchment
+  placement: focused
+  boot: autoload
+  theme: retro-terminal
+  inline:
+    height: 720
+    allow_fullscreen: true
 ```
 
-Candidate `launch_mode` values are `detail_button`, `play_page`, and `inline`. Candidate theme presets are `default`, `cit101`, `green-screen`, `amber-crt`, and `retro-terminal`.
+Candidate `placement` values are `focused`, `inline`, and `inline_autostart`. Candidate `boot` values are `autoload` and `manual`. Candidate theme presets are `default`, `retro-terminal`, `cit101`, `green-screen`, `amber-crt`, `light-paper`, and `parchment-classic`.
+
+Older roadmap examples used `launch_mode` and `autostart`; prefer `placement` and `boot` for future package/global config examples.
 
 Terminal themes should be scoped to the TerpVault/Parchment shell and should not rely on parent theme colors for readability. A CIT101-style pale blue phosphor terminal, green monochrome, amber/orange monochrome, and retro terminal theme are all reasonable presets. Scanline or CRT overlays should be optional and disableable, with reduced-motion and contrast preferences respected.
 

@@ -29,6 +29,9 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Admin2 pagination and virtual scrolling are not implemented.
 - Named save slots and server-side saves are not implemented.
 - Public frontend routing and Parchment/player behavior should stay unchanged during Admin2 work.
+- The Oracle/progressive hint system is roadmap-only; current packages continue to use helper Markdown such as `resources.hints: hints.md`.
+- Content transparency search/filter controls are roadmap-only; current manifests with simple tags or no tags remain valid.
+- Admin2 Guide/Help tab is roadmap-only; no runtime in-product guide is implemented yet.
 
 ## Candidate next work
 
@@ -38,11 +41,12 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Use v0.4.x for Admin2 large-library basics. Search, sort, simple filters, metadata-completeness filters, and `localStorage` state preservation are now baseline; pagination or virtual scrolling remains future work.
 - Use v0.4.x for Metadata Assistant Phase 1 work. Local `metadata.iFiction.xml` status, upload/replace, XML present/missing filters, import inspection awareness, and preview/apply polish are now baseline; package creation awareness remains future polish where practical.
 - Continue safe delete/remove design before implementation. Do not add physical package delete until guardrails are reviewed; keep manifest removal distinct from physical package deletion; prefer trash/quarantine before permanent deletion.
-- Continue demo package preparation incrementally. Zork II and Zork III remain candidates until legal/provenance/build/playback/package docs are clean.
+- Continue demo package preparation incrementally. Zork I and Zork III are the stronger bundled/demo anchors for the current development tree. Zork II remains candidate-only until the walkthrough verification basis, source compatibility patch posture, provenance, playback coverage, export/import smoke, audit, and approval are resolved.
 - Add a stable ZILF/ZAPF tooling note or helper later. The current scratch-built ZILF/ZAPF 1.8 executables live under `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/`, but `/tmp` is volatile and `zilf` is not on `PATH`.
 - Track Mainframe Zork / Dungeon as a research-only demo candidate. Do not create a playable package or bundle artifacts until source selection, license/provenance, reference transcripts, build/reconstruction path, playback behavior, and helper docs are complete.
 - Polish public/demo suite candidates such as Adventure / Colossal Cave, Grue, and You Are Standing only when story files, art, helper docs, and license notes are original or properly licensed.
 - Continue Quark2/Typhoon light/dark checks and player shell refinements. Plan Inline Play Mode and terminal-style player themes as roadmap work only; pass future Parchment theme hints only if the bundled/configured Parchment runtime supports them safely.
+- Align docs before new package work around The Oracle/progressive hints, player placement/boot behavior, content transparency, Grav-compatible tagging/search posture, and a future Admin2 Guide tab.
 
 ### v0.5.0 milestone concept
 
@@ -68,13 +72,15 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Treat future IFDB/IFWiki/IF Archive package-builder work as draft-only and license-aware: pasted URLs may seed metadata where allowed, but story files/assets should only be staged when legally and directly available.
 - Polish public library/detail/play rendering across light and dark Grav themes, with Quark2 and Typhoon as explicit verification targets.
 - Explore first-class future Ink package support as a complementary choice-based interactive narrative format, without disturbing current Z-code/Parchment playback.
+- Return to Zork II candidate work only after this docs alignment, with a focused source/playback verification pass that resolves or reopens the dfrotz post-crown balloon descent blocker and reviews the scratch-only `DREARY-ROOM-FCN` compatibility patch before any export/import or `_demo` decision.
 
 ## Player and format roadmap position
 
 - Current supported playback path: parser IF packages served to bundled Parchment under `/if/_engine/parchment`, with Parchment tracked as a required runtime dependency under `assets/vendor/parchment/`.
 - Near-term polish: make the TerpVault player shell more theme-aware around the existing iframe, using CSS variables, `prefers-color-scheme` fallbacks, and carefully tested fullscreen behavior.
-- Future Inline Play Mode should allow selected game detail pages to embed the player directly on `/if/{slug}`, optionally autostarting into the story prompt. The existing focused `/if/{slug}/play` page should remain supported for users and themes that prefer a separate play surface.
-- Candidate player controls should support global and per-package defaults without forcing public controls: `player.launch_mode: detail_button | play_page | inline`, `player.autostart: true | false`, `player.theme: default | cit101 | green-screen | amber-crt | retro-terminal`, and `player.allow_theme_picker: true | false`.
+- Future player placement should allow selected game detail pages to embed the player directly on `/if/{slug}`. The existing focused `/if/{slug}/play` page should remain supported for users and themes that prefer a separate play surface.
+- Candidate player controls should support global and per-package defaults without forcing public controls: `player.placement: focused | inline | inline_autostart`, `player.boot: autoload | manual`, `player.theme: default | retro-terminal | cit101 | green-screen | amber-crt | light-paper | parchment-classic`, and inline options such as height/fullscreen.
+- When the user clicks Play from `/if/{slug}` and lands on `/if/{slug}/play`, the focused page should ideally load Parchment ready at the prompt without a redundant second Play click unless a technical or accessibility reason requires manual boot.
 - Admin should be able to choose a default player theme, and public pages should be able to hide the theme picker or launch controls when configured.
 - Player theme presets should include the current default, a CIT101-style pale blue terminal, green monochrome, amber/orange monochrome, and a retro terminal option. Scanline/CRT treatment should be optional, never forced.
 - Accessibility and readability must be part of the design: sufficient contrast, reduced-motion handling, scanline/CRT toggle behavior, font fallbacks, and readable chrome across parent light/dark themes.
@@ -84,6 +90,13 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Ink may be explored around the v0.5.0 era as roadmap/demo planning, but it is not required for v0.5.0 unless the package format, runtime adapter, validation path, and documentation are ready.
 - Any Ink element included before v0.5.0 should be clearly experimental and separate from parser/Parchment support. Do not add `inkjs` or another Ink runtime until implementation is intentionally scoped.
 - Interactive Grav page concepts such as "Enter the Vault", "The Archivist's Tour", and a beginner guided IF introduction remain roadmap-only.
+
+## Frontend experience roadmap position
+
+- Oracle/progressive hints: future hint/help UX layered into the existing Help & Reference section. Preserve `resources.hints: hints.md` and normalize richer package-local sources into `Section -> Question -> Hint steps`. Ink-guided hints are future/complementary.
+- Player presentation: future gameplay presentation UX around player placement, boot behavior, and CSS-based terminal themes. Preserve `/if/{slug}/play`.
+- Content transparency: future catalog discovery UX around neutral `tags`, `content_notes`, `theme_notes`, and `audience` guidance. Do not hide, block, endorse, or morally rank works by default.
+- Admin2 Guide/Help tab: future in-product documentation UX with a short tab label such as `Guide`, `Help`, or `Help & Docs`; read-only, local, and separate from Settings/contextual field help.
 
 ## Packaging posture
 

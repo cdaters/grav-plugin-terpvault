@@ -67,6 +67,8 @@ These files make a package easier to browse, verify, and play:
 - `walkthrough.md`: a solution or route through the work.
 - `feelies/`: optional package-local supplemental files such as manuals, maps, clue sheets, newsletters, audio, and other extras.
 
+The simple `resources.hints: hints.md` convention is the backwards-compatible hint path and should remain valid even after richer Oracle/progressive hint support is added.
+
 ## Preferred manifest shape
 
 New packages should use the structured manifest fields. Older flat fields still work as compatibility aliases.
@@ -113,6 +115,19 @@ resources:
       title: Map
       type: map
 
+tags:
+  - parser
+  - fantasy
+  - puzzle-focused
+content_notes:
+  - mild violence
+theme_notes:
+  - exploration
+  - underground
+audience:
+  rating: teen
+  note: "Contains fantasy peril and old-school parser death."
+
 catalog:
   ifdb:
     tuid: ''
@@ -140,25 +155,102 @@ terpvault:
 
 player:
   engine: parchment
+  placement: focused
+  boot: autoload
   theme: retro-terminal
-  launch_mode: button
+  inline:
+    height: 720
+    allow_fullscreen: true
 ```
 
-Current player fields are intentionally minimal. Future player presentation fields may expand to support Inline Play Mode and terminal theme presets without changing the package's story/provenance contract:
+`terpvault.tags` remains a compatibility location for older packages, but new package metadata should prefer top-level `tags`, `content_notes`, `theme_notes`, and `audience` for discovery and transparency.
+
+Current player fields are intentionally minimal. Future player presentation fields may expand to support focused and inline player placement, boot behavior, and terminal theme presets without changing the package's story/provenance contract:
 
 ```yaml
 player:
-  launch_mode: detail_button
-  autostart: false
-  theme: default
-  allow_theme_picker: false
+  engine: parchment
+  placement: focused
+  boot: autoload
+  theme: retro-terminal
+  inline:
+    height: 720
+    allow_fullscreen: true
 ```
 
-Candidate `player.launch_mode` values are `detail_button`, `play_page`, and `inline`. Candidate `player.theme` values are `default`, `cit101`, `green-screen`, `amber-crt`, and `retro-terminal`.
+Candidate `player.placement` values are `focused`, `inline`, and `inline_autostart`. Candidate `player.boot` values are `autoload` and `manual`. Candidate `player.theme` values are `default`, `retro-terminal`, `cit101`, `green-screen`, `amber-crt`, `light-paper`, and `parchment-classic`.
 
-These are roadmap concepts until implemented. The focused `/if/{slug}/play` page should remain supported even if a package later opts into inline detail-page playback. Public theme controls should be optional, and site/admin defaults should be able to hide controls for a locked presentation.
+These are roadmap concepts until implemented. The focused `/if/{slug}/play` page should remain supported even if a package later opts into inline detail-page playback. When the focused play route is opened from the detail page Play button, the ideal future behavior is for Parchment to be loaded and ready at the prompt without a redundant second Play click, unless a technical or accessibility reason requires manual boot. Public theme controls should be optional, and site/admin defaults should be able to hide controls for a locked presentation.
 
 Player theme CSS should be scoped to the TerpVault/Parchment shell and designed for accessibility: sufficient contrast, readable font fallbacks, optional scanline/CRT effects, reduced-motion handling, and compatibility with parent Grav light/dark themes. If custom fonts are bundled later, verify license and notice requirements first.
+
+Older roadmap examples used `player.launch_mode` and `player.autostart`. Treat those as migration/backwards-compatibility concepts only; new examples should use `placement` and `boot`.
+
+## The Oracle hint roadmap
+
+The Oracle is TerpVault's future spoiler-safe hint experience. It should evolve the current Help & Reference hints area into progressive reveal cards without replacing the whole detail page structure.
+
+Simple packages should continue to declare:
+
+```yaml
+resources:
+  hints: hints.md
+```
+
+Future richer packages may add an `oracle` block:
+
+```yaml
+oracle:
+  title: "The Oracle"
+  subtitle: "Are you lost and need a hand?"
+  mode: progressive
+  sources:
+    - path: hints.md
+      format: markdown
+    - path: hints.inv
+      format: inv
+    - path: hints.rot13.txt
+      format: markdown
+      encoding: rot13
+    - path: hints.yaml
+      format: yaml
+    - path: hints.json
+      format: json
+    - path: hints.ink.json
+      format: ink-guided
+```
+
+This block is roadmap-only. Static hint adapters should normalize package-local sources into `Section -> Question -> Hint steps`. `.inv` support should parse or import legacy/classic IF hint files into that normalized model without a runtime dependency on external converters. Ink-guided hints are future complementary guided-help flows and should not replace parser IF support or simple Markdown hints.
+
+See `docs/ORACLE-HINTS.md`.
+
+## Content transparency and discovery
+
+TerpVault should separate catalog discovery tags from content notes, theme notes, and audience guidance. These fields describe works for discovery and patron choice; they do not hide, block, endorse, or morally rank packages by default.
+
+Preferred shape:
+
+```yaml
+tags:
+  - parser
+  - fantasy
+  - puzzle-focused
+  - beginner-friendly
+content_notes:
+  - mild violence
+  - death
+theme_notes:
+  - exploration
+  - underground
+  - treasure hunting
+audience:
+  rating: teen
+  note: "Contains fantasy peril and old-school parser death."
+```
+
+Future Admin2 and frontend search/filter work should map appropriate fields into Grav-compatible taxonomy/search structures where practical, while preserving richer package-local YAML fields such as `content_notes`, `theme_notes`, and `audience`.
+
+See `docs/CONTENT-TRANSPARENCY.md`.
 
 ## Presentation resources
 

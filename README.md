@@ -31,7 +31,9 @@ The v0.4.x line is intentionally incremental. The next larger public milestone t
 - It enables only the opt-in Admin2 package creation, export, draft-only import, and metadata/helper/media/feelies/story/iFiction apply API for TerpVault packages; package delete and import overwrite/replace endpoints are not implemented.
 - It does not provide an arbitrary package file browser.
 - It does not yet provide named save slots or server-side save syncing.
-- It does not yet provide Inline Play Mode, player autostart controls, public theme pickers, or terminal theme presets beyond the current player-shell styling.
+- It does not yet provide Inline Play Mode, player placement/boot controls, public theme pickers, or terminal theme presets beyond the current player-shell styling.
+- It does not yet provide The Oracle/progressive hint renderer beyond package-local helper Markdown rendering.
+- It does not yet provide content-note/theme-note filtering or Admin2 controls for content transparency metadata.
 - It shows local `metadata.iFiction.xml` status, can upload or replace the package-root XML file, and can apply explicitly selected supported fields into `game.yaml` without remote lookup.
 - It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
 - It is not packaged or claimed as GPM-ready yet.
@@ -110,10 +112,11 @@ player:
   engine: parchment
   parchment_url: ''
   theme: retro-terminal
-  launch_mode: button
 ```
 
-Future roadmap concepts include package or global player controls such as inline detail-page playback, autostart, terminal theme presets, and optional public theme pickers. These are not implemented in v0.4.12; the stable current play surface remains `/if/{slug}/play`.
+The current default config also contains legacy player placeholders such as `launch_mode: button` and save-related flags. Keep those as compatibility/current-config details; new roadmap examples should use `placement` and `boot`.
+
+Future roadmap concepts include package or global player controls for placement, boot behavior, terminal theme presets, and optional public theme pickers. Preferred future terms are `player.placement: focused | inline | inline_autostart` and `player.boot: autoload | manual`. These are not implemented in v0.4.12; the stable current play surface remains `/if/{slug}/play`, and the detail page Play button remains the safe default entry point.
 
 ## Requirements and setup notes
 
@@ -199,6 +202,19 @@ resources:
   hints: hints.md
   walkthrough: walkthrough.md
 
+tags:
+  - parser
+  - fantasy
+  - puzzle-focused
+content_notes:
+  - mild violence
+theme_notes:
+  - exploration
+  - underground
+audience:
+  rating: teen
+  note: "Contains fantasy peril and old-school parser death."
+
 catalog:
   ifdb:
     tuid: ''
@@ -226,9 +242,12 @@ terpvault:
 
 player:
   engine: parchment
+  placement: focused
+  boot: autoload
   theme: retro-terminal
-  launch_mode: button
-  autosave: true
+  inline:
+    height: 720
+    allow_fullscreen: true
 ```
 
 Required files:
@@ -247,6 +266,10 @@ Recommended files:
 - `how-to-play.md`
 - `hints.md`
 - `walkthrough.md`
+
+Future Oracle/progressive hint support is planned as an additive layer over the existing `resources.hints: hints.md` convention. The current simple Markdown path remains backwards compatible; richer future sources may normalize Markdown, ROT13 text, `.inv`, YAML, JSON, or Ink-guided hint flows into `Section -> Question -> Hint steps`. See [docs/ORACLE-HINTS.md](docs/ORACLE-HINTS.md).
+
+Future content transparency metadata should separate ordinary discovery tags from `content_notes`, `theme_notes`, and optional `audience` guidance. These fields are for neutral discovery and patron choice; they should not hide, block, endorse, or morally rank works by default. See [docs/CONTENT-TRANSPARENCY.md](docs/CONTENT-TRANSPARENCY.md).
 
 Older flat fields such as `title`, `format`, `story_file`, `cover`, `small_cover`, `description`, `license`, and `source` remain supported as compatibility aliases.
 
@@ -347,6 +370,8 @@ The bundled Parchment adapter can be used for these broad story families:
 Format labels are shown per package, based on package metadata and story-file extension where useful.
 
 Parchment is the current bundled parser/runtime dependency and must remain tracked under `assets/vendor/parchment/` for local/self-contained playback. Future Ink support is planned as a complementary choice-based interactive narrative format, not a replacement for Z-machine, Glulx, TADS, Parchment, Quixe, or parser IF.
+
+Future player presentation work should keep `/if/{slug}/play` supported while separating player placement from story boot behavior. When a user clicks Play on `/if/{slug}` and lands on `/if/{slug}/play`, the ideal future focused page behavior is for Parchment to be loaded and ready at the prompt without a redundant second Play click, unless a technical or accessibility reason requires manual boot. Inline detail-page embedding and terminal theme presets are separate roadmap items. See [docs/PLAYER-PRESENTATION.md](docs/PLAYER-PRESENTATION.md).
 
 ## Future Ink support
 
@@ -482,6 +507,8 @@ The current page provides package inventory plus metadata/helper/media/story edi
 - Import panel for validating a `.terpvault.zip` package, reporting whether package-root `metadata.iFiction.xml` is present, and committing it as a draft package after server-side revalidation. Import preserves local iFiction XML but does not auto-apply it to `game.yaml`.
 
 Package delete, import overwrite/replace, arbitrary file browsing, remote iFiction/catalog lookup, pagination/virtual scrolling for large libraries, and player settings edits are not implemented yet. Future Admin2 roadmap work includes safe package delete/remove design, richer large-library controls, a preview-driven Metadata Assistant, back-end-configurable metadata source providers, and explicit IFDB/IFWiki/IF Archive metadata lookup/package-builder workflows that stay separate from story-file or asset download. Package creation uses `/api/v1/terpvault/packages`, package export uses `/api/v1/terpvault/packages/{slug}/export`, import inspection uses `/api/v1/terpvault/packages/import/inspect`, import commit uses `/api/v1/terpvault/packages/import`, metadata saves use `/api/v1/terpvault/packages/{slug}/metadata`, iFiction preview/upload/apply uses `/api/v1/terpvault/packages/{slug}/metadata/ifiction`, helper Markdown saves use `/api/v1/terpvault/packages/{slug}/markdown/{type}`, image uploads use `/api/v1/terpvault/packages/{slug}/media/{type}`, authenticated image previews use `/api/v1/terpvault/packages/{slug}/media/preview?path={package-local-image}`, feelies/extras management uses `/api/v1/terpvault/packages/{slug}/feelies`, and story replacement uses `/api/v1/terpvault/packages/{slug}/story` when the Admin2 Library Manager is enabled.
+
+A future Admin2 Guide/Help tab is planned as in-product documentation only. It should use a short tab label such as `Guide`, `Help`, or `Help & Docs`, remain read-only, render local bundled documentation without remote fetches, and explain package lifecycle, metadata, iFiction XML, media, helper Markdown, The Oracle, player presentation, content transparency, safety boundaries, troubleshooting, and IF terminology. See [docs/ADMIN2-GUIDE.md](docs/ADMIN2-GUIDE.md).
 
 Public virtual routes and Admin2 API routes are intentionally separate. Frontend routes such as `/if`, `/if/{slug}`, `/if/{slug}/play`, and `/if/_story/{slug}/{filename}` are registered as virtual Grav pages or controlled file endpoints only for frontend requests. Admin2 endpoints are controller-style API routes and are registered only when the experimental Admin2 Library Manager is enabled.
 

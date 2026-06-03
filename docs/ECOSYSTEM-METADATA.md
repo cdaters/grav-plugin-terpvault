@@ -68,6 +68,24 @@ terpvault:
   tags: []
 ```
 
+New package metadata should prefer top-level discovery and transparency fields:
+
+```yaml
+tags:
+  - parser
+  - fantasy
+  - puzzle-focused
+content_notes:
+  - mild violence
+theme_notes:
+  - exploration
+audience:
+  rating: teen
+  note: "Contains fantasy peril and old-school parser death."
+```
+
+`terpvault.tags` remains a compatibility location for older packages. Future search/filter work should map appropriate package metadata into Grav-compatible taxonomy/search structures where practical, while preserving richer package-local fields such as `content_notes`, `theme_notes`, and `audience`. These fields are descriptive; they should not hide, block, endorse, or morally rank works by default.
+
 ## iFiction XML
 
 A package may include:
