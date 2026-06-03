@@ -15,14 +15,15 @@
 - A scratch source/playback repair pass on 2026-06-02 traced that crash to the Fantasize spell's `FANTASIES` `LTABLE` shape and built a repair candidate that gets past the normal-output balloon descent without `SUPERBRIEF`.
 - A repaired-artifact route verification pass later on 2026-06-02 reached `Score: 348` and the Cerberus Room under normal dfrotz output without `SUPERBRIEF`, then a follow-up cleanup pass corrected the Bank of Zork treasure route and completed the repaired scratch artifact to `400/400` in `372` moves, rank `Master Adventurer`.
 - The verified repaired artifact was adopted into the DDEV-only draft package on 2026-06-02 as `zork2.z3`, SHA-256 `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`; Release 63 / Serial 860811 and IFID `ZCODE-63-860811` are unchanged.
+- Export/import smoke passed on 2026-06-02: the package exported cleanly, import inspection passed, a temporary `zork-ii-import-smoke` draft import preserved story, metadata, art, screenshots, feelies, helper docs, and `metadata.iFiction.xml`, temporary publish routes passed, and imported-story dfrotz verification still reached `400/400` in `372` moves, rank `Master Adventurer`.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
 - Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
 - DDEV package dfrotz smoke passed against the selected story file.
 - Not approved for bundled demo.
-- Export/import smoke, final audit, and approval remain before any `_demo` work.
-- Next state: run export/import smoke and final package audit while keeping the DDEV package draft and candidate-only.
+- Final audit and approval remain before any `_demo` work.
+- Next state: run final package audit while keeping the DDEV package draft and candidate-only.
 
 Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
 
@@ -389,7 +390,7 @@ A scratch control against upstream `COMPILED/zork2.z3` reproduced the same post-
 - SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
 - Transcript: `/private/tmp/terpvault-zork2-walkthrough-transcript-upstream-prebuilt-v8.txt`.
 
-DDEV helper docs were updated to keep the walkthrough explicitly unverified and to document the blocker in package provenance. The package remains draft. Export/import smoke, final audit, Craig approval, and `_demo` promotion remain pending.
+DDEV helper docs were updated during this earlier pass to keep the walkthrough explicitly unverified and to document the blocker in package provenance. At that point, export/import smoke, final audit, Craig approval, and `_demo` promotion remained pending; later sections supersede the walkthrough and export/import status.
 
 ## Source/playback repair investigation - 2026-06-02
 
@@ -507,7 +508,7 @@ Recommendation:
 
 - Treat the `FANTASIES` repair as adopted for the DDEV-only candidate artifact, alongside the existing `DREARY-ROOM-FCN` build-compatibility patch.
 - Keep the DDEV package draft and candidate-only.
-- Do not run `_demo` promotion until export/import smoke, final package audit, and approval are complete.
+- Do not run `_demo` promotion until final package audit and approval are complete. Later smoke testing completed the export/import item.
 
 ## Repaired artifact adoption - 2026-06-02
 
@@ -518,7 +519,7 @@ Artifact replacement:
 | Field | Value |
 | --- | --- |
 | Previous selected DDEV artifact SHA-256 | `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019` |
-| Previous artifact backup path | `~/Sites/grav2.0-ddev/user/data/terpvault/games/zork-ii/zork2.z3.pre-repair-10015c-20260602-192833.bak` |
+| Previous artifact backup path | `/private/tmp/terpvault-zork2-pre-repair-backup/zork2.z3.pre-repair-10015c-20260602-192833.bak` |
 | New selected DDEV artifact SHA-256 | `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef` |
 | File identification | `Infocom (Z-machine 3, Release 63, Serial 860811)` |
 | IFID | `ZCODE-63-860811` |
@@ -540,9 +541,60 @@ DDEV verification after adoption:
 
 Remaining work:
 
-- Export/import smoke.
 - Final package audit.
 - Approval before any `_demo` promotion.
+
+## Export/import smoke - 2026-06-02
+
+This pass verified the repaired DDEV-only Zork II draft package through TerpVault package export, import inspection, non-overwriting draft import, temporary route checks, and imported-story dfrotz playback. It did not copy anything into `_demo`, did not modify Zork I or Zork III, and did not change runtime/Admin2/Parchment code.
+
+Pre-export cleanup:
+
+- Package-root backup files were moved out of the active package folder before export.
+- Backup location: `/private/tmp/terpvault-zork2-pre-repair-backup/`.
+- The moved pre-repair story backup retains SHA-256 `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+
+Export result:
+
+| Field | Value |
+| --- | --- |
+| Export zip path | `/private/tmp/terpvault-zork-ii-export-smoke/zork-ii.terpvault.zip` |
+| Export zip SHA-256 | `8f49305048c708829415bcbe928885edee79d3a11642a985d46011bd9d18259c` |
+| Export zip size | `100827901` bytes |
+| Exported story SHA-256 | `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef` |
+
+Exported contents included `game.yaml`, `zork2.z3`, upstream license/provenance, package-root `metadata.iFiction.xml`, helper Markdown, cover/small-cover/hero art, screenshots, and seven feelies. No `.DS_Store`, `__MACOSX`, AppleDouble files, temp/swap/lock files, or `.bak` story files were present.
+
+Import inspection result:
+
+- Result: ok.
+- Candidate slug: `zork-ii`.
+- Story file detected: `zork2.z3`.
+- `metadata.iFiction.xml` detected and preview-capable.
+- Expected warnings only: original slug collision and draft-forcing note.
+- Fatal errors: none.
+
+Import commit result:
+
+- Temporary import slug: `zork-ii-import-smoke`.
+- Import result: ok.
+- Import was forced to `draft` and `featured: false`.
+- IFID remained `ZCODE-63-860811`.
+- Imported story SHA-256: `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`.
+- Imported helper docs, images, screenshots, feelies, `LICENSE-upstream.txt`, `provenance.md`, and `metadata.iFiction.xml` were present.
+
+Route and playback checks:
+
+- Manifest after import showed both original `zork-ii` and temporary `zork-ii-import-smoke` as draft with warnings `[]` and errors `null`.
+- Temporary publish checks for `zork-ii-import-smoke` returned `200` for detail, play, story, walkthrough, cover, and hero routes.
+- Story route returned `application/octet-stream`, `92414` bytes, and SHA-256 `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`.
+- dfrotz verification against the imported package story completed to `400/400` in `372` moves, rank `Master Adventurer`, using normal output and without `SUPERBRIEF`.
+
+Cleanup:
+
+- Temporary import package moved out of the active DDEV library to `/private/tmp/terpvault-zork-ii-import-smoke/zork-ii-import-smoke`.
+- Original `zork-ii` remains draft with story SHA-256 `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`.
+- Final package audit and approval remain before any `_demo` promotion.
 
 ## Admin2 draft package preview fix - 2026-06-02
 
@@ -785,11 +837,11 @@ Result:
 - Continue TerpVault/Parchment playback checks as part of final audit.
 - Package metadata and package-local provenance notes created for the DDEV draft package; final audit remains pending.
 - Package-local art, screenshots, helper docs, and classified feelies added to the DDEV draft package; walkthrough transcript verification now completes for the adopted repaired DDEV artifact.
-- Run package export/import smoke tests.
+- Package export/import smoke passed for the repaired DDEV draft package and temporary `zork-ii-import-smoke` import.
 
 ## Recommended next action
 
-Keep reviewing the `DREARY-ROOM-FCN` bracket fix and `FANTASIES` table-counter repair as source compatibility patches, preferably against upstream history or ZILF maintainers before treating them as final bundled-demo provenance. Keep Zork II candidate-only until export/import smoke, final audit, and approval are complete.
+Keep reviewing the `DREARY-ROOM-FCN` bracket fix and `FANTASIES` table-counter repair as source compatibility patches, preferably against upstream history or ZILF maintainers before treating them as final bundled-demo provenance. Keep Zork II candidate-only until final audit and approval are complete.
 
 ## Promotion checklist against Zork I standard
 
@@ -802,4 +854,4 @@ Before Zork II can move from candidate to bundled demo review, it still needs:
 - Screenshots captured from the selected bundled playable version.
 - Original or properly licensed cover, small cover, hero art, and any feelies.
 - Explicit exclusion of historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, and Invisiclues-style material unless separately licensed.
-- Package-local audit notes, upstream license text, export/import smoke tests, and final review.
+- Package-local audit notes, upstream license text, completed export/import smoke evidence, and final review.
