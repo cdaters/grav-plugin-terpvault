@@ -16,16 +16,17 @@
 - A repaired-artifact route verification pass later on 2026-06-02 reached `Score: 348` and the Cerberus Room under normal dfrotz output without `SUPERBRIEF`, then a follow-up cleanup pass corrected the Bank of Zork treasure route and completed the repaired scratch artifact to `400/400` in `372` moves, rank `Master Adventurer`.
 - The verified repaired artifact was adopted into the DDEV-only draft package on 2026-06-02 as `zork2.z3`, SHA-256 `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`; Release 63 / Serial 860811 and IFID `ZCODE-63-860811` are unchanged.
 - Export/import smoke passed on 2026-06-02: the package exported cleanly, import inspection passed, a temporary `zork-ii-import-smoke` draft import preserved story, metadata, art, screenshots, feelies, helper docs, and `metadata.iFiction.xml`, temporary publish routes passed, and imported-story dfrotz verification still reached `400/400` in `372` moves, rank `Master Adventurer`.
+- Final package audit passed on 2026-06-02: package inventory, metadata, XML, helper docs, media, dfrotz, manifest, temporary public routes, and public draft behavior were rechecked.
 - License/provenance reviewed from observed repository files only.
 - Source build attempted on 2026-05-25.
 - Unmodified source build still fails; scratch-only compatibility patch produced playable artifacts.
 - Frotz smoke test passed for scratch-patched source-built historical-header variants and the upstream prebuilt artifact.
 - DDEV package dfrotz smoke passed against the selected story file.
 - Not approved for bundled demo.
-- Final audit and approval remain before any `_demo` work.
-- Next state: run final package audit while keeping the DDEV package draft and candidate-only.
+- Ready for Craig approval and a later explicit `_demo` promotion pass if approved.
+- Next state: approval decision and explicit `_demo` promotion pass, while keeping the DDEV package draft and candidate-only until then.
 
-Zork II must not be treated as ready to bundle until the source, license, build output or prebuilt artifact basis, TerpVault package contents, assets, helper docs, and provenance notes are verified and complete.
+Zork II should not be copied to `_demo` automatically. The DDEV package is now audited and ready for an explicit approval/promotion pass, but it remains draft and candidate-only until that separate action happens.
 
 ## Artifact basis recheck - 2026-06-02
 
@@ -350,7 +351,7 @@ Validation:
 - The route-served story returned HTTP `200`, `application/octet-stream`, 92412 bytes, and the expected SHA-256.
 - `/if/_asset/zork-ii/metadata.iFiction.xml` returned HTTP `404` because XML is not a public asset extension under the current TerpVault asset-serving policy; the manifest still detects `metadata.iFiction.xml` via `has_ifiction` and `ifiction_path`.
 
-The package was restored to draft and cache was cleared after the temporary route checks. Walkthrough transcript verification, export/import smoke, final audit, and `_demo` promotion remain pending.
+The package was restored to draft and cache was cleared after the temporary route checks. At that point, walkthrough transcript verification, export/import smoke, final audit, and `_demo` promotion remained pending; later sections supersede those statuses.
 
 ## DDEV walkthrough verification attempt - 2026-06-02
 
@@ -390,7 +391,7 @@ A scratch control against upstream `COMPILED/zork2.z3` reproduced the same post-
 - SHA-256: `3ae7d5558943e9721f3e4b273c8a7faec1a03a604e1ae4ee1cde472c21cb24ac`.
 - Transcript: `/private/tmp/terpvault-zork2-walkthrough-transcript-upstream-prebuilt-v8.txt`.
 
-DDEV helper docs were updated during this earlier pass to keep the walkthrough explicitly unverified and to document the blocker in package provenance. At that point, export/import smoke, final audit, Craig approval, and `_demo` promotion remained pending; later sections supersede the walkthrough and export/import status.
+DDEV helper docs were updated during this earlier pass to keep the walkthrough explicitly unverified and to document the blocker in package provenance. At that point, export/import smoke, final audit, Craig approval, and `_demo` promotion remained pending; later sections supersede the walkthrough, export/import, and final-audit statuses.
 
 ## Source/playback repair investigation - 2026-06-02
 
@@ -508,7 +509,7 @@ Recommendation:
 
 - Treat the `FANTASIES` repair as adopted for the DDEV-only candidate artifact, alongside the existing `DREARY-ROOM-FCN` build-compatibility patch.
 - Keep the DDEV package draft and candidate-only.
-- Do not run `_demo` promotion until final package audit and approval are complete. Later smoke testing completed the export/import item.
+- Do not run `_demo` promotion until final package audit and approval are complete. Later sections completed the export/import and final-audit items; approval remains.
 
 ## Repaired artifact adoption - 2026-06-02
 
@@ -541,7 +542,6 @@ DDEV verification after adoption:
 
 Remaining work:
 
-- Final package audit.
 - Approval before any `_demo` promotion.
 
 ## Export/import smoke - 2026-06-02
@@ -594,7 +594,49 @@ Cleanup:
 
 - Temporary import package moved out of the active DDEV library to `/private/tmp/terpvault-zork-ii-import-smoke/zork-ii-import-smoke`.
 - Original `zork-ii` remains draft with story SHA-256 `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`.
-- Final package audit and approval remain before any `_demo` promotion.
+- Final package audit later passed; approval remains before any `_demo` promotion.
+
+## Final package audit - 2026-06-02
+
+This pass audited the repaired DDEV-only Zork II draft package after artifact adoption and export/import smoke. It did not copy anything into `_demo`, did not modify Zork I or Zork III, and did not change runtime/Admin2/Parchment code.
+
+Audit result:
+
+- Result: passed for DDEV package readiness.
+- Recommendation: ready for Craig approval and ready for an explicit `_demo` promotion pass, if approved.
+- Package remains draft and candidate-only until that later explicit pass.
+
+Package hygiene and metadata:
+
+- Active package inventory contained only expected package files: `game.yaml`, `zork2.z3`, `LICENSE-upstream.txt`, `provenance.md`, `metadata.iFiction.xml`, helper Markdown, cover/small-cover/hero art, screenshots, and feelies.
+- Cruft check returned no active package files matching `.DS_Store`, `__MACOSX`, AppleDouble files, temp files, editor backups, swap files, lock files, `.bak`, or `.bak-*`.
+- Pre-repair backup remains outside the package at `/private/tmp/terpvault-zork2-pre-repair-backup/zork2.z3.pre-repair-10015c-20260602-192833.bak`, SHA-256 `10015c715e9226c491bbfe23e448df14e859a0d9f905afc4fe0c18d65d176019`.
+- `game.yaml` parsed as YAML, `terpvault.status` remained `draft`, `terpvault.featured` remained `false`, `resources.story_file` remained `zork2.z3`, `identification.format` remained `zcode`, and `identification.ifids` included `ZCODE-63-860811`.
+- `metadata.iFiction.xml` passed `xmllint --noout` and references `Zork II`, `ZCODE-63-860811`, and Release 63 / Serial 860811 context.
+- Player-facing helper docs are current. `walkthrough.md` states the repaired artifact checksum, final score `400/400`, `372` moves, rank `Master Adventurer`, normal output, and that `SUPERBRIEF` was not needed. `how-to-play.md` now states export/import checks have passed.
+
+Final dfrotz audit:
+
+```text
+/private/tmp/terpvault-zork2-final-audit-transcript.txt
+```
+
+Result:
+
+- Final score: `400/400`.
+- Move count: `372`.
+- Rank: `Master Adventurer`.
+- Normal output worked.
+- `SUPERBRIEF` was not needed.
+- No fatal memory error occurred.
+
+Manifest and route checks:
+
+- Draft manifest returned HTTP `200`.
+- `zork-ii` status was `draft`, `has_story_file: true`, `has_ifiction: true`, IFID `ZCODE-63-860811`, warnings `[]`, and errors `null`.
+- Temporary publish checks returned `200` for detail, play, story, walkthrough, hints, how-to-play, cover, small-cover, hero, screenshot, one PDF feelie, and one JPG feelie.
+- Story route returned `application/octet-stream`, `92414` bytes, and SHA-256 `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef`.
+- After restore to draft, `/if/zork-ii` and `/if/_asset/zork-ii/cover.jpg` returned `404`.
 
 ## Admin2 draft package preview fix - 2026-06-02
 
@@ -835,23 +877,17 @@ Result:
 - Keep the `FANTASIES` table-counter repair documented in source-build provenance.
 - Preserve the adopted DDEV artifact filename, file identification, checksum, and redistribution basis.
 - Continue TerpVault/Parchment playback checks as part of final audit.
-- Package metadata and package-local provenance notes created for the DDEV draft package; final audit remains pending.
+- Package metadata and package-local provenance notes created for the DDEV draft package; final audit passed on 2026-06-02.
 - Package-local art, screenshots, helper docs, and classified feelies added to the DDEV draft package; walkthrough transcript verification now completes for the adopted repaired DDEV artifact.
 - Package export/import smoke passed for the repaired DDEV draft package and temporary `zork-ii-import-smoke` import.
 
 ## Recommended next action
 
-Keep reviewing the `DREARY-ROOM-FCN` bracket fix and `FANTASIES` table-counter repair as source compatibility patches, preferably against upstream history or ZILF maintainers before treating them as final bundled-demo provenance. Keep Zork II candidate-only until final audit and approval are complete.
+Keep reviewing the `DREARY-ROOM-FCN` bracket fix and `FANTASIES` table-counter repair as source compatibility patches, preferably against upstream history or ZILF maintainers before treating them as final bundled-demo provenance. Keep Zork II candidate-only until approval and an explicit `_demo` promotion pass are complete.
 
 ## Promotion checklist against Zork I standard
 
 Before Zork II can move from candidate to bundled demo review, it still needs:
 
-- Source/provenance and license basis final audit for the selected artifact.
-- TerpVault/Parchment playback final audit for the selected artifact.
-- Package metadata, release-specific IFID/catalog fields, and package-local `metadata.iFiction.xml` drafted for the DDEV package.
-- Original how-to-play, hints, and walkthrough text.
-- Screenshots captured from the selected bundled playable version.
-- Original or properly licensed cover, small cover, hero art, and any feelies.
-- Explicit exclusion of historical commercial packaging, manuals, maps, ads, logos, trade dress, scans, and Invisiclues-style material unless separately licensed.
-- Package-local audit notes, upstream license text, completed export/import smoke evidence, and final review.
+- Craig approval / explicit promotion decision.
+- A separate `_demo` promotion pass that copies only the reviewed package files, verifies checksums/routes after copy, and preserves draft/candidate evidence in docs.
