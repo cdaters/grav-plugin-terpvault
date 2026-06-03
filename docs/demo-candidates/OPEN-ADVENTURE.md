@@ -4,6 +4,8 @@ Status: **Research candidate / source/oracle only**
 
 Open Adventure is tracked as the next candidate arc. It is not packaged in `_demo` yet.
 
+Current port-strategy notes are kept outside this repo at `~/Code/if-lab/open-adventure-port/notes/PORT-STRATEGY.md`.
+
 ## Upstream/source basis
 
 - Repository: https://gitlab.com/esr/open-adventure
@@ -84,13 +86,16 @@ Current TerpVault/Parchment compatibility:
 Primary options to evaluate:
 
 1. **Source-to-Inform / Z-machine route (primary)**
-   - Generate a compatible `.z8`/`.z5`-style playable artifact from the source lineage with clean rights and provenance.
+- Generate a compatible `.z8` Z-machine playable artifact from the source lineage with clean rights and provenance, likely through Inform 6 or another documented Z-machine authoring path.
+- `.z8` is preferred over smaller Z-machine formats because it gives more room for Open Adventure's world/action complexity while staying directly playable through TerpVault/Parchment.
 2. **Glulx route**
    - Use a native-to-Glulx strategy if source constraints make Inform/Z-machine conversion impractical.
 3. **Native/web runtime adapter (future only)**
    - Implement a dedicated web/native adapter for this exact binary stack.
 4. **Source/provenance demo first**
    - Keep as a researched basis without playable packaging until a format is confirmed.
+
+The current strategy is to treat the native `advent` baseline as a caveated oracle for a future `.z8` port, not as a package artifact. Do not present a future port as the original Crowther/Woods binary or a historical Infocom artifact; identify it as a TerpVault Z-machine port based on ESR Open Adventure.
 
 ## Current repo docs status
 
@@ -102,9 +107,11 @@ Primary options to evaluate:
 
 No TerpVault package for Open Adventure is being created in this pass.
 
+No `_demo` content exists for Open Adventure.
+
 Next actions before any package work:
 
 - confirm final license/provenance posture for redistributable playable artifacts,
-- select exact playable format,
+- prove a tiny Inform 6 / Z-machine `.z8` slice outside the TerpVault repo,
 - validate route/playback in TerpVault,
 - then assemble helper docs/assets and package conventions.
