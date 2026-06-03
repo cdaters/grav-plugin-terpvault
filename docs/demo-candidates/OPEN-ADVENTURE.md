@@ -27,6 +27,30 @@ Open Adventure is tracked as the next candidate arc. It is not packaged in `_dem
 
 This remains suitable as a golden-master/oracle, but not as a clean “zero-fail” packaged baseline without addressing the savegame prompt conditions in this environment.
 
+## Continuation/tooling check
+
+Current local verification state:
+
+- The documented lab checkout exists at `~/Code/if-lab/open-adventure`.
+- The lab checkout is on branch `master` at commit `993291a21da44234ae9cf303d0ffc0df19ec3c31`.
+- The lab checkout currently has an untracked `.venv/`; do not treat that checkout as pristine without reviewing or ignoring local tooling state.
+- Basic build prerequisites observed on `PATH`: `make`, `gcc`, `python3`, `pkg-config`, `cppcheck`, and `asciidoctor`.
+- `pkg-config` resolves `libedit` for the native build (`-ledit`) and reports the local editline include path.
+- Full `make check` support is incomplete on the current `PATH`: `pylint`, `spellcheck`, and `tapview` were not found.
+
+Safe repeatable verification steps before any package work:
+
+1. Confirm the lab checkout branch and commit:
+   - `git -C ~/Code/if-lab/open-adventure rev-parse --abbrev-ref HEAD`
+   - `git -C ~/Code/if-lab/open-adventure rev-parse HEAD`
+   - `git -C ~/Code/if-lab/open-adventure status --short`
+2. Confirm prerequisite tools without building:
+   - `command -v make gcc python3 pkg-config cppcheck pylint spellcheck tapview asciidoctor`
+   - `pkg-config --libs libedit`
+   - `pkg-config --cflags libedit`
+3. If a fresh build/test rerun is needed, do it only in the lab checkout or another scratch path outside the TerpVault repo.
+4. Do not copy `advent`, `cheat`, generated `dungeon.c`/`dungeon.h`, save files, logs, transcripts, story artifacts, images, or package skeletons into this repository during candidate verification.
+
 ## License/provenance notes
 
 Open Adventure includes:
