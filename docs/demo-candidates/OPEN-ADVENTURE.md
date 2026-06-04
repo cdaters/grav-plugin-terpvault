@@ -1,8 +1,16 @@
 # Open Adventure / Colossal Cave Candidate Basis
 
-Status: **Research candidate / source/oracle only**
+Status: **Draft TerpVault demo/library candidate**
 
-Open Adventure is tracked as the next candidate arc. It is not packaged in `_demo` yet.
+Open Adventure is now promoted into the repository `_demo` tree as a draft,
+non-featured demo/library candidate at:
+
+```text
+_demo/data/terpvault/games/open-adventure
+```
+
+This is not a final release package. The current map/poster feelie is a
+draft/mockup and may be replaced later.
 
 Current port-strategy notes are kept outside this repo at `~/Code/if-lab/open-adventure-port/notes/PORT-STRATEGY.md`.
 
@@ -100,18 +108,18 @@ The current strategy is to treat the native `advent` baseline as a caveated orac
 ## Current repo docs status
 
 - `docs/DEMO-CANDIDATES.md` entry should be linked to this file.
-- `docs/DEMO-LIBRARY.md`, `docs/STARTER-LIBRARY.md`, and `docs/RELEASE-READINESS.md` still treat Open Adventure as candidate-only.
+- `docs/DEMO-LIBRARY.md`, `docs/STARTER-LIBRARY.md`, and `README.md` treat Open Adventure as a draft, non-featured demo/library candidate rather than a final bundled starter package.
 - `docs/NEXT-BUILD.md` should retain Open Adventure as a next-target verification item.
 
 ## Current decision
 
-No TerpVault package for Open Adventure is being created in this pass.
+The validated Open Adventure package candidate has been promoted into `_demo`
+for TerpVault demo/library evaluation.
 
-No `_demo` content exists for Open Adventure.
+Next actions before any final package/release decision:
 
-Next actions before any package work:
-
-- confirm final license/provenance posture for redistributable playable artifacts,
-- prove a tiny Inform 6 / Z-machine `.z8` slice outside the TerpVault repo,
-- validate route/playback in TerpVault,
-- then assemble helper docs/assets and package conventions.
+- complete final license/provenance review for the playable artifact and all
+  package assets,
+- replace or explicitly approve final map/poster art,
+- revalidate route/playback in TerpVault,
+- then decide whether to publish or keep the package draft-only.

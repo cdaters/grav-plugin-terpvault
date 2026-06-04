@@ -1,0 +1,92 @@
+id: open-adventure
+slug: open-adventure
+
+identification:
+  format: zcode
+  ifids:
+    - 74146740-24EA-5383-A8BF-8B239CE36DBE
+  zcode_version: 8
+
+bibliographic:
+  title: Open Adventure
+  author: William Crowther, Don Woods, ESR Open Adventure contributors
+  headline: Colossal Cave Adventure, Adventure 2.5 / 430-point lineage, ported to Inform 6
+  first_published: '2026'
+  genre: Interactive Fiction
+  language: en
+  description: |
+    Open Adventure is a faithful-as-practical Inform 6 / Z-machine port of ESR Open Adventure, representing all 20 native treasures with deterministic versions of the major late-game systems for reliable browser play.
+
+    This package candidate is based on the Crowther/Woods Adventure 2.5 / 430-point lineage as forward-ported by Eric S. Raymond. It is a package candidate, not final release art.
+
+resources:
+  story_file: story/open-adventure.z8
+  cover: cover.jpg
+  small_cover: small-cover.jpg
+  hero:
+    path: hero.jpg
+    focal_position: center center
+    overlay_tone: dark
+    gradient_direction: to bottom
+  screenshots:
+    - screenshots/01.png
+    - screenshots/02.png
+  how_to_play: how-to-play.md
+  hints: hints.md
+  walkthrough: walkthrough.md
+  feelies:
+    - title: Draft Map
+      path: feelies/open-adventure-map-draft.png
+      type: map
+      description: Draft Graphviz-rendered map mockup for the implemented port. Final map/poster art is still pending.
+    - title: Map Notes
+      path: feelies/open-adventure-map-notes.md
+      type: notes
+      description: Notes on map scope, source files, special transitions, and known limitations.
+    - title: Treasure Checklist
+      path: feelies/treasure-checklist.md
+      type: checklist
+      description: Checklist of all 20 native treasures represented by the port.
+    - title: History And Port Context
+      path: feelies/details-history.md
+      type: notes
+      description: Player-facing history and lineage notes for the package details page.
+    - title: Known Differences
+      path: feelies/known-differences.md
+      type: notes
+      description: Player-facing summary of port-specific differences and deferred native parity.
+
+release:
+  license:
+    name: BSD-2-Clause source lineage; package candidate needs final rights review
+    url: ''
+    notes: Native ESR Open Adventure source files identify BSD-2-Clause code/data licensing. Final packaging must re-check upstream, port, artwork, screenshot, and feelie rights before publication.
+  source:
+    url: ''
+    retrieved: '2026-06-04'
+    notes: Native oracle baseline 993291a21da44234ae9cf303d0ffc0df19ec3c31. Story SHA-256 284f3d08ab9cc692457d1a982acf7dddffcaf8bf0b4aa71cb5d1f33d82865d43.
+
+checksums:
+  story_sha256: 284f3d08ab9cc692457d1a982acf7dddffcaf8bf0b4aa71cb5d1f33d82865d43
+
+terpvault:
+  status: draft
+  featured: false
+  tags:
+    - candidate
+    - parser
+    - z-code
+    - adventure
+    - colossal-cave
+
+player:
+  engine: parchment
+  placement: focused
+  boot: autoload
+  theme: retro-terminal
+
+packaging_notes: >-
+  Draft TerpVault demo/library candidate promoted after import/inspect smoke.
+  Keep this package draft and non-featured. Current map/poster art is a
+  replaceable mockup and final release artwork/provenance review is still
+  pending.

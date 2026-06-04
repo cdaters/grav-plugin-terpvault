@@ -15,7 +15,7 @@ For Craig's development branch, the `_demo` tree also includes real starter pack
 - Keep v0.4.x starter-library work incremental and evidence-driven.
 - Zork II has completed approval, helper-doc polish, final audit, `_demo` promotion, and clean DDEV seed verification for this development demo tree. Zork III has completed that review path for this development demo tree and is bundled in `_demo`.
 - Mainframe Zork / Dungeon should remain a research-only candidate, separate from Zork I/II/III, until source selection, legal/provenance review, reference transcripts, build/reconstruction path, playback, and helper docs are clean.
-- Open Adventure / Colossal Cave should remain a candidate until the exact implementation, license/distribution scope, playable target, and TerpVault runtime strategy are verified. Current native `advent` output is a caveated oracle with `115 tests, 2 failures` (`saveresume.1`, `saveresume.3`), not a TerpVault-playable package; the preferred future strategy is a Z-machine `.z8` port.
+- Open Adventure / Colossal Cave is now present in `_demo` as a draft, non-featured demo/library candidate using an Inform 6 / Z-machine `.z8` port. It should remain draft until release-level provenance review, final map/poster art approval or replacement, and route/checksum validation are complete.
 - Grue and You Are Standing should be polished only if the exact story-file license, package-local original material notes, and supplemental material provenance are clear enough for the intended distribution.
 - v0.5.0 may become a public/GPM-readiness candidate only if the included starter/demo set is conservative, well documented, and free of questionable historical/commercial assets.
 - Demo art and helper docs should be original or have documented reuse rights, with package-local notes explaining source, classification, and license/provenance status.
@@ -87,9 +87,9 @@ The likely future path is to select the exact source basis, verify license/prove
 
 ### Open Adventure / Colossal Cave
 
-Open Adventure is a candidate-only source/oracle track based on `https://gitlab.com/esr/open-adventure` at commit `993291a21da44234ae9cf303d0ffc0df19ec3c31`. The native `advent` and `cheat` binaries build, and the current test baseline reports `115 tests, 2 failures` (`saveresume.1`, `saveresume.3`) from save/resume prompt/session behavior in this environment.
+Open Adventure is a draft, non-featured `_demo` demo/library candidate based on `https://gitlab.com/esr/open-adventure` at commit `993291a21da44234ae9cf303d0ffc0df19ec3c31`. The native `advent` and `cheat` binaries build, and the native test baseline reports `115 tests, 2 failures` (`saveresume.1`, `saveresume.3`) from save/resume prompt/session behavior in this environment.
 
-Treat the native build as a caveated oracle, not as a package artifact. TerpVault/Parchment cannot play native `advent` directly. The preferred future playable target is a Z-machine `.z8` port, likely through Inform 6 or another documented Z-machine authoring path, with Glulx as a fallback if `.z8` proves too constrained.
+Treat the native build as a caveated oracle, not as the package artifact. The promoted package uses an Inform 6 / Z-machine `.z8` port with package-local helper docs, screenshots, iFiction metadata, and draft feelies. It is not final or release-ready; final map/poster art remains replaceable.
 
 ### PDFA Ottumwa
 
