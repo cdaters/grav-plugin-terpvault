@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ifindex version="1.0" xmlns="http://babel.ifarchive.org/protocol/iFiction/">
+  <story>
+    <identification>
+      <ifid>74146740-24EA-5383-A8BF-8B239CE36DBE</ifid>
+      <format>zcode</format>
+    </identification>
+    <bibliographic>
+      <title>Open Adventure</title>
+      <author>William Crowther, Don Woods, Eric S. Raymond and contributors; Inform 6 / Z-machine port prepared for TerpVault</author>
+      <headline>Inform 6 / Z-machine port of ESR Open Adventure / Adventure 2.5 / 430-point lineage</headline>
+      <genre>Adventure</genre>
+      <language>en</language>
+      <description>This metadata describes the Open Adventure Inform 6 / Z-machine TerpVault port package candidate. The IFID belongs to this port artifact, not to the original Crowther/Woods Adventure, ESR's native C source, the 350-point version, the 550-point version, or another historical build.</description>
+    </bibliographic>
+  </story>
+</ifindex>
