@@ -147,7 +147,7 @@ class TerpVaultPlugin extends Plugin
                 'version' => $this->pluginVersion(),
                 'games' => array_map(static function (GamePackage $game) {
                     return $game->toArray();
-                }, $this->repository()->all(true)),
+                }, $this->repository()->all($this->showUnpublished())),
             ]);
         }
 
