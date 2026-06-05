@@ -35,6 +35,73 @@ Oracle v1 is a rendering layer over existing `resources.hints`.
 
 For Markdown files that already contain `<details>/<summary>`, V1 renders the Markdown inside The Oracle as-is, with disclosures collapsed. For simple heading-based Markdown such as `## Topic` followed by `### Gentle`, `### Stronger`, and `### Answer`, V1 adapts each `##` topic into a visible group and each `###` block into a collapsed progressive hint step.
 
+## Current Package Authoring
+
+Package authors should start with the existing helper resource path:
+
+```yaml
+resources:
+  hints: hints.md
+```
+
+The `hints.md` file must live in the package folder and should stay package-local. It can use any of the current Markdown patterns below.
+
+### Plain Markdown Notes
+
+Plain Markdown renders inside the collapsed Oracle panel. Use this for short, low-spoiler notes or general puzzle advice:
+
+```markdown
+# Hints
+
+Read room descriptions carefully, keep a map, and save before risky experiments.
+```
+
+### Disclosure Blocks
+
+Use `<details>/<summary>` when you want explicit question-and-answer spoiler blocks. TerpVault preserves the summary text and collapses every disclosure by default, even if the source uses `<details open>`:
+
+```markdown
+## Getting Started
+
+<details>
+<summary>Where should I begin?</summary>
+
+Explore nearby rooms, inspect obvious objects, and keep notes.
+
+</details>
+```
+
+This is the backward-compatible pattern used by legacy Zork-style hint files.
+
+### Heading-Based Progressive Hints
+
+Use `##` headings for Oracle groups and `###` headings for progressive hint steps. TerpVault adapts each step into a collapsed hint card:
+
+```markdown
+## Finding The Cave
+
+### Gentle
+
+The entrance is not inside the building.
+
+### Stronger
+
+Explore from the road through the valley and streambed.
+
+### Answer
+
+Take the keys and lamp, go to the grate, unlock it, open it, and go down.
+```
+
+This format is best when a package needs repeated gentle-to-direct hint ladders.
+
+### Authoring Advice
+
+- Keep spoilers progressive; make the first visible hint a nudge, not the solution.
+- Put full command routes and complete solution paths in `resources.walkthrough`, not in the first hint.
+- Keep hint files original or properly licensed, and record provenance where needed.
+- Keep all hint sources package-local so export/import can preserve them.
+
 ## Normalized Hint Model
 
 Static and guided hint sources should normalize into one internal model:
@@ -71,6 +138,8 @@ oracle:
 ```
 
 The `oracle` block should not replace `resources.hints`. It is a richer future configuration layer. If both exist, `resources.hints` should remain a valid simple source and can be treated as the default Markdown source unless a future migration explicitly says otherwise.
+
+Current packages do not need an `oracle` block. YAML/JSON structured hints, ROT13 sources, `.inv` files, Ink-guided hints, and Admin2 Oracle controls are roadmap items, not required or supported package-author setup for Oracle v1.
 
 ## Adapter Roadmap
 

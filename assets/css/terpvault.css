@@ -247,9 +247,24 @@ html.light-theme .terpvault,
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-start;
   gap: .35rem;
   margin-bottom: 1rem;
   font-size: .92rem;
+}
+
+.terpvault-breadcrumb > * {
+  flex: 0 1 auto;
+}
+
+.terpvault-breadcrumb [aria-current="page"] {
+  color: var(--tv-text-muted);
+  opacity: var(--tv-muted-opacity);
+}
+
+.terpvault-breadcrumb-separator {
+  color: var(--tv-text-muted);
+  opacity: .52;
 }
 
 .terpvault-version {
@@ -699,6 +714,22 @@ html.light-theme .terpvault,
 .terpvault-oracle-step summary strong {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.terpvault-feelies-summary {
+  cursor: pointer;
+  font-size: 1.18rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.terpvault-feelies-summary:hover,
+.terpvault-feelies-summary:focus {
+  color: var(--tv-link-color);
+}
+
+.terpvault-feelies-body {
+  margin-top: .75rem;
 }
 
 .terpvault-feelies-list {

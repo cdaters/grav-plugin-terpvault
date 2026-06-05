@@ -197,6 +197,8 @@ resources:
   hints: hints.md
 ```
 
+For current packages, `hints.md` may be plain Markdown, Markdown with `<details>/<summary>` spoiler blocks, or heading-based progressive hints using `##` groups and `###` steps such as `Gentle`, `Stronger`, and `Answer`. TerpVault renders these inside the collapsed Oracle panel and keeps individual hints collapsed by default. Put full command routes in `resources.walkthrough` instead of the first hint, and keep all hint sources package-local.
+
 Future richer packages may add an `oracle` block:
 
 ```yaml

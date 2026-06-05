@@ -96,22 +96,24 @@
 
     {% set feelies = game.feelies %}
     {% if feelies|length %}
-      <section class="terpvault-panel terpvault-feelies">
-        <h2>Extras & Feelies</h2>
-        <p class="terpvault-section-note">Package-local supplemental files such as manuals, maps, clue sheets, audio, and other extras.</p>
-        <div class="terpvault-feelies-list">
-          {% for item in feelies %}
-            <a class="terpvault-feelie" href="{{ item.url }}" rel="noopener">
-              <span>
-                <strong>{{ item.title }}</strong>
-                {% if item.description %}<small>{{ item.description }}</small>{% endif %}
-                <code>{{ item.path }}</code>
-              </span>
-              <em>{{ item.type ?: item.extension }}</em>
-            </a>
-          {% endfor %}
+      <details class="terpvault-panel terpvault-feelies">
+        <summary class="terpvault-feelies-summary">Extras & Feelies</summary>
+        <div class="terpvault-feelies-body">
+          <p class="terpvault-section-note">Package-local supplemental files such as manuals, maps, clue sheets, audio, and other extras.</p>
+          <div class="terpvault-feelies-list">
+            {% for item in feelies %}
+              <a class="terpvault-feelie" href="{{ item.url }}" rel="noopener">
+                <span>
+                  <strong>{{ item.title }}</strong>
+                  {% if item.description %}<small>{{ item.description }}</small>{% endif %}
+                  <code>{{ item.path }}</code>
+                </span>
+                <em>{{ item.type ?: item.extension }}</em>
+              </a>
+            {% endfor %}
+          </div>
         </div>
-      </section>
+      </details>
     {% endif %}
 
     {% set provenance_rows = game.provenanceRows %}
