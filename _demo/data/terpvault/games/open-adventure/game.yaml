@@ -62,12 +62,12 @@ release:
     url: ''
     notes: Native ESR Open Adventure source files identify BSD-2-Clause code/data licensing. Final packaging must re-check upstream, port, artwork, screenshot, and feelie rights before publication.
   source:
-    url: ''
+    url: https://github.com/cdaters/open-adventure-inform
     retrieved: '2026-06-04'
-    notes: Native oracle baseline 993291a21da44234ae9cf303d0ffc0df19ec3c31. Story SHA-256 197a3aabe20d04225985b58349e59ee50caf8da24a6a0c8999283bab4f10d67a.
+    notes: Intended public port repository name is open-adventure-inform. Native oracle baseline 993291a21da44234ae9cf303d0ffc0df19ec3c31. Story SHA-256 a30277240f66a6fa107d9cbf84674133ee19714eebf24d3ef0d0dddb628f27be.
 
 checksums:
-  story_sha256: 197a3aabe20d04225985b58349e59ee50caf8da24a6a0c8999283bab4f10d67a
+  story_sha256: a30277240f66a6fa107d9cbf84674133ee19714eebf24d3ef0d0dddb628f27be
 
 terpvault:
   status: draft
@@ -86,7 +86,6 @@ player:
   theme: retro-terminal
 
 packaging_notes: >-
-  Draft TerpVault demo/library candidate refreshed from the rebuilt Open
-  Adventure package candidate. Keep this package draft and non-featured. Current
-  map/poster art is a replaceable mockup and final release artwork/provenance
-  review is still pending.
+  Candidate staged inside the Open Adventure Inform 6 port repo only. Do not
+  import into TerpVault until metadata, artwork, provenance, and import smoke
+  have been reviewed.

@@ -13,20 +13,22 @@ Native oracle baseline:
 993291a21da44234ae9cf303d0ffc0df19ec3c31
 ```
 
+Intended port source repository:
+
+```text
+https://github.com/cdaters/open-adventure-inform
+```
+
 IFID:
 
 ```text
 74146740-24EA-5383-A8BF-8B239CE36DBE
 ```
 
-This IFID belongs to the Open Adventure Inform 6 / Z-machine TerpVault port. It
+This IFID belongs to the Open Adventure Inform 6 / Z-machine port artifact. It
 is not a historical identifier for Crowther/Woods Adventure, ESR's native C
-source, or another existing build. The policy for this candidate is a stable
-UUIDv5-style identifier generated from the port-specific name:
-
-```text
-urn:open-adventure-port:inform6-zmachine:terpvault:993291a21da44234ae9cf303d0ffc0df19ec3c31
-```
+source, or another existing build. It is preserved as the port moves toward the
+standalone `open-adventure-inform` repository identity.
 
 Built story file:
 
@@ -37,7 +39,7 @@ open-adventure.z8
 Validated SHA-256 at seed time:
 
 ```text
-197a3aabe20d04225985b58349e59ee50caf8da24a6a0c8999283bab4f10d67a
+a30277240f66a6fa107d9cbf84674133ee19714eebf24d3ef0d0dddb628f27be
 ```
 
 Package-local iFiction metadata:
@@ -47,9 +49,9 @@ metadata.iFiction.xml
 ```
 
 The iFiction file repeats the port-owned IFID and describes this Inform 6 /
-Z-machine TerpVault package candidate. It does not claim to identify the
-original Crowther/Woods Adventure, ESR's native C source, the 350-point version,
-the 550-point version, or another historical build.
+Z-machine port artifact and package candidate. It does not claim to identify
+the original Crowther/Woods Adventure, ESR's native C source, the 350-point
+version, the 550-point version, or another historical build.
 
 Package-candidate archive hashes are recorded in the source repo packaging
 notes and build log after each rebuild. The zip hash is not embedded in this
