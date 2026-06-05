@@ -188,7 +188,7 @@ Older roadmap examples used `player.launch_mode` and `player.autostart`. Treat t
 
 ## The Oracle hint roadmap
 
-The Oracle is TerpVault's future spoiler-safe hint experience. It should evolve the current Help & Reference hints area into progressive reveal cards without replacing the whole detail page structure.
+The Oracle is TerpVault's spoiler-safe hint experience. Oracle v1 renders the current Help & Reference hints area as a progressive panel without replacing the whole detail page structure.
 
 Simple packages should continue to declare:
 
@@ -196,6 +196,8 @@ Simple packages should continue to declare:
 resources:
   hints: hints.md
 ```
+
+For current packages, `hints.md` may be plain Markdown, Markdown with `<details>/<summary>` spoiler blocks, or heading-based progressive hints using `##` groups and `###` steps such as `Gentle`, `Stronger`, and `Answer`. TerpVault renders these inside the collapsed Oracle panel and keeps individual hints collapsed by default. Put full command routes in `resources.walkthrough` instead of the first hint, and keep all hint sources package-local.
 
 Future richer packages may add an `oracle` block:
 

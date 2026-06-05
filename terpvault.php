@@ -97,6 +97,7 @@ class TerpVaultPlugin extends Plugin
         $twig->addFunction(new TwigFunction('terpvault_game', [$this, 'twigGame']));
         $twig->addFunction(new TwigFunction('terpvault_player_url', [$this, 'twigPlayerUrl']));
         $twig->addFunction(new TwigFunction('terpvault_render_markdown', [$this, 'twigRenderMarkdown'], ['is_safe' => ['html']]));
+        $twig->addFunction(new TwigFunction('terpvault_render_oracle', [$this, 'twigRenderOracle'], ['is_safe' => ['html']]));
         $twig->addFunction(new TwigFunction('terpvault_markdown', [$this, 'twigMarkdown'], ['is_safe' => ['html']]));
         $twig->addFunction(new TwigFunction('terpvault_game_from_route', [$this, 'twigGameFromRoute']));
     }
@@ -404,6 +405,167 @@ class TerpVaultPlugin extends Plugin
 
         $markdown = file_get_contents($file) ?: '';
         return $this->markdownToHtml($markdown);
+    }
+
+    public function twigRenderOracle(?string $file): string
+    {
+        if (!$file || !is_file($file)) {
+            return '';
+        }
+
+        $markdown = file_get_contents($file) ?: '';
+        return $this->oracleHintsToHtml($markdown);
+    }
+
+    protected function oracleHintsToHtml(string $markdown): string
+    {
+        $markdown = trim($markdown);
+        if ($markdown === '') {
+            return '';
+        }
+
+        if (preg_match('/<details\b/i', $markdown)) {
+            $html = $this->markdownToHtml($markdown);
+            $html = $this->collapseDisclosureHtml($html);
+            $html = $this->stripGenericHintsHeading($html);
+
+            return '<div class="terpvault-oracle-markdown terpvault-detail-body">' . $html . '</div>';
+        }
+
+        $sections = $this->oracleMarkdownSections($markdown);
+        if ($sections) {
+            return $this->renderOracleSections($sections);
+        }
+
+        $html = $this->stripGenericHintsHeading($this->markdownToHtml($markdown));
+        return '<div class="terpvault-oracle-markdown terpvault-detail-body">' . $html . '</div>';
+    }
+
+    /**
+     * Light adapter for simple package Markdown organized as:
+     * ## Topic, then ### Gentle / Stronger / Answer style hint steps.
+     */
+    protected function oracleMarkdownSections(string $markdown): array
+    {
+        $lines = preg_split('/\R/', $markdown);
+        if (!$lines) {
+            return [];
+        }
+
+        $sections = [];
+        $section = null;
+        $step = null;
+
+        $flushStep = static function () use (&$section, &$step): void {
+            if ($section !== null && $step !== null) {
+                $step['markdown'] = trim(implode("\n", $step['lines']));
+                unset($step['lines']);
+                $section['steps'][] = $step;
+            }
+            $step = null;
+        };
+
+        $flushSection = static function () use (&$sections, &$section, &$flushStep): void {
+            if ($section === null) {
+                return;
+            }
+
+            $flushStep();
+            $section['body'] = trim(implode("\n", $section['body_lines']));
+            unset($section['body_lines']);
+
+            if ($section['steps'] || $section['body'] !== '') {
+                $sections[] = $section;
+            }
+
+            $section = null;
+        };
+
+        foreach ($lines as $line) {
+            if (preg_match('/^##\s+(.+?)\s*$/', $line, $matches)) {
+                $flushSection();
+                $section = [
+                    'title' => trim($matches[1]),
+                    'body_lines' => [],
+                    'steps' => [],
+                ];
+                continue;
+            }
+
+            if ($section !== null && preg_match('/^###\s+(.+?)\s*$/', $line, $matches)) {
+                $flushStep();
+                $step = [
+                    'title' => trim($matches[1]),
+                    'lines' => [],
+                ];
+                continue;
+            }
+
+            if ($section === null) {
+                continue;
+            }
+
+            if ($step !== null) {
+                $step['lines'][] = $line;
+            } else {
+                $section['body_lines'][] = $line;
+            }
+        }
+
+        $flushSection();
+
+        foreach ($sections as $item) {
+            if (!empty($item['steps'])) {
+                return $sections;
+            }
+        }
+
+        return [];
+    }
+
+    protected function renderOracleSections(array $sections): string
+    {
+        $html = ['<div class="terpvault-oracle-groups">'];
+
+        foreach ($sections as $section) {
+            $title = htmlspecialchars((string) $section['title'], ENT_QUOTES, 'UTF-8');
+            $html[] = '<section class="terpvault-oracle-group">';
+            $html[] = '<h4>' . $title . '</h4>';
+
+            if (!empty($section['body'])) {
+                $html[] = '<div class="terpvault-oracle-group-body terpvault-detail-body">' . $this->markdownToHtml((string) $section['body']) . '</div>';
+            }
+
+            if (!empty($section['steps'])) {
+                $html[] = '<div class="terpvault-oracle-steps">';
+                foreach ($section['steps'] as $index => $step) {
+                    $label = htmlspecialchars((string) $step['title'], ENT_QUOTES, 'UTF-8');
+                    $number = $index + 1;
+                    $body = $this->markdownToHtml((string) ($step['markdown'] ?? ''));
+                    $html[] = '<details class="terpvault-oracle-step">';
+                    $html[] = '<summary><span>Hint ' . $number . '</span><strong>' . $label . '</strong></summary>';
+                    $html[] = '<div class="terpvault-detail-body">' . $body . '</div>';
+                    $html[] = '</details>';
+                }
+                $html[] = '</div>';
+            }
+
+            $html[] = '</section>';
+        }
+
+        $html[] = '</div>';
+
+        return implode("\n", $html);
+    }
+
+    protected function collapseDisclosureHtml(string $html): string
+    {
+        return preg_replace('/<details\b([^>]*)\s+open(?:=(?:"[^"]*"|\'[^\']*\'|[^\s>]+))?([^>]*)>/i', '<details$1$2>', $html) ?: $html;
+    }
+
+    protected function stripGenericHintsHeading(string $html): string
+    {
+        return preg_replace('/^\s*<h1>\s*Hints\s*<\/h1>\s*/i', '', $html, 1) ?: $html;
     }
 
     /**

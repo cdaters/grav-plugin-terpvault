@@ -69,10 +69,17 @@
           </details>
         {% endif %}
         {% if hints %}
-          <details>
-            <summary>Hints</summary>
-            <div class="terpvault-detail-body">
-              {{ terpvault_render_markdown(hints)|raw }}
+          <details class="terpvault-oracle" aria-labelledby="terpvault-oracle-{{ game.slug }}">
+            <summary class="terpvault-oracle-summary">
+              <span>
+                <span class="terpvault-kicker">Progressive Hints</span>
+                <strong id="terpvault-oracle-{{ game.slug }}">The Oracle</strong>
+                <span>Are you lost and need a hand?</span>
+              </span>
+            </summary>
+            <div class="terpvault-oracle-body">
+              <p class="terpvault-oracle-warning">Open only the hints you want. Later hints may reveal puzzle solutions.</p>
+              {{ terpvault_render_oracle(hints)|raw }}
             </div>
           </details>
         {% endif %}
@@ -89,22 +96,24 @@
 
     {% set feelies = game.feelies %}
     {% if feelies|length %}
-      <section class="terpvault-panel terpvault-feelies">
-        <h2>Extras & Feelies</h2>
-        <p class="terpvault-section-note">Package-local supplemental files such as manuals, maps, clue sheets, audio, and other extras.</p>
-        <div class="terpvault-feelies-list">
-          {% for item in feelies %}
-            <a class="terpvault-feelie" href="{{ item.url }}" rel="noopener">
-              <span>
-                <strong>{{ item.title }}</strong>
-                {% if item.description %}<small>{{ item.description }}</small>{% endif %}
-                <code>{{ item.path }}</code>
-              </span>
-              <em>{{ item.type ?: item.extension }}</em>
-            </a>
-          {% endfor %}
+      <details class="terpvault-panel terpvault-feelies">
+        <summary class="terpvault-feelies-summary">Extras & Feelies</summary>
+        <div class="terpvault-feelies-body">
+          <p class="terpvault-section-note">Package-local supplemental files such as manuals, maps, clue sheets, audio, and other extras.</p>
+          <div class="terpvault-feelies-list">
+            {% for item in feelies %}
+              <a class="terpvault-feelie" href="{{ item.url }}" rel="noopener">
+                <span>
+                  <strong>{{ item.title }}</strong>
+                  {% if item.description %}<small>{{ item.description }}</small>{% endif %}
+                  <code>{{ item.path }}</code>
+                </span>
+                <em>{{ item.type ?: item.extension }}</em>
+              </a>
+            {% endfor %}
+          </div>
         </div>
-      </section>
+      </details>
     {% endif %}
 
     {% set provenance_rows = game.provenanceRows %}

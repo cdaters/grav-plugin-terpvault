@@ -5,10 +5,12 @@
   {% set feelie = terpvault_current_feelie %}
   {% set feelie_path = terpvault_current_feelie_path %}
   <article class="terpvault terpvault-feelie-page">
-    <nav class="terpvault-breadcrumb">
+    <nav class="terpvault-breadcrumb" aria-label="Breadcrumb">
       <a href="{{ terpvault.route }}">← Library</a>
-      <span>/</span>
+      <span class="terpvault-breadcrumb-separator">/</span>
       <a href="{{ game.url('detail') }}">{{ game.title }}</a>
+      <span class="terpvault-breadcrumb-separator">/</span>
+      <span aria-current="page">{{ feelie.title }}</span>
     </nav>
 
     <section class="terpvault-panel">

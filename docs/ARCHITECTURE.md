@@ -123,7 +123,7 @@ Future terminal theme presets should be CSS-based TerpVault shell presets such a
 
 ## Oracle hint architecture
 
-The Oracle is the future spoiler-safe hint/help UX. It should scaffold into the existing Help & Reference area and preserve the current simple helper-file path:
+The Oracle is TerpVault's spoiler-safe hint/help UX. Oracle v1 scaffolds into the existing Help & Reference area and preserves the current simple helper-file path:
 
 ```yaml
 resources:

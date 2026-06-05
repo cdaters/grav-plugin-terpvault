@@ -247,9 +247,24 @@ html.light-theme .terpvault,
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-start;
   gap: .35rem;
   margin-bottom: 1rem;
   font-size: .92rem;
+}
+
+.terpvault-breadcrumb > * {
+  flex: 0 1 auto;
+}
+
+.terpvault-breadcrumb [aria-current="page"] {
+  color: var(--tv-text-muted);
+  opacity: var(--tv-muted-opacity);
+}
+
+.terpvault-breadcrumb-separator {
+  color: var(--tv-text-muted);
+  opacity: .52;
 }
 
 .terpvault-version {
@@ -545,6 +560,176 @@ html.light-theme .terpvault,
 .terpvault-detail-body summary {
   margin: 0 -.75rem;
   padding: .65rem .75rem;
+}
+
+.terpvault-oracle {
+  padding: 0;
+  border: 1px solid var(--tv-border-strong);
+  border-radius: var(--tv-radius-sm);
+  background: var(--tv-surface-raised);
+}
+
+.terpvault-oracle-summary {
+  padding: .85rem .9rem;
+}
+
+.terpvault-oracle-summary > span {
+  display: grid;
+  gap: .2rem;
+}
+
+.terpvault-oracle-summary strong {
+  font-size: 1.08rem;
+  line-height: 1.2;
+}
+
+.terpvault-oracle-summary > span > span:last-child {
+  font-weight: 400;
+  opacity: var(--tv-soft-opacity);
+}
+
+.terpvault-oracle-body {
+  display: grid;
+  gap: .75rem;
+  padding: .9rem;
+  border-top: 1px solid var(--tv-border);
+}
+
+.terpvault-oracle-warning {
+  margin: 0;
+  padding: .6rem .7rem;
+  border: 1px solid var(--tv-border);
+  border-radius: var(--tv-radius-sm);
+  background: var(--tv-surface-inset);
+  color: var(--tv-text-muted);
+  font-size: .9rem;
+  opacity: var(--tv-muted-opacity);
+}
+
+.terpvault-oracle-markdown {
+  padding: 0;
+}
+
+.terpvault-oracle-markdown > :first-child {
+  margin-top: 0;
+}
+
+.terpvault-oracle-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.terpvault-oracle-markdown h2,
+.terpvault-oracle-group h4 {
+  margin: .4rem 0 .45rem;
+  font-size: .98rem;
+  line-height: 1.25;
+}
+
+.terpvault-oracle-markdown details,
+.terpvault-oracle-step {
+  margin: .55rem 0;
+  padding: 0;
+  border: 1px solid var(--tv-border);
+  border-radius: var(--tv-radius-sm);
+  background: var(--tv-surface-inset);
+  overflow: hidden;
+}
+
+.terpvault-oracle-markdown details + details {
+  margin-top: .55rem;
+}
+
+.terpvault-oracle-markdown details[open] {
+  padding-bottom: .85rem;
+}
+
+.terpvault-oracle-markdown details > :not(summary) {
+  margin-right: .95rem;
+  margin-left: .95rem;
+}
+
+.terpvault-oracle-markdown details > summary + :not(summary) {
+  margin-top: .8rem;
+}
+
+.terpvault-oracle-markdown details > :last-child {
+  margin-bottom: 0;
+}
+
+.terpvault-oracle-markdown summary,
+.terpvault-oracle-step summary {
+  margin: 0;
+  cursor: pointer;
+  padding: .7rem .8rem;
+  font-weight: 700;
+}
+
+.terpvault-oracle-markdown summary:hover,
+.terpvault-oracle-markdown summary:focus,
+.terpvault-oracle-step summary:hover,
+.terpvault-oracle-step summary:focus {
+  background: var(--tv-surface);
+}
+
+.terpvault-oracle-groups {
+  display: grid;
+  gap: .8rem;
+}
+
+.terpvault-oracle-group {
+  display: grid;
+  gap: .55rem;
+}
+
+.terpvault-oracle-group h4 {
+  margin-bottom: 0;
+}
+
+.terpvault-oracle-group-body {
+  padding: 0;
+}
+
+.terpvault-oracle-steps {
+  display: grid;
+  gap: .5rem;
+}
+
+.terpvault-oracle-step summary {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+}
+
+.terpvault-oracle-step summary span {
+  flex: 0 0 auto;
+  padding: .12rem .45rem;
+  border-radius: var(--tv-radius-sm);
+  background: var(--tv-surface-strong);
+  color: var(--tv-text-muted);
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.terpvault-oracle-step summary strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.terpvault-feelies-summary {
+  cursor: pointer;
+  font-size: 1.18rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.terpvault-feelies-summary:hover,
+.terpvault-feelies-summary:focus {
+  color: var(--tv-link-color);
+}
+
+.terpvault-feelies-body {
+  margin-top: .75rem;
 }
 
 .terpvault-feelies-list {
