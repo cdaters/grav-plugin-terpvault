@@ -27,6 +27,7 @@ Oracle v1 is a rendering layer over existing `resources.hints`.
 - It adds a public `The Oracle` panel inside Help & Reference.
 - It uses the subtitle `Are you lost and need a hand?`.
 - It keeps native `<details>` disclosure controls so hints are keyboard-accessible without JavaScript.
+- The whole Oracle panel is collapsed by default, so hint content is opt-in before any individual hint is opened.
 - It collapses Oracle disclosures by default, even if a hint source contains `<details open>`.
 - It preserves existing package-local Markdown rendering and the limited safe HTML whitelist for `<details>` and `<summary>`.
 - It does not require or read an `oracle` manifest block.

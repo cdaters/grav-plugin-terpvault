@@ -548,27 +548,36 @@ html.light-theme .terpvault,
 }
 
 .terpvault-oracle {
-  display: grid;
-  gap: .75rem;
-  padding: .9rem;
+  padding: 0;
   border: 1px solid var(--tv-border-strong);
   border-radius: var(--tv-radius-sm);
   background: var(--tv-surface-raised);
 }
 
-.terpvault-oracle-header {
+.terpvault-oracle-summary {
+  padding: .85rem .9rem;
+}
+
+.terpvault-oracle-summary > span {
   display: grid;
   gap: .2rem;
 }
 
-.terpvault-oracle-header h3 {
-  margin: 0;
+.terpvault-oracle-summary strong {
   font-size: 1.08rem;
   line-height: 1.2;
 }
 
-.terpvault-oracle-header p {
-  margin: 0;
+.terpvault-oracle-summary > span > span:last-child {
+  font-weight: 400;
+  opacity: var(--tv-soft-opacity);
+}
+
+.terpvault-oracle-body {
+  display: grid;
+  gap: .75rem;
+  padding: .9rem;
+  border-top: 1px solid var(--tv-border);
 }
 
 .terpvault-oracle-warning {
@@ -613,6 +622,23 @@ html.light-theme .terpvault,
 
 .terpvault-oracle-markdown details + details {
   margin-top: .55rem;
+}
+
+.terpvault-oracle-markdown details[open] {
+  padding-bottom: .85rem;
+}
+
+.terpvault-oracle-markdown details > :not(summary) {
+  margin-right: .95rem;
+  margin-left: .95rem;
+}
+
+.terpvault-oracle-markdown details > summary + :not(summary) {
+  margin-top: .8rem;
+}
+
+.terpvault-oracle-markdown details > :last-child {
+  margin-bottom: 0;
 }
 
 .terpvault-oracle-markdown summary,
