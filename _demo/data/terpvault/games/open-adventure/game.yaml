@@ -64,10 +64,10 @@ release:
   source:
     url: ''
     retrieved: '2026-06-04'
-    notes: Native oracle baseline 993291a21da44234ae9cf303d0ffc0df19ec3c31. Story SHA-256 284f3d08ab9cc692457d1a982acf7dddffcaf8bf0b4aa71cb5d1f33d82865d43.
+    notes: Native oracle baseline 993291a21da44234ae9cf303d0ffc0df19ec3c31. Story SHA-256 197a3aabe20d04225985b58349e59ee50caf8da24a6a0c8999283bab4f10d67a.
 
 checksums:
-  story_sha256: 284f3d08ab9cc692457d1a982acf7dddffcaf8bf0b4aa71cb5d1f33d82865d43
+  story_sha256: 197a3aabe20d04225985b58349e59ee50caf8da24a6a0c8999283bab4f10d67a
 
 terpvault:
   status: draft
@@ -86,7 +86,7 @@ player:
   theme: retro-terminal
 
 packaging_notes: >-
-  Draft TerpVault demo/library candidate promoted after import/inspect smoke.
-  Keep this package draft and non-featured. Current map/poster art is a
-  replaceable mockup and final release artwork/provenance review is still
-  pending.
+  Draft TerpVault demo/library candidate refreshed from the rebuilt Open
+  Adventure package candidate. Keep this package draft and non-featured. Current
+  map/poster art is a replaceable mockup and final release artwork/provenance
+  review is still pending.

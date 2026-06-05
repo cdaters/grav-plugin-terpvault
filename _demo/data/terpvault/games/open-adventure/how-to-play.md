@@ -11,6 +11,8 @@ lamp on
 north
 open grate
 score
+help
+info
 ```
 
 Compass directions (`north`, `south`, `east`, `west`, `up`, `down`) move you
@@ -25,6 +27,11 @@ underground.
 
 Use `inventory` to see what you are carrying. Use `score` or `points` to check
 progress. Treasures earn their full value only when left safely in the building.
+Use `help` for general movement and command hints, `info` for scoring and
+ending-your-game notes, and `news` for a short source/port note.
+
+At the opening question, type `yes` or `no` to choose whether you want the
+introductory instructions.
 
 ## Command Style
 
