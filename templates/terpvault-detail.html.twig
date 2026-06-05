@@ -69,12 +69,15 @@
           </details>
         {% endif %}
         {% if hints %}
-          <details>
-            <summary>Hints</summary>
-            <div class="terpvault-detail-body">
-              {{ terpvault_render_markdown(hints)|raw }}
+          <section class="terpvault-oracle" aria-labelledby="terpvault-oracle-{{ game.slug }}">
+            <div class="terpvault-oracle-header">
+              <p class="terpvault-kicker">Progressive Hints</p>
+              <h3 id="terpvault-oracle-{{ game.slug }}">The Oracle</h3>
+              <p>Are you lost and need a hand?</p>
             </div>
-          </details>
+            <p class="terpvault-oracle-warning">Open only the hints you want. Later hints may reveal puzzle solutions.</p>
+            {{ terpvault_render_oracle(hints)|raw }}
+          </section>
         {% endif %}
         {% if walkthrough %}
           <details>

@@ -1,6 +1,6 @@
 # The Oracle and Progressive Hints
 
-The Oracle is TerpVault's future spoiler-safe hint/help experience. It should evolve the current frontend Help & Reference hints area without replacing the game detail page structure or breaking simple packages.
+The Oracle is TerpVault's spoiler-safe hint/help experience. It evolves the current frontend Help & Reference hints area without replacing the game detail page structure or breaking simple packages.
 
 Current packages can keep using:
 
@@ -9,16 +9,30 @@ resources:
   hints: hints.md
 ```
 
-That path remains the legacy/simple hint source. Existing `hints.md` files should continue to render as package-local Markdown, including the current limited safe HTML support for `<details>` and `<summary>` disclosure blocks.
+That path remains the legacy/simple hint source. Existing `hints.md` files render as package-local Markdown, including the current limited safe HTML support for `<details>` and `<summary>` disclosure blocks.
 
 ## Public UX Direction
 
 - Public-facing label: `The Oracle`.
 - Possible subtitle: `Are you lost and need a hand?`
 - The Oracle should live inside or near the existing Help & Reference section.
-- First implementation should be additive and backwards compatible.
+- The first implementation is additive and backwards compatible.
 - A plain `hints.md` package should still work without an `oracle` manifest block.
 - UI should avoid the name `Invisiclues`; use `The Oracle`, `Progressive Hints`, or plain `Hints` where needed.
+
+## V1 Runtime Behavior
+
+Oracle v1 is a rendering layer over existing `resources.hints`.
+
+- It adds a public `The Oracle` panel inside Help & Reference.
+- It uses the subtitle `Are you lost and need a hand?`.
+- It keeps native `<details>` disclosure controls so hints are keyboard-accessible without JavaScript.
+- It collapses Oracle disclosures by default, even if a hint source contains `<details open>`.
+- It preserves existing package-local Markdown rendering and the limited safe HTML whitelist for `<details>` and `<summary>`.
+- It does not require or read an `oracle` manifest block.
+- It does not add Ink, inkjs, Admin2 Oracle controls, `.inv` parsing, ROT13 decoding, YAML hints, or JSON hints.
+
+For Markdown files that already contain `<details>/<summary>`, V1 renders the Markdown inside The Oracle as-is, with disclosures collapsed. For simple heading-based Markdown such as `## Topic` followed by `### Gentle`, `### Stronger`, and `### Answer`, V1 adapts each `##` topic into a visible group and each `###` block into a collapsed progressive hint step.
 
 ## Normalized Hint Model
 
@@ -92,7 +106,7 @@ Admin2 currently supports helper Markdown editing for `how-to-play.md`, `hints.m
 
 ## Implementation Guardrails
 
-- Docs first; no runtime implementation is implied by this note.
+- Oracle v1 is runtime presentation only; richer sources remain roadmap work.
 - Keep import/export aware of conventional helper files including `hints.md`.
 - Keep public rendering spoiler-safe and keyboard-accessible.
 - Sanitize any rendered Markdown or limited HTML consistently with existing TerpVault behavior.

@@ -18,7 +18,7 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - TerpVault is not GPM-ready yet.
 - The v0.4.x line should remain incremental: focused Admin2/library improvements, metadata/iFiction polish, safe delete design, demo candidate preparation, and player/theme checks.
 - Player placement, boot behavior, Inline Play Mode, terminal theme presets, and public theme pickers are roadmap-only unless a future build explicitly implements and documents them.
-- The Oracle/progressive hint system is roadmap-only; simple package-local `resources.hints: hints.md` remains the current compatible hint path.
+- Oracle v1 renders simple package-local `resources.hints: hints.md` in the frontend; richer Oracle sources, guided flows, and Admin2 controls remain roadmap-only.
 - Content transparency filtering and Admin2 controls are roadmap-only; content notes should describe works neutrally and should not hide, block, endorse, or morally rank works by default.
 - A future Admin2 Guide/Help tab is roadmap-only; no runtime Guide tab is implemented yet.
 - v0.5.0 is the intended public milestone/GPM-readiness candidate line, pending a full audit and a credible demo/support posture.

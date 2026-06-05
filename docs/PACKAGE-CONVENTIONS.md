@@ -188,7 +188,7 @@ Older roadmap examples used `player.launch_mode` and `player.autostart`. Treat t
 
 ## The Oracle hint roadmap
 
-The Oracle is TerpVault's future spoiler-safe hint experience. It should evolve the current Help & Reference hints area into progressive reveal cards without replacing the whole detail page structure.
+The Oracle is TerpVault's spoiler-safe hint experience. Oracle v1 renders the current Help & Reference hints area as a progressive panel without replacing the whole detail page structure.
 
 Simple packages should continue to declare:
 

@@ -29,7 +29,7 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Admin2 pagination and virtual scrolling are not implemented.
 - Named save slots and server-side saves are not implemented.
 - Public frontend routing and Parchment/player behavior should stay unchanged during Admin2 work.
-- The Oracle/progressive hint system is roadmap-only; current packages continue to use helper Markdown such as `resources.hints: hints.md`.
+- Oracle v1 renders current helper Markdown such as `resources.hints: hints.md` in a spoiler-safe frontend panel; richer sources and Admin2 controls remain roadmap-only.
 - Content transparency search/filter controls are roadmap-only; current manifests with simple tags or no tags remain valid.
 - Admin2 Guide/Help tab is roadmap-only; no runtime in-product guide is implemented yet.
 
@@ -46,7 +46,7 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Track Mainframe Zork / Dungeon as a research-only demo candidate. Do not create a playable package or bundle artifacts until source selection, license/provenance, reference transcripts, build/reconstruction path, playback behavior, and helper docs are complete.
 - Polish public/demo suite candidates such as Open Adventure / Colossal Cave, Grue, and You Are Standing only when story files, art, helper docs, and license/provenance notes are original or properly licensed. Open Adventure now has a draft, non-featured `_demo` package candidate using an Inform 6 / Z-machine `.z8` port, with native `advent` still treated as a caveated oracle (`115 tests, 2 failures`: `saveresume.1`, `saveresume.3`). Keep it draft until final map/poster art and release-level provenance review are complete.
 - Continue Quark2/Typhoon light/dark checks and player shell refinements. Plan Inline Play Mode and terminal-style player themes as roadmap work only; pass future Parchment theme hints only if the bundled/configured Parchment runtime supports them safely.
-- Align docs before new package work around The Oracle/progressive hints, player placement/boot behavior, content transparency, Grav-compatible tagging/search posture, and a future Admin2 Guide tab.
+- Keep docs aligned before new package work around richer Oracle/progressive hints, player placement/boot behavior, content transparency, Grav-compatible tagging/search posture, and a future Admin2 Guide tab.
 
 ### v0.5.0 milestone concept
 
