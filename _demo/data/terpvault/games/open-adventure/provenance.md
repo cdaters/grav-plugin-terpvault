@@ -39,7 +39,7 @@ open-adventure.z8
 Validated SHA-256 at seed time:
 
 ```text
-a30277240f66a6fa107d9cbf84674133ee19714eebf24d3ef0d0dddb628f27be
+54a70e56fb78c5e2d2fcd98668177779f0cba35916ac9e6f902b2b2c82fdc712
 ```
 
 Package-local iFiction metadata:

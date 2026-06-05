@@ -64,10 +64,10 @@ release:
   source:
     url: https://github.com/cdaters/open-adventure-inform
     retrieved: '2026-06-04'
-    notes: Intended public port repository name is open-adventure-inform. Native oracle baseline 993291a21da44234ae9cf303d0ffc0df19ec3c31. Story SHA-256 3380a1bf83857e46b59bb1c40222baffc780d3d68c053fb8f6fecb34bbaf2794.
+    notes: Intended public port repository name is open-adventure-inform. Native oracle baseline 993291a21da44234ae9cf303d0ffc0df19ec3c31. Story SHA-256 54a70e56fb78c5e2d2fcd98668177779f0cba35916ac9e6f902b2b2c82fdc712.
 
 checksums:
-  story_sha256: 3380a1bf83857e46b59bb1c40222baffc780d3d68c053fb8f6fecb34bbaf2794
+  story_sha256: 54a70e56fb78c5e2d2fcd98668177779f0cba35916ac9e6f902b2b2c82fdc712
 
 terpvault:
   status: draft
