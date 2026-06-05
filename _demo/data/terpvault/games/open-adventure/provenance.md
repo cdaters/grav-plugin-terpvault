@@ -1,19 +1,5 @@
 # Provenance
 
-## TerpVault demo/library candidate promotion - 2026-06-04
-
-Craig approved promoting this validated package candidate into the TerpVault
-repository `_demo` tree as a draft, non-featured demo/library candidate:
-
-```text
-_demo/data/terpvault/games/open-adventure
-```
-
-This is not a final release package. The current map/poster feelie is a
-draft/mockup and may be replaced later. Keep the package at
-`terpvault.status: draft` and `terpvault.featured: false` until a later explicit
-release-readiness review.
-
 This package seed is based on an Inform 6 / Z-machine port of ESR Open
 Adventure / Colossal Cave.
 
@@ -51,7 +37,7 @@ open-adventure.z8
 Validated SHA-256 at seed time:
 
 ```text
-284f3d08ab9cc692457d1a982acf7dddffcaf8bf0b4aa71cb5d1f33d82865d43
+197a3aabe20d04225985b58349e59ee50caf8da24a6a0c8999283bab4f10d67a
 ```
 
 Package-local iFiction metadata:
