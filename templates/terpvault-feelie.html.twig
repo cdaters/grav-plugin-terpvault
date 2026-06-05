@@ -1,0 +1,31 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+  {% set game = terpvault_current_game %}
+  {% set feelie = terpvault_current_feelie %}
+  {% set feelie_path = terpvault_current_feelie_path %}
+  <article class="terpvault terpvault-feelie-page">
+    <nav class="terpvault-breadcrumb">
+      <a href="{{ terpvault.route }}">← Library</a>
+      <span>/</span>
+      <a href="{{ game.url('detail') }}">{{ game.title }}</a>
+    </nav>
+
+    <section class="terpvault-panel">
+      <p class="terpvault-kicker">{{ game.title }}</p>
+      <h1>{{ feelie.title }}</h1>
+      {% if feelie.description %}
+        <p class="terpvault-section-note">{{ feelie.description }}</p>
+      {% endif %}
+      <p class="terpvault-feelie-path"><code>{{ feelie.path }}</code></p>
+    </section>
+
+    <section class="terpvault-panel terpvault-feelie-document">
+      <div class="terpvault-detail-body">
+        {{ terpvault_render_markdown(feelie_path)|raw }}
+      </div>
+    </section>
+
+    {% include 'partials/terpvault-version.html.twig' %}
+  </article>
+{% endblock %}

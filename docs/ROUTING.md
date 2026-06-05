@@ -28,7 +28,9 @@ Ideally this returns no hardcoded frontend URLs.
 
 Public TerpVault routes and Admin2 integration routes are different systems:
 
-- Frontend virtual routes: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_story/{slug}/{filename}`, `/if/_asset/{slug}/{path}`.
+- Frontend virtual routes: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/{slug}/feelie/{path}`, `/if/_story/{slug}/{filename}`, `/if/_asset/{slug}/{path}`.
 - Admin2/API routes: registered only when `admin.enable_admin2_page` is true and the current request is an Admin2/API request. These endpoints use controller-style integration, not Closure handlers.
 
 Frontend routes are added to Grav's page collection during `onPagesInitialized` and must not override `$grav['page']`. Admin2/API requests are guarded out of frontend virtual routing.
+
+Markdown feelies use `/if/{slug}/feelie/{path}` so package-local `.md` extras render through TerpVault instead of opening as raw Markdown. The route resolves only declared `resources.feelies` entries, only renders `.md`, and uses the same published/draft visibility gate as the game detail page. Non-Markdown feelies continue to use the controlled `_asset` route.

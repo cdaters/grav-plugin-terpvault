@@ -251,6 +251,8 @@ class GamePackage
                 return $this->route . '/_story/' . rawurlencode($this->slug) . '/' . rawurlencode($storyFile ?: 'story.z5');
             case 'asset':
                 return $this->route . '/_asset/' . rawurlencode($this->slug);
+            case 'feelie':
+                return $this->route . '/' . rawurlencode($this->slug) . '/feelie';
             case 'detail':
             default:
                 return $this->route . '/' . rawurlencode($this->slug);
@@ -264,6 +266,20 @@ class GamePackage
         }
 
         return $this->url('asset') . '/' . ltrim(str_replace('\\', '/', $relative), '/');
+    }
+
+    public function feelieUrl(?string $relative): ?string
+    {
+        $relative = $this->normalizeRelativePath((string)$relative);
+        if ($relative === '' || !$this->assetPath($relative) || !$this->declaredFeeliePath($relative)) {
+            return null;
+        }
+
+        if (strtolower(pathinfo($relative, PATHINFO_EXTENSION)) === 'md') {
+            return $this->url('feelie') . '/' . $this->encodeRelativeUrlPath($relative);
+        }
+
+        return $this->assetUrl($relative);
     }
 
     /**
@@ -380,7 +396,7 @@ class GamePackage
                 continue;
             }
 
-            $url = $this->assetUrl($path);
+            $url = $this->feelieUrl($path);
             if (!$url) {
                 continue;
             }
@@ -401,6 +417,22 @@ class GamePackage
         }
 
         return $items;
+    }
+
+    public function feelie(string $relative): ?array
+    {
+        $relative = $this->normalizeRelativePath($relative);
+        if ($relative === '') {
+            return null;
+        }
+
+        foreach ($this->feelies() as $item) {
+            if (($item['path'] ?? '') === $relative) {
+                return $item;
+            }
+        }
+
+        return null;
     }
 
     public function declaredFeeliePath(string $relative): bool
@@ -877,6 +909,14 @@ class GamePackage
                 return '';
             }
         }
+
+        return implode('/', $segments);
+    }
+
+    private function encodeRelativeUrlPath(string $relative): string
+    {
+        $segments = explode('/', $this->normalizeRelativePath($relative));
+        $segments = array_map('rawurlencode', $segments);
 
         return implode('/', $segments);
     }
