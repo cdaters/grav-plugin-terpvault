@@ -244,6 +244,10 @@ html.light-theme .terpvault,
 }
 
 .terpvault-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem;
   margin-bottom: 1rem;
   font-size: .92rem;
 }
@@ -592,6 +596,19 @@ html.light-theme .terpvault,
   font-size: .78rem;
   font-style: normal;
   text-transform: uppercase;
+}
+
+.terpvault-feelie-page h1 {
+  margin: .1rem 0 .35rem;
+  line-height: 1.1;
+}
+
+.terpvault-feelie-path {
+  margin: .65rem 0 0;
+}
+
+.terpvault-feelie-document .terpvault-detail-body {
+  padding-top: 0;
 }
 
 .terpvault-provenance {

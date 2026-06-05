@@ -183,6 +183,18 @@ class TerpVaultPlugin extends Plugin
             return;
         }
 
+        if (preg_match('#^' . preg_quote($base, '#') . '/([^/]+)/feelie/(.+)$#', $route, $matches)) {
+            $game = $this->repository()->find(rawurldecode($matches[1]), $this->showUnpublished());
+            $asset = rawurldecode($matches[2]);
+            if ($game && $this->isRenderableMarkdownFeelie($game, $asset)) {
+                $this->grav['twig']->twig_vars['terpvault_current_game'] = $game;
+                $this->grav['twig']->twig_vars['terpvault_current_feelie'] = $game->feelie($asset);
+                $this->grav['twig']->twig_vars['terpvault_current_feelie_path'] = $game->assetPath($asset);
+                $this->addVirtualPage(__DIR__ . '/pages/feelie.md', $route);
+            }
+            return;
+        }
+
         if (preg_match('#^' . preg_quote($base, '#') . '/([^/]+)$#', $route, $matches)) {
             $game = $this->repository()->find(rawurldecode($matches[1]), $this->showUnpublished());
             if ($game) {
@@ -437,13 +449,20 @@ class TerpVaultPlugin extends Plugin
 
         $html = strtr($html, $replacements);
 
-        return preg_replace_callback(
+        $html = preg_replace_callback(
             '/&lt;summary&gt;(.*?)&lt;\/summary&gt;/is',
             static function (array $matches): string {
                 return '<summary>' . $matches[1] . '</summary>';
             },
             $html
         ) ?: $html;
+
+        $html = preg_replace('/<p>\s*(<details(?:\s+open)?>)\s*/i', '$1' . "\n", $html) ?: $html;
+        $html = preg_replace('/<p>\s*(<\/details>)/i', '$1', $html) ?: $html;
+        $html = preg_replace('/\s*(<\/details>)\s*<\/p>/i', "\n" . '$1', $html) ?: $html;
+        $html = preg_replace('/(<summary>.*?<\/summary>)\s*<\/p>/is', '$1', $html) ?: $html;
+
+        return $html;
     }
 
     /**
@@ -802,6 +821,17 @@ class TerpVaultPlugin extends Plugin
         }
 
         return $game->declaredFeeliePath($asset);
+    }
+
+    protected function isRenderableMarkdownFeelie(GamePackage $game, string $asset): bool
+    {
+        if (strtolower(pathinfo($asset, PATHINFO_EXTENSION)) !== 'md') {
+            return false;
+        }
+
+        $path = $game->assetPath($asset);
+
+        return $path !== null && $game->declaredFeeliePath($asset);
     }
 
     protected function serveFile(string $path, string $mime, ?string $filename = null): void
