@@ -51,6 +51,10 @@ terpvault:
 
 Missing or unreadable story files are the only error-level package condition because they prevent reliable play. Other metadata gaps are advisory completeness notes.
 
+`terpvault.status` controls public visibility. `published` packages appear on normal public routes, while `draft` packages are hidden from `/if`, `/if/_manifest`, detail/play pages, story files, and assets unless the site explicitly enables `library.show_unpublished`. Admin2 Library Manager is draft-inclusive for authenticated curators and can publish or unpublish a package by updating only `terpvault.status`.
+
+`terpvault.featured` is a curator-facing placement signal. Admin2 can toggle it without changing publication status; public themes/templates may use the flag where featured placement is supported.
+
 ## Recommended files
 
 These files make a package easier to browse, verify, and play:
