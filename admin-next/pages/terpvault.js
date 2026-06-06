@@ -303,7 +303,9 @@ class TerpVaultPage extends HTMLElement {
         .helper-tabs .button[aria-selected="true"] { border-color:rgba(93,164,255,.72); background:rgba(93,164,255,.18); }
         .story-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .create-panel { border:1px solid rgba(93,164,255,.35); border-radius:12px; padding:1rem; margin:0 0 .85rem; background:rgba(93,164,255,.055); }
+        .create-panel form { display:grid; gap:.85rem; }
         .create-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:.75rem; }
+        .create-optional { margin-top:.75rem; }
         .media-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .media-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:.75rem; margin:.75rem 0; }
         .media-card { display:block; width:100%; border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.65rem; background:rgba(127,127,127,.035); color:inherit; font:inherit; text-align:left; cursor:pointer; }
@@ -1124,18 +1126,18 @@ class TerpVaultPage extends HTMLElement {
   _createPackagePanel() {
     const state = this.state.create || {};
     return `
-      <section class="create-panel">
+      <section class="create-panel" data-terpwright-phase="2-url-metadata">
         <div class="editor-head">
           <div>
-            <h2>Terpwright Phase 1: Local Package Builder</h2>
-            <p class="meta">Creates a new draft package from local files only. Remote IFDB, IF Archive, IFWiki, scraping, and metadata automation are not used.</p>
+            <h2>Terpwright Phase 2: Local Package Builder</h2>
+            <p class="meta">Creates a new draft package from local files and curator-supplied reference URLs. Remote IFDB, IF Archive, IFWiki, scraping, and metadata automation are not used.</p>
           </div>
           <button class="button" type="button" data-action="cancel-create">Close</button>
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
         ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
         ${state.report ? this._createReport(state.report) : ''}
-        <form data-create-package>
+        <form data-create-package data-terpwright-phase="2-url-metadata">
           <fieldset>
             <legend>Metadata &amp; provenance URLs</legend>
             <p class="meta">Optional reference links for curator review. TerpVault does not assume rights from URLs.</p>
@@ -1150,7 +1152,7 @@ class TerpVaultPage extends HTMLElement {
               ${this._createInput('IF Archive path', 'ifarchive_path')}
               ${this._createUrlInput('IF Archive URL', 'ifarchive_url')}
             </div>
-            <details class="create-optional">
+            <details class="create-optional" open>
               <summary>Optional reference URLs</summary>
               <div class="create-grid">
                 ${this._createUrlInput('Cover art source URL', 'cover_art_source_url')}
