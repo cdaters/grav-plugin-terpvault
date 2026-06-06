@@ -1,8 +1,8 @@
 # Hints
 
 These hints are written for the current Open Adventure Inform 6 port. They are
-inspired by classic Colossal Cave hint topics, but adapted to this 430-point
-Open Adventure lineage and the port's deterministic systems.
+inspired by classic Colossal Cave hint topics, but adapted to the Adventure 2.5
+/ 430-point Open Adventure lineage.
 
 ## General Advice
 
@@ -172,8 +172,8 @@ The pirate's stash is in the all-alike maze region.
 ### Answer
 
 In this port, carrying an eligible treasure into the represented west Hall of
-Mists approach triggers deterministic pirate theft. Recover the stolen treasure
-and chest from the pirate dead end.
+Mists approach triggers pirate theft. Recover the stolen treasure and chest
+from the pirate dead end.
 
 ## Dwarf, Axe, Ogre, And Ruby
 
@@ -188,8 +188,8 @@ The axe matters for dwarf combat and the ogre route.
 ### Answer
 
 Take the axe after the represented first dwarf encounter. Use `throw axe at
-dwarf` for the dwarf slice. The ogre/ruby route is a deterministic bounded
-implementation of the native-shaped dwarf/ogre dependency.
+dwarf` when the dwarf blocks your way. The ogre/ruby route depends on resolving
+that dwarf encounter.
 
 ## Cave Closing And Endgame
 
@@ -203,6 +203,6 @@ The repository is a special endgame space. The rusty-mark rod matters.
 
 ### Answer
 
-For deterministic smoke tests, the port has scaffold-only `testclose` helpers.
-In the repository victory route, move the rusty-mark rod away from the southwest
-side, return southwest, and `blast`.
+Some test transcripts use `testclose` helpers to reach closing states quickly;
+those are not normal player commands. In the repository victory route, move the
+rusty-mark rod away from the southwest side, return southwest, and `blast`.

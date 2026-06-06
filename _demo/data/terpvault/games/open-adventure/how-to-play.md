@@ -1,7 +1,7 @@
 # How To Play
 
-Open Adventure is a parser game: you type commands and the cave answers back.
-Most useful commands are short.
+Open Adventure is a parser game: you type commands, and the cave answers back.
+Short commands usually work best.
 
 ```text
 look
@@ -13,22 +13,22 @@ open grate
 score
 help
 info
+news
+version
 ```
 
-Compass directions (`north`, `south`, `east`, `west`, `up`, `down`) move you
-through the cave. Many interpreters also accept abbreviations such as `n`, `s`,
-`e`, `w`, `u`, and `d`.
+Compass directions such as `north`, `south`, `east`, `west`, `up`, and `down`
+move you through the cave. Many interpreters also accept `n`, `s`, `e`, `w`,
+`u`, and `d`.
 
 ## First Steps
 
-Start by exploring the road, forest, valley, and building. The building holds
-several important supplies. The keys open the grate, and the lamp is essential
+Explore the road, forest, valley, and building. The building holds several
+important supplies. The keys open the grate, and the lamp is essential
 underground.
 
 Use `inventory` to see what you are carrying. Use `score` or `points` to check
-progress. Treasures earn their full value only when left safely in the building.
-Use `help` for general movement and command hints, `info` for scoring and
-ending-your-game notes, and `news` for a short source/port note.
+progress. Treasures earn their full value when left safely in the building.
 
 At the opening question, type `yes` or `no` to choose whether you want the
 introductory instructions.
@@ -42,18 +42,19 @@ take keys
 drop bird
 wave rod
 throw axe at dwarf
+pour water on plant
 listen
 ```
 
-If a command fails, try simpler wording. The game is intentionally old-school:
-many puzzles are about object use, route mapping, and noticing odd room
-connections.
+If a command fails, try simpler wording. Adventure is an old-school puzzle
+game: map carefully, notice odd room connections, and experiment with objects.
 
 ## About This Port
 
-This package seed describes an Inform 6 / Z-machine port of ESR Open Adventure.
-All 20 native treasures are represented, and major late-game systems are
-playable.
+This draft package describes an Inform 6 / Z-machine port of ESR Open
+Adventure, from the Adventure 2.5 / 430-point lineage. All 20 native treasures
+are represented, and the main cave, treasure, and endgame routes are playable.
 
-Some native random behavior is implemented deterministically so the browser
-version can be tested reliably. See `known-differences.md` for details.
+Some native random behavior is deterministic here so the port can be tested
+reliably in Z-machine and browser interpreters. See `known-differences.md` for
+details.

@@ -1,18 +1,20 @@
 # Known Differences
 
-This package seed describes a faithful-as-practical port, not a byte-for-byte
-native engine clone.
+This draft package describes a faithful-as-practical Inform 6 port. It is not a
+byte-for-byte clone of ESR Open Adventure's native C engine.
 
-- Dwarves and pirate behavior are deterministic bounded slices rather than full
+- Dwarf and pirate behavior are deterministic bounded slices rather than full
   native random scheduling.
-- Save/restore deductions are not implemented.
-- Full native hints are not implemented.
-- Some cave-closing timing and repository relocation behavior is bounded to
-  represented rooms and objects.
-- Full maze fidelity and exact random event parity remain deferred.
-- Some interpreter text, prompt, status-line, and line-wrapping behavior may
-  differ from native Open Adventure.
+- Cave closing and the repository endgame are represented, but exact native
+  timing, relocation, and mirror/dwarf edge cases remain bounded.
+- Save/restore score deductions are not implemented.
+- Full native hints, novice deductions, turn-threshold deductions, and some
+  late scoring edge cases are not implemented.
+- Full forest and maze fidelity remains incomplete.
+- Some parser wording, prompt text, status-line display, inventory formatting,
+  and line wrapping may differ by interpreter.
 - The included walkthrough is a deterministic port route, not a perfect-score
   native transcript.
 
-See the repository `docs/KNOWN-DIFFERENCES.md` for the full developer version.
+The repository version of this document has the full developer detail:
+`docs/KNOWN-DIFFERENCES.md`.
