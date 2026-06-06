@@ -76,6 +76,7 @@
 - Keep Oracle/progressive hint work additive and backwards compatible with `resources.hints: hints.md`.
 - Keep content transparency work descriptive and neutral; it should improve discovery/filtering without hiding, blocking, endorsing, or morally ranking works by default.
 - Keep player/theme work additive and scoped to the TerpVault shell unless Parchment exposes a supported theme-hint path. Player placement, boot behavior, inline play, and terminal theme controls are roadmap-only until the Parchment integration path is documented.
+- Treat Terpwright as a future Admin2 package-builder workflow, not a current runtime feature. V1 should be local-file-first, draft-only, validation-driven, and separate from later smart Metadata Assistant lookup.
 
 ### v0.5.0 Admin2/public milestone target
 
@@ -286,16 +287,18 @@ player:
 - Explain that some extensions may be safe as package contents but unsafe as public same-origin browser links.
 - Keep SVG feelies excluded unless a future safe sanitization or forced-download strategy is designed.
 
-### Vaultwright package builder
+### Terpwright package builder
 
-- Add a future package builder for creating or refining TerpVault packages from curated inputs.
-- Keep generated packages reviewable before installation or publication.
+- Add a future Admin2 package builder for creating or refining TerpVault packages from curated local files and explicit ecosystem references.
+- Keep generated packages reviewable before installation, export, or publication.
 - Reuse import/export validation rules rather than bypassing package safety checks.
-- Allow a curator to paste an IFDB, IFWiki, or IF Archive URL, resolve/fetch metadata where allowed, and preview the resulting candidate package metadata.
-- Optionally stage a story file only when it is legally and directly available for that use. Do not silently download, redistribute, or package questionable assets.
-- Create draft packages only, with `game.yaml`, `metadata.iFiction.xml` when available, helper Markdown stubs, and the normal package folder structure.
-- Keep provenance/license review explicit and do not auto-publish.
-- Keep cover, screenshot, and art import conservative and license-aware.
+- V1 should be local-file-first: local story file, optional package zip, local media, helper Markdown, local `metadata.iFiction.xml`, and manually supplied IFDB/IFWiki/IF Archive/source/license references.
+- Create draft packages only, with `game.yaml`, story file, optional `metadata.iFiction.xml`, helper Markdown, provenance notes, and the normal package folder structure.
+- Keep Terpwright separate from later smart Metadata Assistant features. Remote lookup/search, provider confidence scoring, automated provenance drafting, cover generation, and art suggestions are later roadmap work.
+- Never silently download, redistribute, or package story files, cover art, screenshots, walkthroughs, hints, maps, manuals, scans, clue sheets, or feelies from a URL.
+- Keep provenance/license review explicit, preserve source URLs and retrieval dates, require curator confirmation before packaging third-party assets, and do not auto-publish.
+- Keep cover, screenshot, helper-doc, and feelie import conservative and license-aware.
+- See `docs/TERPWRIGHT.md`.
 
 ### Curated demo/starter library
 

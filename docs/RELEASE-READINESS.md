@@ -21,6 +21,7 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - Oracle v1 renders simple package-local `resources.hints: hints.md` in the frontend; richer Oracle sources, guided flows, and Admin2 controls remain roadmap-only.
 - Content transparency filtering and Admin2 controls are roadmap-only; content notes should describe works neutrally and should not hide, block, endorse, or morally rank works by default.
 - A future Admin2 Guide/Help tab is roadmap-only; no runtime Guide tab is implemented yet.
+- Terpwright, the future Admin2 package-builder workflow, is roadmap-only. It is not required for current Open Adventure/Zork demo readiness, v0.4.x package lifecycle testing, or the v0.5.0 milestone unless a future build explicitly implements and documents it.
 - v0.5.0 is the intended public milestone/GPM-readiness candidate line, pending a full audit and a credible demo/support posture.
 
 ## v0.5.0 milestone criteria

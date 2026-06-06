@@ -451,6 +451,22 @@ bin/grav clearcache
 - Add how-to-play, hints, and walkthrough Markdown when useful.
 - Clear Grav cache and check `/if`, `/if/{slug}`, and `/if/{slug}/play`.
 
+## Future Terpwright package-builder output
+
+Terpwright is the planned Admin2 package-builder workflow. It should produce ordinary TerpVault packages, not a separate package format.
+
+V1 builder output should follow this document's conventions:
+
+- Create draft packages only, with `terpvault.status: draft` and `terpvault.featured: false`.
+- Use the structured `game.yaml` shape for new manifests.
+- Keep story files, media, helper Markdown, `metadata.iFiction.xml`, provenance notes, and feelies package-local.
+- Reuse existing validation, import inspection, draft-only install, and `.terpvault.zip` export rules.
+- Preserve source URLs, retrieval dates, license notes, and package-local provenance.
+- Treat uncertain rights as warnings or pending-review notes, not hidden assumptions.
+- Do not imply Ink package/runtime support, structured Oracle support, remote lookup, or automated asset download until those features are intentionally implemented and documented.
+
+See `docs/TERPWRIGHT.md`.
+
 ## `.terpvault.zip` packages
 
 Admin2 export creates a `.terpvault.zip` archive containing exactly one top-level folder named after the package slug.
