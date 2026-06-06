@@ -9,7 +9,7 @@
 - Admin2 routes should continue to use controller-style API integration rather than ad hoc request handlers.
 - Current write workflows are scoped to specific package-management actions; TerpVault should not expose an arbitrary package file browser.
 - Admin2/API write permissions should remain conservative unless a future release defines a more granular permission model.
-- v0.4.4 includes narrow Admin2 feelies/extras management for curated `resources.feelies` entries without physical delete behavior.
+- Current Library Manager rows show draft/published status, featured state, story/iFiction presence, validation counts, and curator actions for publish/unpublish, featured toggle, metadata editing, export, and iFiction preview.
 
 ## Shipped milestones
 
@@ -37,6 +37,7 @@
 - Forced imported packages to draft and unfeatured status.
 - Normalized empty imported IFIDs, screenshots, and tags to arrays.
 - Improved import success messaging and stale collision handling.
+- Kept import inspection read-only; commit revalidates the uploaded zip and reports draft/not-featured import policy clearly.
 - Delayed export object URL cleanup for browser download safety.
 - Aligned release metadata and docs with the v0.3.x early public-beta/foundation posture.
 
