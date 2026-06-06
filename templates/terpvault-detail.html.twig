@@ -55,16 +55,25 @@
     {% set howto = game.markdownPath(game.resourceFile('how_to_play', 'how_to_play')) %}
     {% set hints = game.markdownPath(game.resourceFile('hints', 'hints')) %}
     {% set walkthrough = game.markdownPath(game.resourceFile('walkthrough', 'walkthrough')) %}
+    {% set known_differences = game.markdownPath(game.resourceFile('known_differences')) %}
 
-    {% if howto or hints or walkthrough %}
+    {% if howto or hints or walkthrough or known_differences %}
       <section class="terpvault-panel terpvault-accordions">
         <h2>Help & Reference</h2>
-        <p class="terpvault-section-note">Package-local notes for commands, hints, and solution paths.</p>
+        <p class="terpvault-section-note">Package-local notes for commands, hints, solution paths, and version-specific package notes.</p>
         {% if howto %}
           <details open>
             <summary>How to Play</summary>
             <div class="terpvault-detail-body">
               {{ terpvault_render_markdown(howto)|raw }}
+            </div>
+          </details>
+        {% endif %}
+        {% if known_differences %}
+          <details>
+            <summary>Known Differences</summary>
+            <div class="terpvault-detail-body">
+              {{ terpvault_render_markdown(known_differences)|raw }}
             </div>
           </details>
         {% endif %}

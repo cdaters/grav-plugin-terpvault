@@ -37,6 +37,7 @@ class PackageImportService
         'how-to-play.md',
         'hints.md',
         'walkthrough.md',
+        'known-differences.md',
         'metadata.iFiction.xml',
     ];
 
@@ -353,7 +354,7 @@ class PackageImportService
             }
         }
 
-        foreach (['how_to_play', 'hints', 'walkthrough'] as $key) {
+        foreach (['how_to_play', 'hints', 'walkthrough', 'known_differences'] as $key) {
             $relative = isset($resources[$key]) ? (string) $resources[$key] : '';
             if ($relative === '') {
                 continue;
@@ -474,7 +475,7 @@ class PackageImportService
 
         $this->allowResourcePath($allowed, isset($resources['story_file']) ? (string) $resources['story_file'] : '');
 
-        foreach (['how_to_play', 'hints', 'walkthrough', 'cover', 'small_cover'] as $key) {
+        foreach (['how_to_play', 'hints', 'walkthrough', 'known_differences', 'cover', 'small_cover'] as $key) {
             $this->allowResourcePath($allowed, isset($resources[$key]) ? (string) $resources[$key] : '');
         }
 

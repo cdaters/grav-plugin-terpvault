@@ -15,14 +15,16 @@ TerpVault package validation is curator-facing. The goal is to show whether a ga
 - `missing-redistribution-notes`: no redistribution or rights-context notes are available.
 - `license-review`: license text indicates the package still needs review.
 - `missing-how-to-play`, `missing-hints`, `missing-walkthrough`: optional player-help files are missing.
+- `invalid-known-differences`: `resources.known_differences` is set but does not reference a safe package-local `.md` file.
+- `missing-known-differences`: `resources.known_differences` is set but the referenced file is not present.
 
 ## Severity
 
-- `error`: prevents reliable play. At present, only missing story-file data should be treated this way.
+- `error`: prevents reliable play or indicates an unsafe package-local resource reference. Missing story-file data prevents play; unsafe optional resource paths such as an invalid `resources.known_differences` reference should also be treated as errors because package containment is a safety boundary.
 - `warning`: advisory package completeness or provenance note.
 - `info`: reserved for future low-priority hints.
 
-Missing IFIDs, source links, license names, redistribution notes, cover art, and helper files should remain advisory. They are important for curation and rights review, but they should not block public listing or make a playable game look broken.
+Missing IFIDs, source links, license names, redistribution notes, cover art, and helper files should remain advisory. They are important for curation and rights review, but they should not block public listing or make a playable game look broken. Optional `resources.known_differences` is only checked when present; missing the field is not a warning.
 
 ## Public display
 

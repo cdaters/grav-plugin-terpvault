@@ -78,6 +78,7 @@ class PackageMetadataService
                 'resources.how_to_play',
                 'resources.hints',
                 'resources.walkthrough',
+                'resources.known_differences',
                 'player',
             ],
         ];

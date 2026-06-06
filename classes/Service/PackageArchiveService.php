@@ -31,6 +31,7 @@ class PackageArchiveService
         'how-to-play.md',
         'hints.md',
         'walkthrough.md',
+        'known-differences.md',
         'metadata.iFiction.xml',
     ];
 
@@ -116,7 +117,7 @@ class PackageArchiveService
         $this->addFile($files, $package, 'game.yaml', true);
 
         $resources = is_array($metadata['resources'] ?? null) ? $metadata['resources'] : [];
-        foreach (['story_file', 'cover', 'small_cover', 'how_to_play', 'hints', 'walkthrough'] as $key) {
+        foreach (['story_file', 'cover', 'small_cover', 'how_to_play', 'hints', 'walkthrough', 'known_differences'] as $key) {
             $relative = isset($resources[$key]) ? (string) $resources[$key] : '';
             if ($relative !== '') {
                 $this->addFile($files, $package, $relative, $key === 'story_file');

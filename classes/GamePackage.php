@@ -379,16 +379,42 @@ class GamePackage
 
     public function feelies(): array
     {
+        return $this->feelieItems(true);
+    }
+
+    public function feelie(string $relative): ?array
+    {
+        $relative = $this->normalizeRelativePath($relative);
+        if ($relative === '') {
+            return null;
+        }
+
+        foreach ($this->feelieItems(false) as $item) {
+            if (($item['path'] ?? '') === $relative) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    private function feelieItems(bool $suppressFirstClassMarkdown): array
+    {
         $feelies = $this->get('resources.feelies', []);
         if (!is_array($feelies)) {
             return [];
         }
 
+        $firstClassMarkdownPaths = $suppressFirstClassMarkdown ? array_fill_keys($this->firstClassMarkdownFeeliePaths(), true) : [];
         $items = [];
         foreach ($feelies as $item) {
             $data = is_array($item) ? $item : ['path' => (string) $item];
             $path = $this->resourcePathValue($data);
             if ($path === '') {
+                continue;
+            }
+            $normalizedPath = $this->normalizeRelativePath($path);
+            if ($normalizedPath !== '' && isset($firstClassMarkdownPaths[$normalizedPath])) {
                 continue;
             }
             $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
@@ -417,22 +443,6 @@ class GamePackage
         }
 
         return $items;
-    }
-
-    public function feelie(string $relative): ?array
-    {
-        $relative = $this->normalizeRelativePath($relative);
-        if ($relative === '') {
-            return null;
-        }
-
-        foreach ($this->feelies() as $item) {
-            if (($item['path'] ?? '') === $relative) {
-                return $item;
-            }
-        }
-
-        return null;
     }
 
     public function declaredFeeliePath(string $relative): bool
@@ -723,6 +733,7 @@ class GamePackage
         if (!$this->markdownPath($this->resourceFile('walkthrough', 'walkthrough'))) {
             $add('missing-walkthrough', 'Walkthrough not found', 'Add walkthrough.md when a full solution is available.');
         }
+        $this->addOptionalMarkdownResourceWarning('known_differences', 'Known Differences', $add);
 
         return $warnings;
     }
@@ -802,6 +813,45 @@ class GamePackage
         }
 
         return false;
+    }
+
+    private function addOptionalMarkdownResourceWarning(string $key, string $label, callable $add): void
+    {
+        $relative = $this->resourceFile($key, '');
+        if (trim($relative) === '') {
+            return;
+        }
+
+        if ($this->normalizeRelativePath($relative) === '') {
+            $add('invalid-' . str_replace('_', '-', $key), $label . ' reference invalid', 'resources.' . $key . ' must reference a safe package-local .md file.', 'error');
+            return;
+        }
+
+        if (strtolower(pathinfo($relative, PATHINFO_EXTENSION)) !== 'md') {
+            $add('invalid-' . str_replace('_', '-', $key), $label . ' reference invalid', 'resources.' . $key . ' must reference a package-local .md file.', 'error');
+            return;
+        }
+
+        if (!$this->markdownPath($relative)) {
+            $add('missing-' . str_replace('_', '-', $key), $label . ' file not found', 'The configured resources.' . $key . ' file does not exist in this package folder.');
+        }
+    }
+
+    private function firstClassMarkdownFeeliePaths(): array
+    {
+        $paths = [];
+        foreach (['known_differences'] as $key) {
+            $relative = $this->resourceFile($key, '');
+            if ($relative === '' || strtolower(pathinfo($relative, PATHINFO_EXTENSION)) !== 'md' || !$this->markdownPath($relative)) {
+                continue;
+            }
+            $normalized = $this->normalizeRelativePath($relative);
+            if ($normalized !== '') {
+                $paths[] = $normalized;
+            }
+        }
+
+        return array_values(array_unique($paths));
     }
 
     private function firstAssetUrl(array $candidates, array $allowedExtensions = []): ?string
