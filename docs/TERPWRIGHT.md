@@ -2,7 +2,7 @@
 
 Terpwright is the Admin2 package-builder workflow for TerpVault. It helps a curator assemble a reviewable TerpVault package from local files and known interactive-fiction ecosystem references without replacing curator judgment, license review, or provenance notes.
 
-Phase 1 local-file package creation is implemented in Admin2. Later metadata lookup, scraping, automation, guided recipes, richer Oracle generation, and Ink support remain roadmap-only.
+Phase 1 local-file package creation and Phase 2 manually supplied URL capture are implemented in Admin2. Later ecosystem lookup helpers, guided recipes, richer Oracle generation, and Ink support remain roadmap-only. Scraping, AI metadata generation, automatic package creation from remote sources, and Ink support are not part of the current Terpwright implementation.
 
 ## Purpose
 
@@ -172,13 +172,58 @@ URL presence reduces missing-source prompts only when it records a source, upstr
 
 Later phases may add:
 
-- Remote lookup/search.
+- Explicit ecosystem lookup/search helpers.
 - Metadata Assistant provider candidates.
 - Cover generation or art suggestion workflows.
 - Automated provenance draft suggestions.
 - Guided package recipes for known source families.
 
 Later inputs must keep preview/apply behavior, source attribution, retrieval dates, and license review explicit.
+
+## Phase 3 Planning: Ecosystem Lookup Helpers
+
+Terpwright Phase 3 is planned as a set of ecosystem lookup helpers, not automated package creation. The goal is to help curators find and compare metadata from known interactive-fiction sources while preserving package-local data, rights review, and explicit curator decisions.
+
+Phase 3 helpers may look up or cross-check:
+
+- IFDB entries by TUID, IFID, title, author, or pasted URL.
+- IFWiki pages by title or pasted URL.
+- IF Archive paths and URLs.
+- Upstream project, source release, or port/source repository URLs.
+- Package-local `metadata.iFiction.xml`.
+- Treaty of Babel / iFiction metadata where available.
+
+Candidate data may include title, author, publication year, IFID, format, source URLs, IF Archive path, license hints, external catalog links, and cover/art references where appropriate. These values should be treated as review candidates. Package-local story data and package-local iFiction XML remain primary until the curator explicitly chooses otherwise.
+
+Phase 3 must not automatically:
+
+- Assume redistribution rights from a catalog entry, archive path, wiki page, source repository, or license hint.
+- Copy large web text into package helper docs or provenance files.
+- Download story files, packages, covers, screenshots, maps, manuals, scans, clue sheets, or artwork without an explicit curator action and separate rights review.
+- Publish packages.
+- Trust catalog metadata over package-local story/iFiction metadata without curator confirmation.
+- Scrape pages when an API, stable data source, package-local XML file, or manual curator entry is the appropriate source.
+
+The intended Admin2 workflow is preview-first:
+
+1. Curator enters a URL, IFID, TUID, IF Archive path, or search term.
+2. Terpwright performs an explicit lookup through an enabled provider.
+3. Admin2 shows candidate metadata beside current `game.yaml` and package-local iFiction XML.
+4. Differences are shown at field level, including source, confidence, warning, and retrieval context.
+5. Curator selects individual fields to apply.
+6. Terpwright backs up `game.yaml` before writes.
+7. Draft provenance/review notes may be generated from selected source references, but remain editable review text.
+8. The package stays draft until the curator uses the separate publish workflow.
+
+Safety and technical constraints:
+
+- Remote providers must be optional and explicitly admin-triggered.
+- Provider failures, timeouts, offline operation, and rate limits should degrade to warnings or unavailable states rather than blocking package-local editing.
+- Cache or store only review-safe metadata, not whole remote pages or large copied prose.
+- Distinguish fatal validation errors from metadata/provider warnings.
+- Avoid hard dependencies on remote services.
+- Preserve package-local `game.yaml`, story-file metadata, and `metadata.iFiction.xml` as the primary package record.
+- Keep lookup, apply, package install/export, and publish as separate operations.
 
 ## Outputs
 
@@ -391,10 +436,23 @@ Terpwright docs and UI should avoid implying that Ink packages are currently pla
 
 ### Phase 3: Ecosystem Lookup Helpers
 
-- Add configured provider lookup for IFDB, IFWiki, IF Archive, or other approved sources.
-- Require explicit admin action.
-- Show confidence, attribution, license notes, and field-level apply controls.
-- Keep metadata lookup separate from story-file and asset download.
+- Future work only; no Phase 3 remote lookup is currently implemented.
+- Add configured provider lookup for IFDB, IFWiki, IF Archive, package-local iFiction XML, Treaty of Babel metadata where available, and approved source/license references.
+- Require explicit admin action for every lookup.
+- Preview candidate metadata beside current `game.yaml` and package-local `metadata.iFiction.xml`.
+- Show source, confidence, attribution, retrieval date, warnings, license hints, and field-level apply controls.
+- Keep metadata lookup separate from story-file download, asset download, package install/export, and publishing.
+- Keep Phase 2's rule: URLs and lookup results are references for curator review, not proof of redistribution rights.
+
+Recommended follow-on phases:
+
+- Phase 3a: URL validation and metadata preview shell.
+- Phase 3b: IF Archive path/URL helper.
+- Phase 3c: IFDB lookup helper.
+- Phase 3d: IFWiki helper.
+- Phase 3e: iFiction/Babel cross-check.
+- Phase 3f: curator apply/diff workflow.
+- Phase 3g: package validation integration.
 
 ### Phase 4: Richer Helper Docs And Oracle Generation
 

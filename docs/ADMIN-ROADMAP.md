@@ -209,7 +209,7 @@
 - Clearly distinguish metadata import/enrichment from story-file or package download.
 - Phase 1 baseline: local iFiction XML presence/status in package rows, XML present/missing filters, package-root upload/replace, import inspection awareness, and improved local preview/apply. Remaining Phase 1 polish is package creation awareness where practical.
 - Phase 2: assist catalog/provenance fields such as IFDB TUID, IFDB URL, IFWiki URL, IF Archive path, IF Archive URL, source URL, retrieved date, and license notes.
-- Phase 3: add explicit remote metadata lookup by title/author, by IFID where possible, and from pasted IFDB/IFWiki/IF Archive URLs. Preview candidates, apply selected fields only, and document source/retrieval date.
+- Phase 3: add explicit ecosystem lookup helpers by title/author, IFID where possible, and pasted IFDB/IFWiki/IF Archive URL or path. Preview candidates beside current `game.yaml` and package-local iFiction XML, apply selected fields only, document source/retrieval date, and preserve the rule that lookup results are curator-review references, not proof of rights.
 - Tie this assistant to large-library cleanup by letting admins filter for incomplete metadata groups, then use the assistant to resolve missing IFID, catalog URL, cover, screenshot, helper-doc, provenance, license, or `metadata.iFiction.xml` gaps.
 
 ### Public theme and Parchment integration polish
@@ -270,13 +270,15 @@ player:
 
 ### Remote IFDB/IFWiki/IF Archive enrichment
 
-- Explore IFDB lookup by IFID/TUID after local iFiction apply/import is safe.
-- Explore IFWiki and IF Archive enrichment after IFDB lookup patterns are proven.
+- Treat this as Terpwright Phase 3 ecosystem lookup helper planning, not automated package creation.
+- Explore IF Archive path/URL helpers first, then IFDB lookup by IFID/TUID/title/URL, then IFWiki helpers after lookup patterns are proven.
+- Add optional package-local iFiction/Treaty of Babel cross-checks so current `game.yaml`, local XML, and catalog candidates can be compared in one review surface.
 - Keep remote catalog lookup preview-based and curator-reviewed, not authoritative.
 - Remote lookup must be an explicit admin action through a configured provider. Do not run provider lookups automatically during package import, package creation, metadata save, or manifest load.
 - Treat remote data as a curator aid, not a replacement for license/provenance review.
-- Show source, confidence, and target field for every proposed remote change.
-- Do not add IFDB/IFWiki scraping or IF Archive/story package downloads as part of metadata lookup. Any future remote feature must respect source terms, distinguish references from redistributable assets, and keep license/provenance review visible.
+- Show source, confidence, retrieval context, warning state, and target field for every proposed remote change.
+- Do not add IFDB/IFWiki scraping, AI metadata generation, or IF Archive/story package downloads as part of metadata lookup. Any future remote feature must respect source terms, distinguish references from redistributable assets, and keep license/provenance review visible.
+- Do not trust catalog metadata over package-local story/iFiction metadata without curator confirmation.
 
 ### Advanced File Type Policy
 
@@ -295,6 +297,7 @@ player:
 - V1 is local-file-first: local story file, local media, helper Markdown, local `metadata.iFiction.xml`, feelies, and manually supplied source/license notes. Package zip handling remains on the existing inspect/import path.
 - Create draft packages only, with `game.yaml`, story file, optional `metadata.iFiction.xml`, helper Markdown, provenance notes, and the normal package folder structure.
 - Keep Terpwright separate from later smart Metadata Assistant features. Remote lookup/search, provider confidence scoring, automated provenance drafting, cover generation, and art suggestions are later roadmap work.
+- Phase 3 planning should limit remote/catalog work to explicit ecosystem lookup helpers: URL validation/preview shell, IF Archive helper, IFDB helper, IFWiki helper, iFiction/Babel cross-check, curator apply/diff workflow, and validation integration.
 - Never silently download, redistribute, or package story files, cover art, screenshots, walkthroughs, hints, maps, manuals, scans, clue sheets, or feelies from a URL.
 - Keep provenance/license review explicit, preserve source URLs and retrieval dates, require curator confirmation before packaging third-party assets, and do not auto-publish.
 - Keep cover, screenshot, helper-doc, and feelie import conservative and license-aware.

@@ -78,6 +78,8 @@ Package manifests should avoid broad claims that all package material is covered
 
 Pasted URLs in `game.yaml` are review pointers, not rights conclusions. A source repository, IFDB page, IFWiki page, IF Archive path, license URL, art source, map reference, or walkthrough reference should not be treated as permission to redistribute story files or supplemental materials unless the item-level rights basis is separately documented.
 
+Future Terpwright Phase 3 lookup helpers should preserve this distinction. Lookup results may help curators find titles, authors, IFIDs, archive paths, source links, license hints, and external catalog references, but they should not be treated as rights clearance, copied wholesale into package docs, or used to auto-download story files, artwork, or historical materials.
+
 ## What not to claim
 
 Do not claim that demo package materials are licensed, public domain, copyright-free, official, endorsed, approved by a rights holder, or automatically fair use unless that status is specifically documented for the item.
