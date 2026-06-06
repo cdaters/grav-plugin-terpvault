@@ -50,9 +50,23 @@ class ApiController extends AbstractApiController
 
         return ApiResponse::create([
             'read_only' => false,
+            'version' => $this->pluginVersion(),
             'source' => 'Admin2 package API',
             'games' => $games,
         ]);
+    }
+
+    private function pluginVersion(): string
+    {
+        $blueprint = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'blueprints.yaml';
+        if (is_file($blueprint)) {
+            $contents = file_get_contents($blueprint) ?: '';
+            if (preg_match('/^version:\s*[\'"]?([^\'"\r\n#]+)[\'"]?/m', $contents, $matches)) {
+                return trim($matches[1]);
+            }
+        }
+
+        return 'unknown';
     }
 
     private function creationService(): PackageCreationService
