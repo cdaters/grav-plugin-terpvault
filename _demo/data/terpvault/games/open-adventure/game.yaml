@@ -15,9 +15,9 @@ bibliographic:
   genre: Interactive Fiction
   language: en
   description: |
-    Open Adventure is a faithful-as-practical Inform 6 / Z-machine port of ESR Open Adventure, representing all 20 native treasures with deterministic versions of the major late-game systems for reliable browser play.
+    Open Adventure is a faithful-as-practical Inform 6 / Z-machine port of ESR Open Adventure, representing all 20 native treasures with testable versions of the major late-game systems for reliable browser play.
 
-    This package candidate is based on the Crowther/Woods Adventure 2.5 / 430-point lineage as forward-ported by Eric S. Raymond. It is a package candidate, not final release art.
+    This draft package is based on the Crowther/Woods Adventure 2.5 / 430-point lineage as forward-ported by Eric S. Raymond. It is a package candidate, not final release art.
 
 resources:
   story_file: story/open-adventure.z8
@@ -64,10 +64,10 @@ release:
   source:
     url: https://github.com/cdaters/open-adventure-inform
     retrieved: '2026-06-04'
-    notes: Intended public port repository name is open-adventure-inform. Native oracle baseline 993291a21da44234ae9cf303d0ffc0df19ec3c31. Story SHA-256 54a70e56fb78c5e2d2fcd98668177779f0cba35916ac9e6f902b2b2c82fdc712.
+    notes: Public port repository name is open-adventure-inform. Native oracle baseline 993291a21da44234ae9cf303d0ffc0df19ec3c31. Story SHA-256 ae26b08ac2196c2ad06b5fa2546bc7499c6a9d4ff03efb3a9ae4ee89069f81c3.
 
 checksums:
-  story_sha256: 54a70e56fb78c5e2d2fcd98668177779f0cba35916ac9e6f902b2b2c82fdc712
+  story_sha256: ae26b08ac2196c2ad06b5fa2546bc7499c6a9d4ff03efb3a9ae4ee89069f81c3
 
 terpvault:
   status: draft
