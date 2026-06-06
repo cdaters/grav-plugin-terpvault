@@ -1231,6 +1231,8 @@ class TerpVaultPage extends HTMLElement {
           <span class="badge ${report.ok ? 'ok' : 'error'}">${report.ok ? 'ok' : 'blocked'}</span>
           <span class="badge ${collisionTone}">${this._esc(collisionLabel)}</span>
           <span class="badge ${report.has_ifiction ? 'ok' : 'warn'}">${report.has_ifiction ? 'iFiction found' : 'no iFiction XML'}</span>
+          <span class="badge ok">imports as draft</span>
+          <span class="badge ok">not featured</span>
         </div>
         <dl>
           <dt>Candidate slug</dt><dd><code>${this._esc(report.candidate_slug || '')}</code></dd>
@@ -1243,11 +1245,12 @@ class TerpVaultPage extends HTMLElement {
           ${committedSlug ? `<dt>Installed slug</dt><dd><code>${this._esc(committedSlug)}</code></dd>` : ''}
           <dt>Destination</dt><dd>${report.destination_exists ? 'Package folder already exists.' : 'No existing package folder detected.'}</dd>
           <dt>iFiction XML</dt><dd>${report.has_ifiction ? `<code>${this._esc(ifictionPath)}</code>` : 'Not present'}</dd>
+          <dt>Import policy</dt><dd>Commit installs as draft, clears featured, revalidates the zip, and never overwrites an existing package folder.</dd>
         </dl>
         <p class="meta">Inspection does not create package files. Commit revalidates and installs as draft only.</p>
         ${ifictionNote}
-        ${this._reportList('Fatal errors', fatal, 'error')}
-        ${this._reportList('Warnings', warnings, 'warn')}
+        ${this._reportList('Fatal errors', fatal, 'error', false)}
+        ${this._reportList('Warnings', warnings, 'warn', false)}
         ${this._reportList('Ignored cruft', ignored)}
         ${this._reportList('Included files', included)}
       </div>
@@ -1274,17 +1277,18 @@ class TerpVaultPage extends HTMLElement {
     `;
   }
 
-  _reportList(label, items, tone = '') {
+  _reportList(label, items, tone = '', codeItems = true) {
     if (!items.length) {
       return `<div class="warnings"><div class="warning ${this._esc(tone)}"><strong>${this._esc(label)}</strong><span class="meta">None.</span></div></div>`;
     }
 
+    const renderItem = item => codeItems ? `<code>${this._esc(item)}</code>` : this._esc(item);
     return `
       <div class="warnings">
         <div class="warning ${this._esc(tone)}">
           <strong>${this._esc(label)}</strong>
           <ul>
-            ${items.slice(0, 40).map(item => `<li><code>${this._esc(item)}</code></li>`).join('')}
+            ${items.slice(0, 40).map(item => `<li>${renderItem(item)}</li>`).join('')}
             ${items.length > 40 ? `<li class="meta">${items.length - 40} more not shown.</li>` : ''}
           </ul>
         </div>

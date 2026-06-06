@@ -404,7 +404,8 @@ class PackageImportService
 
         $this->inspectUnsupportedPackageFiles($metadata, $packageFiles, $report);
 
-        $report['warnings'][] = 'Future import commit should force imported packages to draft status for review.';
+        $report['import_forces_draft'] = true;
+        $report['import_forces_featured_false'] = true;
         $report['package_summary'] = [
             'candidate_slug' => $report['candidate_slug'],
             'title' => $report['title'],
@@ -416,6 +417,8 @@ class PackageImportService
             'ifiction_preview_available' => $report['ifiction_preview_available'],
             'feelies_count' => $feelieCount,
             'file_count' => count($report['included_files']),
+            'import_forces_draft' => true,
+            'import_forces_featured_false' => true,
         ];
     }
 
@@ -932,6 +935,8 @@ class PackageImportService
             'has_ifiction' => false,
             'ifiction_path' => '',
             'ifiction_preview_available' => false,
+            'import_forces_draft' => true,
+            'import_forces_featured_false' => true,
             'package_summary' => [],
         ];
     }

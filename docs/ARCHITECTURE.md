@@ -179,9 +179,9 @@ admin:
   enable_admin2_page: false
 ```
 
-When explicitly enabled, TerpVault registers the Admin2 sidebar/page and controller-style Admin2/API package routes for Admin2/API requests. Current workflows cover package creation, metadata/helper/media/story edits, export, import inspection, and draft-only import commit. Package delete and overwrite/replace are not implemented. Current screenshot and feelie remove actions are manifest-only and do not delete physical files.
+When explicitly enabled, TerpVault registers the Admin2 sidebar/page and controller-style Admin2/API package routes for Admin2/API requests. Current workflows cover package creation, metadata/helper/media/story edits, publish/unpublish status changes, featured toggles, export, import inspection, and draft-only import commit. Package delete and overwrite/replace are not implemented. Current screenshot and feelie remove actions are manifest-only and do not delete physical files.
 
-The Admin2 Library Manager currently receives the full package list and renders it as collapsible rows in one page. It preserves active tab and expanded row state in browser `localStorage`, but search, filters, sorting controls, pagination, and virtual scrolling are future work. Large-library architecture should add a query/state layer before bulk actions, defer heavy media previews, and preserve search/filter/sort/page state in `localStorage` where practical.
+The Admin2 Library Manager currently receives the full package list, including drafts, and renders it as collapsible rows in one page. It preserves active tab, expanded row state, and search/filter/sort state in browser `localStorage`. Baseline search, status/featured/format filters, metadata-completeness filters, sorting, result counts, and reset controls are implemented; pagination and virtual scrolling remain future work. Large-library architecture should add a query/state layer before bulk actions, defer heavy media previews, and preserve search/filter/sort/page state in `localStorage` where practical.
 
 Admin2/API routes are deliberately separate from the public virtual page routes under `/if`, and write operations require authenticated Admin2/API access.
 
