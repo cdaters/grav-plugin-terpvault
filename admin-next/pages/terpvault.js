@@ -10,6 +10,7 @@ class TerpVaultPage extends HTMLElement {
       source: 'loading',
       activeTab: localStorage.getItem('terpvault.admin.tab') || 'library',
       libraryControls: this._libraryControlsFromStorage(),
+      packageActions: {},
       editingSlug: null,
       create: {
         open: false,
@@ -100,16 +101,21 @@ class TerpVaultPage extends HTMLElement {
     }
 
     try {
-      const manifestUrl = this._manifestUrl();
-      const response = await fetch(manifestUrl, { headers: { Accept: 'application/json' } });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || response.statusText || `HTTP ${response.status}`);
-      }
-      this._applyData(data, 'public read-only manifest');
+      const data = await this._requestJson(this._packagesApiUrl(), { method: 'GET' });
+      this._applyData(data, 'Admin2 package API');
     } catch (error) {
-      this.state.source = 'unavailable';
-      this._renderUnavailable(error);
+      try {
+        const manifestUrl = this._manifestUrl();
+        const response = await fetch(manifestUrl, { headers: { Accept: 'application/json' } });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data?.message || response.statusText || `HTTP ${response.status}`);
+        }
+        this._applyData(data, 'public read-only manifest');
+      } catch (fallbackError) {
+        this.state.source = 'unavailable';
+        this._renderUnavailable(fallbackError);
+      }
     }
   }
 
@@ -969,6 +975,11 @@ class TerpVaultPage extends HTMLElement {
     const ifictionBadge = game.has_ifiction
       ? '<span class="badge ok">iFiction XML present</span>'
       : '<span class="badge warn">No iFiction XML</span>';
+    const status = this._gameStatus(game);
+    const statusLabel = status === 'published' ? 'Published' : 'Draft';
+    const featured = this._gameFeatured(game);
+    const action = this.state.packageActions?.[slug] || {};
+    const actionBusy = Boolean(action.saving);
 
     return `
       <details class="game" data-slug="${this._esc(slug)}" ${open}>
@@ -980,7 +991,8 @@ class TerpVaultPage extends HTMLElement {
           </div>
           <div class="badges">
             <span class="badge">${this._esc(game.format_label || game.format || 'Unknown')}</span>
-            <span class="badge">${this._esc(game.status || 'draft')}</span>
+            <span class="badge ${status === 'published' ? 'ok' : 'warn'}">${this._esc(statusLabel)}</span>
+            <span class="badge ${featured ? 'ok' : ''}">${featured ? 'Featured' : 'Not featured'}</span>
             ${ifictionBadge}
             ${storyBadge}
             ${errorCount ? `<span class="badge error">${errorCount} error${errorCount === 1 ? '' : 's'}</span>` : ''}
@@ -992,12 +1004,16 @@ class TerpVaultPage extends HTMLElement {
             ${this._metadata(game)}
             <div class="actions">
               <button class="button primary" type="button" data-action="edit" data-slug="${this._esc(slug)}">${this.state.editingSlug === slug ? 'Edit Open' : 'Edit Metadata'}</button>
+              <button class="button" type="button" data-action="set-status" data-slug="${this._esc(slug)}" data-status="${status === 'published' ? 'draft' : 'published'}" ${actionBusy ? 'disabled' : ''}>${actionBusy && action.type === 'status' ? 'Saving...' : (status === 'published' ? 'Unpublish' : 'Publish')}</button>
+              <button class="button" type="button" data-action="toggle-featured" data-slug="${this._esc(slug)}" data-featured="${featured ? 'false' : 'true'}" ${actionBusy ? 'disabled' : ''}>${actionBusy && action.type === 'featured' ? 'Saving...' : (featured ? 'Remove Featured' : 'Mark Featured')}</button>
               ${urls.detail ? `<a class="button" href="${this._esc(urls.detail)}" target="_blank" rel="noopener">Public Detail</a>` : ''}
               ${urls.play ? `<a class="button" href="${this._esc(urls.play)}" target="_blank" rel="noopener">Public Play</a>` : ''}
               ${urls.story ? `<a class="button" href="${this._esc(urls.story)}" target="_blank" rel="noopener">Story File</a>` : ''}
               <button class="button" type="button" data-action="open-ifiction" data-slug="${this._esc(slug)}">iFiction</button>
               <button class="button" type="button" data-action="export" data-slug="${this._esc(slug)}" ${this.state.export.saving && this.state.export.slug === slug ? 'disabled' : ''}>${this.state.export.saving && this.state.export.slug === slug ? 'Exporting...' : 'Export'}</button>
             </div>
+            ${action.error ? `<div class="message error">${this._esc(action.error)}</div>` : ''}
+            ${action.success ? `<div class="message success">${this._esc(action.success)}</div>` : ''}
             ${this._exportMessage(slug)}
             ${this._warnings(game)}
           </div>
@@ -1320,6 +1336,14 @@ class TerpVaultPage extends HTMLElement {
 
     root.querySelectorAll('[data-action="export"]').forEach(button => {
       button.addEventListener('click', () => this._exportPackage(button.dataset.slug || ''));
+    });
+
+    root.querySelectorAll('[data-action="set-status"]').forEach(button => {
+      button.addEventListener('click', () => this._setPackageStatus(button.dataset.slug || '', button.dataset.status || ''));
+    });
+
+    root.querySelectorAll('[data-action="toggle-featured"]').forEach(button => {
+      button.addEventListener('click', () => this._setPackageFeatured(button.dataset.slug || '', button.dataset.featured === 'true'));
     });
 
     root.querySelectorAll('[data-action="inspect-import"]').forEach(button => {
@@ -1746,17 +1770,75 @@ class TerpVaultPage extends HTMLElement {
 
   async _reloadManifest() {
     try {
-      const data = await this._requestJson(this._manifestUrl(), { method: 'GET' });
-      this.state.games = Array.isArray(data.games) ? data.games : [];
-      this.state.formats = data.formats || this._fallbackFormats();
-      this.state.status = data;
-      this.state.source = 'public read-only manifest';
+      const data = await this._requestJson(this._packagesApiUrl(), { method: 'GET' });
+      const payload = this._unwrapApiResponse(data);
+      this.state.games = Array.isArray(payload.games) ? payload.games : [];
+      this.state.formats = payload.formats || this.state.formats || this._fallbackFormats();
+      this.state.status = {
+        ...(this.state.status || {}),
+        ...payload
+      };
+      this.state.source = payload.source || 'Admin2 package API';
     } catch (error) {
       this.state.editor = {
         ...this.state.editor,
-        error: this.state.editor.error || `Saved, but the package manifest could not be refreshed: ${error.message || error}`
+        error: this.state.editor.error || `Saved, but the Admin2 package list could not be refreshed: ${error.message || error}`
       };
     }
+  }
+
+  async _setPackageStatus(slug, status) {
+    if (!slug || !['draft', 'published'].includes(status)) {
+      return;
+    }
+
+    await this._updatePackageFlags(slug, { terpvault: { status } }, 'status', status === 'published' ? 'Package published.' : 'Package unpublished to draft.');
+  }
+
+  async _setPackageFeatured(slug, featured) {
+    if (!slug) {
+      return;
+    }
+
+    await this._updatePackageFlags(slug, { terpvault: { featured: Boolean(featured) } }, 'featured', featured ? 'Package marked featured.' : 'Package removed from featured.');
+  }
+
+  async _updatePackageFlags(slug, metadata, type, success) {
+    this.state.packageActions = {
+      ...(this.state.packageActions || {}),
+      [slug]: { saving: true, type, error: '', success: '' }
+    };
+    this._renderLibrary();
+
+    try {
+      const data = await this._requestJson(this._metadataApiUrl(slug), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ metadata })
+      });
+      await this._reloadManifest();
+      const game = this._findGame(slug) || {};
+      this.state.packageActions = {
+        ...(this.state.packageActions || {}),
+        [slug]: { saving: false, type, error: '', success }
+      };
+      if (this.state.editingSlug === slug) {
+        this.state.editor = {
+          ...this.state.editor,
+          saving: false,
+          success,
+          values: this._editableFromApi(data, game),
+          readOnly: this._readOnlyFromApi(data, game)
+        };
+      }
+    } catch (error) {
+      this.state.packageActions = {
+        ...(this.state.packageActions || {}),
+        [slug]: { saving: false, type, error: error.message || String(error), success: '' }
+      };
+    }
+
+    this._renderLibrary();
   }
 
   async _loadHelperDoc(slug, type, render = true) {

@@ -751,6 +751,7 @@ class GamePackage
         $data = $this->meta;
         $data['slug'] = $this->slug;
         $data['status'] = $this->status();
+        $data['featured'] = (bool) $this->get('terpvault.featured', $this->get('featured', false));
         $data['title'] = $this->title();
         $data['tagline'] = $this->tagline();
         $data['description'] = $this->description();

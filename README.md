@@ -124,7 +124,7 @@ Future roadmap concepts include package or global player controls for placement,
 - PHP's ZipArchive extension, commonly installed as `php-zip`, is required for `.terpvault.zip` export, import inspection, and draft-only import commit.
 - The Admin2 Library Manager is disabled by default. Enable it with `admin.enable_admin2_page: true` only when testing Admin2 package management workflows.
 - Admin2 write operations require authenticated Admin2/API access with `admin.super` or `api.super`.
-- Current Admin2 package lifecycle: create a package, edit metadata, edit helper Markdown, manage cover/small-cover media and screenshots, replace the story file, export `.terpvault.zip`, inspect an import, and import as a draft package.
+- Current Admin2 package lifecycle: create a package, edit metadata, publish/unpublish draft packages, toggle featured state, edit helper Markdown, manage cover/small-cover media and screenshots, replace the story file, export `.terpvault.zip`, inspect an import, and import as a draft package.
 - During beta, public TerpVault pages show a small "Powered by TerpVault vX.Y.Z" footer by default. Disable it with `display.show_public_version: false` if you do not want the version visible publicly.
 
 ## Game package format
@@ -488,6 +488,8 @@ admin:
 ```
 
 Admin2 package management requires authenticated Admin2/API access with `admin.super` or `api.super`.
+
+The Library Manager uses authenticated Admin2 package data and is draft-inclusive. It should list packages with `terpvault.status: draft` and `terpvault.status: published` regardless of `library.show_unpublished`, then let a curator publish, unpublish, or toggle `terpvault.featured` through controlled metadata saves. Public routes remain separate: `/if`, `/if/_manifest`, detail/play pages, story files, and assets hide drafts unless `library.show_unpublished: true` is explicitly enabled.
 
 When that setting is enabled and the current request is an Admin2/API request, TerpVault registers a sidebar item at:
 

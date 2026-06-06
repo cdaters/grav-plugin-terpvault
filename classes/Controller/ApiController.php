@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Grav\Plugin\TerpVault\Controller;
 
+use Grav\Common\Grav;
 use Grav\Plugin\Api\Controllers\AbstractApiController;
 use Grav\Plugin\Api\Exceptions\ForbiddenException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
 use Grav\Plugin\Api\Response\ApiResponse;
 use Grav\Framework\Psr7\Response;
+use Grav\Plugin\TerpVault\GamePackage;
+use Grav\Plugin\TerpVault\GameRepository;
 use Grav\Plugin\TerpVault\Service\PackageArchiveService;
 use Grav\Plugin\TerpVault\Service\PackageCreationService;
 use Grav\Plugin\TerpVault\Service\PackageFeeliesService;
@@ -29,6 +32,27 @@ class ApiController extends AbstractApiController
     private function service(): PackageMetadataService
     {
         return new PackageMetadataService();
+    }
+
+    public function packages(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+
+        $grav = Grav::instance();
+        $config = (array) $grav['config']->get('plugins.terpvault', []);
+        $repository = new GameRepository($grav, $config);
+        $games = array_map(static function (GamePackage $game): array {
+            $data = $game->toArray(true);
+            $data['advisory_warnings'] = $game->advisoryWarnings();
+            $data['provenance_rows'] = $game->provenanceRows();
+            return $data;
+        }, $repository->all(true));
+
+        return ApiResponse::create([
+            'read_only' => false,
+            'source' => 'Admin2 package API',
+            'games' => $games,
+        ]);
     }
 
     private function creationService(): PackageCreationService
