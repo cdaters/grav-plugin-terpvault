@@ -65,6 +65,7 @@ Each bundled demo package should keep package-local provenance notes, usually in
 
 - Story/source license and provenance.
 - Story artifact checksum and build or selection notes.
+- Canonical upstream, port/source repository, catalog, archive, and reference-only URLs when they are part of the review trail.
 - Upstream license text location when included.
 - Package-local original art/assets and helper docs.
 - Historical reference/preservation materials, if any.
@@ -74,6 +75,8 @@ Each bundled demo package should keep package-local provenance notes, usually in
 - Rights-Holder Removal Requests / DMCA contact language.
 
 Package manifests should avoid broad claims that all package material is covered by the story/source license. If different items have different provenance, record that difference.
+
+Pasted URLs in `game.yaml` are review pointers, not rights conclusions. A source repository, IFDB page, IFWiki page, IF Archive path, license URL, art source, map reference, or walkthrough reference should not be treated as permission to redistribute story files or supplemental materials unless the item-level rights basis is separately documented.
 
 ## What not to claim
 

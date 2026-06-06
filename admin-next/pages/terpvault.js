@@ -303,7 +303,9 @@ class TerpVaultPage extends HTMLElement {
         .helper-tabs .button[aria-selected="true"] { border-color:rgba(93,164,255,.72); background:rgba(93,164,255,.18); }
         .story-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .create-panel { border:1px solid rgba(93,164,255,.35); border-radius:12px; padding:1rem; margin:0 0 .85rem; background:rgba(93,164,255,.055); }
+        .create-panel form { display:grid; gap:.85rem; }
         .create-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:.75rem; }
+        .create-optional { margin-top:.75rem; }
         .media-manager { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .media-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:.75rem; margin:.75rem 0; }
         .media-card { display:block; width:100%; border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.65rem; background:rgba(127,127,127,.035); color:inherit; font:inherit; text-align:left; cursor:pointer; }
@@ -676,6 +678,7 @@ class TerpVaultPage extends HTMLElement {
       ...this._catalogSearchValues(game.catalog || {}),
       ...this._catalogLinkSearchValues(game.catalog_links || []),
       ...this._provenanceSearchValues(game.provenance_rows || []),
+      ...this._objectValues(game.references || {}),
       ...this._objectValues(game.release || {}),
       ...this._objectValues(game.source || {}),
       ...this._objectValues(game.license || {})
@@ -972,7 +975,7 @@ class TerpVaultPage extends HTMLElement {
     const warningCount = Number(game.warning_count || 0);
     const errorCount = Number(game.error_count || 0);
     const coverPath = game.resources?.small_cover || game.small_cover || game.resources?.cover || game.cover || '';
-    const cover = this._adminMediaPreviewUrl(slug, coverPath) || urls.small_cover || urls.thumbnail || urls.cover || '';
+    const cover = urls.small_cover || urls.thumbnail || urls.cover || this._adminMediaPreviewUrl(slug, coverPath) || '';
     const ifictionBadge = game.has_ifiction
       ? '<span class="badge ok">iFiction XML present</span>'
       : '<span class="badge warn">No iFiction XML</span>';
@@ -1031,6 +1034,8 @@ class TerpVaultPage extends HTMLElement {
   _metadata(game) {
     const license = game.release?.license || game.license || {};
     const source = game.release?.source || game.source || {};
+    const upstreamUrl = source.upstream?.url || '';
+    const repositoryUrl = source.port_repository?.url || '';
     return `
       <dl>
         <dt>Slug</dt><dd><code>${this._esc(game.slug || '')}</code></dd>
@@ -1040,6 +1045,8 @@ class TerpVaultPage extends HTMLElement {
         <dt>IFIDs</dt><dd>${this._esc((game.ifids || []).join(', ') || 'Not recorded')}</dd>
         <dt>iFiction XML</dt><dd>${game.has_ifiction ? '<code>metadata.iFiction.xml</code>' : 'Not present'}</dd>
         <dt>Source</dt><dd>${source.url ? `<a href="${this._esc(source.url)}" target="_blank" rel="noopener">${this._esc(source.url)}</a>` : this._esc(source.notes || 'Not recorded')}</dd>
+        <dt>Upstream</dt><dd>${upstreamUrl ? `<a href="${this._esc(upstreamUrl)}" target="_blank" rel="noopener">${this._esc(upstreamUrl)}</a>` : 'Not recorded'}</dd>
+        <dt>Port repo</dt><dd>${repositoryUrl ? `<a href="${this._esc(repositoryUrl)}" target="_blank" rel="noopener">${this._esc(repositoryUrl)}</a>` : 'Not recorded'}</dd>
         <dt>License</dt><dd>${license.url ? `<a href="${this._esc(license.url)}" target="_blank" rel="noopener">${this._esc(license.name || license.url)}</a>` : this._esc(license.name || license.notes || 'Not recorded')}</dd>
       </dl>
     `;
@@ -1119,18 +1126,46 @@ class TerpVaultPage extends HTMLElement {
   _createPackagePanel() {
     const state = this.state.create || {};
     return `
-      <section class="create-panel">
+      <section class="create-panel" data-terpwright-phase="2-url-metadata">
         <div class="editor-head">
           <div>
-            <h2>Terpwright Phase 1: Local Package Builder</h2>
-            <p class="meta">Creates a new draft package from local files only. Remote IFDB, IF Archive, IFWiki, scraping, and metadata automation are not used.</p>
+            <h2>Terpwright Phase 2: Local Package Builder</h2>
+            <p class="meta">Creates a new draft package from local files and curator-supplied reference URLs. Remote IFDB, IF Archive, IFWiki, scraping, and metadata automation are not used.</p>
           </div>
           <button class="button" type="button" data-action="cancel-create">Close</button>
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
         ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
         ${state.report ? this._createReport(state.report) : ''}
-        <form data-create-package>
+        <form data-create-package data-terpwright-phase="2-url-metadata">
+          <fieldset>
+            <legend>Metadata &amp; provenance URLs</legend>
+            <p class="meta">Optional reference links for curator review. TerpVault does not assume rights from URLs.</p>
+            <div class="create-grid">
+              ${this._createUrlInput('Source / package URL', 'source_url')}
+              ${this._createUrlInput('Upstream project URL', 'upstream_source_url')}
+              ${this._createUrlInput('Port/source repository URL', 'port_repository_url')}
+              ${this._createUrlInput('License URL', 'license_url')}
+              ${this._createInput('IFDB TUID', 'ifdb_tuid')}
+              ${this._createUrlInput('IFDB URL', 'ifdb_url')}
+              ${this._createUrlInput('IFWiki URL', 'ifwiki_url')}
+              ${this._createInput('IF Archive path', 'ifarchive_path')}
+              ${this._createUrlInput('IF Archive URL', 'ifarchive_url')}
+            </div>
+            <details class="create-optional" open>
+              <summary>Optional reference URLs</summary>
+              <div class="create-grid">
+                ${this._createUrlInput('Cover art source URL', 'cover_art_source_url')}
+                ${this._createUrlInput('Hero art source URL', 'hero_art_source_url')}
+                ${this._createUrlInput('Screenshot source URL', 'screenshot_source_url')}
+                ${this._createUrlInput('Walkthrough/reference URL', 'walkthrough_reference_url')}
+                ${this._createUrlInput('Hints/reference URL', 'hints_reference_url')}
+                ${this._createUrlInput('Map/reference URL', 'map_reference_url')}
+                ${this._createUrlInput('History/background URL', 'history_reference_url')}
+              </div>
+              ${this._createTextarea('Reference notes', 'reference_notes', 'short')}
+            </details>
+          </fieldset>
           <fieldset>
             <legend>Core Metadata</legend>
           <div class="create-grid">
@@ -1145,8 +1180,6 @@ class TerpVaultPage extends HTMLElement {
             ${this._createSelect('Format', 'format', [['', 'Infer from story file'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['hugo', 'Hugo'], ['adrift', 'ADRIFT']])}
             ${this._createInput('Tags', 'tags')}
             ${this._createInput('License name', 'license_name')}
-            ${this._createInput('License URL', 'license_url')}
-            ${this._createInput('Source URL', 'source_url')}
           </div>
           ${this._createTextarea('Description', 'description')}
           ${this._createTextarea('License notes', 'license_notes', 'short')}
@@ -1189,6 +1222,10 @@ class TerpVaultPage extends HTMLElement {
 
   _createInput(label, name, required = false, value = '') {
     return `<div class="field"><label>${this._esc(label)}</label><input type="text" name="${this._esc(name)}" value="${this._esc(value)}" ${required ? 'required' : ''}></div>`;
+  }
+
+  _createUrlInput(label, name, required = false, value = '') {
+    return `<div class="field"><label>${this._esc(label)}</label><input type="url" name="${this._esc(name)}" value="${this._esc(value)}" ${required ? 'required' : ''} placeholder="https://example.com/"></div>`;
   }
 
   _createTextarea(label, name, className = '') {
@@ -2839,6 +2876,8 @@ class TerpVaultPage extends HTMLElement {
               ${this._input('License URL', 'release.license.url', values)}
               ${this._textarea('License notes', 'release.license.notes', values, 'short', this._helpText('license_notes'))}
               ${this._input('Source URL', 'release.source.url', values, this._helpText('source_url'))}
+              ${this._input('Upstream project URL', 'release.source.upstream.url', values, this._helpText('upstream_source_url'))}
+              ${this._input('Port/source repository URL', 'release.source.port_repository.url', values, this._helpText('port_repository_url'))}
               ${this._input('Source retrieved', 'release.source.retrieved', values, this._helpText('source_retrieved'))}
               ${this._textarea('Source notes', 'release.source.notes', values, 'short', this._helpText('source_notes'))}
             </fieldset>
@@ -3247,6 +3286,8 @@ class TerpVaultPage extends HTMLElement {
       license_name: 'Human-readable license or rights status.',
       license_notes: 'Redistribution limits, permission notes, or review reminders.',
       source_url: 'Original download, repository, catalog, or project page for the package or story file.',
+      upstream_source_url: 'Canonical upstream project, source release, or source distribution URL when different from the packaged artifact.',
+      port_repository_url: 'Repository or project URL for the port/source used to build this package variant.',
       source_retrieved: 'Date the source was retrieved, if you track it.',
       source_notes: 'Source/provenance notes for future maintenance and rights review.',
       terpvault: 'TerpVault-specific curation fields control publication and library presentation.',
@@ -3434,6 +3475,12 @@ class TerpVaultPage extends HTMLElement {
         },
         source: {
           url: source.url || '',
+          upstream: {
+            url: source.upstream?.url || ''
+          },
+          port_repository: {
+            url: source.port_repository?.url || ''
+          },
           retrieved: source.retrieved || '',
           notes: source.notes || ''
         }
