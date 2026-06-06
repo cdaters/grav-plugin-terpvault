@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Grav\Plugin\TerpVault\Service;
 
+use DOMDocument;
 use Grav\Common\Grav;
 use Grav\Common\Yaml;
+use Grav\Plugin\TerpVault\GameRepository;
 use InvalidArgumentException;
 use Psr\Http\Message\UploadedFileInterface;
 use RuntimeException;
@@ -14,8 +16,28 @@ use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 class PackageCreationService
 {
     private const STORY_EXTENSIONS = [
-        'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb', 'zlb',
-        'ulx', 'gblorb', 'glb', 'gam', 't3', 'taf',
+        'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'zblorb', 'zlb',
+        'ulx', 'gblorb', 'glb', 'blorb', 'hex', 'gam', 't3', 'taf',
+    ];
+
+    private const IMAGE_EXTENSIONS = [
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        'gif' => 'image/gif',
+    ];
+
+    private const FEELIE_EXTENSIONS = [
+        'pdf', 'txt', 'md', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp3', 'ogg', 'wav', 'm4a',
+    ];
+
+    private const MARKDOWN_RESOURCES = [
+        'how_to_play' => 'how-to-play.md',
+        'hints' => 'hints.md',
+        'walkthrough' => 'walkthrough.md',
+        'known_differences' => 'known-differences.md',
+        'provenance' => 'provenance.md',
     ];
 
     /** @var Grav */
@@ -39,14 +61,14 @@ class PackageCreationService
         $this->basePath = $this->grav['locator']->findResource($stream, true, true) ?: '';
     }
 
-    public function create(array $fields, UploadedFileInterface $upload): array
+    public function create(array $fields, UploadedFileInterface $storyUpload, array $uploads = []): array
     {
         $slug = $this->slug((string)($fields['slug'] ?? ''));
         $title = trim((string)($fields['title'] ?? ''));
         if ($title === '') {
             throw new InvalidArgumentException('Title is required.');
         }
-        if ($upload->getError() !== UPLOAD_ERR_OK) {
+        if ($storyUpload->getError() !== UPLOAD_ERR_OK) {
             throw new InvalidArgumentException('Initial story file is required.');
         }
 
@@ -68,20 +90,30 @@ class PackageCreationService
                 throw new RuntimeException('Created package folder is outside the games directory.');
             }
 
-            $storyFile = $this->storyFilename($upload);
-            $this->writeUploadAtomically($upload, $packageReal . DIRECTORY_SEPARATOR . $storyFile);
+            $storyFile = $this->safeFilename($storyUpload, self::STORY_EXTENSIONS, 'story');
+            $storyTarget = $this->packageFilePath($packageReal, $storyFile);
+            $this->writeUploadAtomically($storyUpload, $storyTarget);
+            $storySha256 = hash_file('sha256', $storyTarget) ?: '';
 
-            $manifest = $this->manifest($slug, $storyFile, $fields);
+            $manifest = $this->manifest($slug, $storyFile, $storySha256, $fields);
+            $this->writeOptionalResources($packageReal, $manifest, $uploads);
             $this->writeTextAtomically($packageReal . DIRECTORY_SEPARATOR . 'game.yaml', $this->dumpYaml($manifest));
-            $this->writeTextAtomically($packageReal . DIRECTORY_SEPARATOR . 'how-to-play.md', "# How to Play\n\nAdd package-specific parser commands and play notes here.\n");
-            $this->writeTextAtomically($packageReal . DIRECTORY_SEPARATOR . 'hints.md', "# Hints\n\nAdd spoiler-safe hints here. Start broad, then reveal more specific help in later sections.\n");
-            $this->writeTextAtomically($packageReal . DIRECTORY_SEPARATOR . 'walkthrough.md', "# Walkthrough\n\nWalkthrough not yet written. Add a complete solution path when ready.\n");
+
+            $validation = $this->validateReadback($slug);
+            if (!$validation['ok']) {
+                throw new RuntimeException('Generated package validation failed: ' . implode('; ', $validation['fatal_errors']));
+            }
 
             return [
                 'slug' => $slug,
                 'package_path' => $packageReal,
                 'story_file' => $storyFile,
+                'story_sha256' => $storySha256,
                 'metadata' => $manifest,
+                'validation' => $validation,
+                'draft_forced' => true,
+                'featured_forced_false' => true,
+                'has_ifiction' => is_file($packageReal . DIRECTORY_SEPARATOR . 'metadata.iFiction.xml'),
             ];
         } catch (\Throwable $e) {
             $this->cleanupCreated();
@@ -89,14 +121,14 @@ class PackageCreationService
         }
     }
 
-    private function manifest(string $slug, string $storyFile, array $fields): array
+    private function manifest(string $slug, string $storyFile, string $storySha256, array $fields): array
     {
         return [
             'id' => $slug,
             'slug' => $slug,
             'identification' => [
                 'format' => $this->format((string)($fields['format'] ?? ''), $storyFile),
-                'ifids' => [],
+                'ifids' => $this->listField($fields['ifid'] ?? $fields['ifids'] ?? ''),
             ],
             'bibliographic' => [
                 'title' => trim((string)($fields['title'] ?? '')),
@@ -104,15 +136,13 @@ class PackageCreationService
                 'headline' => trim((string)($fields['headline'] ?? '')),
                 'first_published' => trim((string)($fields['first_published'] ?? '')),
                 'genre' => trim((string)($fields['genre'] ?? '')),
-                'language' => trim((string)($fields['language'] ?? '')),
+                'language' => trim((string)($fields['language'] ?? 'en')) ?: 'en',
                 'description' => trim((string)($fields['description'] ?? '')),
             ],
             'resources' => [
                 'story_file' => $storyFile,
+                'story_sha256' => $storySha256,
                 'screenshots' => [],
-                'how_to_play' => 'how-to-play.md',
-                'hints' => 'hints.md',
-                'walkthrough' => 'walkthrough.md',
             ],
             'catalog' => [
                 'ifdb' => ['tuid' => '', 'url' => ''],
@@ -121,7 +151,7 @@ class PackageCreationService
             ],
             'release' => [
                 'license' => [
-                    'name' => trim((string)($fields['license_name'] ?? '')),
+                    'name' => trim((string)($fields['license_name'] ?? 'Verify before redistribution')),
                     'url' => trim((string)($fields['license_url'] ?? '')),
                     'notes' => trim((string)($fields['license_notes'] ?? '')),
                 ],
@@ -131,10 +161,11 @@ class PackageCreationService
                     'notes' => trim((string)($fields['source_notes'] ?? '')),
                 ],
             ],
+            'tags' => $this->listField($fields['tags'] ?? ''),
             'terpvault' => [
-                'status' => $this->status((string)($fields['status'] ?? 'draft')),
+                'status' => 'draft',
                 'featured' => false,
-                'tags' => $this->tags($fields['tags'] ?? ''),
+                'tags' => [],
             ],
             'player' => [
                 'engine' => 'parchment',
@@ -142,24 +173,125 @@ class PackageCreationService
         ];
     }
 
+    private function writeOptionalResources(string $package, array &$manifest, array $uploads): void
+    {
+        foreach (self::MARKDOWN_RESOURCES as $key => $relative) {
+            $upload = $this->uploadedFile($uploads, $key);
+            if (!$this->isPresentUpload($upload)) {
+                continue;
+            }
+            $this->assertClientExtension($upload, ['md'], $relative . ' must be a Markdown file.');
+            $target = $this->packageFilePath($package, $relative);
+            $this->writeUploadAtomically($upload, $target);
+            if ($key === 'provenance') {
+                continue;
+            }
+            $manifest['resources'][$key] = $relative;
+        }
+
+        foreach (['cover' => 'cover', 'small_cover' => 'small-cover', 'hero' => 'hero'] as $key => $basename) {
+            $upload = $this->uploadedFile($uploads, $key);
+            if (!$this->isPresentUpload($upload)) {
+                continue;
+            }
+            $extension = $this->imageExtension($upload);
+            $relative = $basename . '.' . ($extension === 'jpeg' ? 'jpg' : $extension);
+            $target = $this->packageFilePath($package, $relative);
+            $this->writeUploadAtomically($upload, $target);
+            $this->validateImage($target, $extension);
+            $manifest['resources'][$key] = $relative;
+        }
+
+        $screenshots = [];
+        foreach ($this->uploadedFiles($uploads, 'screenshots') as $index => $upload) {
+            if (!$this->isPresentUpload($upload)) {
+                continue;
+            }
+            $extension = $this->imageExtension($upload);
+            $relative = $this->uniqueRelativePath($package, 'screenshots/' . $this->safeStem($upload, 'screenshot-' . ($index + 1)) . '.' . ($extension === 'jpeg' ? 'jpg' : $extension));
+            $target = $this->packageFilePath($package, $relative);
+            $this->writeUploadAtomically($upload, $target);
+            $this->validateImage($target, $extension);
+            $screenshots[] = $relative;
+        }
+        if ($screenshots) {
+            $manifest['resources']['screenshots'] = $screenshots;
+        }
+
+        $feelies = [];
+        foreach ($this->uploadedFiles($uploads, 'feelies') as $upload) {
+            if (!$this->isPresentUpload($upload)) {
+                continue;
+            }
+            $extension = $this->feelieExtension($upload);
+            $relative = $this->uniqueRelativePath($package, 'feelies/' . $this->safeStem($upload, 'feelie') . '.' . $extension);
+            $target = $this->packageFilePath($package, $relative);
+            $this->writeUploadAtomically($upload, $target);
+            $this->validateFeelie($target, $extension);
+            $feelies[] = [
+                'title' => $this->titleFromPath($relative),
+                'path' => $relative,
+                'type' => $this->typeFromExtension($extension),
+                'description' => '',
+            ];
+        }
+        if ($feelies) {
+            $manifest['resources']['feelies'] = $feelies;
+        }
+
+        $ifiction = $this->uploadedFile($uploads, 'ifiction');
+        if ($this->isPresentUpload($ifiction)) {
+            $this->assertClientExtension($ifiction, ['xml'], 'metadata.iFiction.xml upload must be an XML file.');
+            $xml = $this->uploadContents($ifiction);
+            $this->validateIFictionXml($xml);
+            $this->writeTextAtomically($package . DIRECTORY_SEPARATOR . 'metadata.iFiction.xml', $xml);
+        }
+    }
+
+    private function validateReadback(string $slug): array
+    {
+        $repository = new GameRepository($this->grav, $this->config);
+        $game = $repository->find($slug, true);
+        if (!$game) {
+            return [
+                'ok' => false,
+                'fatal_errors' => ['Package could not be read back from the repository.'],
+                'warnings' => [],
+            ];
+        }
+
+        $warnings = $game->warnings();
+        $fatal = array_values(array_map(static function (array $warning): string {
+            return (string)($warning['message'] ?? $warning['label'] ?? $warning['code'] ?? 'Package validation error.');
+        }, array_filter($warnings, static function (array $warning): bool {
+            return ($warning['severity'] ?? '') === 'error';
+        })));
+
+        return [
+            'ok' => count($fatal) === 0,
+            'fatal_errors' => $fatal,
+            'warnings' => array_values(array_filter($warnings, static function (array $warning): bool {
+                return ($warning['severity'] ?? 'warning') !== 'error';
+            })),
+            'error_count' => count($fatal),
+            'warning_count' => count($warnings) - count($fatal),
+        ];
+    }
+
     private function slug(string $slug): string
     {
         $slug = trim($slug);
+        if (strpos($slug, "\0") !== false || preg_match('#^[a-z][a-z0-9+.-]*:#i', $slug)) {
+            throw new InvalidArgumentException('Invalid package slug.');
+        }
+        if ($slug === '' || $slug[0] === '/' || strpos($slug, '/') !== false || strpos($slug, '\\') !== false || preg_match('/^[A-Za-z]:[\/\\\\]/', $slug)) {
+            throw new InvalidArgumentException('Invalid package slug.');
+        }
         if (!preg_match('/^[a-z0-9][a-z0-9_-]*$/', $slug)) {
             throw new InvalidArgumentException('Invalid package slug.');
         }
 
         return $slug;
-    }
-
-    private function status(string $status): string
-    {
-        $status = strtolower(trim($status));
-        if (!in_array($status, ['draft', 'published'], true)) {
-            return 'draft';
-        }
-
-        return $status;
     }
 
     private function format(string $format, string $storyFile): string
@@ -187,20 +319,20 @@ class PackageCreationService
         if (in_array($format, ['tads3', 'tads-3', 'tadsiii', 'tads-iii', 't3'], true)) {
             return 'tads3';
         }
-        if (in_array($format, ['tads', 'hugo', 'adrift', 'ink'], true)) {
-            return $format;
-        }
         if ($format === 'hex') {
             return 'hugo';
         }
         if ($format === 'taf') {
             return 'adrift';
         }
+        if (in_array($format, ['tads', 'hugo', 'adrift'], true)) {
+            return $format;
+        }
 
-        return $format;
+        return '';
     }
 
-    private function tags($value): array
+    private function listField($value): array
     {
         if (is_string($value)) {
             $value = preg_split('/[\r\n,]+/', $value) ?: [];
@@ -216,42 +348,131 @@ class PackageCreationService
         })));
     }
 
-    private function storyFilename(UploadedFileInterface $upload): string
+    private function safeFilename(UploadedFileInterface $upload, array $extensions, string $fallback): string
     {
-        $clientName = (string) $upload->getClientFilename();
-        $extension = strtolower(pathinfo($clientName, PATHINFO_EXTENSION));
-        if (!in_array($extension, self::STORY_EXTENSIONS, true)) {
-            throw new InvalidArgumentException('Unsupported story file extension.');
+        $this->assertClientExtension($upload, $extensions, 'Unsupported story file extension.');
+        return $this->safeStem($upload, $fallback) . '.' . strtolower(pathinfo((string) $upload->getClientFilename(), PATHINFO_EXTENSION));
+    }
+
+    private function safeStem(UploadedFileInterface $upload, string $fallback): string
+    {
+        $name = strtolower(pathinfo((string) $upload->getClientFilename(), PATHINFO_FILENAME));
+        $name = preg_replace('/[^a-z0-9_-]+/', '-', $name) ?: '';
+        return trim($name, '-_') ?: $fallback;
+    }
+
+    private function assertClientExtension(UploadedFileInterface $upload, array $extensions, string $message): void
+    {
+        $extension = strtolower(pathinfo((string) $upload->getClientFilename(), PATHINFO_EXTENSION));
+        if (!in_array($extension, $extensions, true)) {
+            throw new InvalidArgumentException($message);
+        }
+    }
+
+    private function imageExtension(UploadedFileInterface $upload): string
+    {
+        $extension = strtolower(pathinfo((string) $upload->getClientFilename(), PATHINFO_EXTENSION));
+        if ($extension === 'jpeg') {
+            $extension = 'jpg';
+        }
+        if (!array_key_exists($extension, self::IMAGE_EXTENSIONS)) {
+            throw new InvalidArgumentException('Only jpg, jpeg, png, webp, and gif images can be uploaded.');
+        }
+        return $extension;
+    }
+
+    private function feelieExtension(UploadedFileInterface $upload): string
+    {
+        $extension = strtolower(pathinfo((string) $upload->getClientFilename(), PATHINFO_EXTENSION));
+        if ($extension === 'jpeg') {
+            $extension = 'jpg';
+        }
+        if (!in_array($extension, self::FEELIE_EXTENSIONS, true)) {
+            throw new InvalidArgumentException('Only pdf, txt, md, jpg, jpeg, png, webp, gif, mp3, ogg, wav, and m4a feelies can be uploaded.');
+        }
+        return $extension;
+    }
+
+    private function packageFilePath(string $package, string $relative): string
+    {
+        $relative = $this->normalizeRelativePath($relative);
+        $target = $package . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+        $dir = dirname($target);
+        if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Unable to create package resource directory.');
         }
 
-        $name = strtolower(pathinfo($clientName, PATHINFO_FILENAME));
-        $name = preg_replace('/[^a-z0-9_-]+/', '-', $name) ?: '';
-        $name = trim($name, '-_') ?: 'story';
+        $dirReal = realpath($dir);
+        if ($dirReal === false || !$this->isPathInside($dirReal, $package)) {
+            throw new InvalidArgumentException('Package resource path is outside the package directory.');
+        }
 
-        return $name . '.' . $extension;
+        return $target;
+    }
+
+    private function normalizeRelativePath(string $relative): string
+    {
+        if (strpos($relative, "\0") !== false || preg_match('#^[a-z][a-z0-9+.-]*:#i', $relative)) {
+            throw new InvalidArgumentException('Invalid package resource path.');
+        }
+        $relative = str_replace('\\', '/', trim($relative));
+        if ($relative === '' || $relative[0] === '/') {
+            throw new InvalidArgumentException('Invalid package resource path.');
+        }
+        $segments = array_values(array_filter(explode('/', $relative), static function (string $segment): bool {
+            return $segment !== '';
+        }));
+        foreach ($segments as $segment) {
+            $lower = strtolower($segment);
+            if ($segment === '.' || $segment === '..' || $segment[0] === '.' || in_array($lower, ['__macosx', 'thumbs.db', 'desktop.ini'], true)) {
+                throw new InvalidArgumentException('Package resource path cannot contain hidden, system, or traversal segments.');
+            }
+        }
+
+        return implode('/', $segments);
+    }
+
+    private function uniqueRelativePath(string $package, string $relative): string
+    {
+        $relative = $this->normalizeRelativePath($relative);
+        $dir = trim(dirname($relative), '.');
+        $stem = pathinfo($relative, PATHINFO_FILENAME);
+        $extension = strtolower(pathinfo($relative, PATHINFO_EXTENSION));
+        $candidate = $relative;
+        $index = 1;
+        while (is_file($package . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $candidate))) {
+            $candidate = ($dir !== '' ? $dir . '/' : '') . $stem . '-' . $index . '.' . $extension;
+            $index++;
+        }
+
+        return $candidate;
     }
 
     private function writeUploadAtomically(UploadedFileInterface $upload, string $target): void
     {
-        $temp = dirname($target) . DIRECTORY_SEPARATOR . '.' . basename($target) . '.tmp-' . bin2hex(random_bytes(8));
+        if ($upload->getError() !== UPLOAD_ERR_OK) {
+            throw new InvalidArgumentException('Uploaded package resource is not available.');
+        }
+
+        $this->writeTextAtomically($target, $this->uploadContents($upload));
+    }
+
+    private function uploadContents(UploadedFileInterface $upload): string
+    {
         $stream = $upload->getStream();
         if ($stream->isSeekable()) {
             $stream->rewind();
         }
-
-        if (file_put_contents($temp, (string) $stream) === false) {
-            throw new RuntimeException('Unable to write uploaded story file.');
-        }
-        $this->created[] = $temp;
-        if (!rename($temp, $target)) {
-            throw new RuntimeException('Unable to move uploaded story file into package.');
-        }
-        $this->created[] = $target;
+        return (string) $stream;
     }
 
     private function writeTextAtomically(string $target, string $content): void
     {
-        $temp = dirname($target) . DIRECTORY_SEPARATOR . '.' . basename($target) . '.tmp-' . bin2hex(random_bytes(8));
+        $dir = dirname($target);
+        if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Unable to create package resource directory.');
+        }
+        $temp = $dir . DIRECTORY_SEPARATOR . '.' . basename($target) . '.tmp-' . bin2hex(random_bytes(8));
         if (file_put_contents($temp, $content) === false) {
             throw new RuntimeException('Unable to write package file.');
         }
@@ -260,6 +481,124 @@ class PackageCreationService
             throw new RuntimeException('Unable to move package file into place.');
         }
         $this->created[] = $target;
+    }
+
+    private function validateImage(string $path, string $extension): void
+    {
+        $info = @getimagesize($path);
+        if (!is_array($info) || empty($info['mime']) || $info['mime'] !== self::IMAGE_EXTENSIONS[$extension]) {
+            throw new InvalidArgumentException('Uploaded image data does not match the file extension.');
+        }
+    }
+
+    private function validateFeelie(string $path, string $extension): void
+    {
+        if (in_array($extension, ['jpg', 'png', 'webp', 'gif'], true)) {
+            $this->validateImage($path, $extension);
+            return;
+        }
+        if ($extension === 'pdf') {
+            $handle = fopen($path, 'rb');
+            $header = $handle ? fread($handle, 5) : '';
+            if ($handle) {
+                fclose($handle);
+            }
+            if ($header !== '%PDF-') {
+                throw new InvalidArgumentException('Uploaded PDF data does not match the feelie file extension.');
+            }
+        }
+    }
+
+    private function validateIFictionXml(string $xml): void
+    {
+        if (trim($xml) === '') {
+            throw new InvalidArgumentException('metadata.iFiction.xml upload is empty.');
+        }
+        if (strlen($xml) > 524288) {
+            throw new InvalidArgumentException('metadata.iFiction.xml upload is too large.');
+        }
+        if (stripos($xml, '<!DOCTYPE') !== false) {
+            throw new InvalidArgumentException('metadata.iFiction.xml contains a DOCTYPE declaration and was not saved.');
+        }
+        if (!class_exists(DOMDocument::class)) {
+            throw new RuntimeException('PHP DOM extension is required to validate iFiction XML.');
+        }
+
+        $previous = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        $document = new DOMDocument();
+        $document->substituteEntities = false;
+        $loaded = $document->loadXML($xml, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        if (!$loaded || $document->documentElement === null) {
+            $message = 'Unable to parse metadata.iFiction.xml.';
+            if ($errors) {
+                $message .= ' ' . trim($errors[0]->message);
+            }
+            throw new InvalidArgumentException($message);
+        }
+    }
+
+    private function uploadedFile(array $uploads, string $key): ?UploadedFileInterface
+    {
+        $files = $this->uploadedFiles($uploads, $key);
+        return $files[0] ?? null;
+    }
+
+    /**
+     * @return UploadedFileInterface[]
+     */
+    private function uploadedFiles(array $uploads, string $key): array
+    {
+        if (!array_key_exists($key, $uploads)) {
+            return [];
+        }
+        $files = [];
+        $this->collectUploadedFiles($uploads[$key], $files);
+        return $files;
+    }
+
+    private function collectUploadedFiles($value, array &$files): void
+    {
+        if ($value instanceof UploadedFileInterface) {
+            $files[] = $value;
+            return;
+        }
+        if (!is_array($value)) {
+            return;
+        }
+        foreach ($value as $item) {
+            $this->collectUploadedFiles($item, $files);
+        }
+    }
+
+    private function isPresentUpload(?UploadedFileInterface $upload): bool
+    {
+        return $upload instanceof UploadedFileInterface && $upload->getError() !== UPLOAD_ERR_NO_FILE;
+    }
+
+    private function titleFromPath(string $relative): string
+    {
+        $name = pathinfo($relative, PATHINFO_FILENAME);
+        $name = trim(str_replace(['-', '_'], ' ', $name));
+        return $name !== '' ? ucwords($name) : basename($relative);
+    }
+
+    private function typeFromExtension(string $extension): string
+    {
+        if (in_array($extension, ['pdf', 'txt', 'md'], true)) {
+            return 'document';
+        }
+        if (in_array($extension, ['jpg', 'png', 'webp', 'gif'], true)) {
+            return 'image';
+        }
+        if (in_array($extension, ['mp3', 'ogg', 'wav', 'm4a'], true)) {
+            return 'audio';
+        }
+
+        return 'other';
     }
 
     private function basePath(): string
@@ -287,10 +626,28 @@ class PackageCreationService
         foreach (array_reverse($this->created) as $path) {
             if (is_file($path)) {
                 @unlink($path);
-            } elseif (is_dir($path)) {
-                @rmdir($path);
             }
         }
+        foreach (array_reverse($this->created) as $path) {
+            if (is_dir($path)) {
+                $this->removeDirectory($path);
+            }
+        }
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $fileinfo) {
+            if ($fileinfo->isDir()) {
+                @rmdir($fileinfo->getPathname());
+            } else {
+                @unlink($fileinfo->getPathname());
+            }
+        }
+        @rmdir($dir);
     }
 
     private function dumpYaml(array $data): string

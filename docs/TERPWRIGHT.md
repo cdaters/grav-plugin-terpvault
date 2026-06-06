@@ -1,8 +1,8 @@
 # Terpwright Package Builder
 
-Terpwright is the planned Admin2 package-builder workflow for TerpVault. It should help a curator assemble a reviewable TerpVault package from local files and known interactive-fiction ecosystem references without replacing curator judgment, license review, or provenance notes.
+Terpwright is the Admin2 package-builder workflow for TerpVault. It helps a curator assemble a reviewable TerpVault package from local files and known interactive-fiction ecosystem references without replacing curator judgment, license review, or provenance notes.
 
-This document is planning/design only. No Terpwright runtime behavior is implemented by this document.
+Phase 1 local-file package creation is implemented in Admin2. Later metadata lookup, scraping, automation, guided recipes, richer Oracle generation, and Ink support remain roadmap-only.
 
 ## Purpose
 
@@ -15,6 +15,30 @@ Terpwright v1 should make the common package-building path less error-prone:
 - Keep every source and rights assumption visible for curator review.
 
 Terpwright complements the current Admin2 package lifecycle. Current Admin2 already supports limited package creation, metadata editing, helper Markdown editing, media/screenshots management, local iFiction preview/apply, story replacement, export, import inspection, and draft-only import commit. Terpwright should reuse those services and validation rules rather than becoming a parallel package system.
+
+## Current Phase 1 Status
+
+Admin2 now exposes `Terpwright Phase 1: Local Package Builder` through the existing Create Package action.
+
+Implemented:
+
+- Local story-file upload with the TerpVault story extension allowlist.
+- `resources.story_file` creation and `resources.story_sha256` checksum recording.
+- Format inference from story extension when the curator leaves format blank.
+- Basic metadata entry for title, slug, author/source attribution, headline, IFID, description, tags, license, and source notes.
+- Draft-only output: `terpvault.status` is forced to `draft` and `terpvault.featured` is forced to `false`.
+- Optional local uploads for cover, small-cover, hero, screenshots, helper Markdown files, `known-differences.md`, `provenance.md`, `metadata.iFiction.xml`, and feelies.
+- Package-local resource paths only, with traversal/system-file checks and conservative extension allowlists.
+- Repository readback validation after package generation, with warning/error results shown in Admin2.
+- Created packages remain exportable through the existing `.terpvault.zip` export flow.
+
+Not implemented in Phase 1:
+
+- Remote IFDB, IF Archive, IFWiki, or arbitrary URL lookup.
+- Scraping.
+- Metadata assistant automation.
+- Ink support.
+- Oracle structured-source generation.
 
 ## What Terpwright Is Not
 
@@ -304,13 +328,13 @@ Terpwright docs and UI should avoid implying that Ink packages are currently pla
 
 ### Phase 1: Local-File Package Builder
 
-- Build local-file wizard flow.
-- Accept local story file and local package resources.
-- Create draft package folders only.
-- Reuse package validation, story-file allowlists, and export/import rules.
-- Support local `metadata.iFiction.xml` upload/preview/apply through existing local workflow.
-- Support `resources.known_differences` as an optional first-class Markdown package document.
-- Export reviewed candidates as `.terpvault.zip`.
+- Implemented as a narrow Admin2 local builder.
+- Accepts local story file and local package resources.
+- Creates draft package folders only.
+- Reuses package readback validation and keeps export/import rules aligned with story-file allowlists.
+- Supports local `metadata.iFiction.xml` upload during creation; preview/apply still happens through the existing package editor workflow.
+- Supports `resources.known_differences` as an optional first-class Markdown package document.
+- Exports reviewed candidates through the existing `.terpvault.zip` flow.
 
 ### Phase 2: Metadata Assistant For Manually Supplied URLs
 

@@ -30,6 +30,21 @@ It should cover package management, package creation, import inspection, export,
 
 It should also explain IF-specific jargon such as IFID, iFiction, Treaty of Babel, IFDB, IFWiki, IF Archive, Z-machine, Glulx, TADS, ADRIFT, Ink, feelies, helper Markdown, hints, walkthroughs, and story files.
 
+## Current Local Builder Workflow
+
+The Library Manager Create Package action now opens `Terpwright Phase 1: Local Package Builder`.
+
+Use it when a curator already has local package materials:
+
+- Enter a URL-safe slug, title, author/source attribution, headline, optional IFID, and source/license notes.
+- Upload one supported local story file. The builder writes it package-locally, records it as `resources.story_file`, computes `resources.story_sha256`, and infers format when possible.
+- Optionally upload cover, small-cover, hero, screenshots, helper Markdown, `known-differences.md`, `provenance.md`, `metadata.iFiction.xml`, and feelies.
+- Submit to create a draft package under the configured games path. The builder always forces draft status and clears featured placement.
+- Review the creation report and package validation notes in Admin2 before exporting or publishing.
+- Export the created package with the existing package Export action.
+
+The local builder does not fetch remote pages or files, scrape IFDB/IFWiki/IF Archive, generate metadata, auto-apply iFiction fields, publish packages, overwrite existing packages, or create Ink packages.
+
 ## Proposed Sections
 
 - Overview / What TerpVault Manages.
