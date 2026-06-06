@@ -164,6 +164,7 @@ Recommended steps:
    - Create or attach `how-to-play.md`, `hints.md`, `walkthrough.md`, `provenance.md`, and `known-differences.md`.
    - Prefer original curator writing or explicitly licensed reuse.
    - Avoid copying large web content verbatim into package docs.
+   - Treat `known-differences.md` as the optional `resources.known_differences` document when the package differs materially from a source, native build, reference release, or historical edition.
 
 6. Feelies review.
    - Add only curated supplemental files, not arbitrary directory contents.
@@ -253,6 +254,7 @@ Validation should cover:
 - iFiction XML well-formedness and DOCTYPE rejection.
 - iFiction consistency with selected `game.yaml` fields.
 - Package-local resource references.
+- Optional `resources.known_differences` references when present; they must be safe package-local `.md` files.
 - Allowed story/image/helper/feelie extensions.
 - Conventional package support files.
 - Export contents.
@@ -307,6 +309,7 @@ Terpwright docs and UI should avoid implying that Ink packages are currently pla
 - Create draft package folders only.
 - Reuse package validation, story-file allowlists, and export/import rules.
 - Support local `metadata.iFiction.xml` upload/preview/apply through existing local workflow.
+- Support `resources.known_differences` as an optional first-class Markdown package document.
 - Export reviewed candidates as `.terpvault.zip`.
 
 ### Phase 2: Metadata Assistant For Manually Supplied URLs
@@ -339,7 +342,6 @@ Terpwright docs and UI should avoid implying that Ink packages are currently pla
 
 - Should Terpwright stage candidate packages in a temporary build area before moving them into `games/{slug}`, or create draft packages directly after validation?
 - Should partially completed wizard state be persisted, and if so where?
-- Should `known-differences.md` become a conventional root support file for export/import, or remain a helper document referenced only when explicitly included?
 - Should `provenance.md` be generated from structured source entries, edited manually, or both?
 - How much story-file format detection should Terpwright expose before richer interpreter support exists?
 - Should Terpwright support package templates for common cases such as source-built Z-code, Inform releases, or IF Archive references?

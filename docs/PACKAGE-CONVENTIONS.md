@@ -22,6 +22,7 @@ user/data/terpvault/games/
     how-to-play.md
     hints.md
     walkthrough.md
+    known-differences.md
 ```
 
 The folder name should be stable, URL-safe, and lowercase where practical. TerpVault uses this folder as the fallback slug when `game.yaml` does not provide one.
@@ -69,6 +70,7 @@ These files make a package easier to browse, verify, and play:
 - `how-to-play.md`: basic commands, parser conventions, or accessibility notes.
 - `hints.md`: spoiler-safe hint sections, ideally using Markdown headings or `<details>` blocks.
 - `walkthrough.md`: a solution or route through the work.
+- `known-differences.md`: package-specific notes on meaningful differences between this playable package and another source, release, reference implementation, native build, or historical edition.
 - `feelies/`: optional package-local supplemental files such as manuals, maps, clue sheets, newsletters, audio, and other extras.
 
 The simple `resources.hints: hints.md` convention is the backwards-compatible hint path and should remain valid even after richer Oracle/progressive hint support is added.
@@ -110,6 +112,7 @@ resources:
   how_to_play: how-to-play.md
   hints: hints.md
   walkthrough: walkthrough.md
+  known_differences: known-differences.md
   feelies:
     - path: feelies/manual.pdf
       title: Original Manual
@@ -168,6 +171,23 @@ player:
 ```
 
 `terpvault.tags` remains a compatibility location for older packages, but new package metadata should prefer top-level `tags`, `content_notes`, `theme_notes`, and `audience` for discovery and transparency.
+
+## Known differences
+
+`resources.known_differences` is an optional package-local Markdown document for explaining meaningful package/version differences. Use it when a playable package is a port, reconstruction, source-built variant, browser-playable adaptation, patched artifact, or otherwise differs from an upstream/native/reference version in ways a player or curator should understand.
+
+Preferred shape:
+
+```yaml
+resources:
+  known_differences: known-differences.md
+```
+
+The file must be a safe package-local `.md` path. It renders as Markdown HTML in a collapsed `Known Differences` item in the public Help & Reference area when present. It is not required for package validity.
+
+Use `known-differences.md` for player-facing or curator-facing behavioral/version notes such as changed scoring, parser behavior, missing native features, port caveats, supported browser-playable subset, patched bugs, or known parity gaps. Use `provenance.md` for source, build, license, checksum, retrieval, and rights/audit notes. Use `walkthrough.md` for solution commands and route spoilers.
+
+Older packages may already list a known-differences document under `resources.feelies`. That remains valid for backward compatibility. New or updated packages should prefer `resources.known_differences`; if the same existing Markdown file is also listed as a feelie, TerpVault suppresses the duplicate feelie card where practical and renders the first-class Known Differences section instead. Package authors should avoid listing the same file twice in new manifests.
 
 Current player fields are intentionally minimal. Future player presentation fields may expand to support focused and inline player placement, boot behavior, and terminal theme presets without changing the package's story/provenance contract:
 
@@ -449,6 +469,7 @@ bin/grav clearcache
 - Add IFDB, IFWiki, and IF Archive links when known.
 - Add feelies/extras such as manuals, maps, clue sheets, and audio when rights allow it.
 - Add how-to-play, hints, and walkthrough Markdown when useful.
+- Add known-differences Markdown when the playable package differs materially from a source, native build, reference release, or historical edition.
 - Clear Grav cache and check `/if`, `/if/{slug}`, and `/if/{slug}/play`.
 
 ## Future Terpwright package-builder output
@@ -459,7 +480,7 @@ V1 builder output should follow this document's conventions:
 
 - Create draft packages only, with `terpvault.status: draft` and `terpvault.featured: false`.
 - Use the structured `game.yaml` shape for new manifests.
-- Keep story files, media, helper Markdown, `metadata.iFiction.xml`, provenance notes, and feelies package-local.
+- Keep story files, media, helper Markdown including `known-differences.md`, `metadata.iFiction.xml`, provenance notes, and feelies package-local.
 - Reuse existing validation, import inspection, draft-only install, and `.terpvault.zip` export rules.
 - Preserve source URLs, retrieval dates, license notes, and package-local provenance.
 - Treat uncertain rights as warnings or pending-review notes, not hidden assumptions.
@@ -486,13 +507,14 @@ adventure/
   how-to-play.md
   hints.md
   walkthrough.md
+  known-differences.md
 ```
 
 Export includes:
 
 - `game.yaml`.
 - One playable story file referenced by `resources.story_file`.
-- Referenced cover, small-cover, hero, screenshot, feelies, how-to-play, hints, and walkthrough files.
+- Referenced cover, small-cover, hero, screenshot, feelies, how-to-play, hints, walkthrough, and known-differences files.
 - `metadata.iFiction.xml` when present.
 - Exact package-root support files `provenance.md` and `LICENSE-upstream.txt` when present.
 - Safe conventional cover, small-cover, hero, screenshot, feelies, and helper Markdown filenames when present.

@@ -3198,13 +3198,14 @@ class TerpVaultPage extends HTMLElement {
     const labels = {
       'how-to-play': 'How to Play',
       hints: 'Hints',
-      walkthrough: 'Walkthrough'
+      walkthrough: 'Walkthrough',
+      'known-differences': 'Known Differences'
     };
 
     return `
       <section class="helper-docs">
         <h3>Helper Docs</h3>
-        <p class="meta">Plain Markdown editor for package-local curator/helper content such as play notes, hints, and walkthroughs. This does not edit story files, artwork, iFiction XML, or player config.</p>
+        <p class="meta">Plain Markdown editor for package-local curator/helper content such as play notes, hints, walkthroughs, and known differences. This does not edit story files, artwork, iFiction XML, or player config.</p>
         <div class="helper-tabs" role="tablist" aria-label="Helper Markdown files">
           ${Object.entries(labels).map(([type, label]) => `
             <button class="button" type="button" role="tab" aria-selected="${active === type ? 'true' : 'false'}" data-action="helper-doc" data-slug="${this._esc(slug)}" data-type="${this._esc(type)}">${this._esc(label)}</button>
@@ -3276,6 +3277,7 @@ class TerpVaultPage extends HTMLElement {
       ['How-to-play', readOnly.how_to_play],
       ['Hints', readOnly.hints],
       ['Walkthrough', readOnly.walkthrough],
+      ['Known differences', readOnly.known_differences],
       ['iFiction XML', readOnly.ifiction],
       ['Player', readOnly.player]
     ].filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== '');
@@ -3405,6 +3407,7 @@ class TerpVaultPage extends HTMLElement {
       how_to_play: resources.how_to_play || fallbackGame.how_to_play || '',
       hints: resources.hints || fallbackGame.hints || '',
       walkthrough: resources.walkthrough || fallbackGame.walkthrough || '',
+      known_differences: resources.known_differences || fallbackGame.known_differences || '',
       ifiction: fallbackGame.has_ifiction ? 'metadata.iFiction.xml' : '',
       player: metadata.player?.engine || fallbackGame.player_engine || fallbackGame.player || ''
     };
@@ -3422,6 +3425,7 @@ class TerpVaultPage extends HTMLElement {
       how_to_play: game.how_to_play || game.resources?.how_to_play || '',
       hints: game.hints || game.resources?.hints || '',
       walkthrough: game.walkthrough || game.resources?.walkthrough || '',
+      known_differences: game.known_differences || game.resources?.known_differences || '',
       ifiction: game.has_ifiction ? 'metadata.iFiction.xml' : '',
       player: game.player_engine || game.player?.engine || ''
     };
@@ -3618,14 +3622,15 @@ class TerpVaultPage extends HTMLElement {
   }
 
   _helperTypes() {
-    return ['how-to-play', 'hints', 'walkthrough'];
+    return ['how-to-play', 'hints', 'walkthrough', 'known-differences'];
   }
 
   _emptyHelperState(type) {
     const labels = {
       'how-to-play': 'How to Play',
       hints: 'Hints',
-      walkthrough: 'Walkthrough'
+      walkthrough: 'Walkthrough',
+      'known-differences': 'Known Differences'
     };
 
     return {

@@ -27,6 +27,11 @@ class PackageMarkdownService
             'filename' => 'walkthrough.md',
             'label' => 'Walkthrough',
         ],
+        'known-differences' => [
+            'resource' => 'known_differences',
+            'filename' => 'known-differences.md',
+            'label' => 'Known Differences',
+        ],
     ];
 
     /** @var Grav */
