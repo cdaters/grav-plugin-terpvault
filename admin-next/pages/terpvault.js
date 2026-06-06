@@ -423,7 +423,7 @@ class TerpVaultPage extends HTMLElement {
           <h2>No game packages found</h2>
           <p>Create folders under <code>user/data/terpvault/games</code>, each with a <code>game.yaml</code>.</p>
           <div class="actions">
-            <button class="button primary" type="button" data-action="create-package">Create Package</button>
+            <button class="button primary" type="button" data-action="create-package" aria-expanded="${this.state.create.open ? 'true' : 'false'}">${this.state.create.open ? 'Package Builder Open' : 'Create Package'}</button>
             <button class="button" type="button" data-action="inspect-import">Inspect Import</button>
           </div>
         </div>
@@ -446,7 +446,7 @@ class TerpVaultPage extends HTMLElement {
           </div>
           <div class="actions" style="margin-top:0;">
             <button class="button" type="button" data-action="inspect-import">${this.state.importInspect.open ? 'Inspecting Import' : 'Inspect Import'}</button>
-            <button class="button primary" type="button" data-action="create-package">${this.state.create.open ? 'Creating Package' : 'Create Package'}</button>
+            <button class="button primary" type="button" data-action="create-package" aria-expanded="${this.state.create.open ? 'true' : 'false'}">${this.state.create.open ? 'Package Builder Open' : 'Create Package'}</button>
           </div>
         </div>
         <div class="badges" style="justify-content:flex-start;margin-top:.5rem;">

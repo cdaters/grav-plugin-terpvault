@@ -169,13 +169,33 @@ Future provider/source definitions should be back-end configurable before remote
 - Field mapping rules.
 - Confidence or scoring notes.
 
-Remote providers must run only after an explicit admin action. No provider should silently fetch, merge, overwrite, download story files, or download assets. Candidate metadata from any provider should appear in the same side-by-side review model, with field-level checkboxes and a `game.yaml` backup before writes.
+Remote providers must run only after an explicit admin action. No provider should silently fetch, merge, overwrite, download story files, download assets, publish packages, or treat catalog metadata as more authoritative than package-local story/iFiction metadata without curator confirmation. Candidate metadata from any provider should appear in the same side-by-side review model, with field-level checkboxes and a `game.yaml` backup before writes.
+
+Phase 3 Terpwright planning treats remote/catalog support as ecosystem lookup helpers, not automated package creation. Candidate lookup sources may include IFDB, IFWiki, IF Archive, upstream project/source repositories, package-local `metadata.iFiction.xml`, and Treaty of Babel / iFiction metadata where available. Candidate fields may include title, author, publication year, IFID, format, source URLs, IF Archive path, license hints, external catalog links, and cover/art references when appropriate.
+
+Phase 3 helpers should not assume redistribution rights, scrape pages when a stable source/API/manual entry is appropriate, copy large web text into package docs, auto-download story files or artwork, or publish packages. Lookup failures should be handled as warnings or unavailable states so package-local editing still works offline. Any cached/stored data should be review-safe metadata, not whole remote pages or copied prose.
+
+The intended curator workflow is:
+
+1. Enter a URL, IFID, TUID, IF Archive path, or search term.
+2. Preview lookup candidates beside current `game.yaml` and package-local iFiction XML.
+3. Review field-level differences, source attribution, confidence, retrieval context, and warnings.
+4. Apply only selected fields.
+5. Review generated draft provenance notes as editable text.
+6. Keep the package draft until the separate publish action is used.
 
 Phased plan:
 
 - Phase 1 baseline: local iFiction XML presence/status, package-root upload/replace, import inspection awareness, preview/apply polish, and metadata-completeness filters for XML present/missing. Future Phase 1 polish may integrate local preview/apply into package creation/import when XML is present.
 - Phase 2: manual catalog and provenance URL capture in package creation, including IFDB TUID/URL, IFWiki URL, IF Archive path/URL, source URL, upstream URL, port/source repository URL, license URL/notes, and reference-only URL roles.
-- Phase 3: add explicit remote metadata lookup by title/author, IFID where possible, and pasted IFDB/IFWiki/IF Archive URL. Preview candidates, apply selected fields only, and document the source/retrieval date.
+- Phase 3: add explicit ecosystem lookup helpers by title/author, IFID where possible, and pasted IFDB/IFWiki/IF Archive URL or path. Preview candidates, apply selected fields only, document source/retrieval date, and preserve the rule that URLs are curator-review references, not proof of rights.
+- Phase 3a: URL validation and metadata preview shell.
+- Phase 3b: IF Archive path/URL helper.
+- Phase 3c: IFDB lookup helper.
+- Phase 3d: IFWiki helper.
+- Phase 3e: iFiction/Babel cross-check.
+- Phase 3f: curator apply/diff workflow.
+- Phase 3g: package validation integration.
 
 Large-library cleanup should eventually connect to the assistant. Admins should be able to filter for missing IFID, missing cover, missing screenshots, missing helper docs, missing catalog URLs, provenance needing review, license needing review, and `metadata.iFiction.xml` present/missing, then use the assistant to work through those problem groups.
 

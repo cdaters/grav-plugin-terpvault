@@ -501,6 +501,8 @@ V1 builder output should follow this document's conventions:
 - Treat uncertain rights as warnings or pending-review notes, not hidden assumptions.
 - Do not imply Ink package/runtime support, structured Oracle support, remote lookup, or automated asset download until those features are intentionally implemented and documented.
 
+Future Phase 3 ecosystem lookup helpers should only propose package-convention fields for curator review. They may compare current `game.yaml`, package-local `metadata.iFiction.xml`, IFDB/IFWiki/IF Archive candidates, and source/license/provenance hints, but they must not rewrite package metadata, package remote assets, download story files, or publish packages without explicit curator actions. Catalog URLs and lookup results remain references, not proof of redistribution rights.
+
 See `docs/TERPWRIGHT.md`.
 
 ## `.terpvault.zip` packages
