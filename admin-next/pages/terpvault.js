@@ -16,7 +16,8 @@ class TerpVaultPage extends HTMLElement {
         open: false,
         saving: false,
         error: '',
-        success: ''
+        success: '',
+        report: null
       },
       importInspect: {
         open: false,
@@ -1121,24 +1122,27 @@ class TerpVaultPage extends HTMLElement {
       <section class="create-panel">
         <div class="editor-head">
           <div>
-            <h2>Create Package</h2>
-            <p class="meta">Creates a new package folder, starter <code>game.yaml</code>, initial story file, and starter helper Markdown files. Cover art and screenshots can be added after creation.</p>
+            <h2>Terpwright Phase 1: Local Package Builder</h2>
+            <p class="meta">Creates a new draft package from local files only. Remote IFDB, IF Archive, IFWiki, scraping, and metadata automation are not used.</p>
           </div>
           <button class="button" type="button" data-action="cancel-create">Close</button>
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
         ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
+        ${state.report ? this._createReport(state.report) : ''}
         <form data-create-package>
+          <fieldset>
+            <legend>Core Metadata</legend>
           <div class="create-grid">
             ${this._createInput('Slug', 'slug', true)}
             ${this._createInput('Title', 'title', true)}
-            ${this._createInput('Author', 'author')}
+            ${this._createInput('Author / source attribution', 'author')}
             ${this._createInput('Headline', 'headline')}
+            ${this._createInput('IFID', 'ifid')}
             ${this._createInput('First published', 'first_published')}
             ${this._createInput('Genre', 'genre')}
             ${this._createInput('Language', 'language', false, 'en')}
-            ${this._createSelect('Format', 'format', [['', 'Infer later'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['adrift', 'ADRIFT']])}
-            ${this._createSelect('Status', 'status', [['draft', 'Draft'], ['published', 'Published']])}
+            ${this._createSelect('Format', 'format', [['', 'Infer from story file'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['hugo', 'Hugo'], ['adrift', 'ADRIFT']])}
             ${this._createInput('Tags', 'tags')}
             ${this._createInput('License name', 'license_name')}
             ${this._createInput('License URL', 'license_url')}
@@ -1147,14 +1151,36 @@ class TerpVaultPage extends HTMLElement {
           ${this._createTextarea('Description', 'description')}
           ${this._createTextarea('License notes', 'license_notes', 'short')}
           ${this._createTextarea('Source notes', 'source_notes', 'short')}
+          <div class="message">Created packages are always saved as <strong>draft</strong> and <strong>not featured</strong>. Publish and featured placement remain separate review actions.</div>
+          </fieldset>
+          <fieldset>
+            <legend>Local Story File</legend>
           <div class="field">
-            <label>Initial story file</label>
-            <input type="file" name="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.gam,.t3,.taf" required ${state.saving ? 'disabled' : ''}>
-            <span class="meta">Allowed: z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, gam, t3, taf.</span>
+            <label>Story file</label>
+            <input type="file" name="story_file" accept=".z1,.z2,.z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.blorb,.hex,.gam,.t3,.taf" required ${state.saving ? 'disabled' : ''}>
+            <span class="meta">Allowed: z1, z2, z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, blorb, hex, gam, t3, taf. SHA-256 is computed into <code>resources.story_sha256</code>.</span>
           </div>
+          </fieldset>
+          <fieldset>
+            <legend>Optional Local Resources</legend>
+            <div class="create-grid">
+              ${this._createFile('Cover', 'cover', '.jpg,.jpeg,.png,.webp,.gif')}
+              ${this._createFile('Small cover', 'small_cover', '.jpg,.jpeg,.png,.webp,.gif')}
+              ${this._createFile('Hero', 'hero', '.jpg,.jpeg,.png,.webp,.gif')}
+              ${this._createFile('Screenshots', 'screenshots[]', '.jpg,.jpeg,.png,.webp,.gif', true)}
+              ${this._createFile('metadata.iFiction.xml', 'ifiction', '.xml')}
+              ${this._createFile('Feelies', 'feelies[]', '.pdf,.txt,.md,.jpg,.jpeg,.png,.webp,.gif,.mp3,.ogg,.wav,.m4a', true)}
+              ${this._createFile('how-to-play.md', 'how_to_play', '.md')}
+              ${this._createFile('hints.md', 'hints', '.md')}
+              ${this._createFile('walkthrough.md', 'walkthrough', '.md')}
+              ${this._createFile('known-differences.md', 'known_differences', '.md')}
+              ${this._createFile('provenance.md', 'provenance', '.md')}
+            </div>
+            <p class="meta">Files are copied into safe package-local conventional paths. Optional helper docs are referenced in <code>game.yaml</code> only when supplied.</p>
+          </fieldset>
           <div class="form-actions">
             <button class="button" type="button" data-action="cancel-create">Cancel</button>
-            <button class="button primary" type="submit" ${state.saving ? 'disabled' : ''}>${state.saving ? 'Creating...' : 'Create Package'}</button>
+            <button class="button primary" type="submit" ${state.saving ? 'disabled' : ''}>${state.saving ? 'Creating...' : 'Create Draft Package'}</button>
           </div>
         </form>
       </section>
@@ -1176,6 +1202,41 @@ class TerpVaultPage extends HTMLElement {
         <select name="${this._esc(name)}">
           ${options.map(([value, text]) => `<option value="${this._esc(value)}">${this._esc(text)}</option>`).join('')}
         </select>
+      </div>
+    `;
+  }
+
+  _createFile(label, name, accept, multiple = false) {
+    return `
+      <div class="field">
+        <label>${this._esc(label)}</label>
+        <input type="file" name="${this._esc(name)}" accept="${this._esc(accept)}" ${multiple ? 'multiple' : ''}>
+      </div>
+    `;
+  }
+
+  _createReport(report) {
+    const validation = report.validation || report;
+    const warnings = Array.isArray(validation.warnings) ? validation.warnings : [];
+    const fatal = Array.isArray(validation.fatal_errors) ? validation.fatal_errors : [];
+    const warningItems = warnings.map(warning => warning.message || warning.label || warning.code || String(warning));
+    return `
+      <div class="box" style="margin:.85rem 0;">
+        <h3>Creation Report</h3>
+        <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
+          <span class="badge ${validation.ok === false ? 'error' : 'ok'}">${validation.ok === false ? 'blocked' : 'created'}</span>
+          <span class="badge ok">draft</span>
+          <span class="badge ok">not featured</span>
+          ${report.story_sha256 ? '<span class="badge ok">story SHA-256 recorded</span>' : ''}
+          ${report.has_ifiction ? '<span class="badge ok">iFiction copied</span>' : ''}
+        </div>
+        <dl>
+          <dt>Slug</dt><dd><code>${this._esc(report.slug || '')}</code></dd>
+          <dt>Story file</dt><dd><code>${this._esc(report.story_file || '')}</code></dd>
+          ${report.story_sha256 ? `<dt>Story SHA-256</dt><dd><code>${this._esc(report.story_sha256)}</code></dd>` : ''}
+        </dl>
+        ${this._reportList('Fatal errors', fatal, 'error', false)}
+        ${this._reportList('Warnings', warningItems, 'warn', false)}
       </div>
     `;
   }
@@ -1449,12 +1510,12 @@ class TerpVaultPage extends HTMLElement {
   }
 
   _openCreatePackage() {
-    this.state.create = { open: true, saving: false, error: '', success: '' };
+    this.state.create = { open: true, saving: false, error: '', success: '', report: null };
     this._renderLibrary();
   }
 
   _closeCreatePackage() {
-    this.state.create = { open: false, saving: false, error: '', success: '' };
+    this.state.create = { open: false, saving: false, error: '', success: '', report: null };
     this._renderLibrary();
   }
 
@@ -1601,7 +1662,7 @@ class TerpVaultPage extends HTMLElement {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    this.state.create = { open: true, saving: true, error: '', success: '' };
+    this.state.create = { open: true, saving: true, error: '', success: '', report: null };
     this._renderLibrary();
 
     try {
@@ -1610,7 +1671,13 @@ class TerpVaultPage extends HTMLElement {
         body: data
       });
       const slug = result.slug || data.get('slug');
-      this.state.create = { open: false, saving: false, error: '', success: '' };
+      this.state.create = {
+        open: true,
+        saving: false,
+        error: '',
+        success: `Created ${slug} as a draft package. Review validation notes before publishing.`,
+        report: result
+      };
       await this._reloadManifest();
       if (slug) {
         localStorage.setItem(`terpvault.admin.open.${slug}`, '1');
@@ -1621,7 +1688,7 @@ class TerpVaultPage extends HTMLElement {
           loading: false,
           saving: false,
           error: '',
-          success: 'Package created. Continue editing metadata, helper docs, media, or story file below.',
+          success: 'Package created as draft and not featured. Review metadata, helper docs, media, story file, validation notes, and export only when ready.',
           values: this._editableFromGame(this._findGame(slug) || {}),
           readOnly: this._readOnlyFromGame(this._findGame(slug) || {}),
           activeHelper: 'how-to-play',
@@ -1642,7 +1709,8 @@ class TerpVaultPage extends HTMLElement {
         open: true,
         saving: false,
         error: error.message || String(error),
-        success: ''
+        success: '',
+        report: null
       };
     }
 
@@ -2824,8 +2892,8 @@ class TerpVaultPage extends HTMLElement {
         <form data-story-slug="${this._esc(slug)}">
           <div class="field">
             <label>Replace Story File</label>
-            <input type="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.gam,.t3,.taf" ${story.loading || story.saving ? 'disabled' : ''}>
-            <span class="meta">Allowed: z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, gam, t3, taf. Archives, scripts, HTML, SVG, and arbitrary files are not accepted.</span>
+            <input type="file" accept=".z1,.z2,.z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.blorb,.hex,.gam,.t3,.taf" ${story.loading || story.saving ? 'disabled' : ''}>
+            <span class="meta">Allowed: z1, z2, z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, blorb, hex, gam, t3, taf. Archives, scripts, HTML, SVG, and arbitrary files are not accepted.</span>
           </div>
           <div class="form-actions">
             <button class="button primary" type="submit" ${story.loading || story.saving ? 'disabled' : ''}>${story.saving ? 'Uploading...' : 'Upload Story File'}</button>

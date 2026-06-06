@@ -191,7 +191,7 @@
 - Current state: Admin2 shows package-local `metadata.iFiction.xml` presence/status in package rows and details, can preview package-local XML, and can apply explicitly selected supported fields into `game.yaml`. The apply route re-parses local XML server-side and creates a package-local `game.yaml` backup through the metadata service before writing.
 - Supported mapped fields are title, author, headline/subtitle, description/teaser, first published/date, genre, language, IFIDs, and format/system.
 - Admin2 can upload or replace package-root `metadata.iFiction.xml`. Upload validates XML, rejects DOCTYPE declarations, backs up an existing XML file before replacement, and never applies metadata into `game.yaml` automatically.
-- Package creation does not accept `metadata.iFiction.xml`. Import inspection reports whether the incoming package contains package-root `metadata.iFiction.xml`, and import commit preserves the file but does not use it to prefill or merge metadata during import commit.
+- Terpwright Phase 1 package creation can preserve an uploaded package-root `metadata.iFiction.xml`, but it does not prefill or merge XML fields into `game.yaml`. Import inspection also reports whether an incoming package contains package-root `metadata.iFiction.xml`, and import commit preserves the file without auto-applying it.
 - Keep the local XML file package-local and reviewable. Preserve unknown YAML fields when applying accepted changes.
 - Future local iFiction improvements should make package creation/import flows even more directly connected to local preview/apply when XML is present.
 - Continue to avoid remote lookup in local iFiction workflows.
@@ -289,10 +289,10 @@ player:
 
 ### Terpwright package builder
 
-- Add a future Admin2 package builder for creating or refining TerpVault packages from curated local files and explicit ecosystem references.
+- Admin2 now includes the Phase 1 local-file package builder for creating new draft TerpVault packages from curated local files and explicit basic metadata.
 - Keep generated packages reviewable before installation, export, or publication.
 - Reuse import/export validation rules rather than bypassing package safety checks.
-- V1 should be local-file-first: local story file, optional package zip, local media, helper Markdown, local `metadata.iFiction.xml`, and manually supplied IFDB/IFWiki/IF Archive/source/license references.
+- V1 is local-file-first: local story file, local media, helper Markdown, local `metadata.iFiction.xml`, feelies, and manually supplied source/license notes. Package zip handling remains on the existing inspect/import path.
 - Create draft packages only, with `game.yaml`, story file, optional `metadata.iFiction.xml`, helper Markdown, provenance notes, and the normal package folder structure.
 - Keep Terpwright separate from later smart Metadata Assistant features. Remote lookup/search, provider confidence scoring, automated provenance drafting, cover generation, and art suggestions are later roadmap work.
 - Never silently download, redistribute, or package story files, cover art, screenshots, walkthroughs, hints, maps, manuals, scans, clue sheets, or feelies from a URL.

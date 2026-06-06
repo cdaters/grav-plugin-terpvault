@@ -128,13 +128,14 @@ class ApiController extends AbstractApiController
         $this->requireAdminApiSuper($request);
         $body = $request->getParsedBody();
         $fields = is_array($body) ? $body : [];
-        $upload = $this->firstUploadedFile($request->getUploadedFiles());
+        $uploads = $request->getUploadedFiles();
+        $upload = $this->namedUploadedFile($uploads, 'story_file') ?: $this->namedUploadedFile($uploads, 'file') ?: $this->firstUploadedFile($uploads);
         if (!$upload) {
             throw new ValidationException('Initial story file is required.');
         }
 
         try {
-            return ApiResponse::create($this->creationService()->create($fields, $upload));
+            return ApiResponse::create($this->creationService()->create($fields, $upload, $uploads));
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         } catch (RuntimeException $e) {
@@ -544,5 +545,19 @@ class ApiController extends AbstractApiController
         }
 
         return null;
+    }
+
+    private function namedUploadedFile(array $files, string $name): ?UploadedFileInterface
+    {
+        if (!array_key_exists($name, $files)) {
+            return null;
+        }
+
+        $file = $files[$name];
+        if ($file instanceof UploadedFileInterface) {
+            return $file;
+        }
+
+        return is_array($file) ? $this->firstUploadedFile($file) : null;
     }
 }
