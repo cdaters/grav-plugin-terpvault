@@ -973,7 +973,7 @@ class TerpVaultPage extends HTMLElement {
     const warningCount = Number(game.warning_count || 0);
     const errorCount = Number(game.error_count || 0);
     const coverPath = game.resources?.small_cover || game.small_cover || game.resources?.cover || game.cover || '';
-    const cover = this._adminMediaPreviewUrl(slug, coverPath) || urls.small_cover || urls.thumbnail || urls.cover || '';
+    const cover = urls.small_cover || urls.thumbnail || urls.cover || this._adminMediaPreviewUrl(slug, coverPath) || '';
     const ifictionBadge = game.has_ifiction
       ? '<span class="badge ok">iFiction XML present</span>'
       : '<span class="badge warn">No iFiction XML</span>';
@@ -1137,28 +1137,8 @@ class TerpVaultPage extends HTMLElement {
         ${state.report ? this._createReport(state.report) : ''}
         <form data-create-package>
           <fieldset>
-            <legend>Core Metadata</legend>
-          <div class="create-grid">
-            ${this._createInput('Slug', 'slug', true)}
-            ${this._createInput('Title', 'title', true)}
-            ${this._createInput('Author / source attribution', 'author')}
-            ${this._createInput('Headline', 'headline')}
-            ${this._createInput('IFID', 'ifid')}
-            ${this._createInput('First published', 'first_published')}
-            ${this._createInput('Genre', 'genre')}
-            ${this._createInput('Language', 'language', false, 'en')}
-            ${this._createSelect('Format', 'format', [['', 'Infer from story file'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['hugo', 'Hugo'], ['adrift', 'ADRIFT']])}
-            ${this._createInput('Tags', 'tags')}
-            ${this._createInput('License name', 'license_name')}
-          </div>
-          ${this._createTextarea('Description', 'description')}
-          ${this._createTextarea('License notes', 'license_notes', 'short')}
-          ${this._createTextarea('Source notes', 'source_notes', 'short')}
-          <div class="message">Created packages are always saved as <strong>draft</strong> and <strong>not featured</strong>. Publish and featured placement remain separate review actions.</div>
-          </fieldset>
-          <fieldset>
             <legend>Metadata &amp; provenance URLs</legend>
-            <p class="meta">URLs are references for curator review. TerpVault does not assume rights from URLs. Confirm source, license, and redistribution terms before publishing.</p>
+            <p class="meta">Optional reference links for curator review. TerpVault does not assume rights from URLs.</p>
             <div class="create-grid">
               ${this._createUrlInput('Source / package URL', 'source_url')}
               ${this._createUrlInput('Upstream project URL', 'upstream_source_url')}
@@ -1183,6 +1163,26 @@ class TerpVaultPage extends HTMLElement {
               </div>
               ${this._createTextarea('Reference notes', 'reference_notes', 'short')}
             </details>
+          </fieldset>
+          <fieldset>
+            <legend>Core Metadata</legend>
+          <div class="create-grid">
+            ${this._createInput('Slug', 'slug', true)}
+            ${this._createInput('Title', 'title', true)}
+            ${this._createInput('Author / source attribution', 'author')}
+            ${this._createInput('Headline', 'headline')}
+            ${this._createInput('IFID', 'ifid')}
+            ${this._createInput('First published', 'first_published')}
+            ${this._createInput('Genre', 'genre')}
+            ${this._createInput('Language', 'language', false, 'en')}
+            ${this._createSelect('Format', 'format', [['', 'Infer from story file'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['hugo', 'Hugo'], ['adrift', 'ADRIFT']])}
+            ${this._createInput('Tags', 'tags')}
+            ${this._createInput('License name', 'license_name')}
+          </div>
+          ${this._createTextarea('Description', 'description')}
+          ${this._createTextarea('License notes', 'license_notes', 'short')}
+          ${this._createTextarea('Source notes', 'source_notes', 'short')}
+          <div class="message">Created packages are always saved as <strong>draft</strong> and <strong>not featured</strong>. Publish and featured placement remain separate review actions.</div>
           </fieldset>
           <fieldset>
             <legend>Local Story File</legend>
