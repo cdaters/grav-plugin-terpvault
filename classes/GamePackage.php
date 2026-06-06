@@ -592,6 +592,12 @@ class GamePackage
         if (!empty($source['url'])) {
             $links[] = ['key' => 'source', 'label' => 'Source', 'url' => (string)$source['url'], 'value' => (string)($source['retrieved'] ?? '')];
         }
+        if (!empty($source['upstream']['url'])) {
+            $links[] = ['key' => 'source-upstream', 'label' => 'Upstream source', 'url' => (string)$source['upstream']['url'], 'value' => ''];
+        }
+        if (!empty($source['port_repository']['url'])) {
+            $links[] = ['key' => 'source-port-repository', 'label' => 'Port/source repository', 'url' => (string)$source['port_repository']['url'], 'value' => ''];
+        }
         if (!empty($license['url'])) {
             $links[] = ['key' => 'license', 'label' => 'License', 'url' => (string)$license['url'], 'value' => (string)($license['name'] ?? '')];
         }
@@ -605,6 +611,7 @@ class GamePackage
         $source = $this->sourceInfo();
         $license = $this->licenseInfo();
         $rows = [];
+        $hasSourceLink = !empty($source['url']) || !empty($source['upstream']['url']) || !empty($source['port_repository']['url']);
 
         $ifids = $this->ifids();
         if ($ifids) {
@@ -630,7 +637,14 @@ class GamePackage
                 $note = trim('Retrieved ' . (string)$source['retrieved'] . ($note !== '' ? '. ' . $note : ''));
             }
             $rows[] = ['label' => 'Source', 'type' => 'link', 'url' => (string)$source['url'], 'text' => (string)$source['url'], 'note' => $note];
-        } elseif (!empty($source['notes'])) {
+        }
+        if (!empty($source['upstream']['url'])) {
+            $rows[] = ['label' => 'Upstream source', 'type' => 'link', 'url' => (string)$source['upstream']['url'], 'text' => (string)$source['upstream']['url']];
+        }
+        if (!empty($source['port_repository']['url'])) {
+            $rows[] = ['label' => 'Port/source repository', 'type' => 'link', 'url' => (string)$source['port_repository']['url'], 'text' => (string)$source['port_repository']['url']];
+        }
+        if (!$hasSourceLink && !empty($source['notes'])) {
             $rows[] = ['label' => 'Source notes', 'type' => 'text', 'text' => (string)$source['notes']];
         }
 
@@ -644,6 +658,39 @@ class GamePackage
             ];
         } elseif (!empty($license['notes'])) {
             $rows[] = ['label' => 'Redistribution notes', 'type' => 'text', 'text' => (string)$license['notes']];
+        }
+
+        foreach ($this->referenceRows() as $reference) {
+            $rows[] = $reference;
+        }
+
+        return $rows;
+    }
+
+    private function referenceRows(): array
+    {
+        $references = $this->get('references', []);
+        if (!is_array($references)) {
+            return [];
+        }
+
+        $rows = [];
+        foreach ($references as $reference) {
+            if (!is_array($reference)) {
+                continue;
+            }
+            $url = trim((string)($reference['url'] ?? ''));
+            $text = trim((string)($reference['label'] ?? $reference['role'] ?? $url));
+            if ($url === '' && $text === '') {
+                continue;
+            }
+            $rows[] = [
+                'label' => $text !== '' ? $text : 'Reference',
+                'type' => $url !== '' ? 'link' : 'text',
+                'url' => $url,
+                'text' => $url !== '' ? $url : $text,
+                'note' => trim((string)($reference['notes'] ?? '')),
+            ];
         }
 
         return $rows;
@@ -709,8 +756,14 @@ class GamePackage
         }
 
         $source = $this->sourceInfo();
-        if (empty($source['url']) && empty($this->catalog()['ifarchive']['url'])) {
-            $add('missing-source', 'Source URL not recorded', 'Add release.source.url or catalog.ifarchive.url for provenance.');
+        $catalog = $this->catalog();
+        $hasSourceReference = !empty($source['url'])
+            || !empty($source['upstream']['url'])
+            || !empty($source['port_repository']['url'])
+            || !empty($catalog['ifarchive']['url'])
+            || !empty($catalog['ifarchive']['path']);
+        if (!$hasSourceReference) {
+            $add('missing-source', 'Source reference not recorded', 'Add release.source.url, release.source.upstream.url, release.source.port_repository.url, or IF Archive provenance.');
         }
 
         $license = $this->licenseInfo();

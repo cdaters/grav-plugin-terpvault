@@ -154,6 +154,16 @@ release:
     url: ''
     retrieved: ''
     notes: Source/provenance notes for this package.
+    upstream:
+      url: ''
+    port_repository:
+      url: ''
+
+references:
+  - role: map
+    label: Map reference
+    url: https://example.com/map
+    notes: Reference only; confirm rights before packaging derived material.
 
 terpvault:
   status: published
@@ -380,7 +390,12 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 - `catalog.ifwiki.url`: IFWiki reference link.
 - `catalog.ifarchive.path` and `catalog.ifarchive.url`: IF Archive provenance or download reference.
 - `release.source.*`: where the package files came from and when they were retrieved.
+- `release.source.upstream.url`: canonical upstream project, source release, or source distribution URL when distinct from the packaged artifact.
+- `release.source.port_repository.url`: source repository or port repository used for the TerpVault package variant.
 - `release.license.*`: license, rights, and redistribution notes.
+- `references[]`: role-labeled reference-only links for supporting sources such as cover art, hero art, screenshots, walkthroughs, hints, maps, and history/background pages.
+
+Reference links are evidence for curator review, not permission by themselves. Use `catalog.*` for IF ecosystem catalog context, `release.source.*` for package/story/source provenance, and `references[]` for supporting or reference-only material. Do not collapse canonical upstream, port repository, catalog context, and historical references into one undifferentiated URL.
 
 `metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can show whether the XML is present, report XML presence during import inspection, upload or replace the package-root XML file, preview a conservative subset of local iFiction XML fields, and apply explicitly selected supported fields into `game.yaml`. TerpVault does not edit XML contents in place.
 
@@ -389,7 +404,7 @@ When `identification.format` is blank, TerpVault may infer a normalized package 
 Current metadata workflow limits:
 
 - Admin2 can upload or replace `metadata.iFiction.xml`, but upload writes only the package-root XML file and does not apply fields automatically.
-- Package creation creates `game.yaml`, starter helper Markdown, and the initial story file; it does not ingest iFiction XML.
+- Package creation creates `game.yaml`, optional local helper Markdown/resources, optional package-root `metadata.iFiction.xml`, and the initial story file. iFiction fields are still not applied to `game.yaml` automatically.
 - Import preserves accepted `metadata.iFiction.xml` files and reports their presence during inspection, but import commit does not use the XML to prefill or merge `game.yaml`.
 - Remote IFDB, IFWiki, IF Archive, or catalog metadata lookup is not implemented.
 

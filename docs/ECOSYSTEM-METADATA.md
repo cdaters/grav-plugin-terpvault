@@ -61,6 +61,16 @@ release:
     url: ''
     retrieved: ''
     notes: ''
+    upstream:
+      url: ''
+    port_repository:
+      url: ''
+
+references:
+  - role: map
+    label: Map reference
+    url: https://example.com/map
+    notes: Reference only; confirm rights before packaging derived material.
 
 terpvault:
   status: published
@@ -101,10 +111,27 @@ The upload workflow validates XML and writes only `metadata.iFiction.xml` in the
 Current limits:
 
 - Admin2 can upload or replace `metadata.iFiction.xml`, but it does not edit XML contents in place.
-- Package creation does not accept `metadata.iFiction.xml` as an input.
+- Package creation can accept local `metadata.iFiction.xml` as a package-root file, but it does not apply XML fields to `game.yaml` automatically.
 - Import inspection reports whether accepted `.terpvault.zip` packages include package-root `metadata.iFiction.xml`; import commit preserves the file but does not use it to merge or prefill `game.yaml`.
 - Remote IFDB, IFWiki, IF Archive, or catalog lookup is not implemented.
 - Metadata workflows do not download story files, packages, cover art, screenshots, or other remote assets.
+
+## Manual URL roles
+
+Terpwright Phase 2 accepts pasted, curator-supplied URLs as reference metadata only. The workflow performs light syntax validation, stores the values in `game.yaml`, and displays them in Admin2 readback. It does not fetch, scrape, search, trust, or summarize the remote pages.
+
+Use these roles consistently:
+
+- `catalog.ifdb.tuid` and `catalog.ifdb.url`: IFDB context for the work or related catalog entry.
+- `catalog.ifwiki.url`: IFWiki context or historical reference.
+- `catalog.ifarchive.path` and `catalog.ifarchive.url`: IF Archive path/URL when known.
+- `release.source.url`: primary package/story/source URL when there is one clear source.
+- `release.source.upstream.url`: canonical upstream project, source release, or source distribution URL.
+- `release.source.port_repository.url`: source repository or port repository used for this package variant.
+- `release.license.url`: license text or license page URL.
+- `references[]`: supporting reference-only links for art, screenshots, walkthroughs, hints, maps, and background/history sources.
+
+URL presence does not prove redistribution rights. Curators should still record license names, license notes, source notes, retrieval/review context, item-level asset provenance, and any pending-review status before publishing.
 
 ## Metadata Assistant roadmap
 
@@ -147,7 +174,7 @@ Remote providers must run only after an explicit admin action. No provider shoul
 Phased plan:
 
 - Phase 1 baseline: local iFiction XML presence/status, package-root upload/replace, import inspection awareness, preview/apply polish, and metadata-completeness filters for XML present/missing. Future Phase 1 polish may integrate local preview/apply into package creation/import when XML is present.
-- Phase 2: assist catalog and provenance fields such as IFDB TUID, IFDB URL, IFWiki URL, IF Archive path, IF Archive URL, source URL, retrieved date, and license notes.
+- Phase 2: manual catalog and provenance URL capture in package creation, including IFDB TUID/URL, IFWiki URL, IF Archive path/URL, source URL, upstream URL, port/source repository URL, license URL/notes, and reference-only URL roles.
 - Phase 3: add explicit remote metadata lookup by title/author, IFID where possible, and pasted IFDB/IFWiki/IF Archive URL. Preview candidates, apply selected fields only, and document the source/retrieval date.
 
 Large-library cleanup should eventually connect to the assistant. Admins should be able to filter for missing IFID, missing cover, missing screenshots, missing helper docs, missing catalog URLs, provenance needing review, license needing review, and `metadata.iFiction.xml` present/missing, then use the assistant to work through those problem groups.

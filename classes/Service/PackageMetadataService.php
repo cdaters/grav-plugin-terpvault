@@ -32,6 +32,8 @@ class PackageMetadataService
         'release.source.url',
         'release.source.retrieved',
         'release.source.notes',
+        'release.source.upstream.url',
+        'release.source.port_repository.url',
         'terpvault.status',
         'terpvault.featured',
         'terpvault.tags',
@@ -236,7 +238,57 @@ class PackageMetadataService
             return strtolower(trim((string) $value));
         }
 
-        return is_scalar($value) || $value === null ? (string) ($value ?? '') : '';
+        $normalized = is_scalar($value) || $value === null ? trim((string) ($value ?? '')) : '';
+        if ($this->isUrlField($field)) {
+            return $this->normalizeUrl($normalized, $field);
+        }
+        if ($field === 'catalog.ifarchive.path') {
+            return $this->normalizeIFArchivePath($normalized);
+        }
+
+        return $normalized;
+    }
+
+    private function isUrlField(string $field): bool
+    {
+        return substr($field, -4) === '.url';
+    }
+
+    private function normalizeUrl(string $value, string $field): string
+    {
+        if ($value === '') {
+            return '';
+        }
+        if (preg_match('/[\x00-\x1F\x7F]/', $value) || strpos($value, '\\') !== false) {
+            throw new InvalidArgumentException($field . ' must be an http or https URL.');
+        }
+
+        $parts = parse_url($value);
+        $scheme = is_array($parts) ? strtolower((string)($parts['scheme'] ?? '')) : '';
+        $host = is_array($parts) ? (string)($parts['host'] ?? '') : '';
+        if (!is_array($parts) || !in_array($scheme, ['http', 'https'], true) || trim($host) === '') {
+            throw new InvalidArgumentException($field . ' must be an http or https URL.');
+        }
+
+        return $value;
+    }
+
+    private function normalizeIFArchivePath(string $path): string
+    {
+        $path = str_replace('\\', '/', $path);
+        if ($path === '') {
+            return '';
+        }
+        if (strpos($path, "\0") !== false || $path[0] === '/' || preg_match('#^[a-z][a-z0-9+.-]*:#i', $path)) {
+            throw new InvalidArgumentException('catalog.ifarchive.path must be a relative archive path.');
+        }
+        foreach (explode('/', $path) as $segment) {
+            if ($segment === '' || $segment === '.' || $segment === '..') {
+                throw new InvalidArgumentException('catalog.ifarchive.path must not contain traversal segments.');
+            }
+        }
+
+        return $path;
     }
 
     private function fillBlankFormat(array &$metadata): void

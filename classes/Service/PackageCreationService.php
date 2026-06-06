@@ -40,6 +40,16 @@ class PackageCreationService
         'provenance' => 'provenance.md',
     ];
 
+    private const REFERENCE_URL_FIELDS = [
+        'cover_art_source_url' => ['role' => 'cover_art', 'label' => 'Cover art source'],
+        'hero_art_source_url' => ['role' => 'hero_art', 'label' => 'Hero art source'],
+        'screenshot_source_url' => ['role' => 'screenshot', 'label' => 'Screenshot source'],
+        'walkthrough_reference_url' => ['role' => 'walkthrough', 'label' => 'Walkthrough reference'],
+        'hints_reference_url' => ['role' => 'hints', 'label' => 'Hints reference'],
+        'map_reference_url' => ['role' => 'map', 'label' => 'Map reference'],
+        'history_reference_url' => ['role' => 'history', 'label' => 'History/background reference'],
+    ];
+
     /** @var Grav */
     private $grav;
 
@@ -123,7 +133,12 @@ class PackageCreationService
 
     private function manifest(string $slug, string $storyFile, string $storySha256, array $fields): array
     {
-        return [
+        $sourceUrl = $this->urlField($fields, 'source_url', 'Source URL');
+        $upstreamUrl = $this->urlField($fields, 'upstream_source_url', 'Upstream source URL');
+        $repositoryUrl = $this->urlField($fields, 'port_repository_url', 'Port/source repository URL');
+        $sourceNotes = $this->textField($fields, 'source_notes');
+        $sourceRetrieved = $sourceUrl || $upstreamUrl || $repositoryUrl ? date('Y-m-d') : '';
+        $manifest = [
             'id' => $slug,
             'slug' => $slug,
             'identification' => [
@@ -145,22 +160,29 @@ class PackageCreationService
                 'screenshots' => [],
             ],
             'catalog' => [
-                'ifdb' => ['tuid' => '', 'url' => ''],
-                'ifwiki' => ['url' => ''],
-                'ifarchive' => ['path' => '', 'url' => ''],
+                'ifdb' => ['tuid' => $this->textField($fields, 'ifdb_tuid'), 'url' => $this->urlField($fields, 'ifdb_url', 'IFDB URL')],
+                'ifwiki' => ['url' => $this->urlField($fields, 'ifwiki_url', 'IFWiki URL')],
+                'ifarchive' => ['path' => $this->ifArchivePath($fields['ifarchive_path'] ?? ''), 'url' => $this->urlField($fields, 'ifarchive_url', 'IF Archive URL')],
             ],
             'release' => [
                 'license' => [
-                    'name' => trim((string)($fields['license_name'] ?? 'Verify before redistribution')),
-                    'url' => trim((string)($fields['license_url'] ?? '')),
-                    'notes' => trim((string)($fields['license_notes'] ?? '')),
+                    'name' => $this->textField($fields, 'license_name', 'Verify before redistribution'),
+                    'url' => $this->urlField($fields, 'license_url', 'License URL'),
+                    'notes' => $this->textField($fields, 'license_notes'),
                 ],
                 'source' => [
-                    'url' => trim((string)($fields['source_url'] ?? '')),
-                    'retrieved' => date('Y-m-d'),
-                    'notes' => trim((string)($fields['source_notes'] ?? '')),
+                    'url' => $sourceUrl,
+                    'retrieved' => $sourceRetrieved,
+                    'notes' => $sourceNotes,
+                    'upstream' => [
+                        'url' => $upstreamUrl,
+                    ],
+                    'port_repository' => [
+                        'url' => $repositoryUrl,
+                    ],
                 ],
             ],
+            'references' => $this->referenceRows($fields),
             'tags' => $this->listField($fields['tags'] ?? ''),
             'terpvault' => [
                 'status' => 'draft',
@@ -171,6 +193,8 @@ class PackageCreationService
                 'engine' => 'parchment',
             ],
         ];
+
+        return $manifest;
     }
 
     private function writeOptionalResources(string $package, array &$manifest, array $uploads): void
@@ -346,6 +370,71 @@ class PackageCreationService
         }, $value), static function (string $item): bool {
             return $item !== '';
         })));
+    }
+
+    private function textField(array $fields, string $key, string $default = ''): string
+    {
+        $value = trim((string)($fields[$key] ?? $default));
+        return str_replace("\0", '', $value);
+    }
+
+    private function urlField(array $fields, string $key, string $label): string
+    {
+        $value = $this->textField($fields, $key);
+        if ($value === '') {
+            return '';
+        }
+
+        if (preg_match('/[\x00-\x1F\x7F]/', $value) || strpos($value, '\\') !== false) {
+            throw new InvalidArgumentException($label . ' must be an http or https URL.');
+        }
+
+        $parts = parse_url($value);
+        $scheme = is_array($parts) ? strtolower((string)($parts['scheme'] ?? '')) : '';
+        $host = is_array($parts) ? (string)($parts['host'] ?? '') : '';
+        if (!is_array($parts) || !in_array($scheme, ['http', 'https'], true) || trim($host) === '') {
+            throw new InvalidArgumentException($label . ' must be an http or https URL.');
+        }
+
+        return $value;
+    }
+
+    private function ifArchivePath($value): string
+    {
+        $path = str_replace('\\', '/', trim((string)$value));
+        if ($path === '') {
+            return '';
+        }
+        if (strpos($path, "\0") !== false || $path[0] === '/' || preg_match('#^[a-z][a-z0-9+.-]*:#i', $path)) {
+            throw new InvalidArgumentException('IF Archive path must be a relative archive path.');
+        }
+        foreach (explode('/', $path) as $segment) {
+            if ($segment === '' || $segment === '.' || $segment === '..') {
+                throw new InvalidArgumentException('IF Archive path must not contain traversal segments.');
+            }
+        }
+
+        return $path;
+    }
+
+    private function referenceRows(array $fields): array
+    {
+        $rows = [];
+        $notes = $this->textField($fields, 'reference_notes');
+        foreach (self::REFERENCE_URL_FIELDS as $key => $definition) {
+            $url = $this->urlField($fields, $key, $definition['label'] . ' URL');
+            if ($url === '') {
+                continue;
+            }
+            $rows[] = [
+                'role' => $definition['role'],
+                'label' => $definition['label'],
+                'url' => $url,
+                'notes' => $notes,
+            ];
+        }
+
+        return $rows;
     }
 
     private function safeFilename(UploadedFileInterface $upload, array $extensions, string $fallback): string

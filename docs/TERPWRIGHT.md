@@ -26,6 +26,7 @@ Implemented:
 - `resources.story_file` creation and `resources.story_sha256` checksum recording.
 - Format inference from story extension when the curator leaves format blank.
 - Basic metadata entry for title, slug, author/source attribution, headline, IFID, description, tags, license, and source notes.
+- Manual metadata/provenance URL entry for named roles such as source/package URL, upstream project URL, port/source repository URL, IFDB, IFWiki, IF Archive, license, and optional reference-only links.
 - Draft-only output: `terpvault.status` is forced to `draft` and `terpvault.featured` is forced to `false`.
 - Optional local uploads for cover, small-cover, hero, screenshots, helper Markdown files, `known-differences.md`, `provenance.md`, `metadata.iFiction.xml`, and feelies.
 - Package-local resource paths only, with traversal/system-file checks and conservative extension allowlists.
@@ -118,11 +119,54 @@ Terpwright v1 may let a curator paste or type:
 - IF Archive path or URL.
 - IFWiki URL.
 - Source URL.
+- Upstream project URL.
+- Port/source repository URL.
 - License URL or license name.
+- Cover, hero, screenshot, walkthrough, hints, map, and history/background reference URLs.
 - Retrieval date.
 - Notes describing source selection, build basis, asset basis, and redistribution status.
 
 These references should seed fields or notes only after curator review. They should not trigger remote fetches in v1.
+
+### Phase 2 Manual URL Metadata
+
+Phase 2 adds manual URL assistance on top of the Phase 1 local-file package builder. It accepts curator-supplied URLs and stores them in `game.yaml` without contacting the remote sites:
+
+```yaml
+catalog:
+  ifdb:
+    tuid: ''
+    url: ''
+  ifwiki:
+    url: ''
+  ifarchive:
+    path: ''
+    url: ''
+
+release:
+  license:
+    name: Verify before redistribution
+    url: ''
+    notes: ''
+  source:
+    url: ''
+    retrieved: ''
+    notes: ''
+    upstream:
+      url: ''
+    port_repository:
+      url: ''
+
+references:
+  - role: map
+    label: Map reference
+    url: https://example.com/map
+    notes: Reference only.
+```
+
+`catalog.*` should be used for IF ecosystem catalog context. `release.source.url` should identify the package/story source when there is one clear primary source. `release.source.upstream.url` should identify a canonical upstream project or source distribution. `release.source.port_repository.url` should identify a port or source repository used for the TerpVault package variant. `references` is for supporting or reference-only links such as art sources, maps, walkthroughs, hints, screenshots, or background/history pages.
+
+URL presence reduces missing-source prompts only when it records a source, upstream, port repository, or IF Archive reference. It does not prove redistribution rights. License name, license URL, and license notes remain curator-reviewed evidence, not an automatic clearance decision.
 
 ### Later Inputs
 
@@ -261,7 +305,7 @@ Warnings:
 
 - Missing title.
 - Missing IFID.
-- Missing source/provenance URL or notes.
+- Missing source role, upstream/port repository, IF Archive path/URL, or provenance notes.
 - Missing license name or redistribution notes.
 - License marked "verify before redistribution" or equivalent.
 - Missing cover, small-cover, screenshots, helper docs, or catalog links.
@@ -338,10 +382,12 @@ Terpwright docs and UI should avoid implying that Ink packages are currently pla
 
 ### Phase 2: Metadata Assistant For Manually Supplied URLs
 
-- Accept curator-supplied IFDB, IFWiki, IF Archive, source, and license URLs.
-- Propose catalog/provenance fields for review.
-- Preserve source URLs and retrieval dates.
-- Avoid remote lookup unless explicitly scoped; if any fetch is added, it must be explicit and preview-driven.
+- Implemented as manual URL capture in the Create Package workflow.
+- Accepts curator-supplied IFDB, IFWiki, IF Archive, source/package, upstream project, port/source repository, license, and reference-only URLs.
+- Stores catalog fields, source role fields, retrieval date, license notes, and reference rows in `game.yaml`.
+- Displays the stored URLs in Admin2 package detail/readback.
+- Performs only light syntax validation for pasted URLs and archive paths.
+- Does not perform remote lookup, search, scraping, metadata generation, story-file download, or asset download.
 
 ### Phase 3: Ecosystem Lookup Helpers
 
