@@ -319,10 +319,10 @@ class TerpVaultPage extends HTMLElement {
         textarea.markdown { min-height:18rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.92rem; line-height:1.45; }
         .checkbox { display:flex; gap:.5rem; align-items:center; margin:.7rem 0 .25rem; }
         .checkbox input { width:auto; }
-        .readonly { display:grid; gap:.35rem; margin-top:.35rem; min-width:0; }
-        .readonly div { display:grid; grid-template-columns:120px minmax(0,1fr); gap:.45rem; font-size:.86rem; min-width:0; }
+        .readonly { display:grid; gap:.55rem; margin-top:.35rem; min-width:0; }
+        .readonly div { display:grid; grid-template-columns:minmax(0,1fr); gap:.18rem; font-size:.86rem; min-width:0; }
         .readonly span:first-child { opacity:.68; }
-        .readonly code { display:block; min-width:0; max-width:100%; white-space:normal; overflow-wrap:anywhere; word-break:break-word; }
+        .readonly code { display:block; min-width:0; max-width:100%; overflow-x:auto; white-space:nowrap; overflow-wrap:normal; word-break:normal; }
         .ifiction-fields { display:grid; gap:.65rem; margin:.7rem 0; }
         .ifiction-field { display:grid; grid-template-columns:2rem minmax(0,1fr); gap:.65rem; align-items:start; border:1px solid rgba(127,127,127,.24); border-radius:10px; padding:.7rem; background:rgba(127,127,127,.035); }
         .ifiction-field.overwrite { border-color:rgba(255,188,87,.65); background:rgba(255,188,87,.08); }
