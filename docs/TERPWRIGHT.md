@@ -2,7 +2,7 @@
 
 Terpwright is the Admin2 package-builder workflow for TerpVault. It helps a curator assemble a reviewable TerpVault package from local files and known interactive-fiction ecosystem references without replacing curator judgment, license review, or provenance notes.
 
-Phase 1 local-file package creation, Phase 2 manually supplied URL capture, Phase 3a/3b ecosystem metadata preview with IF Archive URL/path normalization, and Phase 3c IFDB metadata preview are implemented in Admin2. Later IFWiki lookup helpers, guided recipes, richer Oracle generation, and Ink support remain roadmap-only. Scraping, AI metadata generation, automatic package creation from remote sources, and Ink support are not part of the current Terpwright implementation.
+Phase 1 local-file package creation, Phase 2 manually supplied URL capture, Phase 3a/3b ecosystem metadata preview with IF Archive URL/path normalization, Phase 3c IFDB metadata preview, and Phase 3d IFWiki metadata preview are implemented in Admin2. Later guided recipes, richer Oracle generation, and Ink support remain roadmap-only. Scraping, AI metadata generation, automatic package creation from remote sources, and Ink support are not part of the current Terpwright implementation.
 
 ## Purpose
 
@@ -27,7 +27,7 @@ Implemented:
 - Format inference from story extension when the curator leaves format blank.
 - Basic metadata entry for title, slug, author/source attribution, headline, IFID, description, tags, license, and source notes.
 - Manual metadata/provenance URL entry for named roles such as source/package URL, upstream project URL, port/source repository URL, IFDB, IFWiki, IF Archive, license, and optional reference-only links.
-- Ecosystem Metadata Preview for curator-supplied references, with functional IF Archive URL/path normalization and explicit IFDB metadata preview through the official IFDB `viewgame` JSON API.
+- Ecosystem Metadata Preview for curator-supplied references, with functional IF Archive URL/path normalization, explicit IFDB metadata preview through the official IFDB `viewgame` JSON API, and IFWiki metadata preview through IFWiki's MediaWiki API.
 - Draft-only output: `terpvault.status` is forced to `draft` and `terpvault.featured` is forced to `false`.
 - Optional local uploads for cover, small-cover, hero, screenshots, helper Markdown files, `known-differences.md`, `provenance.md`, `metadata.iFiction.xml`, and feelies.
 - Package-local resource paths only, with traversal/system-file checks and conservative extension allowlists.
@@ -36,7 +36,7 @@ Implemented:
 
 Not implemented in Phase 1:
 
-- IFWiki, IF Archive file, or arbitrary URL lookup.
+- IF Archive file or arbitrary URL lookup.
 - Scraping.
 - Metadata assistant automation.
 - Ink support.
@@ -75,7 +75,7 @@ In scope:
   - `known-differences.md`
 - Optional local `metadata.iFiction.xml` upload.
 - Manual metadata entry and review for `game.yaml`.
-- Manual source/reference entry for IFDB URL, IF Archive URL/path, and IFWiki URL.
+- Manual source/reference entry for IFDB URL/TUID, IFWiki URL/title, and IF Archive URL/path.
 - Story-file validation, story hash recording, resource reference validation, and package validation.
 - Draft package folder creation.
 - Draft-only install.
@@ -84,7 +84,7 @@ In scope:
 Out of scope for v1:
 
 - Broad remote lookup/search.
-- Automatic IFWiki, IF Archive, or arbitrary web-page fetching.
+- Automatic IF Archive file or arbitrary web-page fetching.
 - Automatic cover/art download.
 - Cover generation or art suggestions.
 - Automated provenance drafting.
@@ -127,7 +127,7 @@ Terpwright v1 may let a curator paste or type:
 - Retrieval date.
 - Notes describing source selection, build basis, asset basis, and redistribution status.
 
-These references should seed fields or notes only after curator review. IFDB TUID/URL values can be previewed through the official IFDB `viewgame` JSON API; all other remote references remain manual/reference-only unless a later phase implements a focused helper.
+These references should seed fields or notes only after curator review. IFDB TUID/URL values can be previewed through the official IFDB `viewgame` JSON API. IFWiki URL/title values can be previewed through IFWiki's MediaWiki API. Other remote references remain manual/reference-only unless a later phase implements a focused helper.
 
 ### Phase 2 Manual URL Metadata
 
@@ -183,7 +183,7 @@ Later inputs must keep preview/apply behavior, source attribution, retrieval dat
 
 ## Phase 3: Ecosystem Lookup Helpers
 
-Terpwright Phase 3 is a set of ecosystem lookup helpers, not automated package creation. Phase 3a/3b provides a preview shell and an IF Archive URL/path normalizer. Phase 3c adds an IFDB metadata preview helper. The goal is to help curators find and compare metadata from known interactive-fiction sources while preserving package-local data, rights review, and explicit curator decisions.
+Terpwright Phase 3 is a set of ecosystem lookup helpers, not automated package creation. Phase 3a/3b provides a preview shell and an IF Archive URL/path normalizer. Phase 3c adds an IFDB metadata preview helper. Phase 3d adds an IFWiki metadata preview helper. The goal is to help curators find and compare metadata from known interactive-fiction sources while preserving package-local data, rights review, and explicit curator decisions.
 
 Implemented in Phase 3a/3b:
 
@@ -198,7 +198,7 @@ Implemented in Phase 3a/3b:
   - `catalog.ifarchive.url: https://ifarchive.org/if-archive/games/zcode/Advent.z5`
 - Explicit curator apply buttons for selected normalized IF Archive fields.
 - Draft/review messaging: reference only, curator review required, and URL presence does not prove redistribution rights.
-- Stored/reference-only reporting for IFWiki, source, repository, and license URLs.
+- Stored/reference-only reporting for source, repository, and license URLs.
 
 Implemented in Phase 3c:
 
@@ -211,11 +211,23 @@ Implemented in Phase 3c:
 - Reference-only reporting for IFDB download links without downloading story files or assets.
 - Explicit curator apply controls for selected IFDB fields in the Create Package form and metadata editor state.
 
-Phase 3c does not scrape IFDB HTML, search IFDB broadly, fetch IFWiki, fetch IF Archive files, download story files, download assets, assume redistribution rights, generate metadata with AI, or publish packages. Preview responses are read-only and report `writes: false`; `remote_fetches` is `true` only when an IFDB API request was attempted.
+Implemented in Phase 3d:
+
+- IFWiki input normalization from a page title such as `Babel` or a URL such as `https://www.ifwiki.org/Babel`.
+- Normalized output to `catalog.ifwiki.title` and `catalog.ifwiki.url`.
+- Plausibility checks for unsafe schemes, malformed URLs, non-IFWiki hosts, traversal/path nonsense, unsupported title punctuation, and mismatched title/URL pairs.
+- Read-only lookup through IFWiki's MediaWiki API at `https://www.ifwiki.org/api.php`.
+- Preview candidates for supported fields such as page title, canonical URL, short extract when the API provides one, categories, safe external links, and source attribution.
+- Reference-only reporting for IFWiki external links without downloading story files or assets.
+- Explicit curator apply controls for selected IFWiki URL/title fields in the Create Package form and metadata editor state.
+
+Phase 3c/3d do not scrape IFDB or IFWiki HTML, search IFDB or IFWiki broadly, fetch IF Archive files, download story files, download assets, assume redistribution rights, generate metadata with AI, or publish packages. Preview responses are read-only and report `writes: false`; `remote_fetches` is `true` only when an IFDB or IFWiki API request was attempted.
 
 IF Archive validation rejects or reports warnings for unsafe input such as traversal segments, absolute filesystem paths, unsafe schemes, non-IF Archive hosts, malformed `/if-archive/` paths, and empty preview requests. Query strings and fragments are ignored in the normalized IF Archive package URL with a warning.
 
 IFDB metadata is catalog/reference data. IFDB's API can return iFiction-like bibliographic fields and IFIDs, but those values are not treated as author-provided package metadata, license proof, or redistribution permission. Curators should keep descriptions concise, avoid copying large catalog prose into package docs, and confirm license/source fields separately.
+
+IFWiki metadata is encyclopedia/reference data. The helper prefers MediaWiki API access and degrades to warnings when the API is unavailable or does not provide optional fields such as extracts. IFWiki pages and external links do not prove redistribution rights and are not treated as permission to package story files, cover art, screenshots, maps, walkthroughs, or hints.
 
 Phase 3 helpers may look up or cross-check:
 
@@ -482,7 +494,7 @@ Recommended follow-on phases:
 - Phase 3a: URL validation and metadata preview shell. Implemented for curator-supplied references.
 - Phase 3b: IF Archive path/URL helper. Implemented for normalization only.
 - Phase 3c: IFDB lookup helper.
-- Phase 3d: IFWiki helper.
+- Phase 3d: IFWiki helper. Implemented for URL/title normalization and MediaWiki API preview.
 - Phase 3e: iFiction/Babel cross-check.
 - Phase 3f: richer curator apply/diff workflow beyond the current IF Archive selected-field apply.
 - Phase 3g: package validation integration.

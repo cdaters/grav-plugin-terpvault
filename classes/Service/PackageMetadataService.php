@@ -23,6 +23,7 @@ class PackageMetadataService
         'identification.ifids',
         'catalog.ifdb.tuid',
         'catalog.ifdb.url',
+        'catalog.ifwiki.title',
         'catalog.ifwiki.url',
         'catalog.ifarchive.path',
         'catalog.ifarchive.url',
@@ -256,6 +257,7 @@ class PackageMetadataService
         $hasPath = array_key_exists('catalog.ifarchive.path', $flatUpdates);
         $hasUrl = array_key_exists('catalog.ifarchive.url', $flatUpdates);
         if (!$hasPath && !$hasUrl) {
+            $this->normalizeIFWikiPair($flatUpdates);
             return;
         }
 
@@ -268,6 +270,26 @@ class PackageMetadataService
         $ifArchive = (new EcosystemMetadataService())->requireIFArchiveMetadata($path, $url);
         $flatUpdates['catalog.ifarchive.path'] = $ifArchive['path'];
         $flatUpdates['catalog.ifarchive.url'] = $ifArchive['url'];
+        $this->normalizeIFWikiPair($flatUpdates);
+    }
+
+    private function normalizeIFWikiPair(array &$flatUpdates): void
+    {
+        $hasTitle = array_key_exists('catalog.ifwiki.title', $flatUpdates);
+        $hasUrl = array_key_exists('catalog.ifwiki.url', $flatUpdates);
+        if (!$hasTitle && !$hasUrl) {
+            return;
+        }
+
+        $title = $hasTitle ? trim((string)$flatUpdates['catalog.ifwiki.title']) : '';
+        $url = $hasUrl ? trim((string)$flatUpdates['catalog.ifwiki.url']) : '';
+        if ($title === '' && $url === '') {
+            return;
+        }
+
+        $ifwiki = (new EcosystemMetadataService())->requireIFWikiMetadata($url, $title);
+        $flatUpdates['catalog.ifwiki.title'] = $ifwiki['title'];
+        $flatUpdates['catalog.ifwiki.url'] = $ifwiki['url'];
     }
 
     private function isUrlField(string $field): bool
