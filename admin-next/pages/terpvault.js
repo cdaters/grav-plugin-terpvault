@@ -1788,12 +1788,17 @@ class TerpVaultPage extends HTMLElement {
 
   async _previewEcosystem(scope, slug = '') {
     const normalizedScope = scope === 'editor' ? 'editor' : 'create';
-    const payload = this._ecosystemPayloadFromPage(normalizedScope);
+    const form = normalizedScope === 'create'
+      ? this.shadowRoot.querySelector('form[data-create-package]')
+      : this.shadowRoot.querySelector('form[data-editor-slug]');
+    const values = normalizedScope === 'create'
+      ? (form ? this._collectCreateValues(form) : (this.state.create.values || {}))
+      : (form ? this._collectEditorValues(form) : (this.state.editor.values || {}));
+    const payload = this._ecosystemPayloadFromValues(normalizedScope, values);
     if (normalizedScope === 'create') {
-      const form = this.shadowRoot.querySelector('form[data-create-package]');
       this.state.create = {
         ...(this.state.create || {}),
-        values: form ? this._collectCreateValues(form) : (this.state.create.values || {}),
+        values,
         ecosystem: {
           ...(this.state.create.ecosystem || this._emptyEcosystemState()),
           loading: true,
@@ -1803,10 +1808,9 @@ class TerpVaultPage extends HTMLElement {
         }
       };
     } else {
-      const form = this.shadowRoot.querySelector('form[data-editor-slug]');
       this.state.editor = {
         ...(this.state.editor || {}),
-        values: form ? this._collectEditorValues(form) : this.state.editor.values,
+        values,
         ecosystem: {
           ...(this.state.editor.ecosystem || this._emptyEcosystemState()),
           loading: true,
@@ -1825,7 +1829,7 @@ class TerpVaultPage extends HTMLElement {
         body: JSON.stringify(payload)
       });
       const message = report.ok
-        ? 'Ecosystem metadata preview is ready. Review warnings before applying normalized fields.'
+        ? 'Ecosystem metadata preview is ready. Review notes are grouped below.'
         : 'Ecosystem metadata preview returned warnings or errors. No fields were applied.';
       this._setEcosystemState(normalizedScope, {
         loading: false,
@@ -1968,6 +1972,16 @@ class TerpVaultPage extends HTMLElement {
     if (scope === 'editor') {
       const form = this.shadowRoot.querySelector('form[data-editor-slug]');
       const values = form ? this._collectEditorValues(form) : (this.state.editor.values || {});
+      return this._ecosystemPayloadFromValues(scope, values);
+    }
+
+    const form = this.shadowRoot.querySelector('form[data-create-package]');
+    const values = form ? this._collectCreateValues(form) : (this.state.create.values || {});
+    return this._ecosystemPayloadFromValues(scope, values);
+  }
+
+  _ecosystemPayloadFromValues(scope, values) {
+    if (scope === 'editor') {
       return {
         ifarchive_path: this._get(values, 'catalog.ifarchive.path'),
         ifarchive_url: this._get(values, 'catalog.ifarchive.url'),
@@ -1981,8 +1995,6 @@ class TerpVaultPage extends HTMLElement {
       };
     }
 
-    const form = this.shadowRoot.querySelector('form[data-create-package]');
-    const values = form ? this._collectCreateValues(form) : (this.state.create.values || {});
     return {
       ifarchive_path: values.ifarchive_path || '',
       ifarchive_url: values.ifarchive_url || '',
@@ -2083,7 +2095,7 @@ class TerpVaultPage extends HTMLElement {
     event.preventDefault();
     const form = event.currentTarget;
     const slug = form.dataset.editorSlug || this.state.editingSlug;
-    const metadata = this._collectEditorValues(form);
+    const metadata = this._mergeObjects(this.state.editor.values || {}, this._collectEditorValues(form));
 
     this.state.editor = {
       ...this.state.editor,
@@ -3212,7 +3224,7 @@ class TerpVaultPage extends HTMLElement {
             </div>
             ${Object.keys(references).length ? this._ecosystemReferenceList(references) : ''}
             ${this._reportList('Preview errors', report.errors || [], 'error', false)}
-            ${this._reportList('Preview warnings', report.warnings || [], 'warn', false)}
+            ${this._reviewNotesDetails('Warnings & review notes', report.warnings || [], 'warn')}
           </div>
         ` : ''}
       </section>
@@ -3252,7 +3264,9 @@ class TerpVaultPage extends HTMLElement {
           </div>
         ` : '<p class="meta">No supported IFDB metadata fields were returned.</p>'}
         ${downloads.length ? `
-          <div class="provenance" style="margin-top:.75rem;">
+          <details class="review-notes" style="margin-top:.75rem;">
+            <summary>IFDB download references (${downloads.length})</summary>
+            <div class="provenance" style="margin-top:.75rem;">
             ${downloads.map(item => `
               <div class="provenance-item">
                 <span>${this._esc(item.title || 'Download reference')}</span>
@@ -3260,18 +3274,25 @@ class TerpVaultPage extends HTMLElement {
                 <p class="meta">${this._esc(item.status || 'reference only; not downloaded')}${item.format ? ` - ${this._esc(item.format)}` : ''}</p>
               </div>
             `).join('')}
-          </div>
+            </div>
+          </details>
         ` : ''}
-        ${sources.length ? this._ecosystemSourceList(sources) : ''}
+        ${sources.length ? this._ecosystemSourceList(sources, true) : ''}
       </div>
     `;
   }
 
-  _ecosystemSourceList(sources) {
+  _ecosystemSourceList(sources, collapsed = false) {
     const rows = sources.map(source => {
       return `<div class="provenance-item"><span>${this._esc(source.label || 'Source')}</span><code>${this._esc(source.url || '')}</code><p class="meta">${this._esc(source.type || 'reference')}</p></div>`;
     });
-    return rows.length ? `<div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div>` : '';
+    if (!rows.length) {
+      return '';
+    }
+    const body = `<div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div>`;
+    return collapsed
+      ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Source attribution (${rows.length})</summary>${body}</details>`
+      : body;
   }
 
   _previewFieldValue(value) {
@@ -3283,7 +3304,23 @@ class TerpVaultPage extends HTMLElement {
     const rows = Object.entries(references).map(([, reference]) => {
       return `<div class="provenance-item"><span>${this._esc(reference.label || 'Reference')}</span><code>${this._esc(reference.value || '')}</code><p class="meta">${this._esc(reference.status || 'stored/reference only')}</p></div>`;
     });
-    return rows.length ? `<div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div>` : '';
+    return rows.length
+      ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Stored reference-only links (${rows.length})</summary><div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div></details>`
+      : '';
+  }
+
+  _reviewNotesDetails(title, items, className = 'warn') {
+    const notes = Array.isArray(items) ? items.filter(item => String(item || '').trim() !== '') : [];
+    if (!notes.length) {
+      return '';
+    }
+
+    return `
+      <details class="review-notes" style="margin-top:.75rem;">
+        <summary>${this._esc(title)} (${notes.length})</summary>
+        ${this._reportList(title, notes, className, false)}
+      </details>
+    `;
   }
 
   _storyPanel(game, slug) {
@@ -3792,6 +3829,26 @@ class TerpVaultPage extends HTMLElement {
     });
 
     return values;
+  }
+
+  _mergeObjects(base = {}, overlay = {}) {
+    const merged = Array.isArray(base) ? [...base] : { ...(base || {}) };
+    Object.entries(overlay || {}).forEach(([key, value]) => {
+      if (
+        value &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        merged[key] &&
+        typeof merged[key] === 'object' &&
+        !Array.isArray(merged[key])
+      ) {
+        merged[key] = this._mergeObjects(merged[key], value);
+      } else {
+        merged[key] = Array.isArray(value) ? [...value] : value;
+      }
+    });
+
+    return merged;
   }
 
   _collectFeelies(form) {
