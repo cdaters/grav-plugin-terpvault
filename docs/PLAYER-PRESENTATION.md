@@ -112,7 +112,7 @@ Future Admin2 controls can expose:
 - Fullscreen allowed.
 - Optional show title/status chrome setting.
 
-These controls are roadmap only. v0.4.x does not implement runtime placement/boot/theme controls beyond the current player-shell styling and existing Parchment configuration.
+These controls are roadmap only. v0.5.0 does not implement runtime placement/boot/theme controls beyond the current player-shell styling and existing Parchment configuration.
 
 ## Accessibility Guardrails
 

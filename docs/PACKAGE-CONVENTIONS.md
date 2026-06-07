@@ -487,17 +487,17 @@ bin/grav clearcache
 - Add known-differences Markdown when the playable package differs materially from a source, native build, reference release, or historical edition.
 - Clear Grav cache and check `/if`, `/if/{slug}`, and `/if/{slug}/play`.
 
-## Future Terpwright package-builder output
+## Terpwright package-builder output
 
-Terpwright is the planned Admin2 package-builder workflow. It should produce ordinary TerpVault packages, not a separate package format.
+Terpwright is the Admin2 package-builder workflow. The current implementation produces ordinary draft TerpVault packages, not a separate package format.
 
-V1 builder output should follow this document's conventions:
+Current Phase 1/2 builder output follows this document's conventions:
 
 - Create draft packages only, with `terpvault.status: draft` and `terpvault.featured: false`.
 - Use the structured `game.yaml` shape for new manifests.
 - Keep story files, media, helper Markdown including `known-differences.md`, `metadata.iFiction.xml`, provenance notes, and feelies package-local.
 - Reuse existing validation, import inspection, draft-only install, and `.terpvault.zip` export rules.
-- Preserve source URLs, retrieval dates, license notes, and package-local provenance.
+- Preserve source URLs, upstream/port repository URLs, IFDB/IFWiki/IF Archive references, retrieval dates, license notes, reference-only URLs, and package-local provenance.
 - Treat uncertain rights as warnings or pending-review notes, not hidden assumptions.
 - Do not imply Ink package/runtime support, structured Oracle support, remote lookup, or automated asset download until those features are intentionally implemented and documented.
 

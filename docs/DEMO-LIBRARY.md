@@ -18,13 +18,13 @@ Use `docs/DEMO-CANDIDATES.md` as the working verification worksheet for individu
 - Prefer original/custom-created art and helper docs when historical assets are not clearly documented for the intended use.
 - Keep demo package structure aligned with TerpVault package conventions so each package can also serve as a reference implementation.
 
-## v0.4.x and v0.5.0 posture
+## v0.5.0 posture
 
-- During v0.4.x, continue preparing demo packages incrementally. A candidate can be researched, built, smoke-tested, or documented without becoming bundled.
+- During v0.5.x, continue preparing demo packages incrementally. A candidate can be researched, built, smoke-tested, or documented without becoming bundled.
 - Do not add Open Adventure / Colossal Cave, Grue, You Are Standing, or any other real IF package to a public/GPM-ready bundle unless story-file provenance, license terms, build/playback behavior, helper docs, artwork, screenshots, and package metadata are clean.
 - Mainframe Zork / Dungeon may be tracked as a research-only candidate, separate from Zork I, Zork II, and Zork III. Do not add story files, playable artifacts, draft package skeletons, package art, or bundled-demo claims until source selection, license/provenance, reference transcripts, build/reconstruction, playback, and helper docs are complete.
-- Treat v0.5.0 as the first possible public milestone where the demo suite should feel coherent rather than ad hoc.
-- A v0.5.0 candidate demo suite may include Zork I as the verified anchor package. Zork II has now joined the development `_demo` tree after approval, helper-doc polish, final audit, `_demo` copy validation, and clean DDEV seed verification. Zork III has completed that path for the development `_demo` tree.
+- Treat v0.5.0 as the current public-beta milestone candidate where the demo suite should feel coherent rather than ad hoc.
+- The v0.5.0 candidate demo suite includes Zork I, Zork II, and Zork III as reviewed development `_demo` anchors. Open Adventure remains draft/non-featured and needs final review before any publish or public-release claim.
 - Open Adventure / Colossal Cave is now a draft, non-featured `_demo` demo/library candidate after package import/inspect smoke. It uses an Inform 6 / Z-machine `.z8` port for TerpVault/Parchment evaluation while the native `advent` build remains a caveated oracle. It is not final or release-ready; final map/poster art and release-level provenance review remain pending.
 - Classify each package item under the shared rights/provenance policy. Generated or Craig-created art/helper docs should be identified honestly and should not imitate restricted packaging, manuals, logos, or trade dress.
 

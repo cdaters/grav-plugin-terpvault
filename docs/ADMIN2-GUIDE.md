@@ -32,13 +32,14 @@ It should also explain IF-specific jargon such as IFID, iFiction, Treaty of Babe
 
 ## Current Local Builder Workflow
 
-The Library Manager Create Package action now opens `Terpwright Phase 1: Local Package Builder`.
+The Library Manager Create Package action now opens the Terpwright local package builder. In the current UI this is labeled `Terpwright Phase 2: Local Package Builder` because it includes Phase 1 local-file package creation plus Phase 2 manual URL/provenance fields.
 
 Use it when a curator already has local package materials:
 
 - Enter a URL-safe slug, title, author/source attribution, headline, optional IFID, and source/license notes.
 - Upload one supported local story file. The builder writes it package-locally, records it as `resources.story_file`, computes `resources.story_sha256`, and infers format when possible.
 - Optionally upload cover, small-cover, hero, screenshots, helper Markdown, `known-differences.md`, `provenance.md`, `metadata.iFiction.xml`, and feelies.
+- Optionally enter source, upstream, port repository, IFDB, IFWiki, IF Archive, license, and reference-only URLs. These values are stored as curator-reviewed metadata only; the builder does not fetch remote pages or files.
 - Submit to create a draft package under the configured games path. The builder always forces draft status and clears featured placement.
 - Review the creation report and package validation notes in Admin2 before exporting or publishing.
 - Export the created package with the existing package Export action.

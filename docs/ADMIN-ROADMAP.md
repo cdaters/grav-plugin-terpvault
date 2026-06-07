@@ -67,21 +67,21 @@
 
 ## Active roadmap
 
-### v0.4.x incremental Admin2 path
+### v0.5.x incremental Admin2 path
 
-- Keep v0.4.x focused on small, reviewable Admin2/library improvements.
+- Keep v0.5.x focused on small, reviewable Admin2/library improvements after the v0.5.0 milestone.
 - Prioritize large-library basics before bulk mutation: search, sort, simple filters, metadata-completeness filters, `localStorage` state preservation, and then pagination or virtual scrolling.
-- Treat Metadata Assistant Phase 1 as local-first: better `metadata.iFiction.xml` presence/status, safe upload/replace planning or implementation, preview/apply polish, and package creation/import awareness where possible.
+- Treat Metadata Assistant Phase 1 as local-first: `metadata.iFiction.xml` presence/status, upload/replace, preview/apply polish, and package creation/import awareness are baseline; future work should deepen those flows without adding silent remote lookup.
 - Keep safe delete/remove in design until destructive guardrails are reviewed. No physical package delete should ship until manifest removal, package folder deletion, trash/quarantine, confirmation, audit feedback, containment, permission, and CSRF/token behavior are clear.
 - Keep Oracle/progressive hint work additive and backwards compatible with `resources.hints: hints.md`.
 - Keep content transparency work descriptive and neutral; it should improve discovery/filtering without hiding, blocking, endorsing, or morally ranking works by default.
 - Keep player/theme work additive and scoped to the TerpVault shell unless Parchment exposes a supported theme-hint path. Player placement, boot behavior, inline play, and terminal theme controls are roadmap-only until the Parchment integration path is documented.
-- Treat Terpwright as a future Admin2 package-builder workflow, not a current runtime feature. V1 should be local-file-first, draft-only, validation-driven, and separate from later smart Metadata Assistant lookup.
+- Treat Terpwright Phase 1/2 as the current Admin2 package-builder workflow. Keep it local-file-first, draft-only, validation-driven, manually sourced, and separate from later smart Metadata Assistant lookup.
 
-### v0.5.0 Admin2/public milestone target
+### v0.5.0 Admin2/public milestone
 
-- Treat v0.5.0 as a public/GPM-readiness candidate milestone, not as another narrow Admin2 feature release.
-- Admin2 should be stable enough for beta use across create, metadata edit, helper Markdown edit, media/screenshots management, story replacement, export, import inspect, draft-only import commit, version visibility, and any completed large-library search/filter/sort basics.
+- Treat v0.5.0 as a public-beta milestone candidate, not as a GPM-ready claim and not as another narrow Admin2 feature release.
+- Admin2 should be stable enough for beta use across create/Terpwright, publish/unpublish, featured toggle, metadata edit, helper Markdown edit, media/screenshots management, story replacement, export, import inspect, draft-only import commit, version visibility, and large-library search/filter/sort basics.
 - Public routes should remain stable while Admin2 evolves: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_engine/parchment`, and `/if/_manifest`.
 - Security/destructive boundaries must remain explicit: no package delete unless the safe workflow exists, no silent physical file deletion, no arbitrary package browser, and import remains draft-only and non-overwriting.
 - Metadata/iFiction behavior must be easy to explain: local preview/apply is supported, remote catalog lookup is roadmap unless implemented, and metadata assistance is separate from story-file/package download.
@@ -324,4 +324,4 @@ player:
 
 - Prepare for GPM only when compatibility, dependency, packaging, and support posture are verified.
 - Do not make GPM-readiness claims until the release process and Grav/Admin/API compatibility targets are confirmed.
-- Use v0.5.0 as the first candidate milestone for a full GPM readiness audit if v0.4.x has stabilized the public routes, Parchment bundling, Admin2 beta workflows, starter/demo package posture, and release packaging.
+- Use v0.5.x for the next full GPM readiness audit only after public routes, Parchment bundling, Admin2 beta workflows, starter/demo package posture, and release packaging are stable enough for that review.
