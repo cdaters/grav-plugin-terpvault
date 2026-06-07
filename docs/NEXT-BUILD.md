@@ -12,6 +12,7 @@ TerpVault is in an early public-beta milestone phase. Public routes and bundled 
 - Confirm Admin2 sidebar registration does not appear while `admin.enable_admin2_page` is false.
 - Confirm Admin2 sidebar registration appears only when Admin2/API is available and `admin.enable_admin2_page` is true.
 - Confirm Admin2 create, edit, export, import inspect, and draft-only import commit workflows still require authenticated Admin2/API access.
+- Confirm Admin2 Settings and Formats config saves require authenticated Admin2/API access, reject unknown fields, preserve package content, and report that Grav cache should be cleared after config writes.
 - Confirm PHP ZipArchive/`php-zip` is present before testing `.terpvault.zip` export/import.
 - Confirm Admin2 dashboard/API requests do not trigger TerpVault frontend virtual-page registration.
 
@@ -30,6 +31,8 @@ TerpVault is in an early public-beta milestone phase. Public routes and bundled 
 - Admin2 pagination and virtual scrolling are not implemented.
 - Named save slots and server-side saves are not implemented.
 - Public frontend routing and Parchment/player behavior should stay unchanged during Admin2 work.
+- Admin2 Settings editability is limited to safe whitelisted plugin config paths. Storage path editing remains read-only.
+- Admin2 Formats editability is limited to story and asset extension allowlists. These settings control acceptance/serving policy only and do not add player/interpreter support or conversion.
 - Oracle v1 renders current helper Markdown such as `resources.hints: hints.md` in a spoiler-safe frontend panel; richer sources and Admin2 controls remain roadmap-only.
 - Content transparency search/filter controls are roadmap-only; current manifests with simple tags or no tags remain valid.
 - Admin2 Guide/Help tab is roadmap-only; no runtime in-product guide is implemented yet.

@@ -30,6 +30,14 @@ It should cover package management, package creation, import inspection, export,
 
 It should also explain IF-specific jargon such as IFID, iFiction, Treaty of Babel, IFDB, IFWiki, IF Archive, Z-machine, Glulx, TADS, ADRIFT, Ink, feelies, helper Markdown, hints, walkthroughs, and story files.
 
+## Current Settings And Formats Tabs
+
+The current Admin2 Settings tab can save a small whitelist of plugin config values: library title, intro, card count, public draft visibility, public route, virtual-route enablement, player presentation flags, Admin2 enablement, and validation warning toggles. Storage path remains read-only in Admin2.
+
+The current Formats tab can save story and asset extension allowlists. It must keep the warning visible that extension allowlists only control what TerpVault accepts and serves; they do not add interpreter/player support and do not convert files.
+
+Both tabs use authenticated Admin2/API routes with the existing `admin.super` or `api.super` permission gate. Saves write user plugin config only, reject unknown config paths, reject unsafe extension values, preserve package `game.yaml` files, and should be followed by a Grav cache clear when validating public behavior.
+
 ## Current Local Builder Workflow
 
 The Library Manager Create Package action now opens the Terpwright local package builder. In the current UI this is labeled `Terpwright Phase 2: Local Package Builder` because it includes Phase 1 local-file package creation plus Phase 2 manual URL/provenance fields.

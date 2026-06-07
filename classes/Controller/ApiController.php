@@ -22,6 +22,7 @@ use Grav\Plugin\TerpVault\Service\PackageMarkdownService;
 use Grav\Plugin\TerpVault\Service\PackageMediaService;
 use Grav\Plugin\TerpVault\Service\PackageMetadataService;
 use Grav\Plugin\TerpVault\Service\PackageStoryService;
+use Grav\Plugin\TerpVault\Service\PluginConfigService;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,6 +34,11 @@ class ApiController extends AbstractApiController
     private function service(): PackageMetadataService
     {
         return new PackageMetadataService();
+    }
+
+    private function configService(): PluginConfigService
+    {
+        return new PluginConfigService();
     }
 
     public function packages(ServerRequestInterface $request): ResponseInterface
@@ -49,10 +55,16 @@ class ApiController extends AbstractApiController
             return $data;
         }, $repository->all(true));
 
+        $config = $this->configService()->snapshot();
+
         return ApiResponse::create([
             'read_only' => false,
             'version' => $this->pluginVersion(),
             'source' => 'Admin2 package API',
+            'route' => '/' . trim((string)($config['config']['route'] ?? '/if'), '/'),
+            'storage' => $config['storage'] ?? [],
+            'config' => $config['config'] ?? [],
+            'formats' => $config['formats'] ?? [],
             'games' => $games,
         ]);
     }
@@ -113,6 +125,47 @@ class ApiController extends AbstractApiController
     private function ecosystemService(): EcosystemMetadataService
     {
         return new EcosystemMetadataService();
+    }
+
+    public function config(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+
+        return ApiResponse::create($this->configService()->snapshot());
+    }
+
+    public function updateConfig(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $body = $this->getRequestBody($request);
+        if (!is_array($body)) {
+            throw new ValidationException('Request body must be a JSON object.');
+        }
+
+        try {
+            return ApiResponse::create($this->configService()->updateSettings($body));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+    }
+
+    public function updateFormats(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $body = $this->getRequestBody($request);
+        if (!is_array($body)) {
+            throw new ValidationException('Request body must be a JSON object.');
+        }
+
+        try {
+            return ApiResponse::create($this->configService()->updateFormats($body));
+        } catch (InvalidArgumentException $e) {
+            throw new ValidationException($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new ValidationException($e->getMessage());
+        }
     }
 
     public function metadata(ServerRequestInterface $request): ResponseInterface

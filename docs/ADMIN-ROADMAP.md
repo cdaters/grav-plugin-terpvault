@@ -8,6 +8,7 @@
 - Public package routes remain separate from Admin2 API routes.
 - Admin2 routes should continue to use controller-style API integration rather than ad hoc request handlers.
 - Current write workflows are scoped to specific package-management actions; TerpVault should not expose an arbitrary package file browser.
+- Current plugin-configuration writes are scoped to authenticated, whitelisted Admin2 Settings and Formats fields; TerpVault should not expose arbitrary YAML editing.
 - Admin2/API write permissions should remain conservative unless a future release defines a more granular permission model.
 - Current Library Manager rows show draft/published status, featured state, story/iFiction presence, validation counts, and curator actions for publish/unpublish, featured toggle, metadata editing, export, and iFiction preview.
 
@@ -76,6 +77,8 @@
 - Keep Oracle/progressive hint work additive and backwards compatible with `resources.hints: hints.md`.
 - Keep content transparency work descriptive and neutral; it should improve discovery/filtering without hiding, blocking, endorsing, or morally ranking works by default.
 - Keep player/theme work additive and scoped to the TerpVault shell unless Parchment exposes a supported theme-hint path. Player placement, boot behavior, inline play, and terminal theme controls are roadmap-only until the Parchment integration path is documented.
+- Keep Admin2 Formats editability limited to extension allowlists. Removing or adding an extension changes TerpVault acceptance/serving policy only; it must not be described as adding player support or conversion.
+- Keep Admin2 Settings editability limited to safe plugin config paths. Storage path editing, arbitrary config browsing, story-engine installation, and file conversion remain out of scope until separately designed.
 - Treat Terpwright Phase 1/2 as the current Admin2 package-builder workflow. Keep it local-file-first, draft-only, validation-driven, manually sourced, and separate from later smart Metadata Assistant lookup.
 
 ### v0.5.0 Admin2/public milestone

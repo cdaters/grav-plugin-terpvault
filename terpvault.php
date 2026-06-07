@@ -289,6 +289,7 @@ class TerpVaultPlugin extends Plugin
         require_once __DIR__ . '/classes/Service/PackageFeeliesService.php';
         require_once __DIR__ . '/classes/Service/PackageStoryService.php';
         require_once __DIR__ . '/classes/Service/EcosystemMetadataService.php';
+        require_once __DIR__ . '/classes/Service/PluginConfigService.php';
         require_once __DIR__ . '/classes/Controller/ApiController.php';
 
         $routes = $event['routes'] ?? null;
@@ -298,6 +299,9 @@ class TerpVaultPlugin extends Plugin
 
         $controller = \Grav\Plugin\TerpVault\Controller\ApiController::class;
         $routes->post('/terpvault/ecosystem/preview', [$controller, 'previewEcosystem']);
+        $routes->get('/terpvault/config', [$controller, 'config']);
+        $routes->patch('/terpvault/config', [$controller, 'updateConfig']);
+        $routes->patch('/terpvault/formats', [$controller, 'updateFormats']);
         $routes->get('/terpvault/packages', [$controller, 'packages']);
         $routes->post('/terpvault/packages', [$controller, 'createPackage']);
         $routes->post('/terpvault/packages/import/inspect', [$controller, 'inspectImport']);
@@ -743,6 +747,8 @@ class TerpVaultPlugin extends Plugin
     protected function admin2PageData(): array
     {
         $config = $this->pluginConfig();
+        $configService = new \Grav\Plugin\TerpVault\Service\PluginConfigService();
+        $configSnapshot = $configService->snapshot();
         $games = array_map(function (GamePackage $game): array {
             $data = $game->toArray(true);
             $data['advisory_warnings'] = $game->advisoryWarnings();
@@ -758,13 +764,10 @@ class TerpVaultPlugin extends Plugin
             'storage' => [
                 'games_path' => (string)($config['storage']['games_path'] ?? 'user://data/terpvault/games'),
                 'resolved_path' => $this->repository()->basePath(),
+                'editable' => false,
             ],
-            'config' => [
-                'show_unpublished' => $this->showUnpublished(),
-                'admin2_enabled' => $this->admin2IntegrationEnabled(),
-                'player_engine' => (string)($config['player']['engine'] ?? 'parchment'),
-            ],
-            'formats' => $this->supportedFormats(),
+            'config' => $configSnapshot['config'] ?? [],
+            'formats' => $configSnapshot['formats'] ?? $this->supportedFormats(),
             'games' => $games,
         ];
     }
