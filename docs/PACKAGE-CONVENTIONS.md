@@ -397,6 +397,17 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 
 Reference links are evidence for curator review, not permission by themselves. Use `catalog.*` for IF ecosystem catalog context, `release.source.*` for package/story/source provenance, and `references[]` for supporting or reference-only material. Do not collapse canonical upstream, port repository, catalog context, and historical references into one undifferentiated URL.
 
+For IFDB references, new create/edit workflows accept either a TUID such as `fft6pu91j85y4acv` or a URL such as `https://ifdb.org/viewgame?id=fft6pu91j85y4acv`. TerpVault stores the normalized pair:
+
+```yaml
+catalog:
+  ifdb:
+    tuid: fft6pu91j85y4acv
+    url: https://ifdb.org/viewgame?id=fft6pu91j85y4acv
+```
+
+The IFDB preview helper can show catalog metadata candidates from IFDB's official `viewgame` JSON API, including bibliographic fields, IFIDs, format, and tags when available. These are review candidates only. IFDB metadata does not prove redistribution rights, and IFDB download links are not downloaded or treated as package sources unless the curator separately records and verifies a source/license basis.
+
 For IF Archive references, new create/edit workflows normalize path and URL as a pair. A curator may enter a full URL such as `https://ifarchive.org/if-archive/games/zcode/Advent.z5`, a prefixed path such as `if-archive/games/zcode/Advent.z5`, or a bare archive path such as `games/zcode/Advent.z5`. TerpVault stores:
 
 ```yaml

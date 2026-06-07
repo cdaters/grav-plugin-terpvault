@@ -119,7 +119,7 @@ Current behavior:
 
 ## Manual URL roles
 
-Terpwright Phase 2 accepts pasted, curator-supplied URLs as reference metadata only. The workflow performs light syntax validation, stores the values in `game.yaml`, and displays them in Admin2 readback. It does not fetch, scrape, search, trust, or summarize the remote pages.
+Terpwright Phase 2 accepts pasted, curator-supplied URLs as reference metadata only. The workflow performs light syntax validation, stores the values in `game.yaml`, and displays them in Admin2 readback. Terpwright Phase 3c adds a narrow IFDB preview helper for pasted IFDB TUID/URL values, but manual URL capture still does not scrape, search broadly, trust, or summarize arbitrary remote pages.
 
 Use these roles consistently:
 
@@ -136,13 +136,13 @@ URL presence does not prove redistribution rights. Curators should still record 
 
 ## Ecosystem Metadata Preview
 
-Terpwright Phase 3a/3b adds an authenticated preview-only Admin2 helper:
+Terpwright Phase 3a/3b adds an authenticated preview-only Admin2 helper, and Phase 3c extends it with IFDB lookup preview:
 
 ```text
 POST /api/v1/terpvault/ecosystem/preview
 ```
 
-The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `ifarchive_url`, `ifdb_url`, `ifwiki_url`, `source_url`, `upstream_source_url`, `port_repository_url`, and `license_url`. It does not write package files, perform remote fetches, download assets, or publish packages. Responses include stable review flags:
+The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `ifarchive_url`, `ifdb_tuid`, `ifdb_url`, `ifwiki_url`, `source_url`, `upstream_source_url`, `port_repository_url`, and `license_url`. It does not write package files, download assets, download story files, or publish packages. Responses include stable review flags:
 
 ```json
 {
@@ -154,7 +154,7 @@ The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `if
 }
 ```
 
-For this phase, only IF Archive normalization is functional. Other supplied URLs are reported as `stored/reference only` with lookup not implemented yet.
+`remote_fetches` is `true` only when an IFDB API lookup was attempted. IFWiki, source, repository, and license URLs are reported as `stored/reference only` with lookup not implemented yet.
 
 Accepted IF Archive inputs normalize to both `catalog.ifarchive.path` and `catalog.ifarchive.url`:
 
@@ -166,7 +166,18 @@ Accepted IF Archive inputs normalize to both `catalog.ifarchive.path` and `catal
 
 The helper rejects or warns about traversal segments, empty preview input, absolute filesystem paths, unsafe schemes, non-IF Archive hosts, malformed IF Archive URL paths, mismatched path/URL pairs, and ignored query strings or fragments. It does not assume the referenced file may be redistributed.
 
-The Admin2 Create Package form and metadata editor both include an `Ecosystem Metadata Preview` section. A curator can preview references, review warnings, and apply selected normalized IF Archive fields into the visible form. Applying to the metadata editor only changes the editor state; the curator must still press `Save Metadata` before `game.yaml` is written.
+Accepted IFDB inputs normalize to both `catalog.ifdb.tuid` and `catalog.ifdb.url`:
+
+| Input | Normalized TUID | Normalized URL |
+| --- | --- | --- |
+| `fft6pu91j85y4acv` | `fft6pu91j85y4acv` | `https://ifdb.org/viewgame?id=fft6pu91j85y4acv` |
+| `https://ifdb.org/viewgame?id=fft6pu91j85y4acv` | `fft6pu91j85y4acv` | `https://ifdb.org/viewgame?id=fft6pu91j85y4acv` |
+
+The IFDB helper rejects or warns about empty requested lookup input, unsafe schemes such as `javascript:`, malformed URLs, non-IFDB hosts, path traversal, IFDB URLs without an `id` parameter, implausible TUIDs, and mismatched TUID/URL pairs. It uses IFDB's official `viewgame` JSON API and does not scrape rendered HTML.
+
+Supported IFDB preview candidates may include title, author, first published, genre, language, concise description text, IFIDs, format, IFDB tags, normalized IFDB TUID/URL, and source attribution. IFDB download links are displayed as reference-only when present; TerpVault does not download those files. Descriptions are converted from IFDB HTML to concise plain text for preview and should only be applied when the curator is comfortable using that text.
+
+The Admin2 Create Package form and metadata editor both include an `Ecosystem Metadata Preview` section. A curator can preview references, review warnings, and apply selected normalized IF Archive or IFDB fields into the visible form. Applying to the metadata editor only changes the editor state; the curator must still press `Save Metadata` before `game.yaml` is written.
 
 ## Metadata Assistant roadmap
 
