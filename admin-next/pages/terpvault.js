@@ -17,7 +17,9 @@ class TerpVaultPage extends HTMLElement {
         saving: false,
         error: '',
         success: '',
-        report: null
+        report: null,
+        values: {},
+        ecosystem: this._emptyEcosystemState()
       },
       importInspect: {
         open: false,
@@ -87,7 +89,8 @@ class TerpVaultPage extends HTMLElement {
           error: '',
           success: '',
           report: null
-        }
+        },
+        ecosystem: this._emptyEcosystemState()
       }
     };
     this._renderSkeleton();
@@ -1165,6 +1168,7 @@ class TerpVaultPage extends HTMLElement {
               </div>
               ${this._createTextarea('Reference notes', 'reference_notes', 'short')}
             </details>
+            ${this._ecosystemPreviewPanel('create')}
           </fieldset>
           <fieldset>
             <legend>Core Metadata</legend>
@@ -1221,15 +1225,15 @@ class TerpVaultPage extends HTMLElement {
   }
 
   _createInput(label, name, required = false, value = '') {
-    return `<div class="field"><label>${this._esc(label)}</label><input type="text" name="${this._esc(name)}" value="${this._esc(value)}" ${required ? 'required' : ''}></div>`;
+    return `<div class="field"><label>${this._esc(label)}</label><input type="text" name="${this._esc(name)}" value="${this._esc(this._createFieldValue(name, value))}" ${required ? 'required' : ''}></div>`;
   }
 
   _createUrlInput(label, name, required = false, value = '') {
-    return `<div class="field"><label>${this._esc(label)}</label><input type="url" name="${this._esc(name)}" value="${this._esc(value)}" ${required ? 'required' : ''} placeholder="https://example.com/"></div>`;
+    return `<div class="field"><label>${this._esc(label)}</label><input type="url" name="${this._esc(name)}" value="${this._esc(this._createFieldValue(name, value))}" ${required ? 'required' : ''} placeholder="https://example.com/"></div>`;
   }
 
   _createTextarea(label, name, className = '') {
-    return `<div class="field"><label>${this._esc(label)}</label><textarea class="${this._esc(className)}" name="${this._esc(name)}"></textarea></div>`;
+    return `<div class="field"><label>${this._esc(label)}</label><textarea class="${this._esc(className)}" name="${this._esc(name)}">${this._esc(this._createFieldValue(name, ''))}</textarea></div>`;
   }
 
   _createSelect(label, name, options) {
@@ -1237,10 +1241,15 @@ class TerpVaultPage extends HTMLElement {
       <div class="field">
         <label>${this._esc(label)}</label>
         <select name="${this._esc(name)}">
-          ${options.map(([value, text]) => `<option value="${this._esc(value)}">${this._esc(text)}</option>`).join('')}
+          ${options.map(([value, text]) => `<option value="${this._esc(value)}" ${this._createFieldValue(name, '') === value ? 'selected' : ''}>${this._esc(text)}</option>`).join('')}
         </select>
       </div>
     `;
+  }
+
+  _createFieldValue(name, fallback = '') {
+    const values = this.state.create?.values || {};
+    return Object.prototype.hasOwnProperty.call(values, name) ? values[name] : fallback;
   }
 
   _createFile(label, name, accept, multiple = false) {
@@ -1481,6 +1490,14 @@ class TerpVaultPage extends HTMLElement {
       form.addEventListener('submit', event => this._createPackage(event));
     });
 
+    root.querySelectorAll('[data-action="preview-ecosystem"]').forEach(button => {
+      button.addEventListener('click', () => this._previewEcosystem(button.dataset.scope || 'create', button.dataset.slug || ''));
+    });
+
+    root.querySelectorAll('[data-action="apply-ecosystem"]').forEach(button => {
+      button.addEventListener('click', () => this._applyEcosystemPreview(button.dataset.scope || 'create'));
+    });
+
     root.querySelectorAll('[data-action="helper-doc"]').forEach(button => {
       button.addEventListener('click', () => this._loadHelperDoc(button.dataset.slug || '', button.dataset.type || ''));
     });
@@ -1547,12 +1564,12 @@ class TerpVaultPage extends HTMLElement {
   }
 
   _openCreatePackage() {
-    this.state.create = { open: true, saving: false, error: '', success: '', report: null };
+    this.state.create = { open: true, saving: false, error: '', success: '', report: null, values: {}, ecosystem: this._emptyEcosystemState() };
     this._renderLibrary();
   }
 
   _closeCreatePackage() {
-    this.state.create = { open: false, saving: false, error: '', success: '', report: null };
+    this.state.create = { open: false, saving: false, error: '', success: '', report: null, values: {}, ecosystem: this._emptyEcosystemState() };
     this._renderLibrary();
   }
 
@@ -1668,7 +1685,8 @@ class TerpVaultPage extends HTMLElement {
           media: this._mediaFromGame(game),
           feelies: this._feeliesFromGame(game),
           story: this._storyFromGame(game),
-          ifiction: this._emptyIFictionState()
+          ifiction: this._emptyIFictionState(),
+          ecosystem: this._emptyEcosystemState()
         };
       }
       this.state.importInspect = {
@@ -1699,7 +1717,16 @@ class TerpVaultPage extends HTMLElement {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    this.state.create = { open: true, saving: true, error: '', success: '', report: null };
+    const values = this._collectCreateValues(form);
+    this.state.create = {
+      ...(this.state.create || {}),
+      open: true,
+      saving: true,
+      error: '',
+      success: '',
+      report: null,
+      values
+    };
     this._renderLibrary();
 
     try {
@@ -1713,7 +1740,9 @@ class TerpVaultPage extends HTMLElement {
         saving: false,
         error: '',
         success: `Created ${slug} as a draft package. Review validation notes before publishing.`,
-        report: result
+        report: result,
+        values,
+        ecosystem: this.state.create.ecosystem || this._emptyEcosystemState()
       };
       await this._reloadManifest();
       if (slug) {
@@ -1734,7 +1763,8 @@ class TerpVaultPage extends HTMLElement {
           media: this._mediaFromGame(this._findGame(slug) || {}),
           feelies: this._feeliesFromGame(this._findGame(slug) || {}),
           story: this._storyFromGame(this._findGame(slug) || {}),
-          ifiction: this._emptyIFictionState()
+          ifiction: this._emptyIFictionState(),
+          ecosystem: this._emptyEcosystemState()
         };
         await this._loadHelperDoc(slug, 'how-to-play', false);
         await this._loadStory(slug, false);
@@ -1747,11 +1777,179 @@ class TerpVaultPage extends HTMLElement {
         saving: false,
         error: error.message || String(error),
         success: '',
-        report: null
+        report: null,
+        values,
+        ecosystem: this.state.create.ecosystem || this._emptyEcosystemState()
       };
     }
 
     this._renderLibrary();
+  }
+
+  async _previewEcosystem(scope, slug = '') {
+    const normalizedScope = scope === 'editor' ? 'editor' : 'create';
+    const payload = this._ecosystemPayloadFromPage(normalizedScope);
+    if (normalizedScope === 'create') {
+      const form = this.shadowRoot.querySelector('form[data-create-package]');
+      this.state.create = {
+        ...(this.state.create || {}),
+        values: form ? this._collectCreateValues(form) : (this.state.create.values || {}),
+        ecosystem: {
+          ...(this.state.create.ecosystem || this._emptyEcosystemState()),
+          loading: true,
+          error: '',
+          success: '',
+          report: null
+        }
+      };
+    } else {
+      const form = this.shadowRoot.querySelector('form[data-editor-slug]');
+      this.state.editor = {
+        ...(this.state.editor || {}),
+        values: form ? this._collectEditorValues(form) : this.state.editor.values,
+        ecosystem: {
+          ...(this.state.editor.ecosystem || this._emptyEcosystemState()),
+          loading: true,
+          error: '',
+          success: '',
+          report: null
+        }
+      };
+    }
+    this._renderLibrary();
+
+    try {
+      const report = await this._requestJson(this._ecosystemPreviewApiUrl(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const message = report.ok
+        ? 'Ecosystem metadata preview is ready. Review warnings before applying normalized fields.'
+        : 'Ecosystem metadata preview returned warnings or errors. No fields were applied.';
+      this._setEcosystemState(normalizedScope, {
+        loading: false,
+        applying: false,
+        error: '',
+        success: message,
+        report
+      });
+    } catch (error) {
+      this._setEcosystemState(normalizedScope, {
+        loading: false,
+        applying: false,
+        error: error.message || String(error),
+        success: '',
+        report: null
+      });
+    }
+
+    this._renderLibrary();
+  }
+
+  _applyEcosystemPreview(scope) {
+    const normalizedScope = scope === 'editor' ? 'editor' : 'create';
+    const state = normalizedScope === 'editor'
+      ? (this.state.editor.ecosystem || this._emptyEcosystemState())
+      : (this.state.create.ecosystem || this._emptyEcosystemState());
+    const ifArchive = state.report?.ifarchive || {};
+    const applyRoot = this.shadowRoot.querySelector(`[data-ecosystem-apply-scope="${normalizedScope}"]`);
+    const applyPath = Boolean(applyRoot?.querySelector('[data-ecosystem-field="path"]')?.checked);
+    const applyUrl = Boolean(applyRoot?.querySelector('[data-ecosystem-field="url"]')?.checked);
+    if ((!applyPath && !applyUrl) || (!ifArchive.path && !ifArchive.url)) {
+      this._setEcosystemState(normalizedScope, {
+        ...state,
+        error: 'Select at least one normalized IF Archive field to apply.',
+        success: ''
+      });
+      this._renderLibrary();
+      return;
+    }
+
+    if (normalizedScope === 'create') {
+      const form = this.shadowRoot.querySelector('form[data-create-package]');
+      const values = form ? this._collectCreateValues(form) : { ...(this.state.create.values || {}) };
+      if (applyPath) {
+        values.ifarchive_path = ifArchive.path || '';
+      }
+      if (applyUrl) {
+        values.ifarchive_url = ifArchive.url || '';
+      }
+      this.state.create = {
+        ...(this.state.create || {}),
+        values,
+        ecosystem: {
+          ...state,
+          error: '',
+          success: 'Selected IF Archive fields were applied to the Create Package form. Review before creating the draft package.'
+        }
+      };
+    } else {
+      const editorForm = this.shadowRoot.querySelector('form[data-editor-slug]');
+      const values = editorForm ? this._collectEditorValues(editorForm) : { ...(this.state.editor.values || {}) };
+      if (applyPath) {
+        this._set(values, 'catalog.ifarchive.path', ifArchive.path || '');
+      }
+      if (applyUrl) {
+        this._set(values, 'catalog.ifarchive.url', ifArchive.url || '');
+      }
+      this.state.editor = {
+        ...(this.state.editor || {}),
+        values,
+        ecosystem: {
+          ...state,
+          error: '',
+          success: 'Selected IF Archive fields were applied to the metadata editor. Save Metadata is still required to write game.yaml.'
+        }
+      };
+    }
+
+    this._renderLibrary();
+  }
+
+  _setEcosystemState(scope, ecosystem) {
+    if (scope === 'editor') {
+      this.state.editor = {
+        ...(this.state.editor || {}),
+        ecosystem
+      };
+      return;
+    }
+
+    this.state.create = {
+      ...(this.state.create || {}),
+      ecosystem
+    };
+  }
+
+  _ecosystemPayloadFromPage(scope) {
+    if (scope === 'editor') {
+      const form = this.shadowRoot.querySelector('form[data-editor-slug]');
+      const values = form ? this._collectEditorValues(form) : (this.state.editor.values || {});
+      return {
+        ifarchive_path: this._get(values, 'catalog.ifarchive.path'),
+        ifarchive_url: this._get(values, 'catalog.ifarchive.url'),
+        ifdb_url: this._get(values, 'catalog.ifdb.url'),
+        ifwiki_url: this._get(values, 'catalog.ifwiki.url'),
+        source_url: this._get(values, 'release.source.url'),
+        upstream_source_url: this._get(values, 'release.source.upstream.url'),
+        port_repository_url: this._get(values, 'release.source.port_repository.url'),
+        license_url: this._get(values, 'release.license.url')
+      };
+    }
+
+    const form = this.shadowRoot.querySelector('form[data-create-package]');
+    const values = form ? this._collectCreateValues(form) : (this.state.create.values || {});
+    return {
+      ifarchive_path: values.ifarchive_path || '',
+      ifarchive_url: values.ifarchive_url || '',
+      ifdb_url: values.ifdb_url || '',
+      ifwiki_url: values.ifwiki_url || '',
+      source_url: values.source_url || '',
+      upstream_source_url: values.upstream_source_url || '',
+      port_repository_url: values.port_repository_url || '',
+      license_url: values.license_url || ''
+    };
   }
 
   async _openEditor(slug) {
@@ -1775,7 +1973,8 @@ class TerpVaultPage extends HTMLElement {
       media: this._mediaFromGame(game || {}),
       feelies: this._feeliesFromGame(game || {}),
       story: this._storyFromGame(game || {}),
-      ifiction: this._emptyIFictionState()
+      ifiction: this._emptyIFictionState(),
+      ecosystem: this._emptyEcosystemState()
     };
     localStorage.setItem(`terpvault.admin.open.${slug}`, '1');
     this._renderLibrary();
@@ -1830,7 +2029,8 @@ class TerpVaultPage extends HTMLElement {
       media: this._emptyMediaState(),
       feelies: this._emptyFeeliesState(),
       story: this._emptyStoryState(),
-      ifiction: this._emptyIFictionState()
+      ifiction: this._emptyIFictionState(),
+      ecosystem: this._emptyEcosystemState()
     };
     this._renderLibrary();
   }
@@ -2903,6 +3103,7 @@ class TerpVaultPage extends HTMLElement {
             <button class="button primary" type="submit" ${editor.loading || editor.saving ? 'disabled' : ''}>${editor.saving ? 'Saving...' : 'Save Metadata'}</button>
           </div>
         </form>
+        ${this._ecosystemPreviewPanel('editor', slug)}
         ${this._ifictionPreviewPanel(slug)}
         ${this._storyPanel(game, slug)}
         ${this._mediaPanel(game, slug)}
@@ -2910,6 +3111,71 @@ class TerpVaultPage extends HTMLElement {
         ${this._helperDocsPanel(slug)}
       </div>
     `;
+  }
+
+  _ecosystemPreviewPanel(scope, slug = '') {
+    const state = scope === 'editor'
+      ? (this.state.editor.ecosystem || this._emptyEcosystemState())
+      : (this.state.create.ecosystem || this._emptyEcosystemState());
+    const report = state.report || null;
+    const ifArchive = report?.ifarchive || null;
+    const hasNormalizedIFArchive = Boolean(ifArchive?.path || ifArchive?.url);
+    const references = report?.references && typeof report.references === 'object' ? report.references : {};
+    const disabled = Boolean(state.loading || state.applying);
+    const contextLabel = scope === 'editor' ? 'metadata editor' : 'Create Package form';
+
+    return `
+      <section class="story-manager ecosystem-preview" data-ecosystem-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''}>
+        <h3>Ecosystem Metadata Preview</h3>
+        <p class="meta">Reference only. Curator review required. URL presence does not prove redistribution rights.</p>
+        <p class="meta">This helper normalizes IF Archive URL/path metadata only. IFDB, IFWiki, source, repository, and license URLs are kept as stored references; lookup is not implemented yet.</p>
+        ${state.loading ? '<div class="message">Previewing ecosystem references...</div>' : ''}
+        ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
+        ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
+        <div class="form-actions">
+          <button class="button" type="button" data-action="preview-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>${state.loading ? 'Previewing...' : 'Preview Ecosystem Metadata'}</button>
+        </div>
+        ${report ? `
+          <div class="box" style="margin-top:.85rem;">
+            <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
+              <span class="badge ${report.ok ? 'ok' : 'warn'}">${report.ok ? 'preview ready' : 'review warnings'}</span>
+              <span class="badge ok">no writes</span>
+              <span class="badge ok">no remote fetches</span>
+              <span class="badge warn">draft/review only</span>
+            </div>
+            ${hasNormalizedIFArchive ? `
+              <dl>
+                <dt>IF Archive path</dt><dd><code>${this._esc(ifArchive.path || '')}</code></dd>
+                <dt>IF Archive URL</dt><dd><code>${this._esc(ifArchive.url || '')}</code></dd>
+              </dl>
+              <div data-ecosystem-apply-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''} style="margin-top:.75rem;">
+                <div class="checkbox">
+                  <input type="checkbox" name="catalog.ifarchive.path" data-ecosystem-field="path" checked>
+                  <label>Apply normalized IF Archive path to ${this._esc(contextLabel)}</label>
+                </div>
+                <div class="checkbox">
+                  <input type="checkbox" name="catalog.ifarchive.url" data-ecosystem-field="url" checked>
+                  <label>Apply normalized IF Archive URL to ${this._esc(contextLabel)}</label>
+                </div>
+                <div class="form-actions">
+                  <button class="button primary" type="button" data-action="apply-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>Apply Selected IF Archive Fields</button>
+                </div>
+              </div>
+            ` : '<p class="meta">No normalized IF Archive values are available from this preview.</p>'}
+            ${Object.keys(references).length ? this._ecosystemReferenceList(references) : ''}
+            ${this._reportList('Preview errors', report.errors || [], 'error', false)}
+            ${this._reportList('Preview warnings', report.warnings || [], 'warn', false)}
+          </div>
+        ` : ''}
+      </section>
+    `;
+  }
+
+  _ecosystemReferenceList(references) {
+    const rows = Object.entries(references).map(([, reference]) => {
+      return `<div class="provenance-item"><span>${this._esc(reference.label || 'Reference')}</span><code>${this._esc(reference.value || '')}</code><p class="meta">${this._esc(reference.status || 'stored/reference only')}</p></div>`;
+    });
+    return rows.length ? `<div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div>` : '';
   }
 
   _storyPanel(game, slug) {
@@ -3408,6 +3674,18 @@ class TerpVaultPage extends HTMLElement {
     return metadata;
   }
 
+  _collectCreateValues(form) {
+    const values = {};
+    new FormData(form).forEach((value, name) => {
+      if (value instanceof File) {
+        return;
+      }
+      values[String(name)] = String(value);
+    });
+
+    return values;
+  }
+
   _collectFeelies(form) {
     const rows = [];
     new FormData(form).forEach((value, name) => {
@@ -3556,6 +3834,10 @@ class TerpVaultPage extends HTMLElement {
 
   _packagesApiUrl() {
     return `${this._apiBase()}/terpvault/packages`;
+  }
+
+  _ecosystemPreviewApiUrl() {
+    return `${this._apiBase()}/terpvault/ecosystem/preview`;
   }
 
   _exportApiUrl(slug) {
@@ -3794,6 +4076,16 @@ class TerpVaultPage extends HTMLElement {
     return {
       loading: false,
       uploading: false,
+      applying: false,
+      error: '',
+      success: '',
+      report: null
+    };
+  }
+
+  _emptyEcosystemState() {
+    return {
+      loading: false,
       applying: false,
       error: '',
       success: '',

@@ -397,6 +397,17 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 
 Reference links are evidence for curator review, not permission by themselves. Use `catalog.*` for IF ecosystem catalog context, `release.source.*` for package/story/source provenance, and `references[]` for supporting or reference-only material. Do not collapse canonical upstream, port repository, catalog context, and historical references into one undifferentiated URL.
 
+For IF Archive references, new create/edit workflows normalize path and URL as a pair. A curator may enter a full URL such as `https://ifarchive.org/if-archive/games/zcode/Advent.z5`, a prefixed path such as `if-archive/games/zcode/Advent.z5`, or a bare archive path such as `games/zcode/Advent.z5`. TerpVault stores:
+
+```yaml
+catalog:
+  ifarchive:
+    path: games/zcode/Advent.z5
+    url: https://ifarchive.org/if-archive/games/zcode/Advent.z5
+```
+
+IF Archive normalization is metadata-only. It rejects traversal, absolute filesystem paths, unsafe schemes, non-IF Archive URL hosts, malformed `/if-archive/` paths, and mismatched path/URL pairs. It does not download the referenced story file and does not prove redistribution rights.
+
 `metadata.iFiction.xml` is included in package zip export/import payloads when present. Admin2 can show whether the XML is present, report XML presence during import inspection, upload or replace the package-root XML file, preview a conservative subset of local iFiction XML fields, and apply explicitly selected supported fields into `game.yaml`. TerpVault does not edit XML contents in place.
 
 When `identification.format` is blank, TerpVault may infer a normalized package format from strong local evidence such as IFID prefixes, story-file extension, or declared player engine/runtime. Curator-supplied non-empty format values should be preserved rather than overwritten. Admin2 also uses defensive format inference for library search, sort, and filters so packages with blank format fields can still appear under the right format family.
@@ -406,9 +417,10 @@ Current metadata workflow limits:
 - Admin2 can upload or replace `metadata.iFiction.xml`, but upload writes only the package-root XML file and does not apply fields automatically.
 - Package creation creates `game.yaml`, optional local helper Markdown/resources, optional package-root `metadata.iFiction.xml`, and the initial story file. iFiction fields are still not applied to `game.yaml` automatically.
 - Import preserves accepted `metadata.iFiction.xml` files and reports their presence during inspection, but import commit does not use the XML to prefill or merge `game.yaml`.
-- Remote IFDB, IFWiki, IF Archive, or catalog metadata lookup is not implemented.
+- Admin2 can preview curator-supplied ecosystem references and normalize IF Archive path/URL metadata without remote fetches or writes.
+- Remote IFDB, IFWiki, IF Archive file download, or catalog metadata lookup is not implemented.
 
-Future Metadata Assistant work should stay explicit and preview-driven. It may compare current `game.yaml` values with package-local or manually uploaded iFiction XML and, later, explicit IFDB/IFWiki/IF Archive lookup candidates. Curators should see side-by-side current/candidate values, select fields one by one, and receive a `game.yaml` backup before changes are applied. Metadata import should remain separate from story-file/package download, and provenance/license review should remain visible.
+Future Metadata Assistant work should stay explicit and preview-driven. It may compare current `game.yaml` values with package-local or manually uploaded iFiction XML, current IF Archive normalized values, and later explicit IFDB/IFWiki lookup candidates. Curators should see side-by-side current/candidate values, select fields one by one, and receive a `game.yaml` backup before changes are applied. Metadata import should remain separate from story-file/package download, and provenance/license review should remain visible.
 
 Future metadata source providers should be defined on the back end before remote lookup ships. Provider definitions should include a provider id, display label, enabled/disabled state, lookup method/type, base URL or API endpoint where applicable, rate-limit/caching notes, attribution/license notes, field mapping rules, and confidence/scoring notes. Remote provider lookup must be an explicit admin action and should never run automatically during import or package creation.
 
