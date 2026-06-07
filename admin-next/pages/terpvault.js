@@ -248,6 +248,14 @@ class TerpVaultPage extends HTMLElement {
         .provenance-item { border:1px solid rgba(127,127,127,.2); border-radius:10px; padding:.55rem; }
         .provenance-item span { display:block; opacity:.68; font-size:.75rem; text-transform:uppercase; }
         .provenance-item a { color:inherit; overflow-wrap:anywhere; }
+        .ecosystem-report { display:grid; gap:.85rem; margin-top:.85rem; }
+        .ecosystem-apply { display:grid; gap:.85rem; min-width:0; }
+        .preview-card-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:.65rem; align-items:stretch; }
+        .preview-card { display:grid; align-content:start; gap:.35rem; min-width:0; }
+        .preview-card code { display:block; overflow-wrap:anywhere; white-space:pre-wrap; }
+        .preview-card .checkbox { margin-top:.45rem; }
+        .preview-section { display:grid; gap:.55rem; min-width:0; }
+        .preview-section h4 { margin:.15rem 0 0; }
         .editor { border-top:1px solid rgba(127,127,127,.18); padding:1rem; background:rgba(127,127,127,.035); }
         .editor-head { display:flex; gap:.75rem; align-items:flex-start; justify-content:space-between; margin-bottom:.8rem; }
         .editor-head h3 { margin:0 0 .15rem; }
@@ -3351,7 +3359,7 @@ class TerpVaultPage extends HTMLElement {
           <button class="button" type="button" data-action="preview-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>${state.loading ? 'Previewing...' : 'Preview Ecosystem Metadata'}</button>
         </div>
         ${report ? `
-          <div class="box" style="margin-top:.85rem;">
+          <div class="box ecosystem-report">
             <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
               <span class="badge ${report.ok ? 'ok' : 'warn'}">${report.ok ? 'preview ready' : 'review warnings'}</span>
               <span class="badge ok">no writes</span>
@@ -3359,20 +3367,28 @@ class TerpVaultPage extends HTMLElement {
               <span class="badge warn">draft/review only</span>
               <span class="badge">IFWiki reference only</span>
             </div>
-            <div data-ecosystem-apply-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''} style="margin-top:.75rem;">
+            <div class="ecosystem-apply" data-ecosystem-apply-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''}>
               ${hasNormalizedIFArchive ? `
-                <h4>IF Archive</h4>
-                <dl>
-                  <dt>IF Archive path</dt><dd><code>${this._esc(ifArchive.path || '')}</code></dd>
-                  <dt>IF Archive URL</dt><dd><code>${this._esc(ifArchive.url || '')}</code></dd>
-                </dl>
-                <div class="checkbox">
-                  <input type="checkbox" name="catalog.ifarchive.path" data-ecosystem-field="path" checked>
-                  <label>Apply normalized IF Archive path to ${this._esc(contextLabel)}</label>
-                </div>
-                <div class="checkbox">
-                  <input type="checkbox" name="catalog.ifarchive.url" data-ecosystem-field="url" checked>
-                  <label>Apply normalized IF Archive URL to ${this._esc(contextLabel)}</label>
+                <div class="preview-section">
+                  <h4>IF Archive</h4>
+                  <div class="preview-card-grid">
+                    <div class="provenance-item preview-card">
+                      <span>Normalized path</span>
+                      <code>${this._esc(ifArchive.path || '')}</code>
+                      <div class="checkbox">
+                        <input type="checkbox" name="catalog.ifarchive.path" data-ecosystem-field="path" checked>
+                        <label>Apply path to ${this._esc(contextLabel)}</label>
+                      </div>
+                    </div>
+                    <div class="provenance-item preview-card">
+                      <span>Normalized URL</span>
+                      <code>${this._esc(ifArchive.url || '')}</code>
+                      <div class="checkbox">
+                        <input type="checkbox" name="catalog.ifarchive.url" data-ecosystem-field="url" checked>
+                        <label>Apply URL to ${this._esc(contextLabel)}</label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ` : '<p class="meta">No normalized IF Archive values are available from this preview.</p>'}
               ${hasIFDBPreview ? this._ifdbPreviewPanel(ifdb, contextLabel) : '<p class="meta">No IFDB lookup results are available from this preview.</p>'}
@@ -3395,7 +3411,7 @@ class TerpVaultPage extends HTMLElement {
     const downloads = Array.isArray(ifdb?.downloads_reference_only) ? ifdb.downloads_reference_only : [];
     const sources = Array.isArray(ifdb?.sources) ? ifdb.sources : [];
     return `
-      <div style="margin-top:1rem;">
+      <div class="preview-section">
         <h4>IFDB</h4>
         <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
           <span class="badge ${ifdb?.ok === false ? 'warn' : 'ok'}">${ifdb?.ok === false ? 'lookup warning' : 'lookup ready'}</span>
@@ -3408,9 +3424,9 @@ class TerpVaultPage extends HTMLElement {
           ${ifdb?.api_url ? `<dt>API source</dt><dd><code>${this._esc(ifdb.api_url)}</code></dd>` : ''}
         </dl>
         ${fields.length ? `
-          <div class="provenance" style="margin-top:.75rem;">
+          <div class="preview-card-grid">
             ${fields.map((field, index) => `
-              <div class="provenance-item">
+              <div class="provenance-item preview-card">
                 <span>${this._esc(field.label || field.path || 'IFDB field')}</span>
                 <code>${this._esc(field.path || '')}</code>
                 <p class="meta">${this._esc(this._previewFieldValue(field.value))}</p>
@@ -3425,9 +3441,9 @@ class TerpVaultPage extends HTMLElement {
         ${downloads.length ? `
           <details class="review-notes" style="margin-top:.75rem;">
             <summary>IFDB download references (${downloads.length})</summary>
-            <div class="provenance" style="margin-top:.75rem;">
+            <div class="preview-card-grid" style="margin-top:.75rem;">
             ${downloads.map(item => `
-              <div class="provenance-item">
+              <div class="provenance-item preview-card">
                 <span>${this._esc(item.title || 'Download reference')}</span>
                 <code>${this._esc(item.url || '')}</code>
                 <p class="meta">${this._esc(item.status || 'reference only; not downloaded')}${item.format ? ` - ${this._esc(item.format)}` : ''}</p>
@@ -3443,12 +3459,12 @@ class TerpVaultPage extends HTMLElement {
 
   _ecosystemSourceList(sources, collapsed = false) {
     const rows = sources.map(source => {
-      return `<div class="provenance-item"><span>${this._esc(source.label || 'Source')}</span><code>${this._esc(source.url || '')}</code><p class="meta">${this._esc(source.type || 'reference')}</p></div>`;
+      return `<div class="provenance-item preview-card"><span>${this._esc(source.label || 'Source')}</span><code>${this._esc(source.url || '')}</code><p class="meta">${this._esc(source.type || 'reference')}</p></div>`;
     });
     if (!rows.length) {
       return '';
     }
-    const body = `<div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div>`;
+    const body = `<div class="preview-card-grid" style="margin-top:.75rem;">${rows.join('')}</div>`;
     return collapsed
       ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Source attribution (${rows.length})</summary>${body}</details>`
       : body;
@@ -3463,10 +3479,10 @@ class TerpVaultPage extends HTMLElement {
     const rows = Object.entries(references).map(([key, reference]) => {
       const label = reference.label || 'Reference';
       const status = this._ecosystemReferenceStatus(key, reference);
-      return `<div class="provenance-item"><span>${this._esc(label)}</span><code>${this._esc(reference.value || '')}</code><p class="meta">${this._esc(status)}</p></div>`;
+      return `<div class="provenance-item preview-card"><span>${this._esc(label)}</span><code>${this._esc(reference.value || '')}</code><p class="meta">${this._esc(status)}</p></div>`;
     });
     return rows.length
-      ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Stored reference-only links (${rows.length})</summary><div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div></details>`
+      ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Stored reference-only links (${rows.length})</summary><div class="preview-card-grid" style="margin-top:.75rem;">${rows.join('')}</div></details>`
       : '';
   }
 
