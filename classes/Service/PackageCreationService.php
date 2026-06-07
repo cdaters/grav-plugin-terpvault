@@ -142,6 +142,10 @@ class PackageCreationService
             (string)($fields['ifarchive_path'] ?? ''),
             (string)($fields['ifarchive_url'] ?? '')
         );
+        $ifdb = (new EcosystemMetadataService())->requireIFDBMetadata(
+            (string)($fields['ifdb_tuid'] ?? ''),
+            (string)($fields['ifdb_url'] ?? '')
+        );
         $manifest = [
             'id' => $slug,
             'slug' => $slug,
@@ -164,7 +168,7 @@ class PackageCreationService
                 'screenshots' => [],
             ],
             'catalog' => [
-                'ifdb' => ['tuid' => $this->textField($fields, 'ifdb_tuid'), 'url' => $this->urlField($fields, 'ifdb_url', 'IFDB URL')],
+                'ifdb' => ['tuid' => $ifdb['tuid'], 'url' => $ifdb['url']],
                 'ifwiki' => ['url' => $this->urlField($fields, 'ifwiki_url', 'IFWiki URL')],
                 'ifarchive' => ['path' => $ifArchive['path'], 'url' => $ifArchive['url']],
             ],

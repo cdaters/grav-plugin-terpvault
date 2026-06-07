@@ -1133,7 +1133,7 @@ class TerpVaultPage extends HTMLElement {
         <div class="editor-head">
           <div>
             <h2>Terpwright Phase 2: Local Package Builder</h2>
-            <p class="meta">Creates a new draft package from local files and curator-supplied reference URLs. Remote IFDB, IF Archive, IFWiki, scraping, and metadata automation are not used.</p>
+            <p class="meta">Creates a new draft package from local files and curator-supplied reference URLs. IFDB preview is explicit and review-only; IF Archive file download, IFWiki lookup, scraping, and metadata automation are not used.</p>
           </div>
           <button class="button" type="button" data-action="cancel-create">Close</button>
         </div>
@@ -1788,12 +1788,17 @@ class TerpVaultPage extends HTMLElement {
 
   async _previewEcosystem(scope, slug = '') {
     const normalizedScope = scope === 'editor' ? 'editor' : 'create';
-    const payload = this._ecosystemPayloadFromPage(normalizedScope);
+    const form = normalizedScope === 'create'
+      ? this.shadowRoot.querySelector('form[data-create-package]')
+      : this.shadowRoot.querySelector('form[data-editor-slug]');
+    const values = normalizedScope === 'create'
+      ? (form ? this._collectCreateValues(form) : (this.state.create.values || {}))
+      : (form ? this._collectEditorValues(form) : (this.state.editor.values || {}));
+    const payload = this._ecosystemPayloadFromValues(normalizedScope, values);
     if (normalizedScope === 'create') {
-      const form = this.shadowRoot.querySelector('form[data-create-package]');
       this.state.create = {
         ...(this.state.create || {}),
-        values: form ? this._collectCreateValues(form) : (this.state.create.values || {}),
+        values,
         ecosystem: {
           ...(this.state.create.ecosystem || this._emptyEcosystemState()),
           loading: true,
@@ -1803,10 +1808,9 @@ class TerpVaultPage extends HTMLElement {
         }
       };
     } else {
-      const form = this.shadowRoot.querySelector('form[data-editor-slug]');
       this.state.editor = {
         ...(this.state.editor || {}),
-        values: form ? this._collectEditorValues(form) : this.state.editor.values,
+        values,
         ecosystem: {
           ...(this.state.editor.ecosystem || this._emptyEcosystemState()),
           loading: true,
@@ -1825,7 +1829,7 @@ class TerpVaultPage extends HTMLElement {
         body: JSON.stringify(payload)
       });
       const message = report.ok
-        ? 'Ecosystem metadata preview is ready. Review warnings before applying normalized fields.'
+        ? 'Ecosystem metadata preview is ready. Review notes are grouped below.'
         : 'Ecosystem metadata preview returned warnings or errors. No fields were applied.';
       this._setEcosystemState(normalizedScope, {
         loading: false,
@@ -1853,13 +1857,17 @@ class TerpVaultPage extends HTMLElement {
       ? (this.state.editor.ecosystem || this._emptyEcosystemState())
       : (this.state.create.ecosystem || this._emptyEcosystemState());
     const ifArchive = state.report?.ifarchive || {};
+    const ifdbFields = Array.isArray(state.report?.ifdb?.fields) ? state.report.ifdb.fields : [];
     const applyRoot = this.shadowRoot.querySelector(`[data-ecosystem-apply-scope="${normalizedScope}"]`);
     const applyPath = Boolean(applyRoot?.querySelector('[data-ecosystem-field="path"]')?.checked);
     const applyUrl = Boolean(applyRoot?.querySelector('[data-ecosystem-field="url"]')?.checked);
-    if ((!applyPath && !applyUrl) || (!ifArchive.path && !ifArchive.url)) {
+    const selectedIfdbFields = Array.from(applyRoot?.querySelectorAll('[data-ifdb-field]:checked') || [])
+      .map(input => ifdbFields[Number(input.dataset.ifdbField)])
+      .filter(field => field && field.path);
+    if ((!applyPath && !applyUrl && !selectedIfdbFields.length) || ((applyPath || applyUrl) && !ifArchive.path && !ifArchive.url && !selectedIfdbFields.length)) {
       this._setEcosystemState(normalizedScope, {
         ...state,
-        error: 'Select at least one normalized IF Archive field to apply.',
+        error: 'Select at least one normalized ecosystem field to apply.',
         success: ''
       });
       this._renderLibrary();
@@ -1875,13 +1883,14 @@ class TerpVaultPage extends HTMLElement {
       if (applyUrl) {
         values.ifarchive_url = ifArchive.url || '';
       }
+      selectedIfdbFields.forEach(field => this._applyIFDBPreviewField(values, field, 'create'));
       this.state.create = {
         ...(this.state.create || {}),
         values,
         ecosystem: {
           ...state,
           error: '',
-          success: 'Selected IF Archive fields were applied to the Create Package form. Review before creating the draft package.'
+          success: 'Selected ecosystem fields were applied to the Create Package form. Review before creating the draft package.'
         }
       };
     } else {
@@ -1893,18 +1902,55 @@ class TerpVaultPage extends HTMLElement {
       if (applyUrl) {
         this._set(values, 'catalog.ifarchive.url', ifArchive.url || '');
       }
+      selectedIfdbFields.forEach(field => this._applyIFDBPreviewField(values, field, 'editor'));
       this.state.editor = {
         ...(this.state.editor || {}),
         values,
         ecosystem: {
           ...state,
           error: '',
-          success: 'Selected IF Archive fields were applied to the metadata editor. Save Metadata is still required to write game.yaml.'
+          success: 'Selected ecosystem fields were applied to the metadata editor. Save Metadata is still required to write game.yaml.'
         }
       };
     }
 
     this._renderLibrary();
+  }
+
+  _applyIFDBPreviewField(values, field, scope) {
+    const path = String(field.path || '');
+    let value = field.value;
+    if (Array.isArray(value)) {
+      value = value.map(item => String(item || '').trim()).filter(Boolean);
+    } else {
+      value = String(value || '').trim();
+    }
+
+    if (scope === 'create') {
+      const createMap = {
+        'catalog.ifdb.tuid': 'ifdb_tuid',
+        'catalog.ifdb.url': 'ifdb_url',
+        'bibliographic.title': 'title',
+        'bibliographic.author': 'author',
+        'bibliographic.headline': 'headline',
+        'bibliographic.first_published': 'first_published',
+        'bibliographic.genre': 'genre',
+        'bibliographic.language': 'language',
+        'bibliographic.description': 'description',
+        'identification.format': 'format',
+        'identification.ifids': 'ifid',
+        'tags': 'tags'
+      };
+      const target = createMap[path];
+      if (!target) {
+        return;
+      }
+      values[target] = Array.isArray(value) ? value.join('\n') : value;
+      return;
+    }
+
+    const targetPath = path === 'tags' ? 'terpvault.tags' : path;
+    this._set(values, targetPath, value);
   }
 
   _setEcosystemState(scope, ecosystem) {
@@ -1926,9 +1972,20 @@ class TerpVaultPage extends HTMLElement {
     if (scope === 'editor') {
       const form = this.shadowRoot.querySelector('form[data-editor-slug]');
       const values = form ? this._collectEditorValues(form) : (this.state.editor.values || {});
+      return this._ecosystemPayloadFromValues(scope, values);
+    }
+
+    const form = this.shadowRoot.querySelector('form[data-create-package]');
+    const values = form ? this._collectCreateValues(form) : (this.state.create.values || {});
+    return this._ecosystemPayloadFromValues(scope, values);
+  }
+
+  _ecosystemPayloadFromValues(scope, values) {
+    if (scope === 'editor') {
       return {
         ifarchive_path: this._get(values, 'catalog.ifarchive.path'),
         ifarchive_url: this._get(values, 'catalog.ifarchive.url'),
+        ifdb_tuid: this._get(values, 'catalog.ifdb.tuid'),
         ifdb_url: this._get(values, 'catalog.ifdb.url'),
         ifwiki_url: this._get(values, 'catalog.ifwiki.url'),
         source_url: this._get(values, 'release.source.url'),
@@ -1938,11 +1995,10 @@ class TerpVaultPage extends HTMLElement {
       };
     }
 
-    const form = this.shadowRoot.querySelector('form[data-create-package]');
-    const values = form ? this._collectCreateValues(form) : (this.state.create.values || {});
     return {
       ifarchive_path: values.ifarchive_path || '',
       ifarchive_url: values.ifarchive_url || '',
+      ifdb_tuid: values.ifdb_tuid || '',
       ifdb_url: values.ifdb_url || '',
       ifwiki_url: values.ifwiki_url || '',
       source_url: values.source_url || '',
@@ -2039,7 +2095,7 @@ class TerpVaultPage extends HTMLElement {
     event.preventDefault();
     const form = event.currentTarget;
     const slug = form.dataset.editorSlug || this.state.editingSlug;
-    const metadata = this._collectEditorValues(form);
+    const metadata = this._mergeObjects(this.state.editor.values || {}, this._collectEditorValues(form));
 
     this.state.editor = {
       ...this.state.editor,
@@ -3119,16 +3175,18 @@ class TerpVaultPage extends HTMLElement {
       : (this.state.create.ecosystem || this._emptyEcosystemState());
     const report = state.report || null;
     const ifArchive = report?.ifarchive || null;
+    const ifdb = report?.ifdb || null;
     const hasNormalizedIFArchive = Boolean(ifArchive?.path || ifArchive?.url);
     const references = report?.references && typeof report.references === 'object' ? report.references : {};
     const disabled = Boolean(state.loading || state.applying);
     const contextLabel = scope === 'editor' ? 'metadata editor' : 'Create Package form';
+    const hasIFDBPreview = Boolean(ifdb?.tuid || ifdb?.url || (Array.isArray(ifdb?.fields) && ifdb.fields.length));
 
     return `
       <section class="story-manager ecosystem-preview" data-ecosystem-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''}>
         <h3>Ecosystem Metadata Preview</h3>
         <p class="meta">Reference only. Curator review required. URL presence does not prove redistribution rights.</p>
-        <p class="meta">This helper normalizes IF Archive URL/path metadata only. IFDB, IFWiki, source, repository, and license URLs are kept as stored references; lookup is not implemented yet.</p>
+        <p class="meta">This helper normalizes IF Archive metadata and previews IFDB catalog metadata through the official IFDB API. It does not download story files, covers, screenshots, maps, walkthroughs, or hints.</p>
         ${state.loading ? '<div class="message">Previewing ecosystem references...</div>' : ''}
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
         ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
@@ -3140,15 +3198,16 @@ class TerpVaultPage extends HTMLElement {
             <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
               <span class="badge ${report.ok ? 'ok' : 'warn'}">${report.ok ? 'preview ready' : 'review warnings'}</span>
               <span class="badge ok">no writes</span>
-              <span class="badge ok">no remote fetches</span>
+              <span class="badge ${report.remote_fetches ? 'warn' : 'ok'}">${report.remote_fetches ? 'remote IFDB fetch' : 'no remote fetches'}</span>
               <span class="badge warn">draft/review only</span>
             </div>
-            ${hasNormalizedIFArchive ? `
-              <dl>
-                <dt>IF Archive path</dt><dd><code>${this._esc(ifArchive.path || '')}</code></dd>
-                <dt>IF Archive URL</dt><dd><code>${this._esc(ifArchive.url || '')}</code></dd>
-              </dl>
-              <div data-ecosystem-apply-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''} style="margin-top:.75rem;">
+            <div data-ecosystem-apply-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''} style="margin-top:.75rem;">
+              ${hasNormalizedIFArchive ? `
+                <h4>IF Archive</h4>
+                <dl>
+                  <dt>IF Archive path</dt><dd><code>${this._esc(ifArchive.path || '')}</code></dd>
+                  <dt>IF Archive URL</dt><dd><code>${this._esc(ifArchive.url || '')}</code></dd>
+                </dl>
                 <div class="checkbox">
                   <input type="checkbox" name="catalog.ifarchive.path" data-ecosystem-field="path" checked>
                   <label>Apply normalized IF Archive path to ${this._esc(contextLabel)}</label>
@@ -3157,25 +3216,111 @@ class TerpVaultPage extends HTMLElement {
                   <input type="checkbox" name="catalog.ifarchive.url" data-ecosystem-field="url" checked>
                   <label>Apply normalized IF Archive URL to ${this._esc(contextLabel)}</label>
                 </div>
-                <div class="form-actions">
-                  <button class="button primary" type="button" data-action="apply-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>Apply Selected IF Archive Fields</button>
-                </div>
+              ` : '<p class="meta">No normalized IF Archive values are available from this preview.</p>'}
+              ${hasIFDBPreview ? this._ifdbPreviewPanel(ifdb, contextLabel) : '<p class="meta">No IFDB lookup results are available from this preview.</p>'}
+              <div class="form-actions">
+                <button class="button primary" type="button" data-action="apply-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>Apply Selected Ecosystem Fields</button>
               </div>
-            ` : '<p class="meta">No normalized IF Archive values are available from this preview.</p>'}
+            </div>
             ${Object.keys(references).length ? this._ecosystemReferenceList(references) : ''}
             ${this._reportList('Preview errors', report.errors || [], 'error', false)}
-            ${this._reportList('Preview warnings', report.warnings || [], 'warn', false)}
+            ${this._reviewNotesDetails('Warnings & review notes', report.warnings || [], 'warn')}
           </div>
         ` : ''}
       </section>
     `;
   }
 
+  _ifdbPreviewPanel(ifdb, contextLabel) {
+    const fields = Array.isArray(ifdb?.fields) ? ifdb.fields : [];
+    const downloads = Array.isArray(ifdb?.downloads_reference_only) ? ifdb.downloads_reference_only : [];
+    const sources = Array.isArray(ifdb?.sources) ? ifdb.sources : [];
+    return `
+      <div style="margin-top:1rem;">
+        <h4>IFDB</h4>
+        <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
+          <span class="badge ${ifdb?.ok === false ? 'warn' : 'ok'}">${ifdb?.ok === false ? 'lookup warning' : 'lookup ready'}</span>
+          <span class="badge warn">reference only</span>
+          <span class="badge warn">rights not proven</span>
+        </div>
+        <dl>
+          <dt>IFDB TUID</dt><dd><code>${this._esc(ifdb?.tuid || '')}</code></dd>
+          <dt>IFDB URL</dt><dd><code>${this._esc(ifdb?.url || '')}</code></dd>
+          ${ifdb?.api_url ? `<dt>API source</dt><dd><code>${this._esc(ifdb.api_url)}</code></dd>` : ''}
+        </dl>
+        ${fields.length ? `
+          <div class="provenance" style="margin-top:.75rem;">
+            ${fields.map((field, index) => `
+              <div class="provenance-item">
+                <span>${this._esc(field.label || field.path || 'IFDB field')}</span>
+                <code>${this._esc(field.path || '')}</code>
+                <p class="meta">${this._esc(this._previewFieldValue(field.value))}</p>
+                <div class="checkbox">
+                  <input type="checkbox" data-ifdb-field="${index}" ${String(field.path || '').startsWith('catalog.ifdb.') ? 'checked' : ''}>
+                  <label>Apply to ${this._esc(contextLabel)}</label>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : '<p class="meta">No supported IFDB metadata fields were returned.</p>'}
+        ${downloads.length ? `
+          <details class="review-notes" style="margin-top:.75rem;">
+            <summary>IFDB download references (${downloads.length})</summary>
+            <div class="provenance" style="margin-top:.75rem;">
+            ${downloads.map(item => `
+              <div class="provenance-item">
+                <span>${this._esc(item.title || 'Download reference')}</span>
+                <code>${this._esc(item.url || '')}</code>
+                <p class="meta">${this._esc(item.status || 'reference only; not downloaded')}${item.format ? ` - ${this._esc(item.format)}` : ''}</p>
+              </div>
+            `).join('')}
+            </div>
+          </details>
+        ` : ''}
+        ${sources.length ? this._ecosystemSourceList(sources, true) : ''}
+      </div>
+    `;
+  }
+
+  _ecosystemSourceList(sources, collapsed = false) {
+    const rows = sources.map(source => {
+      return `<div class="provenance-item"><span>${this._esc(source.label || 'Source')}</span><code>${this._esc(source.url || '')}</code><p class="meta">${this._esc(source.type || 'reference')}</p></div>`;
+    });
+    if (!rows.length) {
+      return '';
+    }
+    const body = `<div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div>`;
+    return collapsed
+      ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Source attribution (${rows.length})</summary>${body}</details>`
+      : body;
+  }
+
+  _previewFieldValue(value) {
+    const text = Array.isArray(value) ? value.join(', ') : String(value || '');
+    return text.length > 260 ? `${text.slice(0, 260)}...` : text;
+  }
+
   _ecosystemReferenceList(references) {
     const rows = Object.entries(references).map(([, reference]) => {
       return `<div class="provenance-item"><span>${this._esc(reference.label || 'Reference')}</span><code>${this._esc(reference.value || '')}</code><p class="meta">${this._esc(reference.status || 'stored/reference only')}</p></div>`;
     });
-    return rows.length ? `<div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div>` : '';
+    return rows.length
+      ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Stored reference-only links (${rows.length})</summary><div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div></details>`
+      : '';
+  }
+
+  _reviewNotesDetails(title, items, className = 'warn') {
+    const notes = Array.isArray(items) ? items.filter(item => String(item || '').trim() !== '') : [];
+    if (!notes.length) {
+      return '';
+    }
+
+    return `
+      <details class="review-notes" style="margin-top:.75rem;">
+        <summary>${this._esc(title)} (${notes.length})</summary>
+        ${this._reportList(title, notes, className, false)}
+      </details>
+    `;
   }
 
   _storyPanel(game, slug) {
@@ -3542,7 +3687,7 @@ class TerpVaultPage extends HTMLElement {
       identification: 'Identifiers and format hints help TerpVault choose player behavior and connect the package to IF ecosystem metadata.',
       format: 'Story-file family such as Z-code, Glulx, or TADS. Leave unspecified if the file extension should speak for now.',
       ifids: 'A unique identifier used by the interactive fiction ecosystem. Add one when known; some stories have more than one.',
-      catalog: 'External catalog references are for human review and future lookup workflows. TerpVault does not fetch remote catalog data here.',
+      catalog: 'External catalog references are for human review. IFDB preview is explicit and review-only; other catalog links remain stored references.',
       ifdb_tuid: 'The IFDB story id, not the full URL.',
       ifdb_url: 'Public IFDB page for this work, when known.',
       ifwiki_url: 'Relevant IFWiki page for this work, author, or package.',
@@ -3684,6 +3829,26 @@ class TerpVaultPage extends HTMLElement {
     });
 
     return values;
+  }
+
+  _mergeObjects(base = {}, overlay = {}) {
+    const merged = Array.isArray(base) ? [...base] : { ...(base || {}) };
+    Object.entries(overlay || {}).forEach(([key, value]) => {
+      if (
+        value &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        merged[key] &&
+        typeof merged[key] === 'object' &&
+        !Array.isArray(merged[key])
+      ) {
+        merged[key] = this._mergeObjects(merged[key], value);
+      } else {
+        merged[key] = Array.isArray(value) ? [...value] : value;
+      }
+    });
+
+    return merged;
   }
 
   _collectFeelies(form) {
