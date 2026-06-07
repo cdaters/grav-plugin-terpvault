@@ -242,6 +242,7 @@ class TerpVaultPage extends HTMLElement {
         .warnings { display:grid; gap:.4rem; margin-top:.85rem; }
         .warning { border:1px solid rgba(127,127,127,.22); border-radius:10px; padding:.45rem .55rem; background:rgba(127,127,127,.04); }
         .warning.error { border-color: rgba(255,95,95,.7); }
+        .warning.warn { border-color: rgba(255,188,87,.65); background:rgba(255,188,87,.08); }
         .warning strong { display:block; font-size:.86rem; }
         .side { display:grid; gap:.8rem; align-content:start; }
         .provenance { display:grid; gap:.5rem; }
@@ -338,6 +339,7 @@ class TerpVaultPage extends HTMLElement {
         .ifiction-badge.changed { border-color:rgba(93,164,255,.6); background:rgba(93,164,255,.11); }
         .message { border:1px solid rgba(127,127,127,.28); border-radius:10px; padding:.55rem .65rem; margin:.45rem 0; }
         .message.error { border-color:rgba(255,95,95,.7); background:rgba(255,95,95,.1); }
+        .message.warn { border-color:rgba(255,188,87,.65); background:rgba(255,188,87,.1); }
         .message.success { border-color:rgba(79,190,124,.58); background:rgba(79,190,124,.1); }
         .form-actions { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; justify-content:flex-end; }
         .helper-docs { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
@@ -1177,7 +1179,7 @@ class TerpVaultPage extends HTMLElement {
           <button class="button" type="button" data-action="cancel-create">Close</button>
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
-        ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
+        ${state.success ? this._statusMessage(state.success, state.report ? this._reportStatus(state.report, 'create').tone : 'success') : ''}
         <form data-create-package data-terpwright-phase="3e-metadata-crosscheck">
           <div class="create-steps">
             ${this._createStep('Identity', 'Required title and package metadata', `
@@ -1332,11 +1334,13 @@ class TerpVaultPage extends HTMLElement {
     const warnings = Array.isArray(validation.warnings) ? validation.warnings : [];
     const fatal = Array.isArray(validation.fatal_errors) ? validation.fatal_errors : [];
     const warningItems = warnings.map(warning => warning.message || warning.label || warning.code || String(warning));
+    const status = this._reportStatus(report, 'create');
+    const statusLabel = status.severity === 'error' ? 'blocked' : (status.severity === 'warn' ? 'created with warnings' : 'created');
     return `
       <div class="box" style="margin:.85rem 0;">
         <h3>Creation Report</h3>
         <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
-          <span class="badge ${validation.ok === false ? 'error' : 'ok'}">${validation.ok === false ? 'blocked' : 'created'}</span>
+          <span class="badge ${this._esc(status.badge)}">${this._esc(statusLabel)}</span>
           <span class="badge ok">draft</span>
           <span class="badge ok">not featured</span>
           ${report.story_sha256 ? '<span class="badge ok">story SHA-256 recorded</span>' : ''}
@@ -1365,7 +1369,7 @@ class TerpVaultPage extends HTMLElement {
           <button class="button" type="button" data-action="cancel-import-inspect">Close</button>
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
-        ${state.success ? `<div class="message success">${this._esc(state.success)}${state.importedSlug && state.hasIFiction ? ` <button class="button" type="button" data-action="open-ifiction" data-slug="${this._esc(state.importedSlug)}">Preview iFiction XML</button>` : ''}</div>` : ''}
+        ${state.success ? `<div class="message ${this._esc(state.report ? this._reportStatus(state.report, 'import').tone : 'success')}">${this._esc(state.success)}${state.importedSlug && state.hasIFiction ? ` <button class="button" type="button" data-action="open-ifiction" data-slug="${this._esc(state.importedSlug)}">Preview iFiction XML</button>` : ''}</div>` : ''}
         <form data-import-inspect>
           <div class="field">
             <label>TerpVault package zip</label>
@@ -1397,11 +1401,13 @@ class TerpVaultPage extends HTMLElement {
     const ifictionNote = report.has_ifiction
       ? `<div class="message success"><code>${this._esc(ifictionPath)}</code> found. After draft import, you can preview and selectively apply iFiction metadata from the package editor. Import does not auto-merge XML into <code>game.yaml</code>.</div>`
       : '<div class="message">No <code>metadata.iFiction.xml</code> found. Import can still continue when the package is otherwise valid.</div>';
+    const status = this._reportStatus(report, 'import');
+    const statusLabel = status.severity === 'error' ? 'blocked' : (status.severity === 'warn' ? 'review warnings' : 'ok');
     return `
       <div class="box" style="margin-top:.85rem;">
         <h3>Inspection Report</h3>
         <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
-          <span class="badge ${report.ok ? 'ok' : 'error'}">${report.ok ? 'ok' : 'blocked'}</span>
+          <span class="badge ${this._esc(status.badge)}">${this._esc(statusLabel)}</span>
           <span class="badge ${collisionTone}">${this._esc(collisionLabel)}</span>
           <span class="badge ${report.has_ifiction ? 'ok' : 'warn'}">${report.has_ifiction ? 'iFiction found' : 'no iFiction XML'}</span>
           <span class="badge ok">imports as draft</span>
@@ -1451,7 +1457,11 @@ class TerpVaultPage extends HTMLElement {
   }
 
   _reportList(label, items, tone = '', codeItems = true) {
+    items = Array.isArray(items) ? items : [];
     if (!items.length) {
+      if (tone === 'error' || tone === 'warn') {
+        return '';
+      }
       return `<div class="warnings"><div class="warning ${this._esc(tone)}"><strong>${this._esc(label)}</strong><span class="meta">None.</span></div></div>`;
     }
 
@@ -1467,6 +1477,94 @@ class TerpVaultPage extends HTMLElement {
         </div>
       </div>
     `;
+  }
+
+  _reportSeverity(report) {
+    if (!report || typeof report !== 'object') {
+      return 'info';
+    }
+
+    if (this._reportErrorItems(report).length || report.ok === false) {
+      return 'error';
+    }
+    if (this._reportWarningItems(report).length) {
+      return 'warn';
+    }
+
+    return 'success';
+  }
+
+  _reportStatus(report, context = '') {
+    let severity = this._reportSeverity(report);
+    if (context === 'ifiction' && this._isMissingIFictionReport(report)) {
+      severity = 'warn';
+    }
+    const messages = {
+      ecosystem: {
+        error: 'Preview has errors. Fix the fields below before applying metadata.',
+        warn: 'Preview is ready with review notes. Check warnings before applying metadata.',
+        success: 'Ecosystem metadata preview is ready. Review and apply selected fields.',
+        info: 'Preview has not run yet.'
+      },
+      create: {
+        error: 'Package creation has errors. Fix the fields below before continuing.',
+        warn: 'Package was created with validation warnings. Review notes before publishing.',
+        success: 'Package created as draft. Review before publishing.',
+        info: 'Creation report is not available yet.'
+      },
+      import: {
+        error: 'Import inspection has errors. Fix or choose another package before committing.',
+        warn: 'Import inspection is ready with warnings. Review notes before committing.',
+        success: 'Import inspection is ready.',
+        info: 'Import inspection has not run yet.'
+      },
+      ifiction: {
+        error: 'iFiction preview has errors. Review the XML status below.',
+        warn: this._isMissingIFictionReport(report) ? 'metadata.iFiction.xml is not available for this package.' : 'iFiction preview is ready with review notes.',
+        success: 'Local iFiction metadata parsed. Select fields explicitly before applying changes.',
+        info: 'iFiction preview has not run yet.'
+      }
+    };
+    const group = messages[context] || {};
+
+    return {
+      severity,
+      tone: severity === 'success' ? 'success' : (severity === 'error' ? 'error' : (severity === 'warn' ? 'warn' : '')),
+      badge: severity === 'error' ? 'error' : (severity === 'warn' ? 'warn' : 'ok'),
+      message: group[severity] || ''
+    };
+  }
+
+  _reportErrorItems(report) {
+    const validation = report && typeof report.validation === 'object' ? report.validation : {};
+    return [
+      ...(Array.isArray(report?.errors) ? report.errors : []),
+      ...(Array.isArray(report?.fatal_errors) ? report.fatal_errors : []),
+      ...(Array.isArray(validation.errors) ? validation.errors : []),
+      ...(Array.isArray(validation.fatal_errors) ? validation.fatal_errors : [])
+    ].filter(item => String(item?.message || item || '').trim() !== '');
+  }
+
+  _reportWarningItems(report) {
+    const validation = report && typeof report.validation === 'object' ? report.validation : {};
+    return [
+      ...(Array.isArray(report?.warnings) ? report.warnings : []),
+      ...(Array.isArray(report?.review_notes) ? report.review_notes : []),
+      ...(Array.isArray(validation.warnings) ? validation.warnings : [])
+    ].filter(item => String(item?.message || item || '').trim() !== '');
+  }
+
+  _isMissingIFictionReport(report) {
+    const errors = Array.isArray(report?.errors) ? report.errors : [];
+    return Boolean(report && report.exists === false && errors.length > 0 && errors.every(error => String(error || '').includes('metadata.iFiction.xml was not found')));
+  }
+
+  _statusMessage(message, tone = '') {
+    if (!message) {
+      return '';
+    }
+
+    return `<div class="message ${this._esc(tone)}">${this._esc(message)}</div>`;
   }
 
   _committedImportReport(report, slug) {
@@ -1894,9 +1992,7 @@ class TerpVaultPage extends HTMLElement {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      const message = report.ok
-        ? 'Ecosystem metadata preview is ready. Review notes are grouped below.'
-        : 'Ecosystem metadata preview returned warnings or errors. No fields were applied.';
+      const message = this._reportStatus(report, 'ecosystem').message;
       this._setEcosystemState(normalizedScope, {
         loading: false,
         applying: false,
@@ -3459,6 +3555,10 @@ class TerpVaultPage extends HTMLElement {
     const contextLabel = scope === 'editor' ? 'metadata editor' : 'Create Package form';
     const hasIFDBPreview = Boolean(ifdb?.tuid || ifdb?.url || (Array.isArray(ifdb?.fields) && ifdb.fields.length));
     const hasIFWikiPreview = Boolean(ifwiki?.attempted || ifwiki?.title || ifwiki?.url || (Array.isArray(ifwiki?.fields) && ifwiki.fields.length));
+    const status = report ? this._reportStatus(report, 'ecosystem') : null;
+    const statusLabel = status
+      ? (status.severity === 'error' ? 'preview errors' : (status.severity === 'warn' ? 'review notes' : 'preview ready'))
+      : '';
 
     return `
       <section class="story-manager ecosystem-preview" data-ecosystem-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''}>
@@ -3467,14 +3567,14 @@ class TerpVaultPage extends HTMLElement {
         <p class="meta">This helper uses IFDB's official API, IFWiki's MediaWiki API, and IF Archive path normalization. It does not download story files, covers, screenshots, maps, walkthroughs, or hints.</p>
         ${state.loading ? '<div class="message">Previewing ecosystem references...</div>' : ''}
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
-        ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
+        ${state.success ? this._statusMessage(state.success, status ? status.tone : 'success') : (status ? this._statusMessage(status.message, status.tone) : '')}
         <div class="form-actions">
           <button class="button" type="button" data-action="preview-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>${state.loading ? 'Previewing...' : 'Preview Ecosystem Metadata'}</button>
         </div>
         ${report ? `
           <div class="box ecosystem-report">
             <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
-              <span class="badge ${report.ok ? 'ok' : 'warn'}">${report.ok ? 'preview ready' : 'review warnings'}</span>
+              <span class="badge ${this._esc(status.badge)}">${this._esc(statusLabel)}</span>
               <span class="badge ok">no writes</span>
               <span class="badge ${report.remote_fetches ? 'warn' : 'ok'}">${report.remote_fetches ? 'remote lookup attempted' : 'no remote fetches'}</span>
               <span class="badge warn">draft/review only</span>
@@ -3855,6 +3955,7 @@ class TerpVaultPage extends HTMLElement {
       ? '<span class="badge ok">iFiction XML present</span>'
       : '<span class="badge warn">No iFiction XML</span>';
     const disabled = Boolean(ifiction.loading || ifiction.uploading || ifiction.applying);
+    const reportStatus = report ? this._reportStatus(report, 'ifiction') : null;
 
     return `
       <section class="story-manager">
@@ -3864,9 +3965,8 @@ class TerpVaultPage extends HTMLElement {
         ${ifiction.loading ? '<div class="message">Parsing local metadata.iFiction.xml...</div>' : ''}
         ${ifiction.uploading ? '<div class="message">Uploading and validating metadata.iFiction.xml...</div>' : ''}
         ${ifiction.error ? `<div class="message error">${this._esc(ifiction.error)}</div>` : ''}
-        ${ifiction.success ? `<div class="message success">${this._esc(ifiction.success)}</div>` : ''}
-        ${report && report.errors?.length ? `<div class="message error">${report.errors.map(error => this._esc(error)).join('<br>')}</div>` : ''}
-        ${report && report.ok ? '<div class="message success">Local iFiction metadata parsed. Select fields explicitly before applying changes.</div>' : ''}
+        ${ifiction.success ? this._statusMessage(ifiction.success, reportStatus ? reportStatus.tone : 'success') : (reportStatus ? this._statusMessage(reportStatus.message, reportStatus.tone) : '')}
+        ${report && report.errors?.length ? `<div class="message ${this._isMissingIFictionReport(report) ? 'warn' : 'error'}">${report.errors.map(error => this._esc(error)).join('<br>')}</div>` : ''}
         <div class="form-actions">
           <button class="button" type="button" data-action="preview-ifiction" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>${ifiction.loading ? 'Previewing...' : 'Preview Local iFiction XML'}</button>
         </div>
