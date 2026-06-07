@@ -207,7 +207,7 @@
 - Do not perform remote fetches without explicit user action.
 - Keep provenance and license review explicit, even when external catalog metadata is found.
 - Clearly distinguish metadata import/enrichment from story-file or package download.
-- Phase 1 baseline: local iFiction XML presence/status in package rows, XML present/missing filters, package-root upload/replace, import inspection awareness, and improved local preview/apply. Remaining Phase 1 polish is package creation awareness where practical.
+- Phase 1 baseline: package rows use broader metadata/catalog readiness badges and filters, while local iFiction XML presence/status stays visible in package details, package-root upload/replace, import inspection awareness, and improved local preview/apply. Remaining Phase 1 polish is package creation awareness where practical.
 - Phase 2: assist catalog/provenance fields such as IFDB TUID, IFDB URL, IFWiki URL, IF Archive path, IF Archive URL, source URL, retrieved date, and license notes.
 - Phase 3: add explicit ecosystem lookup helpers by title/author, IFID where possible, and pasted IFDB/IFWiki/IF Archive URL or path. Preview candidates beside current `game.yaml` and package-local iFiction XML, apply selected fields only, document source/retrieval date, and preserve the rule that lookup results are curator-review references, not proof of rights.
 - Tie this assistant to large-library cleanup by letting admins filter for incomplete metadata groups, then use the assistant to resolve missing IFID, catalog URL, cover, screenshot, helper-doc, provenance, license, or `metadata.iFiction.xml` gaps.
