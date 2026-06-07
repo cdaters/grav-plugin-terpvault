@@ -252,12 +252,15 @@ class TerpVaultPage extends HTMLElement {
         .editor-head { display:flex; gap:.75rem; align-items:flex-start; justify-content:space-between; margin-bottom:.8rem; }
         .editor-head h3 { margin:0 0 .15rem; }
         .editor form { display:grid; gap:1rem; }
-        .editor-sections, .create-steps { display:grid; gap:.75rem; }
-        .editor-section, .create-step { border:1px solid rgba(127,127,127,.24); border-radius:12px; background:rgba(127,127,127,.025); overflow:hidden; }
-        .editor-section > summary, .create-step > summary { cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.7rem .85rem; font-weight:700; }
-        .editor-section > summary::-webkit-details-marker, .create-step > summary::-webkit-details-marker { display:none; }
+        .editor-sections, .create-steps, .subsections { display:grid; gap:.75rem; }
+        .editor-section, .create-step, .subsection { border:1px solid rgba(127,127,127,.24); border-radius:12px; background:rgba(127,127,127,.025); overflow:hidden; }
+        .subsection { border-radius:10px; background:rgba(127,127,127,.02); }
+        .editor-section > summary, .create-step > summary, .subsection > summary { cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.7rem .85rem; font-weight:700; }
+        .subsection > summary { padding:.6rem .75rem; font-size:.92rem; }
+        .editor-section > summary::-webkit-details-marker, .create-step > summary::-webkit-details-marker, .subsection > summary::-webkit-details-marker { display:none; }
         .section-kicker { font-weight:400; opacity:.68; font-size:.8rem; text-align:right; }
         .section-body { border-top:1px solid rgba(127,127,127,.16); padding:.85rem; }
+        .subsection .section-body { padding:.75rem; }
         .section-body > .story-manager,
         .section-body > .media-manager,
         .section-body > .feelies-manager,
@@ -1153,26 +1156,30 @@ class TerpVaultPage extends HTMLElement {
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
         ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
-        ${state.report ? this._createReport(state.report) : ''}
         <form data-create-package data-terpwright-phase="2-url-metadata">
           <div class="create-steps">
             ${this._createStep('Identity', 'Required title and package metadata', `
-              <div class="create-grid">
-                ${this._createInput('Slug', 'slug', true)}
-                ${this._createInput('Title', 'title', true)}
-                ${this._createInput('Author / source attribution', 'author')}
-                ${this._createInput('Headline', 'headline')}
-                ${this._createInput('IFID', 'ifid')}
-                ${this._createInput('First published', 'first_published')}
-                ${this._createInput('Genre', 'genre')}
-                ${this._createInput('Language', 'language', false, 'en')}
-                ${this._createSelect('Format', 'format', [['', 'Infer from story file'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['hugo', 'Hugo'], ['adrift', 'ADRIFT']])}
-                ${this._createInput('Tags', 'tags')}
-                ${this._createInput('License name', 'license_name')}
+              <div class="subsections">
+                ${this._subsection('Identity', 'Slug, title, attribution, IFID, year, language, and format', `
+                  <div class="create-grid">
+                    ${this._createInput('Slug', 'slug', true)}
+                    ${this._createInput('Title', 'title', true)}
+                    ${this._createInput('Author / source attribution', 'author')}
+                    ${this._createInput('Headline', 'headline')}
+                    ${this._createInput('IFID', 'ifid')}
+                    ${this._createInput('First published', 'first_published')}
+                    ${this._createInput('Language', 'language', false, 'en')}
+                    ${this._createSelect('Format', 'format', [['', 'Infer from story file'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['hugo', 'Hugo'], ['adrift', 'ADRIFT']])}
+                  </div>
+                `, true)}
+                ${this._subsection('Classification & Presentation', 'Genre, tags, and public description', `
+                  <div class="create-grid">
+                    ${this._createInput('Genre', 'genre')}
+                    ${this._createInput('Tags', 'tags')}
+                  </div>
+                  ${this._createTextarea('Description', 'description')}
+                `, true)}
               </div>
-              ${this._createTextarea('Description', 'description')}
-              ${this._createTextarea('License notes', 'license_notes', 'short')}
-              ${this._createTextarea('Source notes', 'source_notes', 'short')}
             `, true)}
             ${this._createStep('Story File', 'Required only when creating the package', `
               <div class="field">
@@ -1183,31 +1190,41 @@ class TerpVaultPage extends HTMLElement {
             `, true)}
             ${this._createStep('Provenance URLs', 'Catalog, source, license, IFDB, IFWiki, and IF Archive references', `
               <p class="meta">Optional reference links for curator review. URL presence does not prove redistribution rights.</p>
-              <div class="create-grid">
-                ${this._createUrlInput('Source / package URL', 'source_url')}
-                ${this._createUrlInput('Upstream project URL', 'upstream_source_url')}
-                ${this._createUrlInput('Port/source repository URL', 'port_repository_url')}
-                ${this._createUrlInput('License URL', 'license_url')}
-                ${this._createInput('IFDB TUID', 'ifdb_tuid')}
-                ${this._createUrlInput('IFDB URL', 'ifdb_url')}
-                ${this._createUrlInput('IFWiki URL', 'ifwiki_url')}
-                ${this._createInput('IF Archive path', 'ifarchive_path')}
-                ${this._createUrlInput('IF Archive URL', 'ifarchive_url')}
+              <div class="subsections">
+                ${this._subsection('Source & Rights', 'Source, upstream, repository, license, and notes', `
+                  <div class="create-grid">
+                    ${this._createUrlInput('Source / package URL', 'source_url')}
+                    ${this._createUrlInput('Upstream project URL', 'upstream_source_url')}
+                    ${this._createUrlInput('Port/source repository URL', 'port_repository_url')}
+                    ${this._createInput('License name', 'license_name')}
+                    ${this._createUrlInput('License URL', 'license_url')}
+                  </div>
+                  ${this._createTextarea('License notes', 'license_notes', 'short')}
+                  ${this._createTextarea('Source notes / redistribution notes', 'source_notes', 'short')}
+                `, true)}
+                ${this._subsection('Catalog', 'IFDB, IFWiki, and IF Archive references', `
+                  <div class="create-grid">
+                    ${this._createInput('IFDB TUID', 'ifdb_tuid')}
+                    ${this._createUrlInput('IFDB URL', 'ifdb_url')}
+                    ${this._createUrlInput('IFWiki URL', 'ifwiki_url')}
+                    ${this._createInput('IF Archive path', 'ifarchive_path')}
+                    ${this._createUrlInput('IF Archive URL', 'ifarchive_url')}
+                  </div>
+                  <div class="message">IFWiki URL stored as reference only. Lookup is not implemented yet.</div>
+                `, true)}
+                ${this._subsection('Optional Reference URLs', 'Artwork, screenshots, walkthrough, hints, map, and history links', `
+                  <div class="create-grid">
+                    ${this._createUrlInput('Cover art source URL', 'cover_art_source_url')}
+                    ${this._createUrlInput('Hero art source URL', 'hero_art_source_url')}
+                    ${this._createUrlInput('Screenshot source URL', 'screenshot_source_url')}
+                    ${this._createUrlInput('Walkthrough/reference URL', 'walkthrough_reference_url')}
+                    ${this._createUrlInput('Hints/reference URL', 'hints_reference_url')}
+                    ${this._createUrlInput('Map/reference URL', 'map_reference_url')}
+                    ${this._createUrlInput('History/background URL', 'history_reference_url')}
+                  </div>
+                  ${this._createTextarea('Reference notes', 'reference_notes', 'short')}
+                `, false)}
               </div>
-              <div class="message">IFWiki URL stored as reference only. Lookup is not implemented yet.</div>
-              <details class="create-optional" open>
-                <summary>Additional reference URLs</summary>
-                <div class="create-grid">
-                  ${this._createUrlInput('Cover art source URL', 'cover_art_source_url')}
-                  ${this._createUrlInput('Hero art source URL', 'hero_art_source_url')}
-                  ${this._createUrlInput('Screenshot source URL', 'screenshot_source_url')}
-                  ${this._createUrlInput('Walkthrough/reference URL', 'walkthrough_reference_url')}
-                  ${this._createUrlInput('Hints/reference URL', 'hints_reference_url')}
-                  ${this._createUrlInput('Map/reference URL', 'map_reference_url')}
-                  ${this._createUrlInput('History/background URL', 'history_reference_url')}
-                </div>
-                ${this._createTextarea('Reference notes', 'reference_notes', 'short')}
-              </details>
             `, true)}
             ${this._createStep('Ecosystem Preview', 'IFDB lookup, IFWiki reference-only status, and IF Archive normalization', this._ecosystemPreviewPanel('create'), true)}
             ${this._createStep('Local Resources', 'Media, iFiction XML, feelies, and helper docs', `
@@ -1229,11 +1246,12 @@ class TerpVaultPage extends HTMLElement {
             ${this._createStep('Review & Create', 'Draft-only creation and calm validation notes', `
               <div class="message">Created packages are always saved as <strong>draft</strong> and <strong>not featured</strong>. Publish and featured placement remain separate review actions.</div>
               <p class="meta">Review identity, provenance references, local resources, and ecosystem preview notes before creating the draft package.</p>
+              ${state.report ? this._createReport(state.report) : ''}
+              <div class="form-actions">
+                <button class="button" type="button" data-action="cancel-create">Cancel</button>
+                <button class="button primary" type="submit" ${state.saving ? 'disabled' : ''}>${state.saving ? 'Creating...' : 'Create Draft Package'}</button>
+              </div>
             `, true)}
-          </div>
-          <div class="form-actions">
-            <button class="button" type="button" data-action="cancel-create">Cancel</button>
-            <button class="button primary" type="submit" ${state.saving ? 'disabled' : ''}>${state.saving ? 'Creating...' : 'Create Draft Package'}</button>
           </div>
         </form>
       </section>
@@ -3117,44 +3135,48 @@ class TerpVaultPage extends HTMLElement {
         ${editor.error ? `<div class="message error">${this._esc(editor.error)}</div>` : ''}
         ${editor.success ? `<div class="message success">${this._esc(editor.success)}</div>` : ''}
         <form data-editor-slug="${this._esc(slug)}">
+          <div class="form-actions">
+            <button class="button primary" type="submit" ${editor.loading || editor.saving ? 'disabled' : ''}>${editor.saving ? 'Saving...' : 'Save Metadata'}</button>
+          </div>
           <div class="editor-sections">
             ${this._editorSection('Overview', 'Lifecycle controls and package paths', `
-              <div class="fieldsets">
-                <fieldset>
-                  <legend>Lifecycle</legend>
+              <div class="subsections">
+                ${this._subsection('TerpVault / Status', 'Publication and placement controls', `
                   ${this._help('terpvault')}
-                  ${this._select('Status', 'terpvault.status', values, [['draft', 'Draft'], ['published', 'Published']], this._helpText('status'))}
-                  <div class="checkbox">
-                    <input id="tv-featured-${this._esc(slug)}" type="checkbox" name="terpvault.featured" ${this._get(values, 'terpvault.featured') ? 'checked' : ''}>
-                    <label for="tv-featured-${this._esc(slug)}">Featured</label>
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>Lifecycle</legend>
+                      ${this._select('Status', 'terpvault.status', values, [['draft', 'Draft'], ['published', 'Published']], this._helpText('status'))}
+                      <div class="checkbox">
+                        <input id="tv-featured-${this._esc(slug)}" type="checkbox" name="terpvault.featured" ${this._get(values, 'terpvault.featured') ? 'checked' : ''}>
+                        <label for="tv-featured-${this._esc(slug)}">Featured</label>
+                      </div>
+                      ${this._help('featured')}
+                    </fieldset>
                   </div>
-                  ${this._help('featured')}
-                  ${this._textarea('Tags', 'terpvault.tags', values, 'short', this._helpText('tags'))}
-                </fieldset>
-                <fieldset>
-                  <legend>Read-only package files</legend>
+                `, true)}
+                ${this._subsection('Advanced / Raw-ish Fields', 'Package-local paths and read-only diagnostics', `
                   ${this._help('readonly_files')}
                   ${this._readOnlyList(readOnly)}
-                </fieldset>
+                `, false)}
               </div>
             `, true)}
-            ${this._editorSection('Metadata', 'Title, author, identifiers, and description', `
-              <div class="fieldsets">
-                <fieldset>
-                  <legend>Bibliographic</legend>
+            ${this._editorSection('Metadata', 'Identity, bibliography, presentation, and classification', `
+              <div class="subsections">
+                ${this._subsection('Identity', 'Title, attribution, year, language, format, and IFIDs', `
                   ${this._help('bibliographic')}
-                  ${this._input('Title', 'bibliographic.title', values, this._helpText('title'))}
-                  ${this._input('Author', 'bibliographic.author', values, this._helpText('author'))}
-                  ${this._input('Headline', 'bibliographic.headline', values, this._helpText('headline'))}
-                  ${this._input('First published', 'bibliographic.first_published', values, this._helpText('first_published'))}
-                  ${this._input('Genre', 'bibliographic.genre', values)}
-                  ${this._input('Language', 'bibliographic.language', values, this._helpText('language'))}
-                  ${this._textarea('Description', 'bibliographic.description', values, '', this._helpText('description'))}
-                </fieldset>
-                <fieldset>
-                  <legend>Identification</legend>
-                  ${this._help('identification')}
-                  ${this._select('Format', 'identification.format', values, [
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>Core Identity</legend>
+                      ${this._input('Title', 'bibliographic.title', values, this._helpText('title'))}
+                      ${this._input('Headline', 'bibliographic.headline', values, this._helpText('headline'))}
+                      ${this._input('Author / source attribution', 'bibliographic.author', values, this._helpText('author'))}
+                      ${this._input('First published / year', 'bibliographic.first_published', values, this._helpText('first_published'))}
+                      ${this._input('Language', 'bibliographic.language', values, this._helpText('language'))}
+                    </fieldset>
+                    <fieldset>
+                      <legend>Story Identity</legend>
+                      ${this._select('Format', 'identification.format', values, [
                     ['', 'Unspecified'],
                     ['zcode', 'Z-code'],
                     ['glulx', 'Glulx'],
@@ -3162,34 +3184,64 @@ class TerpVaultPage extends HTMLElement {
                     ['tads3', 'TADS 3'],
                     ['hugo', 'Hugo'],
                     ['adrift', 'ADRIFT']
-                  ], this._helpText('format'))}
-                  ${this._textarea('IFIDs', 'identification.ifids', values, 'short', this._helpText('ifids'))}
-                </fieldset>
+                      ], this._helpText('format'))}
+                      ${this._textarea('IFIDs', 'identification.ifids', values, 'short', this._helpText('ifids'))}
+                    </fieldset>
+                  </div>
+                `, true)}
+                ${this._subsection('Bibliographic / Presentation', 'Genre, tags, description, and public-facing copy', `
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>Presentation</legend>
+                      ${this._input('Genre', 'bibliographic.genre', values)}
+                      ${this._textarea('Tags', 'terpvault.tags', values, 'short', this._helpText('tags'))}
+                    </fieldset>
+                    <fieldset>
+                      <legend>Description</legend>
+                      ${this._textarea('Description', 'bibliographic.description', values, '', this._helpText('description'))}
+                    </fieldset>
+                  </div>
+                `, true)}
               </div>
             `, true)}
             ${this._editorSection('Provenance', 'Catalog, source, license, IFDB, IFWiki, and IF Archive', `
-              <div class="fieldsets">
-                <fieldset>
-                  <legend>Catalog</legend>
+              <div class="subsections">
+                ${this._subsection('Catalog', 'IFDB, IFWiki, and IF Archive references', `
                   ${this._help('catalog')}
-                  ${this._input('IFDB TUID', 'catalog.ifdb.tuid', values, this._helpText('ifdb_tuid'))}
-                  ${this._input('IFDB URL', 'catalog.ifdb.url', values, this._helpText('ifdb_url'))}
-                  ${this._input('IFWiki URL', 'catalog.ifwiki.url', values, this._helpText('ifwiki_url'))}
-                  ${this._input('IF Archive path', 'catalog.ifarchive.path', values, this._helpText('ifarchive_path'))}
-                  ${this._input('IF Archive URL', 'catalog.ifarchive.url', values, this._helpText('ifarchive_url'))}
-                </fieldset>
-                <fieldset>
-                  <legend>Release & Provenance</legend>
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>IFDB / IFWiki</legend>
+                      ${this._input('IFDB TUID', 'catalog.ifdb.tuid', values, this._helpText('ifdb_tuid'))}
+                      ${this._input('IFDB URL', 'catalog.ifdb.url', values, this._helpText('ifdb_url'))}
+                      ${this._input('IFWiki URL', 'catalog.ifwiki.url', values, this._helpText('ifwiki_url'))}
+                    </fieldset>
+                    <fieldset>
+                      <legend>IF Archive</legend>
+                      ${this._input('IF Archive path', 'catalog.ifarchive.path', values, this._helpText('ifarchive_path'))}
+                      ${this._input('IF Archive URL', 'catalog.ifarchive.url', values, this._helpText('ifarchive_url'))}
+                    </fieldset>
+                  </div>
+                `, true)}
+                ${this._subsection('Source & Rights', 'Source URLs, license, source notes, and redistribution review', `
                   ${this._help('provenance')}
-                  ${this._input('License name', 'release.license.name', values, this._helpText('license_name'))}
-                  ${this._input('License URL', 'release.license.url', values)}
-                  ${this._textarea('License notes', 'release.license.notes', values, 'short', this._helpText('license_notes'))}
-                  ${this._input('Source URL', 'release.source.url', values, this._helpText('source_url'))}
-                  ${this._input('Upstream project URL', 'release.source.upstream.url', values, this._helpText('upstream_source_url'))}
-                  ${this._input('Port/source repository URL', 'release.source.port_repository.url', values, this._helpText('port_repository_url'))}
-                  ${this._input('Source retrieved', 'release.source.retrieved', values, this._helpText('source_retrieved'))}
-                  ${this._textarea('Source notes', 'release.source.notes', values, 'short', this._helpText('source_notes'))}
-                </fieldset>
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>Source</legend>
+                      ${this._input('Source URL', 'release.source.url', values, this._helpText('source_url'))}
+                      ${this._input('Upstream project URL', 'release.source.upstream.url', values, this._helpText('upstream_source_url'))}
+                      ${this._input('Port/source repository URL', 'release.source.port_repository.url', values, this._helpText('port_repository_url'))}
+                      ${this._input('Source retrieved', 'release.source.retrieved', values, this._helpText('source_retrieved'))}
+                      ${this._textarea('Source notes / redistribution notes', 'release.source.notes', values, 'short', this._helpText('source_notes'))}
+                    </fieldset>
+                    <fieldset>
+                      <legend>Rights</legend>
+                      ${this._input('License name', 'release.license.name', values, this._helpText('license_name'))}
+                      ${this._input('License URL', 'release.license.url', values)}
+                      ${this._textarea('License notes', 'release.license.notes', values, 'short', this._helpText('license_notes'))}
+                    </fieldset>
+                  </div>
+                `, true)}
+                ${this._subsection('Reference Links', 'Create-time support links shown read-only in this editor', this._referenceLinksList(game), false)}
               </div>
             `, true)}
             ${this._editorSection('Validation', 'Warnings and package readiness notes', this._warnings(game), false)}
@@ -3224,6 +3276,53 @@ class TerpVaultPage extends HTMLElement {
         <summary><span>${this._esc(title)}</span><span class="section-kicker">${this._esc(kicker)}</span></summary>
         <div class="section-body">${body}</div>
       </details>
+    `;
+  }
+
+  _subsection(title, kicker, body, open = false) {
+    return `
+      <details class="subsection" ${open ? 'open' : ''}>
+        <summary><span>${this._esc(title)}</span><span class="section-kicker">${this._esc(kicker)}</span></summary>
+        <div class="section-body">${body}</div>
+      </details>
+    `;
+  }
+
+  _referenceLinksList(game = {}) {
+    const references = Array.isArray(game.references)
+      ? game.references
+      : Object.values(game.references || {}).filter(reference => reference && typeof reference === 'object');
+    const labels = {
+      cover_art: 'Cover art source URL',
+      hero_art: 'Hero art source URL',
+      screenshot: 'Screenshot source URL',
+      walkthrough: 'Walkthrough/reference URL',
+      hints: 'Hints/reference URL',
+      map: 'Map/reference URL',
+      history: 'History/background URL'
+    };
+    const rows = references
+      .filter(reference => reference?.url || reference?.value)
+      .map(reference => {
+        const label = reference.label || labels[reference.role] || 'Reference URL';
+        const value = reference.url || reference.value || '';
+        const notes = reference.notes || reference.note || '';
+        return `
+          <div class="provenance-item">
+            <span>${this._esc(label)}</span>
+            ${value ? `<a href="${this._esc(value)}" target="_blank" rel="noopener">${this._esc(value)}</a>` : '<div>Not recorded</div>'}
+            ${notes ? `<p class="meta">${this._esc(notes)}</p>` : ''}
+          </div>
+        `;
+      });
+
+    if (!rows.length) {
+      return '<p class="meta">No create-time reference links are recorded for this package. Editing these reference rows is not available in this UI pass.</p>';
+    }
+
+    return `
+      <p class="meta">Reference links are shown read-only here so metadata saves keep using the current allowlisted fields.</p>
+      <div class="provenance">${rows.join('')}</div>
     `;
   }
 
