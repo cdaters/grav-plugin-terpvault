@@ -176,6 +176,7 @@ class EcosystemMetadataService
     private function ifwikiMismatchPreview(string $title, string $url): array
     {
         $preview = $this->emptyIFWikiPreview();
+        $preview['attempted'] = true;
         $titleResult = $this->normalizeIFWikiReference($title);
         $urlResult = $this->normalizeIFWikiReference($url);
         $preview['warnings'] = array_values(array_unique(array_merge($titleResult['warnings'], $urlResult['warnings'])));
@@ -535,6 +536,7 @@ class EcosystemMetadataService
     {
         $normalized = $this->normalizeIFWikiReference($input);
         $preview = $this->emptyIFWikiPreview();
+        $preview['attempted'] = true;
         $preview['ok'] = $normalized['ok'];
         $preview['title'] = $normalized['title'];
         $preview['url'] = $normalized['url'];
@@ -576,21 +578,22 @@ class EcosystemMetadataService
             $fetched = $this->fetchUrl($apiUrl, 'IFWiki');
             if (!$fetched['ok']) {
                 $preview['ok'] = false;
-                $preview['warnings'][] = $fetched['error'] ?: 'IFWiki lookup failed.';
+                $reason = $fetched['error'] ?: 'IFWiki lookup failed.';
+                $preview['warnings'][] = 'IFWiki lookup failed: ' . $reason . ' URL remains stored as reference only.';
                 return $preview;
             }
 
             $decoded = json_decode($fetched['body'], true);
             if (!is_array($decoded)) {
                 $preview['ok'] = false;
-                $preview['warnings'][] = 'IFWiki returned a response that could not be parsed as JSON.';
+                $preview['warnings'][] = 'IFWiki lookup failed: IFWiki returned a response that could not be parsed as JSON. URL remains stored as reference only.';
                 return $preview;
             }
 
             $extracted = $this->fieldsFromIFWikiJson($decoded, $normalized['title'], $normalized['url']);
             if (!$extracted['found']) {
                 $preview['ok'] = false;
-                $preview['warnings'][] = 'IFWiki lookup did not find a page for the normalized title.';
+                $preview['warnings'][] = 'IFWiki lookup failed: IFWiki did not find a page for the normalized title. URL remains stored as reference only.';
                 return $preview;
             }
 
@@ -607,7 +610,7 @@ class EcosystemMetadataService
             }
         } catch (\Throwable $e) {
             $preview['ok'] = false;
-            $preview['warnings'][] = 'IFWiki lookup failed without writing package files: ' . $e->getMessage();
+            $preview['warnings'][] = 'IFWiki lookup failed: ' . $e->getMessage() . ' URL remains stored as reference only.';
         }
 
         $preview['warnings'] = array_values(array_unique($preview['warnings']));
@@ -769,6 +772,7 @@ class EcosystemMetadataService
     {
         return [
             'ok' => true,
+            'attempted' => false,
             'title' => '',
             'url' => '',
             'api_url' => '',

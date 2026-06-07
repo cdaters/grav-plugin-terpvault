@@ -1219,7 +1219,7 @@ class TerpVaultPage extends HTMLElement {
                     ${this._createInput('IF Archive path', 'ifarchive_path')}
                     ${this._createUrlInput('IF Archive URL', 'ifarchive_url')}
                   </div>
-                  <div class="message">IFWiki preview uses the MediaWiki API when requested. It is reference-only and does not prove redistribution rights.</div>
+                  <div class="message">IFWiki preview uses the MediaWiki API when requested. Results require curator review and do not prove redistribution rights.</div>
                 `, true)}
                 ${this._subsection('Optional Reference URLs', 'Artwork, screenshots, walkthrough, hints, map, and history links', `
                   <div class="create-grid">
@@ -3385,12 +3385,12 @@ class TerpVaultPage extends HTMLElement {
     const disabled = Boolean(state.loading || state.applying);
     const contextLabel = scope === 'editor' ? 'metadata editor' : 'Create Package form';
     const hasIFDBPreview = Boolean(ifdb?.tuid || ifdb?.url || (Array.isArray(ifdb?.fields) && ifdb.fields.length));
-    const hasIFWikiPreview = Boolean(ifwiki?.title || ifwiki?.url || (Array.isArray(ifwiki?.fields) && ifwiki.fields.length));
+    const hasIFWikiPreview = Boolean(ifwiki?.attempted || ifwiki?.title || ifwiki?.url || (Array.isArray(ifwiki?.fields) && ifwiki.fields.length));
 
     return `
       <section class="story-manager ecosystem-preview" data-ecosystem-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''}>
         <h3>Ecosystem Metadata Preview</h3>
-        <p class="meta">IFDB and IFWiki lookup are implemented as reference-only previews. IF Archive path normalization is implemented. URL presence does not prove redistribution rights.</p>
+        <p class="meta">IFDB and IFWiki lookup are implemented as curator-review previews. IF Archive path normalization is implemented. URL presence does not prove redistribution rights.</p>
         <p class="meta">This helper uses IFDB's official API, IFWiki's MediaWiki API, and IF Archive path normalization. It does not download story files, covers, screenshots, maps, walkthroughs, or hints.</p>
         ${state.loading ? '<div class="message">Previewing ecosystem references...</div>' : ''}
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
@@ -3432,7 +3432,7 @@ class TerpVaultPage extends HTMLElement {
                 </div>
               ` : '<p class="meta">No normalized IF Archive values are available from this preview.</p>'}
               ${hasIFDBPreview ? this._ifdbPreviewPanel(ifdb, contextLabel) : '<p class="meta">No IFDB lookup results are available from this preview.</p>'}
-              ${hasIFWikiPreview ? this._ifwikiPreviewPanel(ifwiki, contextLabel) : '<p class="meta">No IFWiki lookup results are available from this preview.</p>'}
+              ${hasIFWikiPreview ? this._ifwikiPreviewPanel(ifwiki, contextLabel) : this._ifwikiNoInputPanel()}
               <p class="meta">Apply selected fields updates the ${this._esc(contextLabel)} only. Save Metadata or Create Draft Package is still required for package writes.</p>
               <div class="form-actions">
                 <button class="button primary" type="button" data-action="apply-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>Apply Selected Ecosystem Fields</button>
@@ -3502,20 +3502,26 @@ class TerpVaultPage extends HTMLElement {
     const fields = Array.isArray(ifwiki?.fields) ? ifwiki.fields : [];
     const externalLinks = Array.isArray(ifwiki?.external_links_reference_only) ? ifwiki.external_links_reference_only : [];
     const sources = Array.isArray(ifwiki?.sources) ? ifwiki.sources : [];
+    const warnings = Array.isArray(ifwiki?.warnings) ? ifwiki.warnings : [];
+    const errors = Array.isArray(ifwiki?.errors) ? ifwiki.errors : [];
+    const hasLookupData = Boolean(ifwiki?.title || ifwiki?.url || fields.length || externalLinks.length || sources.length);
     return `
       <div class="preview-section">
         <h4>IFWiki</h4>
         <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
           <span class="badge ${ifwiki?.ok === false ? 'warn' : 'ok'}">${ifwiki?.ok === false ? 'lookup warning' : 'lookup ready'}</span>
-          <span class="badge warn">reference only</span>
+          <span class="badge ok">MediaWiki API</span>
           <span class="badge warn">curator review required</span>
           <span class="badge warn">rights not proven</span>
         </div>
+        ${!hasLookupData ? '<p class="meta">No IFWiki title or URL could be normalized from this preview request.</p>' : ''}
         <dl>
           <dt>IFWiki title</dt><dd><code>${this._esc(ifwiki?.title || '')}</code></dd>
           <dt>IFWiki URL</dt><dd><code>${this._esc(ifwiki?.url || '')}</code></dd>
           ${ifwiki?.api_url ? `<dt>API source</dt><dd><code>${this._esc(ifwiki.api_url)}</code></dd>` : ''}
         </dl>
+        ${errors.length ? this._reportList('IFWiki preview errors', errors, 'error', false) : ''}
+        ${warnings.some(item => String(item || '').startsWith('IFWiki lookup failed:')) ? this._reportList('IFWiki lookup warning', warnings.filter(item => String(item || '').startsWith('IFWiki lookup failed:')), 'warn', false) : ''}
         ${fields.length ? `
           <div class="preview-card-grid">
             ${fields.map((field, index) => `
@@ -3548,6 +3554,15 @@ class TerpVaultPage extends HTMLElement {
           </details>
         ` : ''}
         ${sources.length ? this._ecosystemSourceList(sources, true) : ''}
+      </div>
+    `;
+  }
+
+  _ifwikiNoInputPanel() {
+    return `
+      <div class="preview-section">
+        <h4>IFWiki</h4>
+        <p class="meta">No IFWiki title or URL was supplied for this preview. Enter an IFWiki page title or IFWiki URL to run the MediaWiki API lookup.</p>
       </div>
     `;
   }
@@ -3589,7 +3604,7 @@ class TerpVaultPage extends HTMLElement {
   _ecosystemReferenceStatus(key, reference) {
     const label = String(reference?.label || key || '').toLowerCase();
     if (key === 'ifwiki_url' || label.includes('ifwiki')) {
-      return 'IFWiki reference only. Use the IFWiki preview section for MediaWiki API lookup results.';
+      return 'IFWiki lookup is available in the preview panel when an IFWiki title or URL is supplied.';
     }
 
     return reference?.status || 'stored/reference only';
@@ -3977,7 +3992,7 @@ class TerpVaultPage extends HTMLElement {
       ifdb_tuid: 'The IFDB story id, not the full URL.',
       ifdb_url: 'Public IFDB page for this work, when known.',
       ifwiki_title: 'Normalized IFWiki page title, applied only after curator review.',
-      ifwiki_url: 'IFWiki URL or page title. Preview uses the MediaWiki API when requested and remains reference-only.',
+      ifwiki_url: 'IFWiki URL or page title. Preview uses the MediaWiki API when requested. Results require curator review and do not prove rights.',
       ifarchive_path: 'IF Archive path such as games/zcode/example.z5, when known.',
       ifarchive_url: 'Full IF Archive URL, when useful alongside the path.',
       provenance: 'Where this package or story file came from. Useful for rights review and future maintenance.',
