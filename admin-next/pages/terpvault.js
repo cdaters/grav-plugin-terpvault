@@ -558,9 +558,12 @@ class TerpVaultPage extends HTMLElement {
                 ['missing-screenshots', 'Missing screenshots'],
                 ['missing-walkthrough', 'Missing walkthrough'],
                 ['missing-ifid', 'Missing IFID'],
-                ['missing-catalog-links', 'Missing catalog links'],
-                ['has-ifiction', 'iFiction XML present'],
-                ['missing-ifiction', 'Missing iFiction XML']
+                ['metadata-ok', 'Metadata OK'],
+                ['metadata-partial', 'Metadata partial'],
+                ['metadata-needs-review', 'Metadata needs review'],
+                ['metadata-error', 'Metadata error'],
+                ['has-catalog-links', 'Catalog linked'],
+                ['missing-catalog-links', 'No catalog links']
               ], controls.completeness)}
             </select>
           </div>
@@ -603,7 +606,7 @@ class TerpVaultPage extends HTMLElement {
         status: this._allowedValue(stored.status, ['all', 'published', 'draft'], defaults.status),
         featured: this._allowedValue(stored.featured, ['all', 'featured', 'not-featured'], defaults.featured),
         format: String(stored.format || defaults.format),
-        completeness: this._allowedValue(stored.completeness, ['all', 'missing-cover', 'missing-screenshots', 'missing-walkthrough', 'missing-ifid', 'missing-catalog-links', 'has-ifiction', 'missing-ifiction'], defaults.completeness)
+        completeness: this._allowedValue(stored.completeness, ['all', 'missing-cover', 'missing-screenshots', 'missing-walkthrough', 'missing-ifid', 'metadata-ok', 'metadata-partial', 'metadata-needs-review', 'metadata-error', 'has-catalog-links', 'missing-catalog-links'], defaults.completeness)
       };
     } catch (e) {
       return defaults;
@@ -715,6 +718,7 @@ class TerpVaultPage extends HTMLElement {
       game.genre,
       game.language,
       game.story_file,
+      this._metadataReadiness(game).label,
       game.has_ifiction ? 'ifiction xml metadata.iFiction.xml present' : 'no ifiction xml missing metadata.iFiction.xml',
       ...(Array.isArray(game.ifids) ? game.ifids : []),
       ...(Array.isArray(game.tags) ? game.tags : []),
@@ -937,14 +941,23 @@ class TerpVaultPage extends HTMLElement {
     if (filter === 'missing-ifid') {
       return !Array.isArray(game.ifids) || game.ifids.length === 0;
     }
+    if (filter === 'metadata-ok') {
+      return this._metadataReadiness(game).key === 'ok';
+    }
+    if (filter === 'metadata-partial') {
+      return this._metadataReadiness(game).key === 'partial';
+    }
+    if (filter === 'metadata-needs-review') {
+      return this._metadataReadiness(game).key === 'needs-review';
+    }
+    if (filter === 'metadata-error') {
+      return this._metadataReadiness(game).key === 'error';
+    }
+    if (filter === 'has-catalog-links') {
+      return this._hasCatalogLinks(game);
+    }
     if (filter === 'missing-catalog-links') {
       return !this._hasCatalogLinks(game);
-    }
-    if (filter === 'has-ifiction') {
-      return Boolean(game.has_ifiction);
-    }
-    if (filter === 'missing-ifiction') {
-      return !game.has_ifiction;
     }
 
     return true;
@@ -961,6 +974,79 @@ class TerpVaultPage extends HTMLElement {
 
     const values = this._catalogSearchValues(game.catalog || {});
     return values.some(value => String(value || '').trim() !== '');
+  }
+
+  _metadataReadiness(game) {
+    const errorCount = Number(game.error_count || 0);
+    if (errorCount > 0 || this._gameWarnings(game).some(warning => (warning?.severity || '') === 'error')) {
+      return { key: 'error', tone: 'error', label: 'Metadata error' };
+    }
+
+    const warningCount = Number(game.warning_count || 0);
+    const reviewCodes = new Set(['missing-source', 'missing-license', 'missing-redistribution-notes', 'license-review']);
+    const hasReviewWarning = this._gameWarnings(game).some(warning => reviewCodes.has(warning?.code || ''));
+    if (hasReviewWarning) {
+      return { key: 'needs-review', tone: 'warn', label: 'Metadata needs review' };
+    }
+
+    if (warningCount > 0) {
+      return { key: 'partial', tone: 'warn', label: 'Metadata partial' };
+    }
+
+    if (this._hasCoreMetadata(game) && this._hasMetadataSource(game)) {
+      return { key: 'ok', tone: 'ok', label: 'Metadata OK' };
+    }
+
+    return { key: 'partial', tone: 'warn', label: 'Metadata partial' };
+  }
+
+  _gameWarnings(game) {
+    const warnings = Array.isArray(game.warnings) ? game.warnings : [];
+    const advisory = Array.isArray(game.advisory_warnings) ? game.advisory_warnings : [];
+    return warnings.length ? warnings : advisory;
+  }
+
+  _hasCoreMetadata(game) {
+    const title = String(game.title || '').trim();
+    const slug = String(game.slug || '').trim();
+    const hasTitle = title !== '' && title !== slug;
+    const hasAuthor = String(game.author || '').trim() !== '';
+    const hasFormat = this._gameFormatInfo(game).key !== '';
+
+    return hasTitle && hasAuthor && hasFormat && Boolean(game.has_story_file);
+  }
+
+  _hasMetadataSource(game) {
+    if (game.has_ifiction || this._hasCatalogLinks(game) || this._hasSourceReference(game) || this._hasLicenseInfo(game)) {
+      return true;
+    }
+
+    const references = game.references || {};
+    if (Array.isArray(references) && references.length) {
+      return true;
+    }
+    if (!Array.isArray(references) && references && typeof references === 'object' && Object.keys(references).length) {
+      return true;
+    }
+
+    return Array.isArray(game.provenance_rows) && game.provenance_rows.length > 0;
+  }
+
+  _hasSourceReference(game) {
+    const source = game.release?.source || game.source || {};
+    const catalog = game.catalog || {};
+    return Boolean(
+      source.url
+      || source.upstream?.url
+      || source.port_repository?.url
+      || catalog.ifarchive?.url
+      || catalog.ifarchive?.path
+    );
+  }
+
+  _hasLicenseInfo(game) {
+    const license = game.release?.license || game.license || {};
+    return Boolean(license.name || license.url || license.notes);
   }
 
   _compareGames(a, b, sort) {
@@ -1020,9 +1106,7 @@ class TerpVaultPage extends HTMLElement {
     const errorCount = Number(game.error_count || 0);
     const coverPath = game.resources?.small_cover || game.small_cover || game.resources?.cover || game.cover || '';
     const cover = urls.small_cover || urls.thumbnail || urls.cover || this._adminMediaPreviewUrl(slug, coverPath) || '';
-    const ifictionBadge = game.has_ifiction
-      ? '<span class="badge ok">iFiction XML present</span>'
-      : '<span class="badge warn">No iFiction XML</span>';
+    const metadataBadge = this._metadataReadiness(game);
     const status = this._gameStatus(game);
     const statusLabel = status === 'published' ? 'Published' : 'Draft';
     const featured = this._gameFeatured(game);
@@ -1041,7 +1125,7 @@ class TerpVaultPage extends HTMLElement {
             <span class="badge">${this._esc(game.format_label || game.format || 'Unknown')}</span>
             <span class="badge ${status === 'published' ? 'ok' : 'warn'}">${this._esc(statusLabel)}</span>
             <span class="badge ${featured ? 'ok' : ''}">${featured ? 'Featured' : 'Not featured'}</span>
-            ${ifictionBadge}
+            <span class="badge ${this._esc(metadataBadge.tone)}">${this._esc(metadataBadge.label)}</span>
             ${storyBadge}
             ${errorCount ? `<span class="badge error">${errorCount} error${errorCount === 1 ? '' : 's'}</span>` : ''}
             ${warningCount ? `<span class="badge warn">${warningCount} warning${warningCount === 1 ? '' : 's'}</span>` : '<span class="badge ok">no warnings</span>'}
@@ -1087,7 +1171,7 @@ class TerpVaultPage extends HTMLElement {
         <dt>Author</dt><dd>${this._esc(game.author || '')}</dd>
         <dt>Year</dt><dd>${this._esc(game.year || '')}</dd>
         <dt>IFIDs</dt><dd>${this._esc((game.ifids || []).join(', ') || 'Not recorded')}</dd>
-        <dt>iFiction XML</dt><dd>${game.has_ifiction ? '<code>metadata.iFiction.xml</code>' : 'Not present'}</dd>
+        <dt>iFiction XML</dt><dd>${game.has_ifiction ? `<code>${this._esc(game.ifiction_path || 'metadata.iFiction.xml')}</code>` : 'Not present'}</dd>
         <dt>Source</dt><dd>${source.url ? `<a href="${this._esc(source.url)}" target="_blank" rel="noopener">${this._esc(source.url)}</a>` : this._esc(source.notes || 'Not recorded')}</dd>
         <dt>Upstream</dt><dd>${upstreamUrl ? `<a href="${this._esc(upstreamUrl)}" target="_blank" rel="noopener">${this._esc(upstreamUrl)}</a>` : 'Not recorded'}</dd>
         <dt>Port repo</dt><dd>${repositoryUrl ? `<a href="${this._esc(repositoryUrl)}" target="_blank" rel="noopener">${this._esc(repositoryUrl)}</a>` : 'Not recorded'}</dd>
