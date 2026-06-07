@@ -323,6 +323,10 @@ class TerpVaultPage extends HTMLElement {
         .readonly div { display:grid; grid-template-columns:minmax(0,1fr); gap:.18rem; font-size:.86rem; min-width:0; }
         .readonly span:first-child { opacity:.68; }
         .readonly code { display:block; min-width:0; max-width:100%; overflow-x:auto; white-space:nowrap; overflow-wrap:normal; word-break:normal; }
+        .readonly-stack { display:grid; gap:.7rem; margin-top:.35rem; min-width:0; }
+        .readonly-stack-row { display:grid; gap:.24rem; min-width:0; }
+        .readonly-label { opacity:.68; font-size:.86rem; }
+        .readonly-code-value { display:block; width:100%; max-width:100%; min-width:0; overflow-x:auto; white-space:nowrap; overflow-wrap:normal; word-break:normal; border:1px solid rgba(127,127,127,.22); border-radius:8px; padding:.42rem .52rem; background:rgba(127,127,127,.055); font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.86rem; line-height:1.4; }
         .ifiction-fields { display:grid; gap:.65rem; margin:.7rem 0; }
         .ifiction-field { display:grid; grid-template-columns:2rem minmax(0,1fr); gap:.65rem; align-items:start; border:1px solid rgba(127,127,127,.24); border-radius:10px; padding:.7rem; background:rgba(127,127,127,.035); }
         .ifiction-field.overwrite { border-color:rgba(255,188,87,.65); background:rgba(255,188,87,.08); }
@@ -5259,10 +5263,16 @@ class TerpVaultPage extends HTMLElement {
             </fieldset>
             <fieldset>
               <legend>Storage</legend>
-              <dl class="readonly">
-                <div><span>Configured</span><code>${this._esc(storage.games_path || 'user://data/terpvault/games')}</code></div>
-                <div><span>Resolved</span><code>${this._esc(storage.resolved_path || 'Available only when embedded Admin2 data is exposed')}</code></div>
-              </dl>
+              <div class="readonly-stack">
+                <div class="readonly-stack-row">
+                  <span class="readonly-label">Configured</span>
+                  <code class="readonly-code-value">${this._esc(storage.games_path || 'user://data/terpvault/games')}</code>
+                </div>
+                <div class="readonly-stack-row">
+                  <span class="readonly-label">Resolved</span>
+                  <code class="readonly-code-value">${this._esc(storage.resolved_path || 'Available only when embedded Admin2 data is exposed')}</code>
+                </div>
+              </div>
               <p class="help">Storage path editing is intentionally read-only in this pass.</p>
             </fieldset>
           </div>
