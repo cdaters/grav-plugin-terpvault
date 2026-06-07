@@ -399,7 +399,7 @@ resources:
 
 Package authors can add simple `hints.md` first. The future `oracle:` block remains roadmap-only. Terpwright v1 should not require structured Oracle sources, `.inv` parsing, ROT13 decoding, YAML hints, JSON hints, or Ink-guided hint flows.
 
-Future Terpwright phases may preview richer Oracle sources after the Oracle source model is implemented, but that should be additive and should preserve simple Markdown hints.
+Future Terpwright phases may preview richer Oracle sources after the richer Oracle source model is implemented, but that should be additive and should preserve simple Markdown hints.
 
 ## Relationship To Ink
 

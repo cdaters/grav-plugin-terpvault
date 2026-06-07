@@ -1,6 +1,6 @@
 # TerpVault Next Build Notes
 
-TerpVault is in an early public-beta foundation phase. Public routes and bundled Parchment playback are established, while the Admin2 Library Manager remains experimental, opt-in, and disabled by default.
+TerpVault is in an early public-beta milestone phase. Public routes and bundled Parchment playback are established, while the Admin2 Library Manager remains experimental, opt-in, and disabled by default.
 
 ## Validation focus before the next code build
 
@@ -35,11 +35,11 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 
 ## Candidate next work
 
-### v0.4.x incremental path
+### v0.5.x incremental path
 
-- Keep v0.4.x focused and incremental rather than treating every small improvement as a milestone release.
-- Use v0.4.x for Admin2 large-library basics. Search, sort, simple filters, metadata-completeness filters, and `localStorage` state preservation are now baseline; pagination or virtual scrolling remains future work.
-- Use v0.4.x for Metadata Assistant Phase 1 work. Local `metadata.iFiction.xml` status, upload/replace, XML present/missing filters, import inspection awareness, and preview/apply polish are now baseline; Terpwright Phase 1 package creation can now preserve uploaded local `metadata.iFiction.xml` without auto-applying it.
+- Keep v0.5.x focused and incremental after the v0.5.0 milestone rather than treating every small improvement as a release event.
+- Admin2 large-library basics are now baseline: search, sort, simple filters, metadata-completeness filters, and `localStorage` state preservation. Pagination or virtual scrolling remains future work.
+- Metadata Assistant Phase 1 is now baseline: local `metadata.iFiction.xml` status, upload/replace, XML present/missing filters, import inspection awareness, and preview/apply polish. Terpwright Phase 1/2 package creation can preserve uploaded local `metadata.iFiction.xml` and manually entered URL/provenance metadata without remote lookup or auto-applying XML fields.
 - Continue safe delete/remove design before implementation. Do not add physical package delete until guardrails are reviewed; keep manifest removal distinct from physical package deletion; prefer trash/quarantine before permanent deletion.
 - Continue demo package preparation incrementally. Zork I, Zork II, and Zork III are now bundled/demo anchors for the current development tree after Zork II approval, helper-doc polish, `_demo` promotion, and clean DDEV seed verification.
 - Add a stable ZILF/ZAPF tooling note or helper later. The current scratch-built ZILF/ZAPF 1.8 executables live under `/tmp/terpvault-zilf-verification/bin/Debug/net10.0/`, but `/tmp` is volatile and `zilf` is not on `PATH`.
@@ -48,14 +48,14 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 - Continue Quark2/Typhoon light/dark checks and player shell refinements. Plan Inline Play Mode and terminal-style player themes as roadmap work only; pass future Parchment theme hints only if the bundled/configured Parchment runtime supports them safely.
 - Keep docs aligned before new package work around richer Oracle/progressive hints, player placement/boot behavior, content transparency, Grav-compatible tagging/search posture, and a future Admin2 Guide tab.
 
-### v0.5.0 milestone concept
+### v0.5.0 milestone posture
 
-- Treat v0.5.0 as a coherent public milestone and possible GPM-readiness/submission candidate, not just another small feature release.
-- v0.5.0 should mean the plugin metadata, blueprints, README, CHANGELOG, LICENSE, third-party notices, dependencies, and compatibility are GPM-friendly and internally consistent.
-- Public routes should be stable: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_engine/parchment`, and `/if/_manifest`.
+- v0.5.0 is the current coherent public-beta milestone candidate, not a GPM-ready claim.
+- Plugin metadata, blueprints, README, CHANGELOG, LICENSE, third-party notices, dependencies, and compatibility should remain internally consistent before tagging.
+- Public routes should remain stable: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_engine/parchment`, and `/if/_manifest`.
 - Parchment should remain bundled, tracked, documented, and license-noticed.
-- Admin2 should be stable enough for beta use across package create, metadata edit, helper Markdown edit, media/screenshots management, story replacement, export, import inspect, draft-only import commit, version visibility, and any completed large-library search/filter/sort basics.
-- Demo material should be credible and conservative: Zork I fully bundled and verified; Zork II/Zork III added only if provenance/build/playback/helper docs are clean; Open Adventure / Colossal Cave, Grue, and You Are Standing polished only if included; no questionable historical/commercial assets; helper docs original or properly licensed.
+- Admin2 should remain stable enough for beta use across package create, publish/unpublish, featured toggle, metadata edit, helper Markdown edit, media/screenshots management, story replacement, export, import inspect, draft-only import commit, version visibility, and large-library search/filter/sort basics.
+- Demo material should remain credible and conservative: Zork I, Zork II, and Zork III are the reviewed bundled starter anchors; Open Adventure remains draft/non-featured until final art/provenance review; Grue, You Are Standing, Adventure, and other real IF candidates need redistribution review before public-release claims.
 - Mainframe Zork / Dungeon may be documented as a research-only candidate, but should not be included in a v0.5.0 candidate bundle unless story/playback/provenance/build/helper docs are clean and the package is separately approved.
 - Metadata/iFiction workflows should be clear: local `metadata.iFiction.xml` preview/apply documented, and remote IFDB/IFWiki/IF Archive lookup still clearly roadmap unless explicitly implemented.
 - Security/destructive boundaries should stay clear: no package delete unless the safe workflow exists, no silent physical file deletion, and import remains non-overwriting and draft-only.
@@ -102,4 +102,4 @@ TerpVault is in an early public-beta foundation phase. Public routes and bundled
 
 ## Packaging posture
 
-TerpVault v0.4.x remains an incremental early public-beta line. TerpVault v0.5.0 is the first planned point where the project may be evaluated as a GPM-readiness/public milestone candidate. Before any future GPM-ready package, keep real IF starter packages development-only unless redistribution review is complete for every story file, cover, helper document, and metadata source.
+TerpVault v0.5.0 is the current early public-beta milestone candidate, not a GPM-ready claim. Future v0.5.x work should stay incremental and conservative. Before any future GPM-ready package, keep real IF starter packages development-only unless redistribution review is complete for every story file, cover, helper document, and metadata source.

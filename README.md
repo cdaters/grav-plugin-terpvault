@@ -2,9 +2,9 @@
 
 **TerpVault** is a Grav plugin for curating, presenting, and playing classic interactive fiction story files. Think of it as a standards-aware shelf of digital IF boxes: story file, metadata, Inform-style cover art, small-cover art, optional hero art, screenshots, feelies/extras, hints, walkthroughs, and a bundled web player.
 
-This is a **v0.4.12 early public-beta release** on the TerpVault foundation. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
+This is a **v0.5.0 early public-beta milestone** on the TerpVault foundation. It is intentionally repo-ready and readable, but it is not a finished public 1.0 release and is not GPM-ready yet.
 
-The v0.4.x line is intentionally incremental. The next larger public milestone target is v0.5.0, which may become a GPM-readiness/submission candidate only after release packaging, Admin2 beta workflows, bundled Parchment notices, public routes, demo package posture, and destructive-action boundaries are audited.
+The v0.5.x line should keep the same conservative posture: public routes, bundled Parchment, Admin2 beta workflows, package lifecycle controls, demo package posture, and destructive-action boundaries must stay audited before any GPM-readiness/submission claim.
 
 ## What it does now
 
@@ -12,18 +12,20 @@ The v0.4.x line is intentionally incremental. The next larger public milestone t
 - Uses a per-game `game.yaml` metadata file.
 - Uses Inform-friendly naming ideas: `cover` for display/title/box art and `small_cover` for compact library card art.
 - Supports optional `resources.hero` art for public detail/play presentation without replacing cover art.
-- Supports screenshots, feelies/extras, how-to-play notes, hints, and walkthrough files.
+- Supports screenshots, feelies/extras, how-to-play notes, Oracle v1 hints, walkthrough files, and optional known-differences notes.
 - Renders compact package cards, detail pages with help/provenance sections, and a focused play view.
 - Provides virtual frontend routes under `/if` by default:
   - `/if` library page
+  - `/if/_manifest` JSON manifest endpoint
   - `/if/{slug}` game detail page
   - `/if/{slug}/play` focused play page
+  - `/if/{slug}/feelie/{path}` rendered Markdown feelie route for declared `.md` extras
   - `/if/_story/{slug}/{filename}` controlled story-file endpoint
   - `/if/_asset/{slug}/{path}` controlled package-asset endpoint
 - Provides a native shortcode-style embed:
   - `[terpvault game="adventure"]`
 - Bundles the tracked Parchment 2025.1.14 single-file web build under `assets/vendor/parchment/` as the first engine adapter, served locally through `/if/_engine/parchment`.
-- Includes an optional Admin2 Library Manager with collapsible package rows, search/sort/filter controls, format support, package validation warnings, provenance summaries, runtime settings diagnostics, a limited package creation wizard, package export, draft-only package import, a metadata-only `game.yaml` editor, local iFiction XML status/upload/preview with selected-field apply, helper Markdown editing, limited package-local cover/small-cover/hero/screenshot image uploads and authenticated draft-safe image previews, curated feelies/extras manifest management and upload, and limited story-file replacement. It is disabled by default.
+- Includes an optional Admin2 Library Manager with collapsible package rows, search/sort/filter controls, format support, draft-inclusive package listing, publish/unpublish controls, featured toggles, package validation warnings, provenance summaries, runtime settings/version diagnostics, Terpwright Phase 1/2 local package creation, package export, draft-only package import, a metadata-only `game.yaml` editor, local iFiction XML status/upload/preview with selected-field apply, helper Markdown editing, limited package-local cover/small-cover/hero/screenshot image uploads and authenticated draft-safe image previews, curated feelies/extras manifest management and upload, and limited story-file replacement. It is disabled by default.
 
 ## What it does not do yet
 
@@ -32,7 +34,7 @@ The v0.4.x line is intentionally incremental. The next larger public milestone t
 - It does not provide an arbitrary package file browser.
 - It does not yet provide named save slots or server-side save syncing.
 - It does not yet provide Inline Play Mode, player placement/boot controls, public theme pickers, or terminal theme presets beyond the current player-shell styling.
-- It does not yet provide The Oracle/progressive hint renderer beyond package-local helper Markdown rendering.
+- It provides Oracle v1 rendering for package-local `resources.hints: hints.md`, but richer Oracle sources, guided flows, and Admin2 Oracle controls remain roadmap-only.
 - It does not yet provide content-note/theme-note filtering or Admin2 controls for content transparency metadata.
 - It shows local `metadata.iFiction.xml` status, can upload or replace the package-root XML file, and can apply explicitly selected supported fields into `game.yaml` without remote lookup.
 - It does not yet provide a full classic Grav Admin custom management page beyond the standard plugin settings screen.
@@ -40,12 +42,12 @@ The v0.4.x line is intentionally incremental. The next larger public milestone t
 
 ## Known limitations
 
-- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory, client-side search/sort/filter controls, package export, draft-only import, whitelisted `game.yaml` metadata edits, local iFiction XML status/upload/preview with selected-field apply, allowlisted helper Markdown edits, limited cover/small-cover/hero/screenshot image uploads and authenticated draft-safe image previews, curated feelies/extras manifest management and upload, and limited story-file replacement.
+- The Admin2 Library Manager is experimental, disabled by default with `admin.enable_admin2_page: false`, and currently limited to package inventory, draft/published and featured controls, client-side search/sort/filter controls, Terpwright Phase 1/2 local package creation, package export, draft-only import, whitelisted `game.yaml` metadata edits, local iFiction XML status/upload/preview with selected-field apply, allowlisted helper Markdown edits, limited cover/small-cover/hero/screenshot image uploads and authenticated draft-safe image previews, curated feelies/extras manifest management and upload, and limited story-file replacement.
 - Public virtual routes and Admin2 API routes are separate integration surfaces. Admin2 API routes are registered only when the Admin2 Library Manager is enabled.
 - `.terpvault.zip` export and draft-only import are available through Admin2. Import overwrite/replace is not implemented.
 - Parchment save/restore is interpreter-native. Players should use story commands such as `SAVE` and `RESTORE`.
 - The `_demo` tree includes development starter packages for testing. Real IF packages need package-level rights/provenance review before broad redistribution; see [docs/DEMO-CONTENT-RIGHTS.md](docs/DEMO-CONTENT-RIGHTS.md).
-- `zork-i` and `zork-iii` are provenance-reviewed bundled starter packages, with source-built story files, package-local provenance, upstream license text, original package materials, and selected package-local feelies/extras. The story/source license notes are separate from package-local original materials and any historical reference/preservation materials.
+- `zork-i`, `zork-ii`, and `zork-iii` are provenance-reviewed bundled starter packages, with source-built story files, package-local provenance, upstream license text, original package materials, and selected package-local feelies/extras. The story/source license notes are separate from package-local original materials and any historical reference/preservation materials.
 - `sample-cave` is the public-safe original structure demo, but its placeholder `game.z5` is not a playable story file.
 
 ## Installation for local development
@@ -116,7 +118,7 @@ player:
 
 The current default config also contains legacy player placeholders such as `launch_mode: button` and save-related flags. Keep those as compatibility/current-config details; new roadmap examples should use `placement` and `boot`.
 
-Future roadmap concepts include package or global player controls for placement, boot behavior, terminal theme presets, and optional public theme pickers. Preferred future terms are `player.placement: focused | inline | inline_autostart` and `player.boot: autoload | manual`. These are not implemented in v0.4.12; the stable current play surface remains `/if/{slug}/play`, and the detail page Play button remains the safe default entry point.
+Future roadmap concepts include package or global player controls for placement, boot behavior, terminal theme presets, and optional public theme pickers. Preferred future terms are `player.placement: focused | inline | inline_autostart` and `player.boot: autoload | manual`. These are not implemented in v0.5.0; the stable current play surface remains `/if/{slug}/play`, and the detail page Play button remains the safe default entry point.
 
 ## Requirements and setup notes
 
@@ -266,8 +268,9 @@ Recommended files:
 - `how-to-play.md`
 - `hints.md`
 - `walkthrough.md`
+- `known-differences.md`
 
-Future Oracle/progressive hint support is planned as an additive layer over the existing `resources.hints: hints.md` convention. The current simple Markdown path remains backwards compatible; richer future sources may normalize Markdown, ROT13 text, `.inv`, YAML, JSON, or Ink-guided hint flows into `Section -> Question -> Hint steps`. See [docs/ORACLE-HINTS.md](docs/ORACLE-HINTS.md).
+Oracle v1 renders the existing `resources.hints: hints.md` convention in a collapsed spoiler-safe panel. The simple Markdown path remains backwards compatible; richer future sources may normalize Markdown, ROT13 text, `.inv`, YAML, JSON, or Ink-guided hint flows into `Section -> Question -> Hint steps`. See [docs/ORACLE-HINTS.md](docs/ORACLE-HINTS.md).
 
 Future content transparency metadata should separate ordinary discovery tags from `content_notes`, `theme_notes`, and optional `audience` guidance. These fields are for neutral discovery and patron choice; they should not hide, block, endorse, or morally rank works by default. See [docs/CONTENT-TRANSPARENCY.md](docs/CONTENT-TRANSPARENCY.md).
 
@@ -339,6 +342,7 @@ TerpVault package validation is curator-facing. Missing or unreadable story file
 - source/provenance URL not recorded
 - license name or redistribution notes not recorded
 - how-to-play, hints, or walkthrough helper files not found
+- invalid or missing first-class known-differences file when `resources.known_differences` is declared
 
 The public detail page may show these as calm package notes. They do not make missing catalog metadata look like a fatal public error. Validation results are exposed through `GamePackage::warnings()`, `advisoryWarnings()`, `warning_count`, and `error_count`.
 
@@ -504,7 +508,7 @@ The current page provides package inventory plus metadata/helper/media/story edi
 - Settings tab showing route/storage/player/version diagnostics.
 - Public Detail and Play links for each package.
 - Advisory validation warnings and Catalog & Provenance summaries where package metadata provides them.
-- Create Package wizard for a new folder, starter `game.yaml`, starter helper Markdown, and one initial story file.
+- Create Package / Terpwright Phase 2 wizard for a draft package from one local story file plus optional local media, helper Markdown, `metadata.iFiction.xml`, feelies, known-differences notes, and manually entered URL/provenance fields.
 - Edit Metadata action for whitelisted existing `game.yaml` fields such as bibliographic details, IFIDs, catalog links, license/source notes, status, featured, and tags.
 - iFiction XML status, import-inspection awareness, upload/replace, preview, and selected-field apply into `game.yaml` for local package `metadata.iFiction.xml`.
 - Helper Docs editor for package-local `how-to-play.md`, `hints.md`, and `walkthrough.md` content.

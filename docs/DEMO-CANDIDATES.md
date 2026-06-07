@@ -10,8 +10,8 @@ A candidate does not become bundled or distribution-ready until story file, meta
 
 ## Release-train posture
 
-- v0.4.x candidate work should stay incremental: verify sources, build artifacts, playback, package metadata, helper docs, and assets one candidate at a time.
-- v0.5.0 may be evaluated as a public/GPM-readiness milestone only after the demo suite is credible and conservative.
+- v0.5.x candidate work should stay incremental: verify sources, build artifacts, playback, package metadata, helper docs, and assets one candidate at a time.
+- v0.5.0 is a public-beta milestone candidate only; do not make GPM-readiness claims until the demo suite and release packaging are separately audited.
 - Zork II is now approved and promoted into `_demo` for the development demo tree. The 2026-06-02 artifact-basis recheck selected the documented patched source-built historical-header artifact, and the package passed route, story-checksum, manifest, dfrotz, export/import, temporary import route checks, final package audit, helper-doc polish, `_demo` copy validation, and clean DDEV seed verification. It has classified feelies, polished helper docs, package-local art, gameplay screenshots, release-specific IFID/catalog fields, and package-local `metadata.iFiction.xml`. A source/playback repair pass traced the normal-output post-crown balloon crash to a `FANTASIES` table-counter issue; the promoted artifact has SHA-256 `02830587cfe5ca68c2f9289a9178780761ccec5f1582d13130d6217bd9e437ef` and completes under normal dfrotz output without `SUPERBRIEF`, reaching `400/400` in `372` moves with rank `Master Adventurer`. Zork III has completed its review path for this development demo tree and is bundled in `_demo`.
 - Open Adventure / Colossal Cave is now promoted into `_demo` as a draft, non-featured demo/library candidate after package import/inspect smoke. It is not final or release-ready; final map/poster art and release-level provenance review remain pending.
 - Mainframe Zork / Dungeon remains a research-only candidate. Treat external Phase 0 packet material as research notes, not as bundled source, story, art, or playable package content.

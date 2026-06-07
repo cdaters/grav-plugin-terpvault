@@ -10,17 +10,17 @@ Before any future GPM-ready plugin package, ship only `sample-cave`, an original
 
 For Craig's development branch, the `_demo` tree also includes real starter packages so the player and library views can be tested with multiple playable titles. Each package should retain cautious source, license, provenance, supplemental-material classification, and redistribution notes before broader public distribution.
 
-## v0.4.x and v0.5.0 direction
+## v0.5.x direction
 
-- Keep v0.4.x starter-library work incremental and evidence-driven.
+- Keep v0.5.x starter-library work incremental and evidence-driven.
 - Zork II has completed approval, helper-doc polish, final audit, `_demo` promotion, and clean DDEV seed verification for this development demo tree. Zork III has completed that review path for this development demo tree and is bundled in `_demo`.
 - Mainframe Zork / Dungeon should remain a research-only candidate, separate from Zork I/II/III, until source selection, legal/provenance review, reference transcripts, build/reconstruction path, playback, and helper docs are clean.
 - Open Adventure / Colossal Cave is now present in `_demo` as a draft, non-featured demo/library candidate using an Inform 6 / Z-machine `.z8` port. It should remain draft until release-level provenance review, final map/poster art approval or replacement, and route/checksum validation are complete.
 - Grue and You Are Standing should be polished only if the exact story-file license, package-local original material notes, and supplemental material provenance are clear enough for the intended distribution.
-- v0.5.0 may become a public/GPM-readiness candidate only if the included starter/demo set is conservative, well documented, and free of questionable historical/commercial assets.
+- v0.5.0 is a public-beta milestone candidate only. Do not treat it as GPM-ready unless the included starter/demo set is conservative, well documented, and free of questionable historical/commercial assets.
 - Demo art and helper docs should be original or have documented reuse rights, with package-local notes explaining source, classification, and license/provenance status.
 - Starter package metadata should eventually use neutral `tags`, `content_notes`, `theme_notes`, and `audience` guidance when useful for discovery and patron choice. These fields should not hide, block, endorse, or morally rank works by default.
-- Starter package helper docs should keep using simple `resources.hints: hints.md` until The Oracle/progressive hint system is implemented. Any future Oracle metadata should be additive and backwards compatible.
+- Starter package helper docs should keep using simple `resources.hints: hints.md`, which Oracle v1 renders today. Any future richer Oracle metadata should be additive and backwards compatible.
 
 ## Current real starter packages
 

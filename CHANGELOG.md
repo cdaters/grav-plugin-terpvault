@@ -1,3 +1,24 @@
+# v0.5.0
+
+## 06/06/2026
+
+1. New
+    - Added Admin2 draft-inclusive package lifecycle controls for publish/unpublish and featured toggles.
+    - Added Oracle v1 frontend hint rendering over package-local `resources.hints: hints.md`.
+    - Added Markdown feelie rendering routes for declared `.md` extras.
+    - Added first-class `resources.known_differences` package support.
+    - Added Terpwright Phase 1 local-file package creation and Phase 2 manual URL/provenance metadata capture.
+
+2. Changed
+    - Restored Admin2 version badge data from plugin metadata and kept public version reporting aligned with the metadata source.
+    - Collapsed Oracle and Extras & Feelies public detail sections by default for more spoiler-safe package pages.
+    - Kept import/export draft-only, non-overwriting, and package-local; created packages are draft and not featured until reviewed.
+
+3. Notes
+    - Terpwright Phase 3 ecosystem lookup helpers remain planning-only.
+    - No release tag, GitHub release, production deployment, package delete, import overwrite/replace, remote scraping, remote asset download, or Ink runtime support is included.
+    - TerpVault remains an early public-beta plugin and is not claimed as GPM-ready.
+
 # v0.4.12
 
 ## 05/28/2026

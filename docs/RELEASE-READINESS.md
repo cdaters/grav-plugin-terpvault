@@ -16,21 +16,21 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - `.terpvault.zip` export, import inspection, and draft-only import commit are implemented; import overwrite/replace is not.
 - Imported packages are forced to draft, forced to not featured, and never overwrite existing package folders.
 - TerpVault is not GPM-ready yet.
-- The v0.4.x line should remain incremental: focused Admin2/library improvements, metadata/iFiction polish, safe delete design, demo candidate preparation, and player/theme checks.
+- The v0.5.0 version line is justified as a public-beta milestone because the accumulated post-v0.4.12 work adds Admin2 package lifecycle controls, Oracle v1, Markdown feelie routing, known-differences resources, and Terpwright Phase 1/2 package creation.
 - Player placement, boot behavior, Inline Play Mode, terminal theme presets, and public theme pickers are roadmap-only unless a future build explicitly implements and documents them.
 - Oracle v1 renders simple package-local `resources.hints: hints.md` in the frontend; richer Oracle sources, guided flows, and Admin2 controls remain roadmap-only.
 - Content transparency filtering and Admin2 controls are roadmap-only; content notes should describe works neutrally and should not hide, block, endorse, or morally rank works by default.
 - A future Admin2 Guide/Help tab is roadmap-only; no runtime Guide tab is implemented yet.
 - Terpwright Phase 1 local-file package building and Phase 2 manual metadata/provenance URL capture are implemented in Admin2 for draft package creation. Terpwright Phase 3 ecosystem lookup helpers remain roadmap-only until explicitly implemented and documented.
-- v0.5.0 is the intended public milestone/GPM-readiness candidate line, pending a full audit and a credible demo/support posture.
+- v0.5.0 should be treated as a release-candidate milestone only after local DDEV validation, changed-file lint/checks, and final manual review. It is not a GPM-ready claim and should not be tagged or published until Craig approves.
 
-## v0.5.0 milestone criteria
+## v0.5.0 readiness criteria
 
-- Plugin metadata, `blueprints.yaml`, README, CHANGELOG, LICENSE, and third-party notices are GPM-friendly.
+- Plugin metadata, `blueprints.yaml`, README, CHANGELOG, LICENSE, and third-party notices are internally consistent and ready for a later GPM-readiness review.
 - Grav/Admin2/API dependencies and compatibility are correct and stable.
 - Bundled Parchment is tracked, documented, included in GitHub source/download ZIPs, and license-noticed.
 - Public routes are stable: `/if`, `/if/{slug}`, `/if/{slug}/play`, `/if/_engine/parchment`, and `/if/_manifest`.
-- Admin2 Library Manager is stable enough for beta use: package create, metadata edit, helper Markdown edit, media/screenshots management with authenticated draft-safe image previews, story replacement, export, import inspect, draft-only import commit, version visibility, and any completed large-library search/filter/sort basics.
+- Admin2 Library Manager is stable enough for beta use: package create/Terpwright Phase 1/2, publish/unpublish, featured toggle, metadata edit, helper Markdown edit, media/screenshots management with authenticated draft-safe image previews, story replacement, export, import inspect, draft-only import commit, version visibility, and large-library search/filter/sort basics.
 - Metadata/iFiction behavior is clear: local `metadata.iFiction.xml` preview/apply is documented, and IFDB/IFWiki/IF Archive remote lookup remains roadmap unless implemented.
 - If Terpwright Phase 3 lookup helpers are implemented before v0.5.0, they must be explicit admin-triggered preview/apply workflows, tolerate provider timeout/offline failures, avoid scraping and AI metadata generation, avoid automatic story/art downloads, preserve package-local metadata as primary, and keep URL/catalog/license hints separate from rights clearance.
 - Security/destructive boundaries are clear: no package delete unless a safe workflow exists, no silent physical file deletion, no arbitrary package browser, and import remains draft-only and non-overwriting.
@@ -38,7 +38,7 @@ This checklist is for preparing TerpVault before broader public-beta testing or 
 - Ported, patched, reconstructed, source-built, or browser-adapted demo packages should use `resources.known_differences` when material behavior/version differences need player-facing explanation. This document is optional but, when present, must be package-local Markdown and should not replace `provenance.md` rights/source/build notes or `walkthrough.md` solution routes.
 - Mainframe Zork / Dungeon remains research-only unless its source basis, license/provenance, reference transcripts, build/reconstruction path, playable artifact, playback behavior, and helper docs are complete and separately approved.
 - Player presentation is readable across common themes. If player placement/boot controls, Inline Play Mode, or terminal themes are implemented before v0.5.0, they must preserve `/if/{slug}/play`, support admin defaults and package overrides, keep public controls optional, avoid redundant second Play clicks on the focused play page where practical, and document Parchment iframe/internal styling limits.
-- If Oracle/progressive hints are implemented before v0.5.0, they must preserve simple `resources.hints: hints.md`, keep package imports/exports backwards compatible, and avoid adding an Ink runtime unless that work is separately scoped.
+- Oracle v1 must preserve simple `resources.hints: hints.md`, render spoiler-safe/collapsed by default, keep package imports/exports backwards compatible, and avoid adding an Ink runtime unless that work is separately scoped.
 - If content transparency/search filtering is implemented before v0.5.0, it must preserve packages with simple/no tags, align with Grav-compatible taxonomy/search structures where practical, and keep filtering descriptive rather than punitive.
 - If an Admin2 Guide/Help tab is implemented before v0.5.0, it must render local/read-only docs, avoid remote fetches, remain separate from Settings, and reinforce current safety boundaries.
 - Release artifacts contain no dev-only paths, accidental test/private artifacts, platform cruft, or questionable historical/commercial assets.
@@ -81,7 +81,7 @@ Before tagging:
 - Confirm the same routes work when Grav is installed in a subdirectory.
 - Confirm public library/detail/play pages remain readable in the active site theme, with future explicit coverage for Quark2 and Typhoon light/dark modes.
 - Confirm Admin2 loads normally with `admin.enable_admin2_page: false`.
-- If `admin.enable_admin2_page: true` is tested, confirm Admin2 create/edit/export/import workflows are authenticated, non-overwriting, and do not add package delete or overwrite/replace behavior. Confirm draft package thumbnails use authenticated Admin/API image previews while public draft `/if/_asset/...` routes remain blocked.
+- If `admin.enable_admin2_page: true` is tested, confirm Admin2 create/Terpwright, publish/unpublish, featured toggle, edit/export/import workflows are authenticated, non-overwriting, and do not add package delete or overwrite/replace behavior. Confirm draft package thumbnails use authenticated Admin/API image previews while public draft `/if/_asset/...` routes remain blocked.
 - For future delete/remove work, confirm destructive actions are absent until a reviewed design exists with package title/slug confirmation, manifest-vs-physical-delete distinction, trash/quarantine or backup behavior, CSRF/token and permission guardrails, package containment checks, and audit/result feedback.
 - For large-library work, confirm Admin2 search/filter/sort controls preserve state, show accurate result counts, keep expanded row state intact, and still handle small libraries normally. Pagination or virtual scrolling remains future work for very large libraries.
 - For metadata-assistant work, confirm local iFiction status/upload/import-awareness/preview/apply remains preview-driven, upload writes only package-root `metadata.iFiction.xml`, import commit preserves XML without auto-applying it, `game.yaml` is backed up before selected-field writes, remote lookup requires explicit action, and metadata enrichment remains separate from story-file/package download or asset redistribution.
