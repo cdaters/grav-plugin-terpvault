@@ -12,9 +12,11 @@ class EcosystemMetadataService
     private const IFDB_CANONICAL_BASE_URL = 'https://ifdb.org/viewgame?id=';
     private const IFDB_JSON_BASE_URL = 'https://ifdb.org/viewgame?json&id=';
     private const IFDB_DESCRIPTION_LIMIT = 700;
+    private const IFWIKI_BASE_URL = 'https://www.ifwiki.org/';
+    private const IFWIKI_API_URL = 'https://www.ifwiki.org/api.php';
+    private const IFWIKI_EXTRACT_LIMIT = 700;
 
     private const REFERENCE_FIELDS = [
-        'ifwiki_url' => 'IFWiki URL',
         'source_url' => 'Source / package URL',
         'upstream_source_url' => 'Upstream source URL',
         'port_repository_url' => 'Port/source repository URL',
@@ -44,7 +46,10 @@ class EcosystemMetadataService
         $ifdbTuidInput = $this->stringInput($inputs, 'ifdb_tuid');
         $ifdbUrlInput = $this->stringInput($inputs, 'ifdb_url') ?: $this->stringInput($inputs, 'ifdb');
         $ifdbInput = $ifdbTuidInput ?: $ifdbUrlInput;
-        $hasInput = $ifArchivePath !== '' || $ifArchiveUrl !== '' || $ifdbInput !== '';
+        $ifwikiUrlInput = $this->stringInput($inputs, 'ifwiki_url') ?: $this->stringInput($inputs, 'ifwiki');
+        $ifwikiTitleInput = $this->stringInput($inputs, 'ifwiki_title');
+        $ifwikiInput = $ifwikiUrlInput ?: $ifwikiTitleInput;
+        $hasInput = $ifArchivePath !== '' || $ifArchiveUrl !== '' || $ifdbInput !== '' || $ifwikiInput !== '';
 
         $ifArchive = [
             'ok' => true,
@@ -107,6 +112,26 @@ class EcosystemMetadataService
             }
         }
 
+        $ifwiki = $this->emptyIFWikiPreview();
+        if ($ifwikiInput !== '') {
+            if ($ifwikiUrlInput !== '' && $ifwikiTitleInput !== '') {
+                $ifwiki = $this->ifwikiMismatchPreview($ifwikiTitleInput, $ifwikiUrlInput);
+                if (!$ifwiki['errors']) {
+                    $ifwiki = $this->previewIFWiki($ifwikiUrlInput);
+                }
+            } else {
+                $ifwiki = $this->previewIFWiki($ifwikiInput);
+            }
+            $warnings = array_merge($warnings, $ifwiki['warnings']);
+            $errors = array_merge($errors, $ifwiki['errors']);
+            if ($ifwiki['title'] !== '' || $ifwiki['url'] !== '') {
+                $metadata['catalog']['ifwiki'] = [
+                    'title' => $ifwiki['title'],
+                    'url' => $ifwiki['url'],
+                ];
+            }
+        }
+
         if (!$hasInput) {
             $errors[] = 'Enter at least one ecosystem reference before previewing metadata.';
         }
@@ -120,11 +145,12 @@ class EcosystemMetadataService
             'metadata' => $metadata,
             'ifarchive' => $ifArchive,
             'ifdb' => $ifdb,
+            'ifwiki' => $ifwiki,
             'references' => $references,
             'warnings' => array_values(array_unique($warnings)),
             'errors' => $errors,
             'writes' => false,
-            'remote_fetches' => (bool)($ifdb['remote_fetches'] ?? false),
+            'remote_fetches' => (bool)(($ifdb['remote_fetches'] ?? false) || ($ifwiki['remote_fetches'] ?? false)),
         ];
     }
 
@@ -142,6 +168,25 @@ class EcosystemMetadataService
         if ($preview['ok']) {
             $preview['tuid'] = $tuidResult['tuid'];
             $preview['url'] = $tuidResult['url'];
+        }
+
+        return $preview;
+    }
+
+    private function ifwikiMismatchPreview(string $title, string $url): array
+    {
+        $preview = $this->emptyIFWikiPreview();
+        $titleResult = $this->normalizeIFWikiReference($title);
+        $urlResult = $this->normalizeIFWikiReference($url);
+        $preview['warnings'] = array_values(array_unique(array_merge($titleResult['warnings'], $urlResult['warnings'])));
+        $preview['errors'] = array_merge($titleResult['errors'], $urlResult['errors']);
+        if (!$preview['errors'] && $titleResult['title'] !== $urlResult['title']) {
+            $preview['errors'][] = 'IFWiki title and URL point to different IFWiki pages.';
+        }
+        $preview['ok'] = !$preview['errors'];
+        if ($preview['ok']) {
+            $preview['title'] = $titleResult['title'];
+            $preview['url'] = $titleResult['url'];
         }
 
         return $preview;
@@ -174,6 +219,51 @@ class EcosystemMetadataService
             'tuid' => $result['tuid'],
             'url' => $result['url'],
         ];
+    }
+
+    public function requireIFWikiMetadata(string $input, string $title = ''): array
+    {
+        $input = trim($input);
+        $title = trim($title);
+        if ($input === '' && $title === '') {
+            return [
+                'title' => '',
+                'url' => '',
+            ];
+        }
+
+        $result = $this->normalizeIFWikiReference($input !== '' ? $input : $title);
+        if ($title !== '' && $input !== '') {
+            $titleResult = $this->normalizeIFWikiReference($title);
+            if ($titleResult['errors']) {
+                throw new InvalidArgumentException(implode(' ', $titleResult['errors']));
+            }
+            if ($result['title'] !== '' && $titleResult['title'] !== '' && $result['title'] !== $titleResult['title']) {
+                throw new InvalidArgumentException('IFWiki title and URL point to different IFWiki pages.');
+            }
+        }
+        if ($result['errors']) {
+            throw new InvalidArgumentException(implode(' ', $result['errors']));
+        }
+
+        return [
+            'title' => $result['title'],
+            'url' => $result['url'],
+        ];
+    }
+
+    public function requireIFWikiUrl(string $url): string
+    {
+        if (trim($url) === '') {
+            return '';
+        }
+
+        $result = $this->normalizeIFWikiReference($url);
+        if ($result['errors']) {
+            throw new InvalidArgumentException(implode(' ', $result['errors']));
+        }
+
+        return $result['url'];
     }
 
     public function requireIFArchiveMetadata(string $path, string $url): array
@@ -315,6 +405,66 @@ class EcosystemMetadataService
         ];
     }
 
+    public function normalizeIFWikiReference(string $input): array
+    {
+        $input = trim($input);
+        $warnings = [
+            'IFWiki is catalog/reference metadata only; TerpVault did not download story files or assets.',
+            'IFWiki metadata does not prove redistribution rights.',
+        ];
+        $errors = [];
+
+        if ($input === '') {
+            return [
+                'ok' => false,
+                'title' => '',
+                'url' => '',
+                'warnings' => $warnings,
+                'errors' => ['Enter an IFWiki URL or page title before previewing IFWiki metadata.'],
+            ];
+        }
+
+        if (preg_match('/[\x00-\x1F\x7F]/', $input) || strpos($input, '\\') !== false) {
+            return [
+                'ok' => false,
+                'title' => '',
+                'url' => '',
+                'warnings' => $warnings,
+                'errors' => ['IFWiki input contains unsafe characters.'],
+            ];
+        }
+
+        $title = '';
+        if (preg_match('#^([a-z][a-z0-9+.-]*):#i', $input, $schemeMatch)) {
+            $scheme = strtolower($schemeMatch[1]);
+            if (!in_array($scheme, ['http', 'https'], true)) {
+                $errors[] = 'IFWiki URL uses an unsafe or unsupported scheme.';
+            } elseif (!preg_match('#^https?://#i', $input)) {
+                $errors[] = 'IFWiki URL is malformed.';
+            } else {
+                $fromUrl = $this->titleFromIFWikiUrl($input);
+                $title = $fromUrl['title'];
+                $errors = array_merge($errors, $fromUrl['errors']);
+                $warnings = array_merge($warnings, $fromUrl['warnings']);
+            }
+        } else {
+            $fromTitle = $this->normalizeIFWikiTitle($input);
+            $title = $fromTitle['title'];
+            $errors = array_merge($errors, $fromTitle['errors']);
+            $warnings = array_merge($warnings, $fromTitle['warnings']);
+        }
+
+        $url = $title !== '' ? self::IFWIKI_BASE_URL . $this->encodeIFWikiTitle($title) : '';
+
+        return [
+            'ok' => count($errors) === 0,
+            'title' => count($errors) === 0 ? $title : '',
+            'url' => count($errors) === 0 ? $url : '',
+            'warnings' => array_values(array_unique($warnings)),
+            'errors' => $errors,
+        ];
+    }
+
     private function previewIFDB(string $input): array
     {
         $normalized = $this->normalizeIFDBReference($input);
@@ -375,6 +525,89 @@ class EcosystemMetadataService
         } catch (\Throwable $e) {
             $preview['ok'] = false;
             $preview['warnings'][] = 'IFDB lookup failed without writing package files: ' . $e->getMessage();
+        }
+
+        $preview['warnings'] = array_values(array_unique($preview['warnings']));
+        return $preview;
+    }
+
+    private function previewIFWiki(string $input): array
+    {
+        $normalized = $this->normalizeIFWikiReference($input);
+        $preview = $this->emptyIFWikiPreview();
+        $preview['ok'] = $normalized['ok'];
+        $preview['title'] = $normalized['title'];
+        $preview['url'] = $normalized['url'];
+        $preview['warnings'] = $normalized['warnings'];
+        $preview['errors'] = $normalized['errors'];
+
+        if (!$normalized['ok'] || $normalized['title'] === '') {
+            return $preview;
+        }
+
+        $apiUrl = self::IFWIKI_API_URL . '?' . http_build_query([
+            'action' => 'query',
+            'format' => 'json',
+            'formatversion' => '2',
+            'prop' => 'extracts|categories|extlinks|info',
+            'exintro' => '1',
+            'explaintext' => '1',
+            'exchars' => (string)self::IFWIKI_EXTRACT_LIMIT,
+            'cllimit' => '20',
+            'ellimit' => '20',
+            'inprop' => 'url',
+            'titles' => $normalized['title'],
+            'redirects' => '1',
+        ], '', '&', PHP_QUERY_RFC3986);
+        $preview['api_url'] = $apiUrl;
+        $preview['remote_fetches'] = true;
+        $preview['sources'][] = [
+            'label' => 'IFWiki MediaWiki API',
+            'url' => $apiUrl,
+            'type' => 'official-api',
+        ];
+        $preview['sources'][] = [
+            'label' => 'IFWiki page',
+            'url' => $normalized['url'],
+            'type' => 'catalog-page',
+        ];
+
+        try {
+            $fetched = $this->fetchUrl($apiUrl, 'IFWiki');
+            if (!$fetched['ok']) {
+                $preview['ok'] = false;
+                $preview['warnings'][] = $fetched['error'] ?: 'IFWiki lookup failed.';
+                return $preview;
+            }
+
+            $decoded = json_decode($fetched['body'], true);
+            if (!is_array($decoded)) {
+                $preview['ok'] = false;
+                $preview['warnings'][] = 'IFWiki returned a response that could not be parsed as JSON.';
+                return $preview;
+            }
+
+            $extracted = $this->fieldsFromIFWikiJson($decoded, $normalized['title'], $normalized['url']);
+            if (!$extracted['found']) {
+                $preview['ok'] = false;
+                $preview['warnings'][] = 'IFWiki lookup did not find a page for the normalized title.';
+                return $preview;
+            }
+
+            $preview['title'] = $extracted['title'] ?: $normalized['title'];
+            $preview['url'] = $extracted['url'] ?: $normalized['url'];
+            $preview['fields'] = $extracted['fields'];
+            $preview['categories'] = $extracted['categories'];
+            $preview['external_links_reference_only'] = $extracted['external_links_reference_only'];
+            if ($preview['title'] !== $normalized['title'] || $preview['url'] !== $normalized['url']) {
+                $preview['warnings'][] = 'IFWiki normalized the requested page title through its API response.';
+            }
+            if (!$preview['fields']) {
+                $preview['warnings'][] = 'IFWiki lookup succeeded, but no supported metadata fields were present.';
+            }
+        } catch (\Throwable $e) {
+            $preview['ok'] = false;
+            $preview['warnings'][] = 'IFWiki lookup failed without writing package files: ' . $e->getMessage();
         }
 
         $preview['warnings'] = array_values(array_unique($preview['warnings']));
@@ -502,6 +735,18 @@ class EcosystemMetadataService
         ];
     }
 
+    private function ifwikiField(string $path, string $label, $value, string $group): array
+    {
+        return [
+            'path' => $path,
+            'label' => $label,
+            'value' => $value,
+            'group' => $group,
+            'source' => 'IFWiki MediaWiki API',
+            'apply' => false,
+        ];
+    }
+
     private function emptyIFDBPreview(): array
     {
         return [
@@ -513,6 +758,23 @@ class EcosystemMetadataService
             'tags' => [],
             'downloads_reference_only' => [],
             'raw_summary' => [],
+            'sources' => [],
+            'warnings' => [],
+            'errors' => [],
+            'remote_fetches' => false,
+        ];
+    }
+
+    private function emptyIFWikiPreview(): array
+    {
+        return [
+            'ok' => true,
+            'title' => '',
+            'url' => '',
+            'api_url' => '',
+            'fields' => [],
+            'categories' => [],
+            'external_links_reference_only' => [],
             'sources' => [],
             'warnings' => [],
             'errors' => [],
@@ -572,7 +834,116 @@ class EcosystemMetadataService
         return (bool)preg_match('/^[a-z0-9]{4,32}$/i', trim($tuid));
     }
 
-    private function fetchUrl(string $url): array
+    private function fieldsFromIFWikiJson(array $data, string $fallbackTitle, string $fallbackUrl): array
+    {
+        $pages = $data['query']['pages'] ?? null;
+        if (!is_array($pages) || !$pages) {
+            return [
+                'found' => false,
+                'title' => '',
+                'url' => '',
+                'fields' => [],
+                'categories' => [],
+                'external_links_reference_only' => [],
+            ];
+        }
+
+        $page = null;
+        foreach ($pages as $candidate) {
+            if (is_array($candidate)) {
+                $page = $candidate;
+                break;
+            }
+        }
+        if (!is_array($page) || isset($page['missing'])) {
+            return [
+                'found' => false,
+                'title' => '',
+                'url' => '',
+                'fields' => [],
+                'categories' => [],
+                'external_links_reference_only' => [],
+            ];
+        }
+
+        $title = $this->cleanScalar($page['title'] ?? $fallbackTitle);
+        $url = $this->cleanScalar($page['canonicalurl'] ?? $page['fullurl'] ?? $fallbackUrl);
+        if ($url !== '') {
+            $normalized = $this->normalizeIFWikiReference($url);
+            $url = $normalized['url'] ?: $fallbackUrl;
+        } else {
+            $url = $fallbackUrl;
+        }
+
+        $fields = [];
+        if ($title !== '') {
+            $fields[] = $this->ifwikiField('catalog.ifwiki.title', 'IFWiki title', $title, 'catalog');
+        }
+        if ($url !== '') {
+            $fields[] = $this->ifwikiField('catalog.ifwiki.url', 'IFWiki URL', $url, 'catalog');
+        }
+
+        $extract = $this->cleanScalar($page['extract'] ?? '');
+        if ($extract !== '') {
+            $extract = $this->limitText($extract, self::IFWIKI_EXTRACT_LIMIT);
+            $fields[] = $this->ifwikiField('catalog.ifwiki.summary', 'IFWiki short extract', $extract, 'reference');
+        }
+
+        $categories = [];
+        if (is_array($page['categories'] ?? null)) {
+            foreach ($page['categories'] as $category) {
+                if (!is_array($category) || count($categories) >= 20) {
+                    continue;
+                }
+                $name = $this->cleanScalar($category['title'] ?? '');
+                if (strpos($name, 'Category:') === 0) {
+                    $name = substr($name, strlen('Category:'));
+                }
+                if ($name !== '' && !$this->isHiddenWikiCategory($name)) {
+                    $categories[] = $name;
+                }
+            }
+        }
+        $categories = array_values(array_unique($categories));
+        if ($categories) {
+            $fields[] = $this->ifwikiField('catalog.ifwiki.categories', 'IFWiki categories', $categories, 'reference');
+        }
+
+        return [
+            'found' => true,
+            'title' => $title,
+            'url' => $url,
+            'fields' => $fields,
+            'categories' => $categories,
+            'external_links_reference_only' => $this->ifwikiExternalLinks($page),
+        ];
+    }
+
+    private function ifwikiExternalLinks(array $page): array
+    {
+        if (!is_array($page['extlinks'] ?? null)) {
+            return [];
+        }
+
+        $links = [];
+        foreach ($page['extlinks'] as $link) {
+            if (count($links) >= 20) {
+                break;
+            }
+            $url = is_array($link) ? $this->cleanScalar($link['url'] ?? $link['*'] ?? '') : $this->cleanScalar($link);
+            if ($url === '' || !$this->safeExternalReferenceUrl($url)) {
+                continue;
+            }
+            $links[] = [
+                'url' => $url,
+                'status' => 'reference only; not downloaded',
+            ];
+        }
+
+        return array_values(array_unique($links, SORT_REGULAR));
+    }
+
+    private function fetchUrl(string $url, string $sourceLabel = 'IFDB'): array
     {
         if ($this->httpFetcher !== null) {
             $result = call_user_func($this->httpFetcher, $url);
@@ -587,14 +958,14 @@ class EcosystemMetadataService
             return [
                 'ok' => is_string($result),
                 'body' => is_string($result) ? $result : '',
-                'error' => is_string($result) ? '' : 'Injected IFDB fetcher returned an invalid response.',
+                'error' => is_string($result) ? '' : 'Injected ' . $sourceLabel . ' fetcher returned an invalid response.',
             ];
         }
 
         if (function_exists('curl_init')) {
             $handle = curl_init($url);
             if ($handle === false) {
-                return ['ok' => false, 'body' => '', 'error' => 'Unable to initialize HTTP client for IFDB lookup.'];
+                return ['ok' => false, 'body' => '', 'error' => 'Unable to initialize HTTP client for ' . $sourceLabel . ' lookup.'];
             }
 
             curl_setopt_array($handle, [
@@ -611,10 +982,10 @@ class EcosystemMetadataService
             curl_close($handle);
 
             if (!is_string($body) || $body === '') {
-                return ['ok' => false, 'body' => '', 'error' => $error ?: 'IFDB lookup returned an empty response.'];
+                return ['ok' => false, 'body' => '', 'error' => $error ?: $sourceLabel . ' lookup returned an empty response.'];
             }
             if ($status < 200 || $status >= 300) {
-                return ['ok' => false, 'body' => $body, 'error' => 'IFDB lookup returned HTTP ' . $status . '.'];
+                return ['ok' => false, 'body' => $body, 'error' => $sourceLabel . ' lookup returned HTTP ' . $status . '.'];
             }
 
             return ['ok' => true, 'body' => $body, 'error' => ''];
@@ -630,10 +1001,118 @@ class EcosystemMetadataService
         ]);
         $body = @file_get_contents($url, false, $context);
         if (!is_string($body) || $body === '') {
-            return ['ok' => false, 'body' => '', 'error' => 'IFDB lookup failed or returned an empty response.'];
+            return ['ok' => false, 'body' => '', 'error' => $sourceLabel . ' lookup failed or returned an empty response.'];
         }
 
         return ['ok' => true, 'body' => $body, 'error' => ''];
+    }
+
+    private function titleFromIFWikiUrl(string $url): array
+    {
+        $warnings = [];
+        $errors = [];
+        $title = '';
+        $parts = parse_url($url);
+        if (!is_array($parts)) {
+            return ['title' => '', 'warnings' => [], 'errors' => ['IFWiki URL is malformed.']];
+        }
+
+        $scheme = strtolower((string)($parts['scheme'] ?? ''));
+        $host = strtolower((string)($parts['host'] ?? ''));
+        $path = (string)($parts['path'] ?? '');
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            $errors[] = 'IFWiki URL must use http or https.';
+        }
+        if (!in_array($host, ['ifwiki.org', 'www.ifwiki.org'], true)) {
+            $errors[] = 'IFWiki URL must be on ifwiki.org.';
+        }
+        if (strpos($path, '\\') !== false || strpos(rawurldecode($path), '..') !== false) {
+            $errors[] = 'IFWiki URL path must not contain traversal or unsafe path segments.';
+        }
+        if (!empty($parts['query']) || !empty($parts['fragment'])) {
+            $warnings[] = 'IFWiki URL query strings and fragments are ignored in the normalized package URL.';
+        }
+
+        if ($path === '' || $path === '/') {
+            $errors[] = 'IFWiki URL must include a page title path.';
+        } elseif (strpos($path, '/wiki/') === 0) {
+            $candidate = substr($path, strlen('/wiki/'));
+        } elseif (substr_count($path, '/') === 1) {
+            $candidate = ltrim($path, '/');
+        } else {
+            $candidate = '';
+            $errors[] = 'IFWiki URL path must be a top-level page path or /wiki/Page_Title.';
+        }
+
+        if (!$errors) {
+            $fromTitle = $this->normalizeIFWikiTitle(rawurldecode($candidate));
+            $title = $fromTitle['title'];
+            $errors = array_merge($errors, $fromTitle['errors']);
+            $warnings = array_merge($warnings, $fromTitle['warnings']);
+        }
+
+        return [
+            'title' => $errors ? '' : $title,
+            'warnings' => $warnings,
+            'errors' => $errors,
+        ];
+    }
+
+    private function normalizeIFWikiTitle(string $title): array
+    {
+        $warnings = [];
+        $errors = [];
+        $title = trim(str_replace('_', ' ', $title));
+        $title = preg_replace('/\s+/', ' ', $title) ?? $title;
+
+        if ($title === '') {
+            $errors[] = 'IFWiki page title is empty.';
+        }
+        if (preg_match('/[\x00-\x1F\x7F]/', $title) || strpos($title, '\\') !== false) {
+            $errors[] = 'IFWiki page title contains unsafe characters.';
+        }
+        if (strpos($title, '/') !== false || strpos($title, '..') !== false) {
+            $errors[] = 'IFWiki page title must not contain traversal or path separators.';
+        }
+        if (preg_match('/^[a-z][a-z0-9+.-]*:/i', $title)) {
+            $errors[] = 'IFWiki page title must be a plain title or a full IFWiki URL.';
+        }
+        if (strpbrk($title, '<>[]{}|') !== false) {
+            $errors[] = 'IFWiki page title contains unsupported punctuation.';
+        }
+        if (function_exists('mb_strlen') ? mb_strlen($title, 'UTF-8') > 180 : strlen($title) > 180) {
+            $errors[] = 'IFWiki page title is too long.';
+        }
+
+        return [
+            'title' => $errors ? '' : str_replace(' ', '_', $title),
+            'warnings' => $warnings,
+            'errors' => $errors,
+        ];
+    }
+
+    private function encodeIFWikiTitle(string $title): string
+    {
+        return implode('/', array_map('rawurlencode', explode('/', str_replace(' ', '_', $title))));
+    }
+
+    private function isHiddenWikiCategory(string $name): bool
+    {
+        return (bool)preg_match('/^(Pages?|Articles?|All pages|All articles|Redirects|Stubs|Pages with|Articles with|Hidden categories)/i', $name);
+    }
+
+    private function safeExternalReferenceUrl(string $url): bool
+    {
+        if (preg_match('/[\x00-\x1F\x7F]/', $url) || strpos($url, '\\') !== false) {
+            return false;
+        }
+        $parts = parse_url($url);
+        if (!is_array($parts)) {
+            return false;
+        }
+        $scheme = strtolower((string)($parts['scheme'] ?? ''));
+        $host = trim((string)($parts['host'] ?? ''));
+        return in_array($scheme, ['http', 'https'], true) && $host !== '';
     }
 
     private function htmlToConciseText(string $html): string
@@ -647,11 +1126,16 @@ class EcosystemMetadataService
         if ($text === '') {
             return '';
         }
-        if (function_exists('mb_strlen') && mb_strlen($text, 'UTF-8') > self::IFDB_DESCRIPTION_LIMIT) {
-            return rtrim((string)mb_substr($text, 0, self::IFDB_DESCRIPTION_LIMIT, 'UTF-8')) . '...';
+        return $this->limitText($text, self::IFDB_DESCRIPTION_LIMIT);
+    }
+
+    private function limitText(string $text, int $limit): string
+    {
+        if (function_exists('mb_strlen') && mb_strlen($text, 'UTF-8') > $limit) {
+            return rtrim((string)mb_substr($text, 0, $limit, 'UTF-8')) . '...';
         }
-        if (strlen($text) > self::IFDB_DESCRIPTION_LIMIT) {
-            return rtrim(substr($text, 0, self::IFDB_DESCRIPTION_LIMIT)) . '...';
+        if (strlen($text) > $limit) {
+            return rtrim(substr($text, 0, $limit)) . '...';
         }
 
         return $text;

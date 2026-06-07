@@ -387,7 +387,7 @@ TerpVault keeps metadata in YAML today, but the fields are aligned with common I
 - `identification.format`: broad story-file family such as `zcode`, `glulx`, `tads3`, `hugo`, or `adrift`.
 - `bibliographic.*`: title, author, headline, publication date, genre, language, and description.
 - `catalog.ifdb.tuid` and `catalog.ifdb.url`: IFDB identity and page link.
-- `catalog.ifwiki.url`: IFWiki reference link.
+- `catalog.ifwiki.title` and `catalog.ifwiki.url`: IFWiki reference link.
 - `catalog.ifarchive.path` and `catalog.ifarchive.url`: IF Archive provenance or download reference.
 - `release.source.*`: where the package files came from and when they were retrieved.
 - `release.source.upstream.url`: canonical upstream project, source release, or source distribution URL when distinct from the packaged artifact.
@@ -407,6 +407,17 @@ catalog:
 ```
 
 The IFDB preview helper can show catalog metadata candidates from IFDB's official `viewgame` JSON API, including bibliographic fields, IFIDs, format, and tags when available. These are review candidates only. IFDB metadata does not prove redistribution rights, and IFDB download links are not downloaded or treated as package sources unless the curator separately records and verifies a source/license basis.
+
+For IFWiki references, new create/edit workflows accept either a page title such as `Babel` or a URL such as `https://www.ifwiki.org/Babel`. TerpVault stores the normalized pair:
+
+```yaml
+catalog:
+  ifwiki:
+    title: Babel
+    url: https://www.ifwiki.org/Babel
+```
+
+The IFWiki preview helper can show MediaWiki API metadata candidates such as page title, canonical URL, short extract when the API provides one, categories, external links, and source attribution. These are review candidates only. IFWiki metadata does not prove redistribution rights, and IFWiki external links are not downloaded or treated as package sources unless the curator separately records and verifies a source/license basis.
 
 For IF Archive references, new create/edit workflows normalize path and URL as a pair. A curator may enter a full URL such as `https://ifarchive.org/if-archive/games/zcode/Advent.z5`, a prefixed path such as `if-archive/games/zcode/Advent.z5`, or a bare archive path such as `games/zcode/Advent.z5`. TerpVault stores:
 
@@ -428,10 +439,10 @@ Current metadata workflow limits:
 - Admin2 can upload or replace `metadata.iFiction.xml`, but upload writes only the package-root XML file and does not apply fields automatically.
 - Package creation creates `game.yaml`, optional local helper Markdown/resources, optional package-root `metadata.iFiction.xml`, and the initial story file. iFiction fields are still not applied to `game.yaml` automatically.
 - Import preserves accepted `metadata.iFiction.xml` files and reports their presence during inspection, but import commit does not use the XML to prefill or merge `game.yaml`.
-- Admin2 can preview curator-supplied ecosystem references and normalize IF Archive path/URL metadata without remote fetches or writes.
-- Remote IFDB, IFWiki, IF Archive file download, or catalog metadata lookup is not implemented.
+- Admin2 can preview curator-supplied ecosystem references, normalize IF Archive path/URL metadata without remote fetches or writes, preview IFDB metadata through IFDB's official API, and preview IFWiki metadata through IFWiki's MediaWiki API.
+- IF Archive file download, broad catalog search, arbitrary URL lookup, and automatic package/source download are not implemented.
 
-Future Metadata Assistant work should stay explicit and preview-driven. It may compare current `game.yaml` values with package-local or manually uploaded iFiction XML, current IF Archive normalized values, and later explicit IFDB/IFWiki lookup candidates. Curators should see side-by-side current/candidate values, select fields one by one, and receive a `game.yaml` backup before changes are applied. Metadata import should remain separate from story-file/package download, and provenance/license review should remain visible.
+Future Metadata Assistant work should stay explicit and preview-driven. It may compare current `game.yaml` values with package-local or manually uploaded iFiction XML, current IF Archive normalized values, and current IFDB/IFWiki lookup candidates. Curators should see side-by-side current/candidate values, select fields one by one, and receive a `game.yaml` backup before changes are applied. Metadata import should remain separate from story-file/package download, and provenance/license review should remain visible.
 
 Future metadata source providers should be defined on the back end before remote lookup ships. Provider definitions should include a provider id, display label, enabled/disabled state, lookup method/type, base URL or API endpoint where applicable, rate-limit/caching notes, attribution/license notes, field mapping rules, and confidence/scoring notes. Remote provider lookup must be an explicit admin action and should never run automatically during import or package creation.
 

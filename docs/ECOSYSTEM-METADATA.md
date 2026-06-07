@@ -114,17 +114,18 @@ Current behavior:
 - Package creation can accept local `metadata.iFiction.xml` as a package-root file, but it does not apply XML fields to `game.yaml` automatically.
 - Import inspection reports whether accepted `.terpvault.zip` packages include package-root `metadata.iFiction.xml`; import commit preserves the file but does not use it to merge or prefill `game.yaml`.
 - The Admin2 Ecosystem Metadata Preview can normalize curator-supplied IF Archive paths/URLs without downloading the referenced file.
-- Remote IFDB, IFWiki, IF Archive file download, or catalog lookup is not implemented.
+- The Admin2 Ecosystem Metadata Preview can look up curator-supplied IFDB TUID/URL values through IFDB's official API and IFWiki URL/title values through IFWiki's MediaWiki API.
+- IF Archive file download, broad catalog search, and arbitrary URL lookup are not implemented.
 - Metadata workflows do not download story files, packages, cover art, screenshots, or other remote assets.
 
 ## Manual URL roles
 
-Terpwright Phase 2 accepts pasted, curator-supplied URLs as reference metadata only. The workflow performs light syntax validation, stores the values in `game.yaml`, and displays them in Admin2 readback. Terpwright Phase 3c adds a narrow IFDB preview helper for pasted IFDB TUID/URL values, but manual URL capture still does not scrape, search broadly, trust, or summarize arbitrary remote pages.
+Terpwright Phase 2 accepts pasted, curator-supplied URLs as reference metadata only. The workflow performs light syntax validation, stores the values in `game.yaml`, and displays them in Admin2 readback. Terpwright Phase 3c adds a narrow IFDB preview helper for pasted IFDB TUID/URL values, and Phase 3d adds IFWiki URL/title preview. Manual URL capture still does not scrape, search broadly, trust, or summarize arbitrary remote pages.
 
 Use these roles consistently:
 
 - `catalog.ifdb.tuid` and `catalog.ifdb.url`: IFDB context for the work or related catalog entry.
-- `catalog.ifwiki.url`: IFWiki context or historical reference.
+- `catalog.ifwiki.title` and `catalog.ifwiki.url`: IFWiki context or historical reference.
 - `catalog.ifarchive.path` and `catalog.ifarchive.url`: IF Archive path/URL when known.
 - `release.source.url`: primary package/story/source URL when there is one clear source.
 - `release.source.upstream.url`: canonical upstream project, source release, or source distribution URL.
@@ -136,13 +137,13 @@ URL presence does not prove redistribution rights. Curators should still record 
 
 ## Ecosystem Metadata Preview
 
-Terpwright Phase 3a/3b adds an authenticated preview-only Admin2 helper, and Phase 3c extends it with IFDB lookup preview:
+Terpwright Phase 3a/3b adds an authenticated preview-only Admin2 helper, Phase 3c extends it with IFDB lookup preview, and Phase 3d adds IFWiki lookup preview:
 
 ```text
 POST /api/v1/terpvault/ecosystem/preview
 ```
 
-The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `ifarchive_url`, `ifdb_tuid`, `ifdb_url`, `ifwiki_url`, `source_url`, `upstream_source_url`, `port_repository_url`, and `license_url`. It does not write package files, download assets, download story files, or publish packages. Responses include stable review flags:
+The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `ifarchive_url`, `ifdb_tuid`, `ifdb_url`, `ifwiki_title`, `ifwiki_url`, `source_url`, `upstream_source_url`, `port_repository_url`, and `license_url`. It does not write package files, download assets, download story files, or publish packages. Responses include stable review flags:
 
 ```json
 {
@@ -154,7 +155,7 @@ The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `if
 }
 ```
 
-`remote_fetches` is `true` only when an IFDB API lookup was attempted. IFWiki, source, repository, and license URLs are reported as `stored/reference only` with lookup not implemented yet.
+`remote_fetches` is `true` only when an IFDB or IFWiki API lookup was attempted. Source, repository, and license URLs are reported as `stored/reference only` with lookup not implemented.
 
 Accepted IF Archive inputs normalize to both `catalog.ifarchive.path` and `catalog.ifarchive.url`:
 
@@ -177,7 +178,20 @@ The IFDB helper rejects or warns about empty requested lookup input, unsafe sche
 
 Supported IFDB preview candidates may include title, author, first published, genre, language, concise description text, IFIDs, format, IFDB tags, normalized IFDB TUID/URL, and source attribution. IFDB download links are displayed as reference-only when present; TerpVault does not download those files. Descriptions are converted from IFDB HTML to concise plain text for preview and should only be applied when the curator is comfortable using that text.
 
-The Admin2 Create Package form and metadata editor both include an `Ecosystem Metadata Preview` section. A curator can preview references, review warnings, and apply selected normalized IF Archive or IFDB fields into the visible form. Applying to the metadata editor only changes the editor state; the curator must still press `Save Metadata` before `game.yaml` is written.
+Accepted IFWiki inputs normalize to both `catalog.ifwiki.title` and `catalog.ifwiki.url`:
+
+| Input | Normalized title | Normalized URL |
+| --- | --- | --- |
+| `Babel` | `Babel` | `https://www.ifwiki.org/Babel` |
+| `https://www.ifwiki.org/Babel` | `Babel` | `https://www.ifwiki.org/Babel` |
+
+The IFWiki helper rejects or warns about empty requested lookup input, unsafe schemes such as `javascript:`, malformed URLs, non-IFWiki hosts, path traversal, page paths with nested/traversal segments, unsupported title punctuation, ignored query strings or fragments, and mismatched title/URL pairs. It uses IFWiki's MediaWiki API and does not scrape rendered HTML.
+
+Supported IFWiki preview candidates may include page title, canonical URL, a short extract if the API provides one, categories, safe external links, and source attribution. IFWiki external links are displayed as reference-only when present; TerpVault does not download those files. IFWiki metadata is encyclopedia/catalog context only and does not prove redistribution rights.
+
+If IFDB or IFWiki lookup fails, the endpoint returns warnings and `writes: false`; it does not crash package editing or write package files. IFWiki's live API may not provide every requested property, such as short extracts, so missing optional fields should be treated as unavailable rather than fatal.
+
+The Admin2 Create Package form and metadata editor both include an `Ecosystem Metadata Preview` section. A curator can preview references, review warnings, and apply selected normalized IF Archive, IFDB, or IFWiki fields into the visible form. Applying to the metadata editor only changes the editor state; the curator must still press `Save Metadata` before `game.yaml` is written.
 
 ## Metadata Assistant roadmap
 
@@ -188,8 +202,9 @@ Candidate sources:
 - Current local `game.yaml`.
 - Package-local `metadata.iFiction.xml`.
 - Manually uploaded or replaced `metadata.iFiction.xml`.
-- Future IFDB lookup by IFID, title, or pasted URL.
-- Future IFWiki lookup by title or pasted URL.
+- Future IFDB lookup by IFID or title.
+- Current IFDB lookup by TUID or pasted URL.
+- Current IFWiki lookup by title or pasted URL.
 - Current IF Archive path/URL helper output.
 
 Required behavior:
@@ -238,7 +253,7 @@ Phased plan:
 - Phase 3a: URL validation and metadata preview shell. Implemented for curator-supplied references.
 - Phase 3b: IF Archive path/URL helper. Implemented for normalization only.
 - Phase 3c: IFDB lookup helper.
-- Phase 3d: IFWiki helper.
+- Phase 3d: IFWiki helper. Implemented for URL/title normalization and MediaWiki API preview.
 - Phase 3e: iFiction/Babel cross-check.
 - Phase 3f: curator apply/diff workflow.
 - Phase 3g: package validation integration.
