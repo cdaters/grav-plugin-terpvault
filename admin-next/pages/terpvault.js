@@ -248,10 +248,35 @@ class TerpVaultPage extends HTMLElement {
         .provenance-item { border:1px solid rgba(127,127,127,.2); border-radius:10px; padding:.55rem; }
         .provenance-item span { display:block; opacity:.68; font-size:.75rem; text-transform:uppercase; }
         .provenance-item a { color:inherit; overflow-wrap:anywhere; }
+        .ecosystem-report { display:grid; gap:.85rem; margin-top:.85rem; }
+        .ecosystem-apply { display:grid; gap:.85rem; min-width:0; }
+        .preview-card-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:.65rem; align-items:stretch; }
+        .preview-card { display:grid; align-content:start; gap:.35rem; min-width:0; }
+        .preview-card code { display:block; overflow-wrap:anywhere; white-space:pre-wrap; }
+        .preview-card .checkbox { margin-top:.45rem; }
+        .preview-section { display:grid; gap:.55rem; min-width:0; }
+        .preview-section h4 { margin:.15rem 0 0; }
         .editor { border-top:1px solid rgba(127,127,127,.18); padding:1rem; background:rgba(127,127,127,.035); }
         .editor-head { display:flex; gap:.75rem; align-items:flex-start; justify-content:space-between; margin-bottom:.8rem; }
         .editor-head h3 { margin:0 0 .15rem; }
         .editor form { display:grid; gap:1rem; }
+        .editor-sections, .create-steps, .subsections { display:grid; gap:.75rem; }
+        .editor-section, .create-step, .subsection { border:1px solid rgba(127,127,127,.24); border-radius:12px; background:rgba(127,127,127,.025); overflow:hidden; }
+        .subsection { border-radius:10px; background:rgba(127,127,127,.02); }
+        .editor-section > summary, .create-step > summary, .subsection > summary { cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.7rem .85rem; font-weight:700; }
+        .subsection > summary { padding:.6rem .75rem; font-size:.92rem; }
+        .editor-section > summary::-webkit-details-marker, .create-step > summary::-webkit-details-marker, .subsection > summary::-webkit-details-marker { display:none; }
+        .section-kicker { font-weight:400; opacity:.68; font-size:.8rem; text-align:right; }
+        .section-body { border-top:1px solid rgba(127,127,127,.16); padding:.85rem; }
+        .subsection .section-body { padding:.75rem; }
+        .section-body > .story-manager,
+        .section-body > .media-manager,
+        .section-body > .feelies-manager,
+        .section-body > .helper-docs { border-top:0; margin-top:0; padding-top:0; }
+        .section-body > .story-manager + .story-manager,
+        .section-body > .media-manager + .feelies-manager,
+        .section-body > .story-manager + .helper-docs { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
+        .export-panel { display:grid; gap:.55rem; }
         .fieldsets { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; }
         fieldset { border:1px solid rgba(127,127,127,.24); border-radius:12px; padding:.8rem; margin:0; min-width:0; }
         legend { padding:0 .25rem; font-weight:700; }
@@ -1132,95 +1157,121 @@ class TerpVaultPage extends HTMLElement {
       <section class="create-panel" data-terpwright-phase="2-url-metadata">
         <div class="editor-head">
           <div>
-            <h2>Terpwright Phase 2: Local Package Builder</h2>
-            <p class="meta">Creates a new draft package from local files and curator-supplied reference URLs. IFDB preview is explicit and review-only; IF Archive file download, IFWiki lookup, scraping, and metadata automation are not used.</p>
+            <h2>Terpwright Local Package Builder</h2>
+            <p class="meta">Creates a new draft package from local files and curator-supplied references. IFDB preview is implemented; IFWiki is stored as reference only for now; IF Archive path normalization is implemented.</p>
           </div>
           <button class="button" type="button" data-action="cancel-create">Close</button>
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
         ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
-        ${state.report ? this._createReport(state.report) : ''}
         <form data-create-package data-terpwright-phase="2-url-metadata">
-          <fieldset>
-            <legend>Metadata &amp; provenance URLs</legend>
-            <p class="meta">Optional reference links for curator review. TerpVault does not assume rights from URLs.</p>
-            <div class="create-grid">
-              ${this._createUrlInput('Source / package URL', 'source_url')}
-              ${this._createUrlInput('Upstream project URL', 'upstream_source_url')}
-              ${this._createUrlInput('Port/source repository URL', 'port_repository_url')}
-              ${this._createUrlInput('License URL', 'license_url')}
-              ${this._createInput('IFDB TUID', 'ifdb_tuid')}
-              ${this._createUrlInput('IFDB URL', 'ifdb_url')}
-              ${this._createUrlInput('IFWiki URL', 'ifwiki_url')}
-              ${this._createInput('IF Archive path', 'ifarchive_path')}
-              ${this._createUrlInput('IF Archive URL', 'ifarchive_url')}
-            </div>
-            <details class="create-optional" open>
-              <summary>Optional reference URLs</summary>
-              <div class="create-grid">
-                ${this._createUrlInput('Cover art source URL', 'cover_art_source_url')}
-                ${this._createUrlInput('Hero art source URL', 'hero_art_source_url')}
-                ${this._createUrlInput('Screenshot source URL', 'screenshot_source_url')}
-                ${this._createUrlInput('Walkthrough/reference URL', 'walkthrough_reference_url')}
-                ${this._createUrlInput('Hints/reference URL', 'hints_reference_url')}
-                ${this._createUrlInput('Map/reference URL', 'map_reference_url')}
-                ${this._createUrlInput('History/background URL', 'history_reference_url')}
+          <div class="create-steps">
+            ${this._createStep('Identity', 'Required title and package metadata', `
+              <div class="subsections">
+                ${this._subsection('Identity', 'Slug, title, attribution, IFID, year, language, and format', `
+                  <div class="create-grid">
+                    ${this._createInput('Slug', 'slug', true)}
+                    ${this._createInput('Title', 'title', true)}
+                    ${this._createInput('Author / source attribution', 'author')}
+                    ${this._createInput('Headline', 'headline')}
+                    ${this._createInput('IFID', 'ifid')}
+                    ${this._createInput('First published', 'first_published')}
+                    ${this._createInput('Language', 'language', false, 'en')}
+                    ${this._createSelect('Format', 'format', [['', 'Infer from story file'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['hugo', 'Hugo'], ['adrift', 'ADRIFT']])}
+                  </div>
+                `, true)}
+                ${this._subsection('Classification & Presentation', 'Genre, tags, and public description', `
+                  <div class="create-grid">
+                    ${this._createInput('Genre', 'genre')}
+                    ${this._createInput('Tags', 'tags')}
+                  </div>
+                  ${this._createTextarea('Description', 'description')}
+                `, true)}
               </div>
-              ${this._createTextarea('Reference notes', 'reference_notes', 'short')}
-            </details>
-            ${this._ecosystemPreviewPanel('create')}
-          </fieldset>
-          <fieldset>
-            <legend>Core Metadata</legend>
-          <div class="create-grid">
-            ${this._createInput('Slug', 'slug', true)}
-            ${this._createInput('Title', 'title', true)}
-            ${this._createInput('Author / source attribution', 'author')}
-            ${this._createInput('Headline', 'headline')}
-            ${this._createInput('IFID', 'ifid')}
-            ${this._createInput('First published', 'first_published')}
-            ${this._createInput('Genre', 'genre')}
-            ${this._createInput('Language', 'language', false, 'en')}
-            ${this._createSelect('Format', 'format', [['', 'Infer from story file'], ['zcode', 'Z-code'], ['glulx', 'Glulx'], ['tads3', 'TADS 3'], ['tads2', 'TADS 2'], ['hugo', 'Hugo'], ['adrift', 'ADRIFT']])}
-            ${this._createInput('Tags', 'tags')}
-            ${this._createInput('License name', 'license_name')}
-          </div>
-          ${this._createTextarea('Description', 'description')}
-          ${this._createTextarea('License notes', 'license_notes', 'short')}
-          ${this._createTextarea('Source notes', 'source_notes', 'short')}
-          <div class="message">Created packages are always saved as <strong>draft</strong> and <strong>not featured</strong>. Publish and featured placement remain separate review actions.</div>
-          </fieldset>
-          <fieldset>
-            <legend>Local Story File</legend>
-          <div class="field">
-            <label>Story file</label>
-            <input type="file" name="story_file" accept=".z1,.z2,.z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.blorb,.hex,.gam,.t3,.taf" required ${state.saving ? 'disabled' : ''}>
-            <span class="meta">Allowed: z1, z2, z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, blorb, hex, gam, t3, taf. SHA-256 is computed into <code>resources.story_sha256</code>.</span>
-          </div>
-          </fieldset>
-          <fieldset>
-            <legend>Optional Local Resources</legend>
-            <div class="create-grid">
-              ${this._createFile('Cover', 'cover', '.jpg,.jpeg,.png,.webp,.gif')}
-              ${this._createFile('Small cover', 'small_cover', '.jpg,.jpeg,.png,.webp,.gif')}
-              ${this._createFile('Hero', 'hero', '.jpg,.jpeg,.png,.webp,.gif')}
-              ${this._createFile('Screenshots', 'screenshots[]', '.jpg,.jpeg,.png,.webp,.gif', true)}
-              ${this._createFile('metadata.iFiction.xml', 'ifiction', '.xml')}
-              ${this._createFile('Feelies', 'feelies[]', '.pdf,.txt,.md,.jpg,.jpeg,.png,.webp,.gif,.mp3,.ogg,.wav,.m4a', true)}
-              ${this._createFile('how-to-play.md', 'how_to_play', '.md')}
-              ${this._createFile('hints.md', 'hints', '.md')}
-              ${this._createFile('walkthrough.md', 'walkthrough', '.md')}
-              ${this._createFile('known-differences.md', 'known_differences', '.md')}
-              ${this._createFile('provenance.md', 'provenance', '.md')}
-            </div>
-            <p class="meta">Files are copied into safe package-local conventional paths. Optional helper docs are referenced in <code>game.yaml</code> only when supplied.</p>
-          </fieldset>
-          <div class="form-actions">
-            <button class="button" type="button" data-action="cancel-create">Cancel</button>
-            <button class="button primary" type="submit" ${state.saving ? 'disabled' : ''}>${state.saving ? 'Creating...' : 'Create Draft Package'}</button>
+            `, true)}
+            ${this._createStep('Story File', 'Required only when creating the package', `
+              <div class="field">
+                <label>Story file</label>
+                <input type="file" name="story_file" accept=".z1,.z2,.z3,.z4,.z5,.z6,.z7,.z8,.zblorb,.zlb,.ulx,.gblorb,.glb,.blorb,.hex,.gam,.t3,.taf" required ${state.saving ? 'disabled' : ''}>
+                <span class="meta">Allowed: z1, z2, z3, z4, z5, z6, z7, z8, zblorb, zlb, ulx, gblorb, glb, blorb, hex, gam, t3, taf. SHA-256 is computed into <code>resources.story_sha256</code>. Ecosystem preview can run before this file is chosen.</span>
+              </div>
+            `, true)}
+            ${this._createStep('Provenance URLs', 'Catalog, source, license, IFDB, IFWiki, and IF Archive references', `
+              <p class="meta">Optional reference links for curator review. URL presence does not prove redistribution rights.</p>
+              <div class="subsections">
+                ${this._subsection('Source & Rights', 'Source, upstream, repository, license, and notes', `
+                  <div class="create-grid">
+                    ${this._createUrlInput('Source / package URL', 'source_url')}
+                    ${this._createUrlInput('Upstream project URL', 'upstream_source_url')}
+                    ${this._createUrlInput('Port/source repository URL', 'port_repository_url')}
+                    ${this._createInput('License name', 'license_name')}
+                    ${this._createUrlInput('License URL', 'license_url')}
+                  </div>
+                  ${this._createTextarea('License notes', 'license_notes', 'short')}
+                  ${this._createTextarea('Source notes / redistribution notes', 'source_notes', 'short')}
+                `, true)}
+                ${this._subsection('Catalog', 'IFDB, IFWiki, and IF Archive references', `
+                  <div class="create-grid">
+                    ${this._createInput('IFDB TUID', 'ifdb_tuid')}
+                    ${this._createUrlInput('IFDB URL', 'ifdb_url')}
+                    ${this._createUrlInput('IFWiki URL', 'ifwiki_url')}
+                    ${this._createInput('IF Archive path', 'ifarchive_path')}
+                    ${this._createUrlInput('IF Archive URL', 'ifarchive_url')}
+                  </div>
+                  <div class="message">IFWiki URL stored as reference only. Lookup is not implemented yet.</div>
+                `, true)}
+                ${this._subsection('Optional Reference URLs', 'Artwork, screenshots, walkthrough, hints, map, and history links', `
+                  <div class="create-grid">
+                    ${this._createUrlInput('Cover art source URL', 'cover_art_source_url')}
+                    ${this._createUrlInput('Hero art source URL', 'hero_art_source_url')}
+                    ${this._createUrlInput('Screenshot source URL', 'screenshot_source_url')}
+                    ${this._createUrlInput('Walkthrough/reference URL', 'walkthrough_reference_url')}
+                    ${this._createUrlInput('Hints/reference URL', 'hints_reference_url')}
+                    ${this._createUrlInput('Map/reference URL', 'map_reference_url')}
+                    ${this._createUrlInput('History/background URL', 'history_reference_url')}
+                  </div>
+                  ${this._createTextarea('Reference notes', 'reference_notes', 'short')}
+                `, false)}
+              </div>
+            `, true)}
+            ${this._createStep('Ecosystem Preview', 'IFDB lookup, IFWiki reference-only status, and IF Archive normalization', this._ecosystemPreviewPanel('create'), true)}
+            ${this._createStep('Local Resources', 'Media, iFiction XML, feelies, and helper docs', `
+              <div class="create-grid">
+                ${this._createFile('Cover', 'cover', '.jpg,.jpeg,.png,.webp,.gif')}
+                ${this._createFile('Small cover', 'small_cover', '.jpg,.jpeg,.png,.webp,.gif')}
+                ${this._createFile('Hero', 'hero', '.jpg,.jpeg,.png,.webp,.gif')}
+                ${this._createFile('Screenshots', 'screenshots[]', '.jpg,.jpeg,.png,.webp,.gif', true)}
+                ${this._createFile('metadata.iFiction.xml', 'ifiction', '.xml')}
+                ${this._createFile('Feelies', 'feelies[]', '.pdf,.txt,.md,.jpg,.jpeg,.png,.webp,.gif,.mp3,.ogg,.wav,.m4a', true)}
+                ${this._createFile('how-to-play.md', 'how_to_play', '.md')}
+                ${this._createFile('hints.md', 'hints', '.md')}
+                ${this._createFile('walkthrough.md', 'walkthrough', '.md')}
+                ${this._createFile('known-differences.md', 'known_differences', '.md')}
+                ${this._createFile('provenance.md', 'provenance', '.md')}
+              </div>
+              <p class="meta">Files are copied into safe package-local conventional paths. Optional helper docs are referenced in <code>game.yaml</code> only when supplied.</p>
+            `, false)}
+            ${this._createStep('Review & Create', 'Draft-only creation and calm validation notes', `
+              <div class="message">Created packages are always saved as <strong>draft</strong> and <strong>not featured</strong>. Publish and featured placement remain separate review actions.</div>
+              <p class="meta">Review identity, provenance references, local resources, and ecosystem preview notes before creating the draft package.</p>
+              ${state.report ? this._createReport(state.report) : ''}
+              <div class="form-actions">
+                <button class="button" type="button" data-action="cancel-create">Cancel</button>
+                <button class="button primary" type="submit" ${state.saving ? 'disabled' : ''}>${state.saving ? 'Creating...' : 'Create Draft Package'}</button>
+              </div>
+            `, true)}
           </div>
         </form>
       </section>
+    `;
+  }
+
+  _createStep(title, kicker, body, open = false) {
+    return `
+      <details class="create-step" ${open ? 'open' : ''}>
+        <summary><span>${this._esc(title)}</span><span class="section-kicker">${this._esc(kicker)}</span></summary>
+        <div class="section-body">${body}</div>
+      </details>
     `;
   }
 
@@ -3076,13 +3127,15 @@ class TerpVaultPage extends HTMLElement {
     const values = editor.values || this._editableFromGame(game);
     const readOnly = editor.readOnly || this._readOnlyFromGame(game);
     const slug = editor.slug || game.slug || '';
+    const exportState = this.state.export || {};
+    const exporting = Boolean(exportState.saving && exportState.slug === slug);
 
     return `
       <div class="editor">
         <div class="editor-head">
           <div>
-            <h3>Edit Metadata</h3>
-            <p class="meta">Only whitelisted <code>game.yaml</code> metadata fields and package-local helper Markdown files are writable. Story files, assets, package folder, and player settings are display-only.</p>
+            <h3>Package Editor</h3>
+            <p class="meta">Grouped editor for metadata, provenance review, story files, media, helper Markdown, validation, and export. Package writes still use the existing explicit save/upload/export actions.</p>
           </div>
           <button class="button" type="button" data-action="cancel-edit">Close</button>
         </div>
@@ -3090,82 +3143,194 @@ class TerpVaultPage extends HTMLElement {
         ${editor.error ? `<div class="message error">${this._esc(editor.error)}</div>` : ''}
         ${editor.success ? `<div class="message success">${this._esc(editor.success)}</div>` : ''}
         <form data-editor-slug="${this._esc(slug)}">
-          <div class="fieldsets">
-            <fieldset>
-              <legend>Bibliographic</legend>
-              ${this._help('bibliographic')}
-              ${this._input('Title', 'bibliographic.title', values, this._helpText('title'))}
-              ${this._input('Author', 'bibliographic.author', values, this._helpText('author'))}
-              ${this._input('Headline', 'bibliographic.headline', values, this._helpText('headline'))}
-              ${this._input('First published', 'bibliographic.first_published', values, this._helpText('first_published'))}
-              ${this._input('Genre', 'bibliographic.genre', values)}
-              ${this._input('Language', 'bibliographic.language', values, this._helpText('language'))}
-              ${this._textarea('Description', 'bibliographic.description', values, '', this._helpText('description'))}
-            </fieldset>
-            <fieldset>
-              <legend>Identification</legend>
-              ${this._help('identification')}
-              ${this._select('Format', 'identification.format', values, [
-                ['', 'Unspecified'],
-                ['zcode', 'Z-code'],
-                ['glulx', 'Glulx'],
-                ['tads2', 'TADS 2'],
-                ['tads3', 'TADS 3'],
-                ['hugo', 'Hugo'],
-                ['adrift', 'ADRIFT']
-              ], this._helpText('format'))}
-              ${this._textarea('IFIDs', 'identification.ifids', values, 'short', this._helpText('ifids'))}
-            </fieldset>
-            <fieldset>
-              <legend>Catalog</legend>
-              ${this._help('catalog')}
-              ${this._input('IFDB TUID', 'catalog.ifdb.tuid', values, this._helpText('ifdb_tuid'))}
-              ${this._input('IFDB URL', 'catalog.ifdb.url', values, this._helpText('ifdb_url'))}
-              ${this._input('IFWiki URL', 'catalog.ifwiki.url', values, this._helpText('ifwiki_url'))}
-              ${this._input('IF Archive path', 'catalog.ifarchive.path', values, this._helpText('ifarchive_path'))}
-              ${this._input('IF Archive URL', 'catalog.ifarchive.url', values, this._helpText('ifarchive_url'))}
-            </fieldset>
-            <fieldset>
-              <legend>Release & Provenance</legend>
-              ${this._help('provenance')}
-              ${this._input('License name', 'release.license.name', values, this._helpText('license_name'))}
-              ${this._input('License URL', 'release.license.url', values)}
-              ${this._textarea('License notes', 'release.license.notes', values, 'short', this._helpText('license_notes'))}
-              ${this._input('Source URL', 'release.source.url', values, this._helpText('source_url'))}
-              ${this._input('Upstream project URL', 'release.source.upstream.url', values, this._helpText('upstream_source_url'))}
-              ${this._input('Port/source repository URL', 'release.source.port_repository.url', values, this._helpText('port_repository_url'))}
-              ${this._input('Source retrieved', 'release.source.retrieved', values, this._helpText('source_retrieved'))}
-              ${this._textarea('Source notes', 'release.source.notes', values, 'short', this._helpText('source_notes'))}
-            </fieldset>
-            <fieldset>
-              <legend>TerpVault</legend>
-              ${this._help('terpvault')}
-              ${this._select('Status', 'terpvault.status', values, [['draft', 'Draft'], ['published', 'Published']], this._helpText('status'))}
-              <div class="checkbox">
-                <input id="tv-featured-${this._esc(slug)}" type="checkbox" name="terpvault.featured" ${this._get(values, 'terpvault.featured') ? 'checked' : ''}>
-                <label for="tv-featured-${this._esc(slug)}">Featured</label>
+          <div class="form-actions">
+            <button class="button primary" type="submit" ${editor.loading || editor.saving ? 'disabled' : ''}>${editor.saving ? 'Saving...' : 'Save Metadata'}</button>
+          </div>
+          <div class="editor-sections">
+            ${this._editorSection('Overview', 'Lifecycle controls and package paths', `
+              <div class="subsections">
+                ${this._subsection('TerpVault / Status', 'Publication and placement controls', `
+                  ${this._help('terpvault')}
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>Lifecycle</legend>
+                      ${this._select('Status', 'terpvault.status', values, [['draft', 'Draft'], ['published', 'Published']], this._helpText('status'))}
+                      <div class="checkbox">
+                        <input id="tv-featured-${this._esc(slug)}" type="checkbox" name="terpvault.featured" ${this._get(values, 'terpvault.featured') ? 'checked' : ''}>
+                        <label for="tv-featured-${this._esc(slug)}">Featured</label>
+                      </div>
+                      ${this._help('featured')}
+                    </fieldset>
+                  </div>
+                `, true)}
+                ${this._subsection('Advanced / Raw-ish Fields', 'Package-local paths and read-only diagnostics', `
+                  ${this._help('readonly_files')}
+                  ${this._readOnlyList(readOnly)}
+                `, false)}
               </div>
-              ${this._help('featured')}
-              ${this._textarea('Tags', 'terpvault.tags', values, 'short', this._helpText('tags'))}
-            </fieldset>
-            <fieldset>
-              <legend>Read-only package files</legend>
-              ${this._help('readonly_files')}
-              ${this._readOnlyList(readOnly)}
-            </fieldset>
+            `, true)}
+            ${this._editorSection('Metadata', 'Identity, bibliography, presentation, and classification', `
+              <div class="subsections">
+                ${this._subsection('Identity', 'Title, attribution, year, language, format, and IFIDs', `
+                  ${this._help('bibliographic')}
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>Core Identity</legend>
+                      ${this._input('Title', 'bibliographic.title', values, this._helpText('title'))}
+                      ${this._input('Headline', 'bibliographic.headline', values, this._helpText('headline'))}
+                      ${this._input('Author / source attribution', 'bibliographic.author', values, this._helpText('author'))}
+                      ${this._input('First published / year', 'bibliographic.first_published', values, this._helpText('first_published'))}
+                      ${this._input('Language', 'bibliographic.language', values, this._helpText('language'))}
+                    </fieldset>
+                    <fieldset>
+                      <legend>Story Identity</legend>
+                      ${this._select('Format', 'identification.format', values, [
+                    ['', 'Unspecified'],
+                    ['zcode', 'Z-code'],
+                    ['glulx', 'Glulx'],
+                    ['tads2', 'TADS 2'],
+                    ['tads3', 'TADS 3'],
+                    ['hugo', 'Hugo'],
+                    ['adrift', 'ADRIFT']
+                      ], this._helpText('format'))}
+                      ${this._textarea('IFIDs', 'identification.ifids', values, 'short', this._helpText('ifids'))}
+                    </fieldset>
+                  </div>
+                `, true)}
+                ${this._subsection('Bibliographic / Presentation', 'Genre, tags, description, and public-facing copy', `
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>Presentation</legend>
+                      ${this._input('Genre', 'bibliographic.genre', values)}
+                      ${this._textarea('Tags', 'terpvault.tags', values, 'short', this._helpText('tags'))}
+                    </fieldset>
+                    <fieldset>
+                      <legend>Description</legend>
+                      ${this._textarea('Description', 'bibliographic.description', values, '', this._helpText('description'))}
+                    </fieldset>
+                  </div>
+                `, true)}
+              </div>
+            `, true)}
+            ${this._editorSection('Provenance', 'Catalog, source, license, IFDB, IFWiki, and IF Archive', `
+              <div class="subsections">
+                ${this._subsection('Catalog', 'IFDB, IFWiki, and IF Archive references', `
+                  ${this._help('catalog')}
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>IFDB / IFWiki</legend>
+                      ${this._input('IFDB TUID', 'catalog.ifdb.tuid', values, this._helpText('ifdb_tuid'))}
+                      ${this._input('IFDB URL', 'catalog.ifdb.url', values, this._helpText('ifdb_url'))}
+                      ${this._input('IFWiki URL', 'catalog.ifwiki.url', values, this._helpText('ifwiki_url'))}
+                    </fieldset>
+                    <fieldset>
+                      <legend>IF Archive</legend>
+                      ${this._input('IF Archive path', 'catalog.ifarchive.path', values, this._helpText('ifarchive_path'))}
+                      ${this._input('IF Archive URL', 'catalog.ifarchive.url', values, this._helpText('ifarchive_url'))}
+                    </fieldset>
+                  </div>
+                `, true)}
+                ${this._subsection('Source & Rights', 'Source URLs, license, source notes, and redistribution review', `
+                  ${this._help('provenance')}
+                  <div class="fieldsets">
+                    <fieldset>
+                      <legend>Source</legend>
+                      ${this._input('Source URL', 'release.source.url', values, this._helpText('source_url'))}
+                      ${this._input('Upstream project URL', 'release.source.upstream.url', values, this._helpText('upstream_source_url'))}
+                      ${this._input('Port/source repository URL', 'release.source.port_repository.url', values, this._helpText('port_repository_url'))}
+                      ${this._input('Source retrieved', 'release.source.retrieved', values, this._helpText('source_retrieved'))}
+                      ${this._textarea('Source notes / redistribution notes', 'release.source.notes', values, 'short', this._helpText('source_notes'))}
+                    </fieldset>
+                    <fieldset>
+                      <legend>Rights</legend>
+                      ${this._input('License name', 'release.license.name', values, this._helpText('license_name'))}
+                      ${this._input('License URL', 'release.license.url', values)}
+                      ${this._textarea('License notes', 'release.license.notes', values, 'short', this._helpText('license_notes'))}
+                    </fieldset>
+                  </div>
+                `, true)}
+                ${this._subsection('Reference Links', 'Create-time support links shown read-only in this editor', this._referenceLinksList(game), false)}
+              </div>
+            `, true)}
+            ${this._editorSection('Validation', 'Warnings and package readiness notes', this._warnings(game), false)}
           </div>
           <div class="form-actions">
             <button class="button" type="button" data-action="cancel-edit">Cancel</button>
             <button class="button primary" type="submit" ${editor.loading || editor.saving ? 'disabled' : ''}>${editor.saving ? 'Saving...' : 'Save Metadata'}</button>
           </div>
         </form>
-        ${this._ecosystemPreviewPanel('editor', slug)}
-        ${this._ifictionPreviewPanel(slug)}
-        ${this._storyPanel(game, slug)}
-        ${this._mediaPanel(game, slug)}
-        ${this._feeliesPanel(game, slug)}
-        ${this._helperDocsPanel(slug)}
+        <div class="editor-sections" style="margin-top:.85rem;">
+          ${this._editorSection('Ecosystem Preview', 'IFDB preview, IFWiki reference-only note, IF Archive normalization', this._ecosystemPreviewPanel('editor', slug), true)}
+          ${this._editorSection('Story', 'Story replacement workflow', this._storyPanel(game, slug), false)}
+          ${this._editorSection('Media', 'Cover, small cover, hero, screenshots, and feelies', `${this._mediaPanel(game, slug)}${this._feeliesPanel(game, slug)}`, false)}
+          ${this._editorSection('Docs & Oracle', 'iFiction XML and helper Markdown for play notes, hints, walkthrough, and known differences', `${this._ifictionPreviewPanel(slug)}${this._helperDocsPanel(slug)}`, false)}
+          ${this._editorSection('Export', 'Download a package archive', `
+            <div class="export-panel">
+              <p class="meta">Export uses the existing package archive endpoint and does not change package metadata.</p>
+              ${this._exportMessage(slug)}
+              <div class="form-actions">
+                <button class="button primary" type="button" data-action="export" data-slug="${this._esc(slug)}" ${exporting ? 'disabled' : ''}>${exporting ? 'Exporting...' : 'Export Package'}</button>
+              </div>
+            </div>
+          `, false)}
+        </div>
       </div>
+    `;
+  }
+
+  _editorSection(title, kicker, body, open = false) {
+    return `
+      <details class="editor-section" ${open ? 'open' : ''}>
+        <summary><span>${this._esc(title)}</span><span class="section-kicker">${this._esc(kicker)}</span></summary>
+        <div class="section-body">${body}</div>
+      </details>
+    `;
+  }
+
+  _subsection(title, kicker, body, open = false) {
+    return `
+      <details class="subsection" ${open ? 'open' : ''}>
+        <summary><span>${this._esc(title)}</span><span class="section-kicker">${this._esc(kicker)}</span></summary>
+        <div class="section-body">${body}</div>
+      </details>
+    `;
+  }
+
+  _referenceLinksList(game = {}) {
+    const references = Array.isArray(game.references)
+      ? game.references
+      : Object.values(game.references || {}).filter(reference => reference && typeof reference === 'object');
+    const labels = {
+      cover_art: 'Cover art source URL',
+      hero_art: 'Hero art source URL',
+      screenshot: 'Screenshot source URL',
+      walkthrough: 'Walkthrough/reference URL',
+      hints: 'Hints/reference URL',
+      map: 'Map/reference URL',
+      history: 'History/background URL'
+    };
+    const rows = references
+      .filter(reference => reference?.url || reference?.value)
+      .map(reference => {
+        const label = reference.label || labels[reference.role] || 'Reference URL';
+        const value = reference.url || reference.value || '';
+        const notes = reference.notes || reference.note || '';
+        return `
+          <div class="provenance-item">
+            <span>${this._esc(label)}</span>
+            ${value ? `<a href="${this._esc(value)}" target="_blank" rel="noopener">${this._esc(value)}</a>` : '<div>Not recorded</div>'}
+            ${notes ? `<p class="meta">${this._esc(notes)}</p>` : ''}
+          </div>
+        `;
+      });
+
+    if (!rows.length) {
+      return '<p class="meta">No create-time reference links are recorded for this package. Editing these reference rows is not available in this UI pass.</p>';
+    }
+
+    return `
+      <p class="meta">Reference links are shown read-only here so metadata saves keep using the current allowlisted fields.</p>
+      <div class="provenance">${rows.join('')}</div>
     `;
   }
 
@@ -3185,8 +3350,8 @@ class TerpVaultPage extends HTMLElement {
     return `
       <section class="story-manager ecosystem-preview" data-ecosystem-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''}>
         <h3>Ecosystem Metadata Preview</h3>
-        <p class="meta">Reference only. Curator review required. URL presence does not prove redistribution rights.</p>
-        <p class="meta">This helper normalizes IF Archive metadata and previews IFDB catalog metadata through the official IFDB API. It does not download story files, covers, screenshots, maps, walkthroughs, or hints.</p>
+        <p class="meta">IFDB lookup is implemented. IFWiki URL stored as reference only. Lookup is not implemented yet. IF Archive path normalization is implemented. URL presence does not prove redistribution rights.</p>
+        <p class="meta">This helper previews IFDB catalog metadata through the official IFDB API and normalizes IF Archive paths. It does not download story files, covers, screenshots, maps, walkthroughs, or hints.</p>
         ${state.loading ? '<div class="message">Previewing ecosystem references...</div>' : ''}
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
         ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
@@ -3194,30 +3359,40 @@ class TerpVaultPage extends HTMLElement {
           <button class="button" type="button" data-action="preview-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>${state.loading ? 'Previewing...' : 'Preview Ecosystem Metadata'}</button>
         </div>
         ${report ? `
-          <div class="box" style="margin-top:.85rem;">
+          <div class="box ecosystem-report">
             <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
               <span class="badge ${report.ok ? 'ok' : 'warn'}">${report.ok ? 'preview ready' : 'review warnings'}</span>
               <span class="badge ok">no writes</span>
               <span class="badge ${report.remote_fetches ? 'warn' : 'ok'}">${report.remote_fetches ? 'remote IFDB fetch' : 'no remote fetches'}</span>
               <span class="badge warn">draft/review only</span>
+              <span class="badge">IFWiki reference only</span>
             </div>
-            <div data-ecosystem-apply-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''} style="margin-top:.75rem;">
+            <div class="ecosystem-apply" data-ecosystem-apply-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''}>
               ${hasNormalizedIFArchive ? `
-                <h4>IF Archive</h4>
-                <dl>
-                  <dt>IF Archive path</dt><dd><code>${this._esc(ifArchive.path || '')}</code></dd>
-                  <dt>IF Archive URL</dt><dd><code>${this._esc(ifArchive.url || '')}</code></dd>
-                </dl>
-                <div class="checkbox">
-                  <input type="checkbox" name="catalog.ifarchive.path" data-ecosystem-field="path" checked>
-                  <label>Apply normalized IF Archive path to ${this._esc(contextLabel)}</label>
-                </div>
-                <div class="checkbox">
-                  <input type="checkbox" name="catalog.ifarchive.url" data-ecosystem-field="url" checked>
-                  <label>Apply normalized IF Archive URL to ${this._esc(contextLabel)}</label>
+                <div class="preview-section">
+                  <h4>IF Archive</h4>
+                  <div class="preview-card-grid">
+                    <div class="provenance-item preview-card">
+                      <span>Normalized path</span>
+                      <code>${this._esc(ifArchive.path || '')}</code>
+                      <div class="checkbox">
+                        <input type="checkbox" name="catalog.ifarchive.path" data-ecosystem-field="path" checked>
+                        <label>Apply path to ${this._esc(contextLabel)}</label>
+                      </div>
+                    </div>
+                    <div class="provenance-item preview-card">
+                      <span>Normalized URL</span>
+                      <code>${this._esc(ifArchive.url || '')}</code>
+                      <div class="checkbox">
+                        <input type="checkbox" name="catalog.ifarchive.url" data-ecosystem-field="url" checked>
+                        <label>Apply URL to ${this._esc(contextLabel)}</label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ` : '<p class="meta">No normalized IF Archive values are available from this preview.</p>'}
               ${hasIFDBPreview ? this._ifdbPreviewPanel(ifdb, contextLabel) : '<p class="meta">No IFDB lookup results are available from this preview.</p>'}
+              <p class="meta">Apply selected fields updates the ${this._esc(contextLabel)} only. Save Metadata or Create Draft Package is still required for package writes.</p>
               <div class="form-actions">
                 <button class="button primary" type="button" data-action="apply-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>Apply Selected Ecosystem Fields</button>
               </div>
@@ -3236,7 +3411,7 @@ class TerpVaultPage extends HTMLElement {
     const downloads = Array.isArray(ifdb?.downloads_reference_only) ? ifdb.downloads_reference_only : [];
     const sources = Array.isArray(ifdb?.sources) ? ifdb.sources : [];
     return `
-      <div style="margin-top:1rem;">
+      <div class="preview-section">
         <h4>IFDB</h4>
         <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
           <span class="badge ${ifdb?.ok === false ? 'warn' : 'ok'}">${ifdb?.ok === false ? 'lookup warning' : 'lookup ready'}</span>
@@ -3249,9 +3424,9 @@ class TerpVaultPage extends HTMLElement {
           ${ifdb?.api_url ? `<dt>API source</dt><dd><code>${this._esc(ifdb.api_url)}</code></dd>` : ''}
         </dl>
         ${fields.length ? `
-          <div class="provenance" style="margin-top:.75rem;">
+          <div class="preview-card-grid">
             ${fields.map((field, index) => `
-              <div class="provenance-item">
+              <div class="provenance-item preview-card">
                 <span>${this._esc(field.label || field.path || 'IFDB field')}</span>
                 <code>${this._esc(field.path || '')}</code>
                 <p class="meta">${this._esc(this._previewFieldValue(field.value))}</p>
@@ -3266,9 +3441,9 @@ class TerpVaultPage extends HTMLElement {
         ${downloads.length ? `
           <details class="review-notes" style="margin-top:.75rem;">
             <summary>IFDB download references (${downloads.length})</summary>
-            <div class="provenance" style="margin-top:.75rem;">
+            <div class="preview-card-grid" style="margin-top:.75rem;">
             ${downloads.map(item => `
-              <div class="provenance-item">
+              <div class="provenance-item preview-card">
                 <span>${this._esc(item.title || 'Download reference')}</span>
                 <code>${this._esc(item.url || '')}</code>
                 <p class="meta">${this._esc(item.status || 'reference only; not downloaded')}${item.format ? ` - ${this._esc(item.format)}` : ''}</p>
@@ -3284,12 +3459,12 @@ class TerpVaultPage extends HTMLElement {
 
   _ecosystemSourceList(sources, collapsed = false) {
     const rows = sources.map(source => {
-      return `<div class="provenance-item"><span>${this._esc(source.label || 'Source')}</span><code>${this._esc(source.url || '')}</code><p class="meta">${this._esc(source.type || 'reference')}</p></div>`;
+      return `<div class="provenance-item preview-card"><span>${this._esc(source.label || 'Source')}</span><code>${this._esc(source.url || '')}</code><p class="meta">${this._esc(source.type || 'reference')}</p></div>`;
     });
     if (!rows.length) {
       return '';
     }
-    const body = `<div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div>`;
+    const body = `<div class="preview-card-grid" style="margin-top:.75rem;">${rows.join('')}</div>`;
     return collapsed
       ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Source attribution (${rows.length})</summary>${body}</details>`
       : body;
@@ -3301,12 +3476,23 @@ class TerpVaultPage extends HTMLElement {
   }
 
   _ecosystemReferenceList(references) {
-    const rows = Object.entries(references).map(([, reference]) => {
-      return `<div class="provenance-item"><span>${this._esc(reference.label || 'Reference')}</span><code>${this._esc(reference.value || '')}</code><p class="meta">${this._esc(reference.status || 'stored/reference only')}</p></div>`;
+    const rows = Object.entries(references).map(([key, reference]) => {
+      const label = reference.label || 'Reference';
+      const status = this._ecosystemReferenceStatus(key, reference);
+      return `<div class="provenance-item preview-card"><span>${this._esc(label)}</span><code>${this._esc(reference.value || '')}</code><p class="meta">${this._esc(status)}</p></div>`;
     });
     return rows.length
-      ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Stored reference-only links (${rows.length})</summary><div class="provenance" style="margin-top:.75rem;">${rows.join('')}</div></details>`
+      ? `<details class="review-notes" style="margin-top:.75rem;"><summary>Stored reference-only links (${rows.length})</summary><div class="preview-card-grid" style="margin-top:.75rem;">${rows.join('')}</div></details>`
       : '';
+  }
+
+  _ecosystemReferenceStatus(key, reference) {
+    const label = String(reference?.label || key || '').toLowerCase();
+    if (key === 'ifwiki_url' || label.includes('ifwiki')) {
+      return 'IFWiki URL stored as reference only. Lookup is not implemented yet.';
+    }
+
+    return reference?.status || 'stored/reference only';
   }
 
   _reviewNotesDetails(title, items, className = 'warn') {
@@ -3690,7 +3876,7 @@ class TerpVaultPage extends HTMLElement {
       catalog: 'External catalog references are for human review. IFDB preview is explicit and review-only; other catalog links remain stored references.',
       ifdb_tuid: 'The IFDB story id, not the full URL.',
       ifdb_url: 'Public IFDB page for this work, when known.',
-      ifwiki_url: 'Relevant IFWiki page for this work, author, or package.',
+      ifwiki_url: 'IFWiki URL stored as reference only. Lookup is not implemented yet.',
       ifarchive_path: 'IF Archive path such as games/zcode/example.z5, when known.',
       ifarchive_url: 'Full IF Archive URL, when useful alongside the path.',
       provenance: 'Where this package or story file came from. Useful for rights review and future maintenance.',
