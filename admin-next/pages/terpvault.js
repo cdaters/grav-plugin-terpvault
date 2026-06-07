@@ -256,6 +256,20 @@ class TerpVaultPage extends HTMLElement {
         .preview-card .checkbox { margin-top:.45rem; }
         .preview-section { display:grid; gap:.55rem; min-width:0; }
         .preview-section h4 { margin:.15rem 0 0; }
+        .comparison-table-wrap { overflow:auto; border:1px solid rgba(127,127,127,.22); border-radius:10px; background:rgba(127,127,127,.025); }
+        .comparison-table { width:100%; min-width:760px; border-collapse:collapse; font-size:.86rem; }
+        .comparison-table th, .comparison-table td { border-bottom:1px solid rgba(127,127,127,.18); padding:.5rem; vertical-align:top; text-align:left; }
+        .comparison-table th { font-size:.74rem; opacity:.78; text-transform:uppercase; background:rgba(127,127,127,.055); position:sticky; top:0; z-index:1; }
+        .comparison-field { min-width:150px; }
+        .comparison-cell { display:grid; gap:.35rem; min-width:150px; }
+        .comparison-cell code { display:block; max-height:8rem; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; }
+        .comparison-status { display:inline-flex; width:max-content; max-width:100%; border:1px solid rgba(127,127,127,.3); border-radius:999px; padding:.08rem .42rem; font-size:.72rem; line-height:1.25; }
+        .comparison-status.identical { border-color:rgba(79,190,124,.58); background:rgba(79,190,124,.1); }
+        .comparison-status.missing { border-color:rgba(93,164,255,.6); background:rgba(93,164,255,.1); }
+        .comparison-status.different { border-color:rgba(255,188,87,.65); background:rgba(255,188,87,.12); }
+        .comparison-status.reference, .comparison-status.unsafe { border-color:rgba(127,127,127,.36); background:rgba(127,127,127,.08); }
+        .comparison-apply { display:flex; gap:.35rem; align-items:center; margin:.1rem 0 0; }
+        .comparison-apply input { width:auto; }
         .editor { border-top:1px solid rgba(127,127,127,.18); padding:1rem; background:rgba(127,127,127,.035); }
         .editor-head { display:flex; gap:.75rem; align-items:flex-start; justify-content:space-between; margin-bottom:.8rem; }
         .editor-head h3 { margin:0 0 .15rem; }
@@ -1154,17 +1168,17 @@ class TerpVaultPage extends HTMLElement {
   _createPackagePanel() {
     const state = this.state.create || {};
     return `
-      <section class="create-panel" data-terpwright-phase="3d-ifwiki-preview">
+      <section class="create-panel" data-terpwright-phase="3e-metadata-crosscheck">
         <div class="editor-head">
           <div>
             <h2>Terpwright Local Package Builder</h2>
-            <p class="meta">Creates a new draft package from local files and curator-supplied references. IFDB and IFWiki preview are implemented; IF Archive path normalization is implemented.</p>
+            <p class="meta">Creates a new draft package from local files and curator-supplied references. IFDB, IFWiki, IF Archive normalization, and metadata cross-check are implemented as review-only helpers.</p>
           </div>
           <button class="button" type="button" data-action="cancel-create">Close</button>
         </div>
         ${state.error ? `<div class="message error">${this._esc(state.error)}</div>` : ''}
         ${state.success ? `<div class="message success">${this._esc(state.success)}</div>` : ''}
-        <form data-create-package data-terpwright-phase="3d-ifwiki-preview">
+        <form data-create-package data-terpwright-phase="3e-metadata-crosscheck">
           <div class="create-steps">
             ${this._createStep('Identity', 'Required title and package metadata', `
               <div class="subsections">
@@ -1235,7 +1249,7 @@ class TerpVaultPage extends HTMLElement {
                 `, false)}
               </div>
             `, true)}
-            ${this._createStep('Ecosystem Preview', 'IFDB lookup, IFWiki lookup, and IF Archive normalization', this._ecosystemPreviewPanel('create'), true)}
+            ${this._createStep('Ecosystem Preview', 'Metadata cross-check, IFDB lookup, IFWiki lookup, and IF Archive normalization', this._ecosystemPreviewPanel('create'), true)}
             ${this._createStep('Local Resources', 'Media, iFiction XML, feelies, and helper docs', `
               <div class="create-grid">
                 ${this._createFile('Cover', 'cover', '.jpg,.jpeg,.png,.webp,.gif')}
@@ -1921,7 +1935,10 @@ class TerpVaultPage extends HTMLElement {
     const selectedIfwikiFields = Array.from(applyRoot?.querySelectorAll('[data-ifwiki-field]:checked') || [])
       .map(input => ifwikiFields[Number(input.dataset.ifwikiField)])
       .filter(field => field && field.path);
-    const selectedFields = [...selectedIfdbFields, ...selectedIfwikiFields];
+    const selectedCrosscheckFields = Array.from(applyRoot?.querySelectorAll('[data-crosscheck-row][data-crosscheck-source]:checked') || [])
+      .map(input => this._crosscheckSelection(state.report?.comparison, input.dataset.crosscheckRow, input.dataset.crosscheckSource))
+      .filter(field => field && field.path);
+    const selectedFields = [...selectedIfdbFields, ...selectedIfwikiFields, ...selectedCrosscheckFields];
     if ((!applyPath && !applyUrl && !selectedFields.length) || ((applyPath || applyUrl) && !ifArchive.path && !ifArchive.url && !selectedFields.length)) {
       this._setEcosystemState(normalizedScope, {
         ...state,
@@ -1943,6 +1960,7 @@ class TerpVaultPage extends HTMLElement {
       }
       selectedIfdbFields.forEach(field => this._applyIFDBPreviewField(values, field, 'create'));
       selectedIfwikiFields.forEach(field => this._applyIFWikiPreviewField(values, field, 'create'));
+      selectedCrosscheckFields.forEach(field => this._applyCrosscheckField(values, field, 'create'));
       this.state.create = {
         ...(this.state.create || {}),
         values,
@@ -1963,6 +1981,7 @@ class TerpVaultPage extends HTMLElement {
       }
       selectedIfdbFields.forEach(field => this._applyIFDBPreviewField(values, field, 'editor'));
       selectedIfwikiFields.forEach(field => this._applyIFWikiPreviewField(values, field, 'editor'));
+      selectedCrosscheckFields.forEach(field => this._applyCrosscheckField(values, field, 'editor'));
       this.state.editor = {
         ...(this.state.editor || {}),
         values,
@@ -1977,6 +1996,48 @@ class TerpVaultPage extends HTMLElement {
     this._renderLibrary();
   }
 
+  _crosscheckSelection(comparison, rowIndex, sourceKey) {
+    const rows = Array.isArray(comparison?.fields) ? comparison.fields : [];
+    const row = rows[Number(rowIndex)];
+    const cell = row?.cells?.[sourceKey];
+    if (!row || !cell || !cell.applyable || !cell.has_value) {
+      return null;
+    }
+
+    return {
+      path: row.path,
+      label: row.label,
+      value: cell.value,
+      source: sourceKey
+    };
+  }
+
+  _applyCrosscheckField(values, field, scope) {
+    const path = String(field.path || '');
+    let value = field.value;
+    if (Array.isArray(value)) {
+      value = value.map(item => String(item || '').trim()).filter(Boolean);
+    } else {
+      value = String(value || '').trim();
+    }
+
+    if (!path || (Array.isArray(value) ? !value.length : value === '')) {
+      return;
+    }
+
+    if (scope === 'create') {
+      const target = this._createTargetForPath(path);
+      if (!target) {
+        return;
+      }
+      values[target] = Array.isArray(value) ? value.join('\n') : value;
+      return;
+    }
+
+    const targetPath = path === 'tags' ? 'terpvault.tags' : path;
+    this._set(values, targetPath, value);
+  }
+
   _applyIFWikiPreviewField(values, field, scope) {
     const path = String(field.path || '');
     let value = field.value;
@@ -1987,11 +2048,7 @@ class TerpVaultPage extends HTMLElement {
     }
 
     if (scope === 'create') {
-      const createMap = {
-        'catalog.ifwiki.title': 'ifwiki_title',
-        'catalog.ifwiki.url': 'ifwiki_url'
-      };
-      const target = createMap[path];
+      const target = this._createTargetForPath(path);
       if (!target) {
         return;
       }
@@ -2014,21 +2071,7 @@ class TerpVaultPage extends HTMLElement {
     }
 
     if (scope === 'create') {
-      const createMap = {
-        'catalog.ifdb.tuid': 'ifdb_tuid',
-        'catalog.ifdb.url': 'ifdb_url',
-        'bibliographic.title': 'title',
-        'bibliographic.author': 'author',
-        'bibliographic.headline': 'headline',
-        'bibliographic.first_published': 'first_published',
-        'bibliographic.genre': 'genre',
-        'bibliographic.language': 'language',
-        'bibliographic.description': 'description',
-        'identification.format': 'format',
-        'identification.ifids': 'ifid',
-        'tags': 'tags'
-      };
-      const target = createMap[path];
+      const target = this._createTargetForPath(path);
       if (!target) {
         return;
       }
@@ -2038,6 +2081,32 @@ class TerpVaultPage extends HTMLElement {
 
     const targetPath = path === 'tags' ? 'terpvault.tags' : path;
     this._set(values, targetPath, value);
+  }
+
+  _createTargetForPath(path) {
+    return {
+      'bibliographic.title': 'title',
+      'bibliographic.author': 'author',
+      'bibliographic.headline': 'headline',
+      'bibliographic.first_published': 'first_published',
+      'bibliographic.genre': 'genre',
+      'bibliographic.language': 'language',
+      'bibliographic.description': 'description',
+      'identification.format': 'format',
+      'identification.ifids': 'ifid',
+      'catalog.ifdb.tuid': 'ifdb_tuid',
+      'catalog.ifdb.url': 'ifdb_url',
+      'catalog.ifwiki.title': 'ifwiki_title',
+      'catalog.ifwiki.url': 'ifwiki_url',
+      'catalog.ifarchive.path': 'ifarchive_path',
+      'catalog.ifarchive.url': 'ifarchive_url',
+      'release.source.url': 'source_url',
+      'release.source.upstream.url': 'upstream_source_url',
+      'release.source.port_repository.url': 'port_repository_url',
+      'release.license.name': 'license_name',
+      'release.license.url': 'license_url',
+      'tags': 'tags'
+    }[String(path || '')] || '';
   }
 
   _setEcosystemState(scope, ecosystem) {
@@ -2070,6 +2139,8 @@ class TerpVaultPage extends HTMLElement {
   _ecosystemPayloadFromValues(scope, values) {
     if (scope === 'editor') {
       return {
+        slug: this.state.editor.slug || this.state.editingSlug || '',
+        current_metadata: values || {},
         ifarchive_path: this._get(values, 'catalog.ifarchive.path'),
         ifarchive_url: this._get(values, 'catalog.ifarchive.url'),
         ifdb_tuid: this._get(values, 'catalog.ifdb.tuid'),
@@ -2084,6 +2155,7 @@ class TerpVaultPage extends HTMLElement {
     }
 
     return {
+      current_metadata: values || {},
       ifarchive_path: values.ifarchive_path || '',
       ifarchive_url: values.ifarchive_url || '',
       ifdb_tuid: values.ifdb_tuid || '',
@@ -3299,7 +3371,7 @@ class TerpVaultPage extends HTMLElement {
           </div>
         </form>
         <div class="editor-sections" style="margin-top:.85rem;">
-          ${this._editorSection('Ecosystem Preview', 'IFDB preview, IFWiki preview, IF Archive normalization', this._ecosystemPreviewPanel('editor', slug), true)}
+          ${this._editorSection('Ecosystem Preview', 'Metadata cross-check, IFDB preview, IFWiki preview, IF Archive normalization', this._ecosystemPreviewPanel('editor', slug), true)}
           ${this._editorSection('Story', 'Story replacement workflow', this._storyPanel(game, slug), false)}
           ${this._editorSection('Media', 'Cover, small cover, hero, screenshots, and feelies', `${this._mediaPanel(game, slug)}${this._feeliesPanel(game, slug)}`, false)}
           ${this._editorSection('Docs & Oracle', 'iFiction XML and helper Markdown for play notes, hints, walkthrough, and known differences', `${this._ifictionPreviewPanel(slug)}${this._helperDocsPanel(slug)}`, false)}
@@ -3409,6 +3481,7 @@ class TerpVaultPage extends HTMLElement {
               <span class="badge warn">rights not proven</span>
             </div>
             <div class="ecosystem-apply" data-ecosystem-apply-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''}>
+              ${this._metadataComparisonPanel(report?.comparison, contextLabel)}
               ${hasIFWikiPreview ? this._ifwikiPreviewPanel(ifwiki, contextLabel) : ''}
               ${hasNormalizedIFArchive ? `
                 <div class="preview-section">
@@ -3441,12 +3514,104 @@ class TerpVaultPage extends HTMLElement {
               </div>
             </div>
             ${Object.keys(references).length ? this._ecosystemReferenceList(references) : ''}
-            ${this._reportList('Preview errors', report.errors || [], 'error', false)}
+            ${Array.isArray(report.errors) && report.errors.length ? this._reportList('Preview errors', report.errors, 'error', false) : ''}
             ${this._reviewNotesDetails('Warnings & review notes', report.warnings || [], 'warn')}
           </div>
         ` : ''}
       </section>
     `;
+  }
+
+  _metadataComparisonPanel(comparison, contextLabel) {
+    const fields = Array.isArray(comparison?.fields) ? comparison.fields : [];
+    const sources = Array.isArray(comparison?.sources) ? comparison.sources : [];
+    const notes = Array.isArray(comparison?.notes) ? comparison.notes : [];
+    const warnings = Array.isArray(comparison?.warnings) ? comparison.warnings : [];
+    const ifiction = comparison?.ifiction || {};
+    if (!fields.length || !sources.length) {
+      return `
+        <div class="preview-section">
+          <h4>Metadata Cross-check</h4>
+          <p class="meta">No comparable metadata is available yet. Add a catalog reference, normalized IF Archive value, or package-local iFiction XML preview source.</p>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="preview-section">
+        <h4>Metadata Cross-check</h4>
+        <div class="badges" style="justify-content:flex-start;margin:.45rem 0;">
+          <span class="badge ok">field-by-field apply</span>
+          <span class="badge ${ifiction.available ? 'ok' : 'warn'}">iFiction ${this._esc(ifiction.status || 'not available')}</span>
+          <span class="badge warn">rights review required</span>
+        </div>
+        <p class="meta">Compare current values with available preview sources. Checked values update only the ${this._esc(contextLabel)}; existing non-empty values are not preselected when they differ.</p>
+        <div class="comparison-table-wrap">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th class="comparison-field">Field</th>
+                <th>Status</th>
+                ${sources.map(source => `<th>${this._esc(source.label || source.key || 'Source')}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${fields.map((row, rowIndex) => `
+                <tr>
+                  <td class="comparison-field">
+                    <strong>${this._esc(row.label || row.path || '')}</strong>
+                    <div class="meta"><code>${this._esc(row.path || '')}</code></div>
+                  </td>
+                  <td><span class="comparison-status ${this._esc(this._comparisonStatusClass(row.status))}">${this._esc(row.status || '')}</span></td>
+                  ${sources.map(source => this._comparisonCell(row, rowIndex, source, contextLabel)).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        ${notes.length ? this._reviewNotesDetails('Cross-check notes', notes, 'warn') : ''}
+        ${warnings.length ? this._reviewNotesDetails('Cross-check warnings', warnings, 'warn') : ''}
+      </div>
+    `;
+  }
+
+  _comparisonCell(row, rowIndex, source, contextLabel) {
+    const sourceKey = source.key || '';
+    const cell = row?.cells?.[sourceKey] || {};
+    const value = this._previewFieldValue(cell.value);
+    const hasValue = Boolean(cell.has_value && value);
+    const status = cell.status || (hasValue ? '' : 'not available');
+    return `
+      <td>
+        <div class="comparison-cell">
+          ${hasValue ? `<code>${this._esc(value)}</code>` : '<span class="meta">Not available</span>'}
+          <span class="comparison-status ${this._esc(this._comparisonStatusClass(status))}">${this._esc(status)}</span>
+          ${cell.applyable ? `
+            <label class="comparison-apply">
+              <input type="checkbox" data-crosscheck-row="${this._esc(String(rowIndex))}" data-crosscheck-source="${this._esc(sourceKey)}" ${cell.default_selected ? 'checked' : ''}>
+              <span>Apply to ${this._esc(contextLabel)}</span>
+            </label>
+          ` : (cell.reference_only ? '<span class="meta">Reference only</span>' : '')}
+        </div>
+      </td>
+    `;
+  }
+
+  _comparisonStatusClass(status) {
+    const text = String(status || '').toLowerCase();
+    if (text.includes('identical') || text === 'current') {
+      return 'identical';
+    }
+    if (text.includes('missing')) {
+      return 'missing';
+    }
+    if (text.includes('different')) {
+      return 'different';
+    }
+    if (text.includes('unsafe')) {
+      return 'unsafe';
+    }
+    return 'reference';
   }
 
   _ifdbPreviewPanel(ifdb, contextLabel) {

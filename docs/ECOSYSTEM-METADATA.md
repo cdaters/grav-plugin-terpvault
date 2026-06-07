@@ -137,13 +137,13 @@ URL presence does not prove redistribution rights. Curators should still record 
 
 ## Ecosystem Metadata Preview
 
-Terpwright Phase 3a/3b adds an authenticated preview-only Admin2 helper, Phase 3c extends it with IFDB lookup preview, and Phase 3d adds IFWiki lookup preview:
+Terpwright Phase 3a/3b adds an authenticated preview-only Admin2 helper, Phase 3c extends it with IFDB lookup preview, Phase 3d adds IFWiki lookup preview, and Phase 3e adds a metadata cross-check workflow:
 
 ```text
 POST /api/v1/terpvault/ecosystem/preview
 ```
 
-The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `ifarchive_url`, `ifdb_tuid`, `ifdb_url`, `ifwiki_title`, `ifwiki_url`, `source_url`, `upstream_source_url`, `port_repository_url`, and `license_url`. It does not write package files, download assets, download story files, or publish packages. Responses include stable review flags:
+The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `ifarchive_url`, `ifdb_tuid`, `ifdb_url`, `ifwiki_title`, `ifwiki_url`, `source_url`, `upstream_source_url`, `port_repository_url`, `license_url`, optional `current_metadata`, and an optional package `slug` used only to read package-root `metadata.iFiction.xml` for comparison. It does not write package files, download assets, download story files, or publish packages. Responses include stable review flags:
 
 ```json
 {
@@ -155,7 +155,7 @@ The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `if
 }
 ```
 
-`remote_fetches` is `true` only when an IFDB or IFWiki API lookup was attempted. Source, repository, and license URLs are reported as `stored/reference only` with lookup not implemented.
+`remote_fetches` is `true` only when an IFDB or IFWiki API lookup was attempted. Source, repository, and license URLs are reported as `stored/reference only` with lookup not implemented. The comparison payload is read-only and reports source columns without applying any field by itself.
 
 Accepted IF Archive inputs normalize to both `catalog.ifarchive.path` and `catalog.ifarchive.url`:
 
@@ -191,7 +191,11 @@ Supported IFWiki preview candidates may include page title, canonical URL, a sho
 
 If IFDB or IFWiki lookup fails, the endpoint returns warnings and `writes: false`; it does not crash package editing or write package files. IFWiki's live API may not provide every requested property, such as short extracts, so missing optional fields should be treated as unavailable rather than fatal.
 
-The Admin2 Create Package form and metadata editor both include an `Ecosystem Metadata Preview` section. A curator can preview references, review warnings, and apply selected normalized IF Archive, IFDB, or IFWiki fields into the visible form. Applying to the metadata editor only changes the editor state; the curator must still press `Save Metadata` before `game.yaml` is written.
+The Admin2 Create Package form and metadata editor both include an `Ecosystem Metadata Preview` section. Phase 3e adds a compact `Metadata Cross-check` table to that section. It compares supported fields across the current visible metadata, package-root `metadata.iFiction.xml` when present, IFDB preview values, IFWiki preview values, and IF Archive normalized path/URL values.
+
+Supported cross-check rows include title, author, headline, description, first published/year, genre, language, format, IFIDs, IFDB TUID/URL, IFWiki title/URL, IF Archive path/URL, source/upstream/port repository URLs, license name/URL, and tags where a source provides them. Rows are marked as `identical`, `missing locally`, `different`, `source-only/reference-only`, or `unsafe/not applicable`.
+
+A curator can select individual source values to apply into the visible Create Package form or metadata editor state. Existing non-empty fields that differ are not preselected. Applying to the metadata editor only changes the editor state; the curator must still press `Save Metadata` before `game.yaml` is written. Applying to Create Package only changes the form state; the draft is not created until the curator submits the package form. License and rights fields must remain curator-confirmed and are not inferred from catalog/source columns.
 
 ## Metadata Assistant roadmap
 
@@ -254,8 +258,8 @@ Phased plan:
 - Phase 3b: IF Archive path/URL helper. Implemented for normalization only.
 - Phase 3c: IFDB lookup helper.
 - Phase 3d: IFWiki helper. Implemented for URL/title normalization and MediaWiki API preview.
-- Phase 3e: iFiction/Babel cross-check.
-- Phase 3f: curator apply/diff workflow.
+- Phase 3e: metadata cross-check / comparison workflow. Implemented for current metadata, package-local iFiction XML where present, IFDB preview, IFWiki preview, and IF Archive normalized path/URL, with explicit apply to form/editor state only.
+- Phase 3f: validation integration and richer review status workflow.
 - Phase 3g: package validation integration.
 
 Large-library cleanup should eventually connect to the assistant. Admins should be able to filter for missing IFID, missing cover, missing screenshots, missing helper docs, missing catalog URLs, provenance needing review, license needing review, and `metadata.iFiction.xml` present/missing, then use the assistant to work through those problem groups.

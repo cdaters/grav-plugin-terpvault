@@ -23,6 +23,38 @@ class EcosystemMetadataService
         'license_url' => 'License URL',
     ];
 
+    private const COMPARISON_FIELDS = [
+        'bibliographic.title' => ['label' => 'Title', 'group' => 'bibliographic'],
+        'bibliographic.author' => ['label' => 'Author', 'group' => 'bibliographic'],
+        'bibliographic.headline' => ['label' => 'Headline', 'group' => 'bibliographic'],
+        'bibliographic.description' => ['label' => 'Description', 'group' => 'bibliographic'],
+        'bibliographic.first_published' => ['label' => 'First published / year', 'group' => 'bibliographic'],
+        'bibliographic.genre' => ['label' => 'Genre', 'group' => 'bibliographic'],
+        'bibliographic.language' => ['label' => 'Language', 'group' => 'bibliographic'],
+        'identification.format' => ['label' => 'Format', 'group' => 'identification'],
+        'identification.ifids' => ['label' => 'IFID(s)', 'group' => 'identification'],
+        'catalog.ifdb.tuid' => ['label' => 'IFDB TUID', 'group' => 'catalog'],
+        'catalog.ifdb.url' => ['label' => 'IFDB URL', 'group' => 'catalog'],
+        'catalog.ifwiki.title' => ['label' => 'IFWiki title', 'group' => 'catalog'],
+        'catalog.ifwiki.url' => ['label' => 'IFWiki URL', 'group' => 'catalog'],
+        'catalog.ifarchive.path' => ['label' => 'IF Archive path', 'group' => 'catalog'],
+        'catalog.ifarchive.url' => ['label' => 'IF Archive URL', 'group' => 'catalog'],
+        'release.source.url' => ['label' => 'Source / package URL', 'group' => 'provenance'],
+        'release.source.upstream.url' => ['label' => 'Upstream source URL', 'group' => 'provenance'],
+        'release.source.port_repository.url' => ['label' => 'Port/source repository URL', 'group' => 'provenance'],
+        'release.license.name' => ['label' => 'License name', 'group' => 'rights'],
+        'release.license.url' => ['label' => 'License URL', 'group' => 'rights'],
+        'tags' => ['label' => 'Tags', 'group' => 'discovery'],
+    ];
+
+    private const SOURCE_LABELS = [
+        'current' => 'Current package',
+        'ifiction' => 'iFiction XML',
+        'ifdb' => 'IFDB',
+        'ifwiki' => 'IFWiki',
+        'ifarchive' => 'IF Archive',
+    ];
+
     /** @var callable|null */
     private $httpFetcher;
 
@@ -132,7 +164,8 @@ class EcosystemMetadataService
             }
         }
 
-        if (!$hasInput) {
+        $comparison = $this->buildComparison($inputs, $ifArchive, $ifdb, $ifwiki, $references);
+        if (!$hasInput && !$comparison['has_candidate_sources']) {
             $errors[] = 'Enter at least one ecosystem reference before previewing metadata.';
         }
 
@@ -147,10 +180,112 @@ class EcosystemMetadataService
             'ifdb' => $ifdb,
             'ifwiki' => $ifwiki,
             'references' => $references,
+            'comparison' => $comparison,
             'warnings' => array_values(array_unique($warnings)),
             'errors' => $errors,
             'writes' => false,
             'remote_fetches' => (bool)(($ifdb['remote_fetches'] ?? false) || ($ifwiki['remote_fetches'] ?? false)),
+        ];
+    }
+
+    private function buildComparison(array $inputs, array $ifArchive, array $ifdb, array $ifwiki, array $references): array
+    {
+        $sources = [
+            'current' => $this->currentComparisonValues($inputs),
+            'ifiction' => $this->ifictionComparisonValues($inputs),
+            'ifdb' => $this->fieldListValues(is_array($ifdb['fields'] ?? null) ? $ifdb['fields'] : []),
+            'ifwiki' => $this->ifwikiComparisonValues($ifwiki),
+            'ifarchive' => $this->ifArchiveComparisonValues($ifArchive),
+        ];
+
+        foreach ($references as $field => $reference) {
+            $path = $this->referencePath($field);
+            if ($path === '') {
+                continue;
+            }
+            $value = $this->cleanScalar($reference['value'] ?? '');
+            if ($value !== '') {
+                $sources['current'][$path] = $value;
+            }
+        }
+
+        $rows = [];
+        $sourceColumns = [];
+        foreach (self::SOURCE_LABELS as $sourceKey => $sourceLabel) {
+            if ($sourceKey === 'current' || $this->sourceHasComparisonData($sources[$sourceKey] ?? [])) {
+                $sourceColumns[] = [
+                    'key' => $sourceKey,
+                    'label' => $sourceLabel,
+                    'available' => $this->sourceHasComparisonData($sources[$sourceKey] ?? []),
+                ];
+            }
+        }
+
+        $notes = [
+            'Comparison is read-only; selected values apply only to the visible form/editor state.',
+            'License and redistribution rights must be curator-confirmed before publishing.',
+        ];
+
+        $ifInfo = $this->ifictionAvailability($inputs);
+        if (!$ifInfo['available']) {
+            $notes[] = 'Package-root metadata.iFiction.xml is not available for this comparison.';
+        }
+
+        foreach (self::COMPARISON_FIELDS as $path => $definition) {
+            $currentValue = $sources['current'][$path] ?? null;
+            $currentText = $this->comparisonText($currentValue);
+            $sourceCells = [];
+            $candidateTexts = [];
+            $hasAny = $currentText !== '';
+
+            foreach (self::SOURCE_LABELS as $sourceKey => $sourceLabel) {
+                $value = $sources[$sourceKey][$path] ?? null;
+                $text = $this->comparisonText($value);
+                $hasValue = $text !== '';
+                $hasAny = $hasAny || $hasValue;
+                if ($sourceKey !== 'current' && $hasValue) {
+                    $candidateTexts[$sourceKey] = $this->canonicalComparisonText($value);
+                }
+
+                $sourceCells[$sourceKey] = [
+                    'source' => $sourceKey,
+                    'label' => $sourceLabel,
+                    'value' => $value,
+                    'text' => $text,
+                    'has_value' => $hasValue,
+                    'status' => $this->cellStatus($sourceKey, $path, $value, $currentValue),
+                    'applyable' => $sourceKey !== 'current' && $hasValue && $this->isApplyableComparisonField($sourceKey, $path),
+                    'default_selected' => $sourceKey !== 'current' && $hasValue && $currentText === '' && $this->isApplyableComparisonField($sourceKey, $path),
+                    'reference_only' => $this->isReferenceOnlyComparisonField($sourceKey, $path),
+                    'rights_review_required' => strpos($path, 'license') !== false || strpos($path, 'source') !== false,
+                ];
+            }
+
+            if (!$hasAny && !in_array($path, ['release.license.name', 'release.license.url'], true)) {
+                continue;
+            }
+
+            $rows[] = [
+                'path' => $path,
+                'label' => $definition['label'],
+                'group' => $definition['group'],
+                'status' => $this->rowStatus($currentValue, $candidateTexts, $path),
+                'cells' => $sourceCells,
+            ];
+        }
+
+        return [
+            'available' => count($rows) > 0,
+            'fields' => $rows,
+            'sources' => $sourceColumns,
+            'source_labels' => self::SOURCE_LABELS,
+            'has_candidate_sources' => $this->hasCandidateSources($sources),
+            'ifiction' => $ifInfo,
+            'notes' => array_values(array_unique($notes)),
+            'warnings' => [
+                'Do not apply catalog descriptions, tags, or license fields without curator review.',
+                'Reference-only values are shown for comparison and are not proof of rights.',
+            ],
         ];
     }
 
@@ -1240,6 +1375,341 @@ class EcosystemMetadataService
         }
 
         return $warnings;
+    }
+
+    private function currentComparisonValues(array $inputs): array
+    {
+        $metadata = is_array($inputs['current_metadata'] ?? null) ? $inputs['current_metadata'] : [];
+        $values = [];
+        foreach (array_keys(self::COMPARISON_FIELDS) as $path) {
+            $value = $this->getNestedValue($metadata, $path);
+            if ($value !== null) {
+                $values[$path] = $this->cleanComparisonValue($value);
+            }
+        }
+
+        $flatMap = [
+            'title' => 'bibliographic.title',
+            'author' => 'bibliographic.author',
+            'headline' => 'bibliographic.headline',
+            'description' => 'bibliographic.description',
+            'first_published' => 'bibliographic.first_published',
+            'genre' => 'bibliographic.genre',
+            'language' => 'bibliographic.language',
+            'format' => 'identification.format',
+            'ifid' => 'identification.ifids',
+            'ifids' => 'identification.ifids',
+            'ifdb_tuid' => 'catalog.ifdb.tuid',
+            'ifdb_url' => 'catalog.ifdb.url',
+            'ifwiki_title' => 'catalog.ifwiki.title',
+            'ifwiki_url' => 'catalog.ifwiki.url',
+            'ifarchive_path' => 'catalog.ifarchive.path',
+            'ifarchive_url' => 'catalog.ifarchive.url',
+            'source_url' => 'release.source.url',
+            'upstream_source_url' => 'release.source.upstream.url',
+            'port_repository_url' => 'release.source.port_repository.url',
+            'license_name' => 'release.license.name',
+            'license_url' => 'release.license.url',
+            'tags' => 'tags',
+        ];
+
+        foreach ($flatMap as $inputKey => $path) {
+            if (array_key_exists($inputKey, $inputs)) {
+                $value = $this->cleanComparisonValue($inputs[$inputKey]);
+                if ($this->comparisonText($value) !== '') {
+                    $values[$path] = $value;
+                }
+            }
+            if (array_key_exists($inputKey, $metadata)) {
+                $value = $this->cleanComparisonValue($metadata[$inputKey]);
+                if ($this->comparisonText($value) !== '') {
+                    $values[$path] = $value;
+                }
+            }
+        }
+
+        if (array_key_exists('terpvault', $metadata) && is_array($metadata['terpvault'] ?? null)) {
+            $tags = $this->getNestedValue($metadata, 'terpvault.tags');
+            if ($tags !== null && $this->comparisonText($tags) !== '') {
+                $values['tags'] = $this->cleanComparisonValue($tags);
+            }
+        }
+
+        return $values;
+    }
+
+    private function ifictionComparisonValues(array $inputs): array
+    {
+        $preview = is_array($inputs['ifiction_preview'] ?? null) ? $inputs['ifiction_preview'] : [];
+        $fields = is_array($preview['fields'] ?? null) ? $preview['fields'] : [];
+        $values = [];
+        foreach ($fields as $field) {
+            if (!is_array($field)) {
+                continue;
+            }
+            $path = $this->cleanScalar($field['path'] ?? '');
+            if (!array_key_exists($path, self::COMPARISON_FIELDS)) {
+                continue;
+            }
+            $value = $field['xml'] ?? $field['value'] ?? null;
+            if ($this->comparisonText($value) !== '') {
+                $values[$path] = $this->cleanComparisonValue($value);
+            }
+        }
+
+        return $values;
+    }
+
+    private function ifictionAvailability(array $inputs): array
+    {
+        $preview = is_array($inputs['ifiction_preview'] ?? null) ? $inputs['ifiction_preview'] : [];
+        if (!$preview) {
+            return [
+                'available' => false,
+                'ok' => false,
+                'status' => 'not available',
+                'errors' => [],
+            ];
+        }
+
+        $errors = is_array($preview['errors'] ?? null) ? $preview['errors'] : [];
+        return [
+            'available' => (bool)($preview['exists'] ?? false),
+            'ok' => (bool)($preview['ok'] ?? false),
+            'status' => !empty($preview['exists']) ? (!empty($preview['ok']) ? 'preview available' : 'not previewable') : 'not available',
+            'errors' => array_values(array_filter(array_map('strval', $errors))),
+        ];
+    }
+
+    private function fieldListValues(array $fields): array
+    {
+        $values = [];
+        foreach ($fields as $field) {
+            if (!is_array($field)) {
+                continue;
+            }
+            $path = $this->cleanScalar($field['path'] ?? '');
+            if (!array_key_exists($path, self::COMPARISON_FIELDS)) {
+                continue;
+            }
+            $value = $field['value'] ?? null;
+            if ($this->comparisonText($value) !== '') {
+                $values[$path] = $this->cleanComparisonValue($value);
+            }
+        }
+
+        return $values;
+    }
+
+    private function ifwikiComparisonValues(array $ifwiki): array
+    {
+        $fields = is_array($ifwiki['fields'] ?? null) ? $ifwiki['fields'] : [];
+        $values = $this->fieldListValues($fields);
+        if (!isset($values['catalog.ifwiki.title']) && $this->cleanScalar($ifwiki['title'] ?? '') !== '') {
+            $values['catalog.ifwiki.title'] = $this->cleanScalar($ifwiki['title']);
+        }
+        if (!isset($values['catalog.ifwiki.url']) && $this->cleanScalar($ifwiki['url'] ?? '') !== '') {
+            $values['catalog.ifwiki.url'] = $this->cleanScalar($ifwiki['url']);
+        }
+        foreach ($fields as $field) {
+            if (!is_array($field)) {
+                continue;
+            }
+            if (($field['path'] ?? '') === 'catalog.ifwiki.summary' && $this->comparisonText($field['value'] ?? null) !== '') {
+                $values['bibliographic.description'] = $this->cleanComparisonValue($field['value']);
+            }
+        }
+
+        return $values;
+    }
+
+    private function ifArchiveComparisonValues(array $ifArchive): array
+    {
+        $values = [];
+        $path = $this->cleanScalar($ifArchive['path'] ?? '');
+        $url = $this->cleanScalar($ifArchive['url'] ?? '');
+        if ($path !== '') {
+            $values['catalog.ifarchive.path'] = $path;
+        }
+        if ($url !== '') {
+            $values['catalog.ifarchive.url'] = $url;
+        }
+
+        return $values;
+    }
+
+    private function sourceHasComparisonData(array $values): bool
+    {
+        foreach ($values as $value) {
+            if ($this->comparisonText($value) !== '') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function hasCandidateSources(array $sources): bool
+    {
+        foreach ($sources as $key => $values) {
+            if ($key !== 'current' && $this->sourceHasComparisonData(is_array($values) ? $values : [])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function rowStatus($currentValue, array $candidateTexts, string $path): string
+    {
+        $currentText = $this->canonicalComparisonText($currentValue);
+        $candidateTexts = array_values(array_filter($candidateTexts, static function (string $text): bool {
+            return $text !== '';
+        }));
+
+        if (!$candidateTexts) {
+            return $currentText === '' ? 'source-only/reference-only' : 'source-only/reference-only';
+        }
+        if ($this->isUnsafeComparisonPath($path)) {
+            return 'unsafe/not applicable';
+        }
+        if ($currentText === '') {
+            return 'missing locally';
+        }
+        foreach ($candidateTexts as $candidateText) {
+            if ($candidateText !== $currentText) {
+                return 'different';
+            }
+        }
+
+        return 'identical';
+    }
+
+    private function cellStatus(string $sourceKey, string $path, $value, $currentValue): string
+    {
+        if ($sourceKey === 'current') {
+            return $this->comparisonText($value) === '' ? 'missing locally' : 'current';
+        }
+        if ($this->comparisonText($value) === '') {
+            return 'not available';
+        }
+        if ($this->isUnsafeComparisonPath($path)) {
+            return 'unsafe/not applicable';
+        }
+        if ($this->isReferenceOnlyComparisonField($sourceKey, $path)) {
+            return 'source-only/reference-only';
+        }
+        $currentText = $this->canonicalComparisonText($currentValue);
+        if ($currentText === '') {
+            return 'missing locally';
+        }
+        return $this->canonicalComparisonText($value) === $currentText ? 'identical' : 'different';
+    }
+
+    private function isApplyableComparisonField(string $sourceKey, string $path): bool
+    {
+        if ($sourceKey === 'current' || $this->isUnsafeComparisonPath($path)) {
+            return false;
+        }
+        if ($this->isReferenceOnlyComparisonField($sourceKey, $path)) {
+            return false;
+        }
+        if ($sourceKey === 'ifwiki') {
+            return in_array($path, ['catalog.ifwiki.title', 'catalog.ifwiki.url'], true);
+        }
+
+        return array_key_exists($path, self::COMPARISON_FIELDS);
+    }
+
+    private function isReferenceOnlyComparisonField(string $sourceKey, string $path): bool
+    {
+        if ($sourceKey === 'ifwiki' && !in_array($path, ['catalog.ifwiki.title', 'catalog.ifwiki.url'], true)) {
+            return true;
+        }
+        if ($sourceKey === 'ifarchive' && !in_array($path, ['catalog.ifarchive.path', 'catalog.ifarchive.url'], true)) {
+            return true;
+        }
+        if ($sourceKey !== 'current' && (strpos($path, 'release.license') === 0 || strpos($path, 'release.source') === 0)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function isUnsafeComparisonPath(string $path): bool
+    {
+        return $path === 'release.license.name';
+    }
+
+    private function cleanComparisonValue($value)
+    {
+        if (is_array($value)) {
+            $items = [];
+            foreach ($value as $item) {
+                if (is_array($item)) {
+                    continue;
+                }
+                $clean = $this->cleanScalar($item);
+                if ($clean !== '') {
+                    $items[] = $clean;
+                }
+            }
+
+            return array_values(array_unique($items));
+        }
+
+        return $this->cleanScalar($value);
+    }
+
+    private function comparisonText($value): string
+    {
+        if (is_array($value)) {
+            return trim(implode("\n", array_map('strval', $value)));
+        }
+
+        return $this->cleanScalar($value);
+    }
+
+    private function canonicalComparisonText($value): string
+    {
+        if (is_array($value)) {
+            $items = array_map(static function ($item): string {
+                return strtolower(trim((string)$item));
+            }, $value);
+            $items = array_values(array_filter($items, static function (string $item): bool {
+                return $item !== '';
+            }));
+            sort($items);
+            return implode("\n", $items);
+        }
+
+        $text = strtolower(trim((string)($value ?? '')));
+        return preg_replace('/\s+/', ' ', $text) ?? $text;
+    }
+
+    private function getNestedValue(array $data, string $path)
+    {
+        $value = $data;
+        foreach (explode('.', $path) as $segment) {
+            if (!is_array($value) || !array_key_exists($segment, $value)) {
+                return null;
+            }
+            $value = $value[$segment];
+        }
+
+        return $value;
+    }
+
+    private function referencePath(string $field): string
+    {
+        $map = [
+            'source_url' => 'release.source.url',
+            'upstream_source_url' => 'release.source.upstream.url',
+            'port_repository_url' => 'release.source.port_repository.url',
+            'license_url' => 'release.license.url',
+        ];
+
+        return $map[$field] ?? '';
     }
 
     private function pathResult(string $path, string $error): array
