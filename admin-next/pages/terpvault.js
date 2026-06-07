@@ -319,9 +319,10 @@ class TerpVaultPage extends HTMLElement {
         textarea.markdown { min-height:18rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.92rem; line-height:1.45; }
         .checkbox { display:flex; gap:.5rem; align-items:center; margin:.7rem 0 .25rem; }
         .checkbox input { width:auto; }
-        .readonly { display:grid; gap:.35rem; margin-top:.35rem; }
-        .readonly div { display:grid; grid-template-columns:120px minmax(0,1fr); gap:.45rem; font-size:.86rem; }
+        .readonly { display:grid; gap:.35rem; margin-top:.35rem; min-width:0; }
+        .readonly div { display:grid; grid-template-columns:120px minmax(0,1fr); gap:.45rem; font-size:.86rem; min-width:0; }
         .readonly span:first-child { opacity:.68; }
+        .readonly code { display:block; min-width:0; max-width:100%; white-space:normal; overflow-wrap:anywhere; word-break:break-word; }
         .ifiction-fields { display:grid; gap:.65rem; margin:.7rem 0; }
         .ifiction-field { display:grid; grid-template-columns:2rem minmax(0,1fr); gap:.65rem; align-items:start; border:1px solid rgba(127,127,127,.24); border-radius:10px; padding:.7rem; background:rgba(127,127,127,.035); }
         .ifiction-field.overwrite { border-color:rgba(255,188,87,.65); background:rgba(255,188,87,.08); }
@@ -343,7 +344,9 @@ class TerpVaultPage extends HTMLElement {
         .message.error { border-color:rgba(255,95,95,.7); background:rgba(255,95,95,.1); }
         .message.warn { border-color:rgba(255,188,87,.65); background:rgba(255,188,87,.1); }
         .message.success { border-color:rgba(79,190,124,.58); background:rgba(79,190,124,.1); }
-        .form-actions { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; justify-content:flex-end; }
+        .form-actions { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; justify-content:flex-end; margin-top:.9rem; }
+        .extension-chip-list { display:flex; flex-wrap:wrap; gap:.35rem; margin:.5rem 0 .15rem; }
+        .extension-chip { display:inline-flex; align-items:center; border:1px solid rgba(127,127,127,.32); border-radius:999px; padding:.1rem .45rem; background:rgba(127,127,127,.065); font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.78rem; line-height:1.35; }
         .helper-docs { border-top:1px solid rgba(127,127,127,.18); margin-top:1rem; padding-top:1rem; }
         .helper-tabs { display:flex; flex-wrap:wrap; gap:.45rem; margin:.7rem 0; }
         .helper-tabs .button[aria-selected="true"] { border-color:rgba(93,164,255,.72); background:rgba(93,164,255,.18); }
@@ -5162,13 +5165,15 @@ class TerpVaultPage extends HTMLElement {
         <form data-form="formats">
           <fieldset>
             <legend>Story Extensions</legend>
-            <p class="help">One extension per line. Leading dots are stripped, values are lowercased, and path-like or duplicate values are rejected.</p>
+            <p class="help">One extension per line or comma-separated. Leading dots are stripped. Values are lowercased; path-like or duplicate values are rejected.</p>
             <textarea class="short" name="story_extensions" spellcheck="false">${this._esc(story.join('\n'))}</textarea>
+            ${this._extensionChips(story)}
           </fieldset>
           <fieldset>
             <legend>Asset / Media Extensions</legend>
-            <p class="help">Controls package-local public asset serving. Upload workflows may have narrower role-specific allowlists.</p>
+            <p class="help">One extension per line or comma-separated. Leading dots are stripped. Controls package-local public asset serving; upload workflows may have narrower role-specific allowlists.</p>
             <textarea class="short" name="asset_extensions" spellcheck="false">${this._esc(assets.join('\n'))}</textarea>
+            ${this._extensionChips(assets)}
           </fieldset>
           <div class="form-actions">
             <button class="button" type="button" data-action="reset-formats">Cancel Changes</button>
@@ -5460,6 +5465,18 @@ class TerpVaultPage extends HTMLElement {
       });
     });
     return extensions;
+  }
+
+  _extensionChips(extensions = []) {
+    if (!extensions.length) {
+      return '';
+    }
+
+    return `
+      <div class="extension-chip-list" aria-label="Current normalized extensions">
+        ${extensions.map(extension => `<span class="extension-chip">.${this._esc(extension)}</span>`).join('')}
+      </div>
+    `;
   }
 
   _fallbackFormats() {
