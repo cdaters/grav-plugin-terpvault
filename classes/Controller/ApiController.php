@@ -247,6 +247,29 @@ class ApiController extends AbstractApiController
             throw new ValidationException('Request body must be a JSON object.');
         }
 
+        $slug = trim((string)($body['slug'] ?? ''));
+        if ($slug !== '' && !isset($body['ifiction_preview'])) {
+            try {
+                $body['ifiction_preview'] = $this->ifictionService()->preview($slug);
+            } catch (InvalidArgumentException $e) {
+                $body['ifiction_preview'] = [
+                    'slug' => $slug,
+                    'exists' => false,
+                    'ok' => false,
+                    'errors' => [$e->getMessage()],
+                    'fields' => [],
+                ];
+            } catch (RuntimeException $e) {
+                $body['ifiction_preview'] = [
+                    'slug' => $slug,
+                    'exists' => false,
+                    'ok' => false,
+                    'errors' => [$e->getMessage()],
+                    'fields' => [],
+                ];
+            }
+        }
+
         return ApiResponse::create($this->ecosystemService()->preview($body));
     }
 
