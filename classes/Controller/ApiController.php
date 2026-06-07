@@ -12,6 +12,7 @@ use Grav\Plugin\Api\Response\ApiResponse;
 use Grav\Framework\Psr7\Response;
 use Grav\Plugin\TerpVault\GamePackage;
 use Grav\Plugin\TerpVault\GameRepository;
+use Grav\Plugin\TerpVault\Service\EcosystemMetadataService;
 use Grav\Plugin\TerpVault\Service\PackageArchiveService;
 use Grav\Plugin\TerpVault\Service\PackageCreationService;
 use Grav\Plugin\TerpVault\Service\PackageFeeliesService;
@@ -107,6 +108,11 @@ class ApiController extends AbstractApiController
     private function storyService(): PackageStoryService
     {
         return new PackageStoryService();
+    }
+
+    private function ecosystemService(): EcosystemMetadataService
+    {
+        return new EcosystemMetadataService();
     }
 
     public function metadata(ServerRequestInterface $request): ResponseInterface
@@ -231,6 +237,17 @@ class ApiController extends AbstractApiController
         } catch (RuntimeException $e) {
             throw new ValidationException($e->getMessage());
         }
+    }
+
+    public function previewEcosystem(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireAdminApiSuper($request);
+        $body = $this->getRequestBody($request);
+        if (!is_array($body)) {
+            throw new ValidationException('Request body must be a JSON object.');
+        }
+
+        return ApiResponse::create($this->ecosystemService()->preview($body));
     }
 
     public function previewIFiction(ServerRequestInterface $request): ResponseInterface

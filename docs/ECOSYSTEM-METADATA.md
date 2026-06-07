@@ -108,12 +108,13 @@ TerpVault includes this file in `.terpvault.zip` export/import payloads when pre
 
 The upload workflow validates XML and writes only `metadata.iFiction.xml` in the package root. It does not apply metadata automatically. The apply workflow re-parses package-local XML on the server, does not perform remote lookup, backs up `game.yaml`, and only overwrites existing non-empty `game.yaml` values when the curator selects that field.
 
-Current limits:
+Current behavior:
 
 - Admin2 can upload or replace `metadata.iFiction.xml`, but it does not edit XML contents in place.
 - Package creation can accept local `metadata.iFiction.xml` as a package-root file, but it does not apply XML fields to `game.yaml` automatically.
 - Import inspection reports whether accepted `.terpvault.zip` packages include package-root `metadata.iFiction.xml`; import commit preserves the file but does not use it to merge or prefill `game.yaml`.
-- Remote IFDB, IFWiki, IF Archive, or catalog lookup is not implemented.
+- The Admin2 Ecosystem Metadata Preview can normalize curator-supplied IF Archive paths/URLs without downloading the referenced file.
+- Remote IFDB, IFWiki, IF Archive file download, or catalog lookup is not implemented.
 - Metadata workflows do not download story files, packages, cover art, screenshots, or other remote assets.
 
 ## Manual URL roles
@@ -133,6 +134,40 @@ Use these roles consistently:
 
 URL presence does not prove redistribution rights. Curators should still record license names, license notes, source notes, retrieval/review context, item-level asset provenance, and any pending-review status before publishing.
 
+## Ecosystem Metadata Preview
+
+Terpwright Phase 3a/3b adds an authenticated preview-only Admin2 helper:
+
+```text
+POST /api/v1/terpvault/ecosystem/preview
+```
+
+The endpoint accepts named curator-supplied fields such as `ifarchive_path`, `ifarchive_url`, `ifdb_url`, `ifwiki_url`, `source_url`, `upstream_source_url`, `port_repository_url`, and `license_url`. It does not write package files, perform remote fetches, download assets, or publish packages. Responses include stable review flags:
+
+```json
+{
+  "reference_only": true,
+  "curator_review_required": true,
+  "rights_notice": "URL presence does not prove redistribution rights.",
+  "writes": false,
+  "remote_fetches": false
+}
+```
+
+For this phase, only IF Archive normalization is functional. Other supplied URLs are reported as `stored/reference only` with lookup not implemented yet.
+
+Accepted IF Archive inputs normalize to both `catalog.ifarchive.path` and `catalog.ifarchive.url`:
+
+| Input | Normalized path | Normalized URL |
+| --- | --- | --- |
+| `https://ifarchive.org/if-archive/games/zcode/Advent.z5` | `games/zcode/Advent.z5` | `https://ifarchive.org/if-archive/games/zcode/Advent.z5` |
+| `if-archive/games/zcode/Advent.z5` | `games/zcode/Advent.z5` | `https://ifarchive.org/if-archive/games/zcode/Advent.z5` |
+| `games/zcode/Advent.z5` | `games/zcode/Advent.z5` | `https://ifarchive.org/if-archive/games/zcode/Advent.z5` |
+
+The helper rejects or warns about traversal segments, empty preview input, absolute filesystem paths, unsafe schemes, non-IF Archive hosts, malformed IF Archive URL paths, mismatched path/URL pairs, and ignored query strings or fragments. It does not assume the referenced file may be redistributed.
+
+The Admin2 Create Package form and metadata editor both include an `Ecosystem Metadata Preview` section. A curator can preview references, review warnings, and apply selected normalized IF Archive fields into the visible form. Applying to the metadata editor only changes the editor state; the curator must still press `Save Metadata` before `game.yaml` is written.
+
 ## Metadata Assistant roadmap
 
 A future Metadata Assistant should reduce manual metadata entry while staying explicit and preview-driven.
@@ -144,7 +179,7 @@ Candidate sources:
 - Manually uploaded or replaced `metadata.iFiction.xml`.
 - Future IFDB lookup by IFID, title, or pasted URL.
 - Future IFWiki lookup by title or pasted URL.
-- Future IF Archive path/URL helper.
+- Current IF Archive path/URL helper output.
 
 Required behavior:
 
@@ -171,7 +206,7 @@ Future provider/source definitions should be back-end configurable before remote
 
 Remote providers must run only after an explicit admin action. No provider should silently fetch, merge, overwrite, download story files, download assets, publish packages, or treat catalog metadata as more authoritative than package-local story/iFiction metadata without curator confirmation. Candidate metadata from any provider should appear in the same side-by-side review model, with field-level checkboxes and a `game.yaml` backup before writes.
 
-Phase 3 Terpwright planning treats remote/catalog support as ecosystem lookup helpers, not automated package creation. Candidate lookup sources may include IFDB, IFWiki, IF Archive, upstream project/source repositories, package-local `metadata.iFiction.xml`, and Treaty of Babel / iFiction metadata where available. Candidate fields may include title, author, publication year, IFID, format, source URLs, IF Archive path, license hints, external catalog links, and cover/art references when appropriate.
+Phase 3 Terpwright treats remote/catalog support as ecosystem lookup helpers, not automated package creation. Phase 3a/3b is limited to preview shell behavior and IF Archive normalization. Future candidate lookup sources may include IFDB, IFWiki, upstream project/source repositories, package-local `metadata.iFiction.xml`, and Treaty of Babel / iFiction metadata where available. Candidate fields may include title, author, publication year, IFID, format, source URLs, IF Archive path, license hints, external catalog links, and cover/art references when appropriate.
 
 Phase 3 helpers should not assume redistribution rights, scrape pages when a stable source/API/manual entry is appropriate, copy large web text into package docs, auto-download story files or artwork, or publish packages. Lookup failures should be handled as warnings or unavailable states so package-local editing still works offline. Any cached/stored data should be review-safe metadata, not whole remote pages or copied prose.
 
@@ -189,8 +224,8 @@ Phased plan:
 - Phase 1 baseline: local iFiction XML presence/status, package-root upload/replace, import inspection awareness, preview/apply polish, and metadata-completeness filters for XML present/missing. Future Phase 1 polish may integrate local preview/apply into package creation/import when XML is present.
 - Phase 2: manual catalog and provenance URL capture in package creation, including IFDB TUID/URL, IFWiki URL, IF Archive path/URL, source URL, upstream URL, port/source repository URL, license URL/notes, and reference-only URL roles.
 - Phase 3: add explicit ecosystem lookup helpers by title/author, IFID where possible, and pasted IFDB/IFWiki/IF Archive URL or path. Preview candidates, apply selected fields only, document source/retrieval date, and preserve the rule that URLs are curator-review references, not proof of rights.
-- Phase 3a: URL validation and metadata preview shell.
-- Phase 3b: IF Archive path/URL helper.
+- Phase 3a: URL validation and metadata preview shell. Implemented for curator-supplied references.
+- Phase 3b: IF Archive path/URL helper. Implemented for normalization only.
 - Phase 3c: IFDB lookup helper.
 - Phase 3d: IFWiki helper.
 - Phase 3e: iFiction/Babel cross-check.

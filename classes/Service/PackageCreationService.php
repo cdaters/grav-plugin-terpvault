@@ -138,6 +138,10 @@ class PackageCreationService
         $repositoryUrl = $this->urlField($fields, 'port_repository_url', 'Port/source repository URL');
         $sourceNotes = $this->textField($fields, 'source_notes');
         $sourceRetrieved = $sourceUrl || $upstreamUrl || $repositoryUrl ? date('Y-m-d') : '';
+        $ifArchive = (new EcosystemMetadataService())->requireIFArchiveMetadata(
+            (string)($fields['ifarchive_path'] ?? ''),
+            (string)($fields['ifarchive_url'] ?? '')
+        );
         $manifest = [
             'id' => $slug,
             'slug' => $slug,
@@ -162,7 +166,7 @@ class PackageCreationService
             'catalog' => [
                 'ifdb' => ['tuid' => $this->textField($fields, 'ifdb_tuid'), 'url' => $this->urlField($fields, 'ifdb_url', 'IFDB URL')],
                 'ifwiki' => ['url' => $this->urlField($fields, 'ifwiki_url', 'IFWiki URL')],
-                'ifarchive' => ['path' => $this->ifArchivePath($fields['ifarchive_path'] ?? ''), 'url' => $this->urlField($fields, 'ifarchive_url', 'IF Archive URL')],
+                'ifarchive' => ['path' => $ifArchive['path'], 'url' => $ifArchive['url']],
             ],
             'release' => [
                 'license' => [

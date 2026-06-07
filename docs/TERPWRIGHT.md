@@ -2,7 +2,7 @@
 
 Terpwright is the Admin2 package-builder workflow for TerpVault. It helps a curator assemble a reviewable TerpVault package from local files and known interactive-fiction ecosystem references without replacing curator judgment, license review, or provenance notes.
 
-Phase 1 local-file package creation and Phase 2 manually supplied URL capture are implemented in Admin2. Later ecosystem lookup helpers, guided recipes, richer Oracle generation, and Ink support remain roadmap-only. Scraping, AI metadata generation, automatic package creation from remote sources, and Ink support are not part of the current Terpwright implementation.
+Phase 1 local-file package creation, Phase 2 manually supplied URL capture, and Phase 3a/3b ecosystem metadata preview with IF Archive URL/path normalization are implemented in Admin2. Later IFDB/IFWiki lookup helpers, guided recipes, richer Oracle generation, and Ink support remain roadmap-only. Scraping, AI metadata generation, automatic package creation from remote sources, and Ink support are not part of the current Terpwright implementation.
 
 ## Purpose
 
@@ -27,6 +27,7 @@ Implemented:
 - Format inference from story extension when the curator leaves format blank.
 - Basic metadata entry for title, slug, author/source attribution, headline, IFID, description, tags, license, and source notes.
 - Manual metadata/provenance URL entry for named roles such as source/package URL, upstream project URL, port/source repository URL, IFDB, IFWiki, IF Archive, license, and optional reference-only links.
+- Ecosystem Metadata Preview for curator-supplied references, with functional IF Archive URL/path normalization and no remote fetches.
 - Draft-only output: `terpvault.status` is forced to `draft` and `terpvault.featured` is forced to `false`.
 - Optional local uploads for cover, small-cover, hero, screenshots, helper Markdown files, `known-differences.md`, `provenance.md`, `metadata.iFiction.xml`, and feelies.
 - Package-local resource paths only, with traversal/system-file checks and conservative extension allowlists.
@@ -180,9 +181,28 @@ Later phases may add:
 
 Later inputs must keep preview/apply behavior, source attribution, retrieval dates, and license review explicit.
 
-## Phase 3 Planning: Ecosystem Lookup Helpers
+## Phase 3: Ecosystem Lookup Helpers
 
-Terpwright Phase 3 is planned as a set of ecosystem lookup helpers, not automated package creation. The goal is to help curators find and compare metadata from known interactive-fiction sources while preserving package-local data, rights review, and explicit curator decisions.
+Terpwright Phase 3 is a set of ecosystem lookup helpers, not automated package creation. Phase 3a/3b currently provides a preview shell and an IF Archive URL/path normalizer. The goal is to help curators find and compare metadata from known interactive-fiction sources while preserving package-local data, rights review, and explicit curator decisions.
+
+Implemented in Phase 3a/3b:
+
+- Authenticated Admin2 API endpoint: `POST /api/v1/terpvault/ecosystem/preview`.
+- Create Package and metadata editor preview panels labeled `Ecosystem Metadata Preview`.
+- IF Archive input normalization from:
+  - `https://ifarchive.org/if-archive/games/zcode/Advent.z5`
+  - `if-archive/games/zcode/Advent.z5`
+  - `games/zcode/Advent.z5`
+- Normalized metadata preview for:
+  - `catalog.ifarchive.path: games/zcode/Advent.z5`
+  - `catalog.ifarchive.url: https://ifarchive.org/if-archive/games/zcode/Advent.z5`
+- Explicit curator apply buttons for selected normalized IF Archive fields.
+- Draft/review messaging: reference only, curator review required, and URL presence does not prove redistribution rights.
+- Stored/reference-only reporting for IFDB, IFWiki, source, repository, and license URLs.
+
+Phase 3a/3b does not fetch IF Archive files, download story files, download assets, query IFDB, query IFWiki, scrape pages, generate AI metadata, or publish packages. Preview responses are read-only and report `writes: false` and `remote_fetches: false`.
+
+IF Archive validation rejects or reports warnings for unsafe input such as traversal segments, absolute filesystem paths, unsafe schemes, non-IF Archive hosts, malformed `/if-archive/` paths, and empty preview requests. Query strings and fragments are ignored in the normalized IF Archive package URL with a warning.
 
 Phase 3 helpers may look up or cross-check:
 
@@ -436,8 +456,8 @@ Terpwright docs and UI should avoid implying that Ink packages are currently pla
 
 ### Phase 3: Ecosystem Lookup Helpers
 
-- Future work only; no Phase 3 remote lookup is currently implemented.
-- Add configured provider lookup for IFDB, IFWiki, IF Archive, package-local iFiction XML, Treaty of Babel metadata where available, and approved source/license references.
+- Phase 3a/3b implemented an authenticated preview shell and IF Archive path/URL helper. No Phase 3 remote lookup is currently implemented.
+- Future work should add configured provider lookup for IFDB, IFWiki, package-local iFiction XML, Treaty of Babel metadata where available, and approved source/license references.
 - Require explicit admin action for every lookup.
 - Preview candidate metadata beside current `game.yaml` and package-local `metadata.iFiction.xml`.
 - Show source, confidence, attribution, retrieval date, warnings, license hints, and field-level apply controls.
@@ -446,12 +466,12 @@ Terpwright docs and UI should avoid implying that Ink packages are currently pla
 
 Recommended follow-on phases:
 
-- Phase 3a: URL validation and metadata preview shell.
-- Phase 3b: IF Archive path/URL helper.
+- Phase 3a: URL validation and metadata preview shell. Implemented for curator-supplied references.
+- Phase 3b: IF Archive path/URL helper. Implemented for normalization only.
 - Phase 3c: IFDB lookup helper.
 - Phase 3d: IFWiki helper.
 - Phase 3e: iFiction/Babel cross-check.
-- Phase 3f: curator apply/diff workflow.
+- Phase 3f: richer curator apply/diff workflow beyond the current IF Archive selected-field apply.
 - Phase 3g: package validation integration.
 
 ### Phase 4: Richer Helper Docs And Oracle Generation

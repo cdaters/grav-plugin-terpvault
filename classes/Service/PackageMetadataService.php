@@ -102,6 +102,8 @@ class PackageMetadataService
             }
         }
 
+        $this->normalizeIFArchivePair($flatUpdates);
+
         $updated = $current;
         foreach ($flatUpdates as $field => $value) {
             $this->setNestedValue($updated, $field, $this->normalizeValue($field, $value));
@@ -247,6 +249,25 @@ class PackageMetadataService
         }
 
         return $normalized;
+    }
+
+    private function normalizeIFArchivePair(array &$flatUpdates): void
+    {
+        $hasPath = array_key_exists('catalog.ifarchive.path', $flatUpdates);
+        $hasUrl = array_key_exists('catalog.ifarchive.url', $flatUpdates);
+        if (!$hasPath && !$hasUrl) {
+            return;
+        }
+
+        $path = $hasPath ? trim((string)$flatUpdates['catalog.ifarchive.path']) : '';
+        $url = $hasUrl ? trim((string)$flatUpdates['catalog.ifarchive.url']) : '';
+        if ($path === '' && $url === '') {
+            return;
+        }
+
+        $ifArchive = (new EcosystemMetadataService())->requireIFArchiveMetadata($path, $url);
+        $flatUpdates['catalog.ifarchive.path'] = $ifArchive['path'];
+        $flatUpdates['catalog.ifarchive.url'] = $ifArchive['url'];
     }
 
     private function isUrlField(string $field): bool

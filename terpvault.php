@@ -288,6 +288,7 @@ class TerpVaultPlugin extends Plugin
         require_once __DIR__ . '/classes/Service/PackageMediaService.php';
         require_once __DIR__ . '/classes/Service/PackageFeeliesService.php';
         require_once __DIR__ . '/classes/Service/PackageStoryService.php';
+        require_once __DIR__ . '/classes/Service/EcosystemMetadataService.php';
         require_once __DIR__ . '/classes/Controller/ApiController.php';
 
         $routes = $event['routes'] ?? null;
@@ -296,6 +297,7 @@ class TerpVaultPlugin extends Plugin
         }
 
         $controller = \Grav\Plugin\TerpVault\Controller\ApiController::class;
+        $routes->post('/terpvault/ecosystem/preview', [$controller, 'previewEcosystem']);
         $routes->get('/terpvault/packages', [$controller, 'packages']);
         $routes->post('/terpvault/packages', [$controller, 'createPackage']);
         $routes->post('/terpvault/packages/import/inspect', [$controller, 'inspectImport']);
