@@ -1910,7 +1910,8 @@ class TerpVaultPage extends HTMLElement {
       : (this.state.create.ecosystem || this._emptyEcosystemState());
     const ifArchive = state.report?.ifarchive || {};
     const ifdbFields = Array.isArray(state.report?.ifdb?.fields) ? state.report.ifdb.fields : [];
-    const ifwikiFields = Array.isArray(state.report?.ifwiki?.fields) ? state.report.ifwiki.fields : [];
+    const ifwikiPreview = this._ifwikiPreviewFromReport(state.report || {});
+    const ifwikiFields = Array.isArray(ifwikiPreview?.fields) ? ifwikiPreview.fields : [];
     const applyRoot = this.shadowRoot.querySelector(`[data-ecosystem-apply-scope="${normalizedScope}"]`);
     const applyPath = Boolean(applyRoot?.querySelector('[data-ecosystem-field="path"]')?.checked);
     const applyUrl = Boolean(applyRoot?.querySelector('[data-ecosystem-field="url"]')?.checked);
@@ -3379,7 +3380,7 @@ class TerpVaultPage extends HTMLElement {
     const report = state.report || null;
     const ifArchive = report?.ifarchive || null;
     const ifdb = report?.ifdb || null;
-    const ifwiki = report?.ifwiki || null;
+    const ifwiki = this._ifwikiPreviewFromReport(report);
     const hasNormalizedIFArchive = Boolean(ifArchive?.path || ifArchive?.url);
     const references = report?.references && typeof report.references === 'object' ? report.references : {};
     const disabled = Boolean(state.loading || state.applying);
@@ -3408,6 +3409,7 @@ class TerpVaultPage extends HTMLElement {
               <span class="badge warn">rights not proven</span>
             </div>
             <div class="ecosystem-apply" data-ecosystem-apply-scope="${this._esc(scope)}" ${slug ? `data-slug="${this._esc(slug)}"` : ''}>
+              ${hasIFWikiPreview ? this._ifwikiPreviewPanel(ifwiki, contextLabel) : ''}
               ${hasNormalizedIFArchive ? `
                 <div class="preview-section">
                   <h4>IF Archive</h4>
@@ -3432,7 +3434,7 @@ class TerpVaultPage extends HTMLElement {
                 </div>
               ` : '<p class="meta">No normalized IF Archive values are available from this preview.</p>'}
               ${hasIFDBPreview ? this._ifdbPreviewPanel(ifdb, contextLabel) : '<p class="meta">No IFDB lookup results are available from this preview.</p>'}
-              ${hasIFWikiPreview ? this._ifwikiPreviewPanel(ifwiki, contextLabel) : this._ifwikiNoInputPanel()}
+              ${hasIFWikiPreview ? '' : this._ifwikiNoInputPanel()}
               <p class="meta">Apply selected fields updates the ${this._esc(contextLabel)} only. Save Metadata or Create Draft Package is still required for package writes.</p>
               <div class="form-actions">
                 <button class="button primary" type="button" data-action="apply-ecosystem" data-scope="${this._esc(scope)}" data-slug="${this._esc(slug)}" ${disabled ? 'disabled' : ''}>Apply Selected Ecosystem Fields</button>
@@ -3556,6 +3558,30 @@ class TerpVaultPage extends HTMLElement {
         ${sources.length ? this._ecosystemSourceList(sources, true) : ''}
       </div>
     `;
+  }
+
+  _ifwikiPreviewFromReport(report) {
+    const direct = report?.ifwiki && typeof report.ifwiki === 'object' ? report.ifwiki : {};
+    const catalog = report?.metadata?.catalog?.ifwiki && typeof report.metadata.catalog.ifwiki === 'object'
+      ? report.metadata.catalog.ifwiki
+      : {};
+    const title = String(direct.title || catalog.title || '').trim();
+    const url = String(direct.url || catalog.url || '').trim();
+    const fields = Array.isArray(direct.fields) ? [...direct.fields] : [];
+    if (title && !fields.some(field => field?.path === 'catalog.ifwiki.title')) {
+      fields.unshift({ path: 'catalog.ifwiki.title', label: 'IFWiki title', value: title, group: 'catalog' });
+    }
+    if (url && !fields.some(field => field?.path === 'catalog.ifwiki.url')) {
+      fields.splice(title ? 1 : 0, 0, { path: 'catalog.ifwiki.url', label: 'IFWiki URL', value: url, group: 'catalog' });
+    }
+
+    return {
+      ...direct,
+      attempted: Boolean(direct.attempted || title || url),
+      title,
+      url,
+      fields
+    };
   }
 
   _ifwikiNoInputPanel() {
