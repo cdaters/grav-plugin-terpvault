@@ -3514,7 +3514,7 @@ class TerpVaultPage extends HTMLElement {
               </div>
             </div>
             ${Object.keys(references).length ? this._ecosystemReferenceList(references) : ''}
-            ${this._reportList('Preview errors', report.errors || [], 'error', false)}
+            ${Array.isArray(report.errors) && report.errors.length ? this._reportList('Preview errors', report.errors, 'error', false) : ''}
             ${this._reviewNotesDetails('Warnings & review notes', report.warnings || [], 'warn')}
           </div>
         ` : ''}
