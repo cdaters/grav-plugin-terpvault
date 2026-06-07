@@ -35,3 +35,5 @@ The detail page can show advisory checks in a calm Package Notes section. Catalo
 Validation powers Admin2 package inventory/editing context and package import checks today. Admin2 should keep errors, warnings, and informational package policy notes visually distinct: missing story-file data blocks reliable play, while missing provenance, catalog, artwork, or helper-doc fields are curator review prompts.
 
 Import inspection is validation-only. A clean inspection does not write files; commit revalidates the uploaded zip, installs as draft, clears featured state, and refuses to overwrite existing package folders. Future work can add richer release-readiness badges without turning advisory metadata gaps into fatal public errors.
+
+Admin2 Settings can toggle selected advisory warnings such as missing IFID, license, source, and helper files. These toggles control curator-facing warning policy only; they do not edit package content and do not weaken story-file existence or unsafe-resource errors.

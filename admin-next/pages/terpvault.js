@@ -6,6 +6,8 @@ class TerpVaultPage extends HTMLElement {
     this.state = {
       games: [],
       formats: {},
+      settingsSave: { saving: false, result: null, error: '' },
+      formatsSave: { saving: false, result: null, error: '' },
       status: null,
       source: 'loading',
       activeTab: localStorage.getItem('terpvault.admin.tab') || 'library',
@@ -403,7 +405,7 @@ class TerpVaultPage extends HTMLElement {
             <span class="badge version-badge" data-terpvault-version></span>
           </div>
           <p>Package inventory, package creation, metadata editing, helper Markdown editing, media management, screenshot ordering, and story-file replacement for installed TerpVault interactive-fiction packages.</p>
-          <p class="meta">Admin2 is opt-in. Package export, import inspection, draft-only import install, local iFiction XML upload/preview, and selected-field iFiction apply are available. Package delete, overwrite, arbitrary file browsing, player settings editing, and remote catalog lookup are not available.</p>
+          <p class="meta">Admin2 is opt-in. Package export, import inspection, draft-only import install, local iFiction XML upload/preview, selected-field iFiction apply, and whitelisted plugin configuration saves are available. Package delete, overwrite, arbitrary file browsing, file conversion, and remote catalog lookup are not available.</p>
         </section>
         <nav class="tabs" aria-label="TerpVault sections">
           ${this._tabButton('library', 'Library')}
@@ -4679,6 +4681,14 @@ class TerpVaultPage extends HTMLElement {
     return `${this._apiBase()}/terpvault/packages`;
   }
 
+  _configApiUrl() {
+    return `${this._apiBase()}/terpvault/config`;
+  }
+
+  _formatsApiUrl() {
+    return `${this._apiBase()}/terpvault/formats`;
+  }
+
   _ecosystemPreviewApiUrl() {
     return `${this._apiBase()}/terpvault/ecosystem/preview`;
   }
@@ -5130,20 +5140,44 @@ class TerpVaultPage extends HTMLElement {
   _renderFormats() {
     const root = this.shadowRoot.getElementById('formats');
     const formats = this.state.formats || this._fallbackFormats();
+    const groups = formats.groups || formats;
+    const story = formats.story_extensions || this._extensionsFromGroups(groups);
+    const assets = formats.asset_extensions || [];
+    const result = this._saveResultHtml(this.state.formatsSave, 'Formats saved.');
     root.innerHTML = `
+      <div class="box notice">
+        <h2>Format Allowlists</h2>
+        <p class="meta">These settings control what TerpVault accepts. They do not add player/interpreter support.</p>
+      </div>
+      ${result}
       <div class="grid">
-        ${Object.entries(formats).map(([key, item]) => `
+        ${Object.entries(groups).map(([key, item]) => `
           <div class="box">
             <h2>${this._esc(item.label || key)}</h2>
-            <p class="meta"><code>${this._esc((item.extensions || []).join(', '))}</code></p>
+            <p class="meta"><code>${this._esc((item.extensions || []).map(ext => `.${ext}`).join(', '))}</code></p>
           </div>
         `).join('')}
       </div>
       <div class="box" style="margin-top:.8rem;">
-        <strong>Format support is read-only</strong>
-        <p class="meta">Format support is inferred from package metadata and story-file extensions. Upload and conversion workflows are future work.</p>
+        <form data-form="formats">
+          <fieldset>
+            <legend>Story Extensions</legend>
+            <p class="help">One extension per line. Leading dots are stripped, values are lowercased, and path-like or duplicate values are rejected.</p>
+            <textarea class="short" name="story_extensions" spellcheck="false">${this._esc(story.join('\n'))}</textarea>
+          </fieldset>
+          <fieldset>
+            <legend>Asset / Media Extensions</legend>
+            <p class="help">Controls package-local public asset serving. Upload workflows may have narrower role-specific allowlists.</p>
+            <textarea class="short" name="asset_extensions" spellcheck="false">${this._esc(assets.join('\n'))}</textarea>
+          </fieldset>
+          <div class="form-actions">
+            <button class="button" type="button" data-action="reset-formats">Cancel Changes</button>
+            <button class="button primary" type="submit" ${this.state.formatsSave.saving ? 'disabled' : ''}>${this.state.formatsSave.saving ? 'Saving...' : 'Save Formats'}</button>
+          </div>
+        </form>
       </div>
     `;
+    this._bindFormatsActions();
   }
 
   _renderSettings() {
@@ -5151,22 +5185,281 @@ class TerpVaultPage extends HTMLElement {
     const data = this.state.status || {};
     const storage = data.storage || {};
     const config = data.config || {};
+    const library = config.library || {};
+    const player = config.player || {};
+    const admin = config.admin || {};
+    const validation = config.validation || {};
+    const result = this._saveResultHtml(this.state.settingsSave, 'Settings saved.');
     root.innerHTML = `
+      ${result}
       <div class="box">
-        <h2>Runtime Settings</h2>
-        <dl>
-          <dt>Mode</dt><dd>Read-only</dd>
-          <dt>Route</dt><dd><code>${this._esc(data.route || this._publicRoute())}</code></dd>
-          <dt>Manifest</dt><dd><code>${this._esc(data.manifest_url || this._manifestUrl())}</code></dd>
-          <dt>Plugin version</dt><dd><code>${this._esc(data.version || this._version() || 'unknown')}</code></dd>
-          <dt>Storage</dt><dd><code>${this._esc(storage.games_path || 'user://data/terpvault/games')}</code></dd>
-          <dt>Resolved path</dt><dd><code>${this._esc(storage.resolved_path || 'Available only when embedded Admin2 data is exposed')}</code></dd>
-          <dt>Player</dt><dd><code>${this._esc(config.player_engine || 'parchment')}</code></dd>
-          <dt>Show unpublished</dt><dd>${config.show_unpublished ? 'Yes' : 'No'}</dd>
-        </dl>
-        <p class="meta">General plugin settings still live in Plugins -> TerpVault. Delete, import, export, arbitrary file browsing, player settings editing, and direct metadata.iFiction.xml content editing remain planned for later versions.</p>
+        <h2>Plugin Settings</h2>
+        <form data-form="settings">
+          <div class="fieldsets">
+            <fieldset>
+              <legend>Library</legend>
+              ${this._textField('library.title', 'Title', library.title || '')}
+              <div class="field">
+                <label for="tv-setting-library-intro">Intro</label>
+                <textarea id="tv-setting-library-intro" class="short" name="library.intro">${this._esc(library.intro || '')}</textarea>
+              </div>
+              ${this._numberField('library.cards_per_row', 'Cards per row', library.cards_per_row || 3, 1, 6)}
+              ${this._checkboxField('library.show_unpublished', 'Show unpublished on public routes', Boolean(library.show_unpublished), 'Admin2 package lists remain draft-inclusive regardless of this setting.')}
+            </fieldset>
+            <fieldset>
+              <legend>Routing</legend>
+              ${this._textField('route', 'Public route', config.route || data.route || this._publicRoute())}
+              ${this._checkboxField('auto_routes', 'Enable virtual routes', Boolean(config.auto_routes ?? true), 'Controls TerpVault public virtual pages, not Admin2 API routes.')}
+              <p class="help">Manifest: <code>${this._esc(data.manifest_url || this._manifestUrl())}</code></p>
+            </fieldset>
+            <fieldset>
+              <legend>Player</legend>
+              <div class="field">
+                <label for="tv-setting-player-engine">Engine</label>
+                <select id="tv-setting-player-engine" name="player.engine">
+                  ${this._options([['parchment', 'Parchment'], ['custom', 'Custom / future adapter label']], player.engine || 'parchment')}
+                </select>
+                <p class="help">Changing this value does not add a new runtime. The bundled player route remains Parchment.</p>
+              </div>
+              <div class="field">
+                <label for="tv-setting-player-theme">Theme</label>
+                <select id="tv-setting-player-theme" name="player.theme">
+                  ${this._options([['retro-terminal', 'Retro Terminal'], ['parchment', 'Parchment Paper'], ['clean', 'Clean']], player.theme || 'retro-terminal')}
+                </select>
+              </div>
+              <div class="field">
+                <label for="tv-setting-launch-mode">Launch mode</label>
+                <select id="tv-setting-launch-mode" name="player.launch_mode">
+                  ${this._options([['button', 'Button'], ['autostart', 'Autostart']], player.launch_mode || 'button')}
+                </select>
+              </div>
+              ${this._checkboxField('player.allow_fullscreen', 'Allow fullscreen', Boolean(player.allow_fullscreen))}
+              ${this._checkboxField('player.allow_download_saves', 'Allow download saves', Boolean(player.allow_download_saves))}
+              ${this._checkboxField('player.allow_upload_saves', 'Allow upload saves', Boolean(player.allow_upload_saves))}
+              ${this._checkboxField('player.autosave', 'Autosave', Boolean(player.autosave))}
+            </fieldset>
+            <fieldset>
+              <legend>Validation</legend>
+              ${this._checkboxField('validation.warn_missing_ifid', 'Warn missing IFID', Boolean(validation.warn_missing_ifid))}
+              ${this._checkboxField('validation.warn_missing_license', 'Warn missing license', Boolean(validation.warn_missing_license))}
+              ${this._checkboxField('validation.warn_missing_source', 'Warn missing source', Boolean(validation.warn_missing_source))}
+              ${this._checkboxField('validation.warn_missing_help_files', 'Warn missing helper files', Boolean(validation.warn_missing_help_files))}
+            </fieldset>
+            <fieldset>
+              <legend>Admin</legend>
+              ${this._checkboxField('admin.enable_admin2_page', 'Enable Admin2 Library Manager', Boolean(admin.enable_admin2_page), 'Turning this off can hide this page after cache clear or reload.')}
+              <dl class="readonly">
+                <div><span>Plugin version</span><code>${this._esc(data.version || this._version() || 'unknown')}</code></div>
+              </dl>
+            </fieldset>
+            <fieldset>
+              <legend>Storage</legend>
+              <dl class="readonly">
+                <div><span>Configured</span><code>${this._esc(storage.games_path || 'user://data/terpvault/games')}</code></div>
+                <div><span>Resolved</span><code>${this._esc(storage.resolved_path || 'Available only when embedded Admin2 data is exposed')}</code></div>
+              </dl>
+              <p class="help">Storage path editing is intentionally read-only in this pass.</p>
+            </fieldset>
+          </div>
+          <div class="form-actions">
+            <button class="button" type="button" data-action="reset-settings">Cancel Changes</button>
+            <button class="button primary" type="submit" ${this.state.settingsSave.saving ? 'disabled' : ''}>${this.state.settingsSave.saving ? 'Saving...' : 'Save Settings'}</button>
+          </div>
+        </form>
       </div>
     `;
+    this._bindSettingsActions();
+  }
+
+  _bindSettingsActions() {
+    const form = this.shadowRoot.querySelector('form[data-form="settings"]');
+    if (!form) return;
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      this._saveSettings(form);
+    });
+
+    form.querySelector('[data-action="reset-settings"]')?.addEventListener('click', () => {
+      this.state.settingsSave = { saving: false, result: null, error: '' };
+      this._renderSettings();
+    });
+  }
+
+  async _saveSettings(form) {
+    this.state.settingsSave = { saving: true, result: null, error: '' };
+    this._renderSettings();
+
+    try {
+      const settings = this._collectSettingsForm(form);
+      const data = await this._requestJson(this._configApiUrl(), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings })
+      });
+      this._applyConfigPayload(data);
+      this.state.settingsSave = { saving: false, result: data, error: '' };
+    } catch (error) {
+      this.state.settingsSave = { saving: false, result: null, error: error?.message || 'Settings save failed.' };
+    }
+
+    this._renderSettings();
+    this._renderFormats();
+  }
+
+  _collectSettingsForm(form) {
+    const values = {};
+    const booleans = [
+      'library.show_unpublished',
+      'auto_routes',
+      'player.allow_fullscreen',
+      'player.allow_download_saves',
+      'player.allow_upload_saves',
+      'player.autosave',
+      'admin.enable_admin2_page',
+      'validation.warn_missing_ifid',
+      'validation.warn_missing_license',
+      'validation.warn_missing_source',
+      'validation.warn_missing_help_files'
+    ];
+
+    new FormData(form).forEach((value, name) => {
+      values[String(name)] = String(value);
+    });
+
+    booleans.forEach(name => {
+      values[name] = form.querySelector(`[name="${name}"]`)?.checked || false;
+    });
+
+    return values;
+  }
+
+  _bindFormatsActions() {
+    const form = this.shadowRoot.querySelector('form[data-form="formats"]');
+    if (!form) return;
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      this._saveFormats(form);
+    });
+
+    form.querySelector('[data-action="reset-formats"]')?.addEventListener('click', () => {
+      this.state.formatsSave = { saving: false, result: null, error: '' };
+      this._renderFormats();
+    });
+  }
+
+  async _saveFormats(form) {
+    this.state.formatsSave = { saving: true, result: null, error: '' };
+    this._renderFormats();
+
+    try {
+      const data = await this._requestJson(this._formatsApiUrl(), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formats: {
+            story_extensions: this._parseExtensionTextarea(form.elements.story_extensions?.value || ''),
+            asset_extensions: this._parseExtensionTextarea(form.elements.asset_extensions?.value || '')
+          }
+        })
+      });
+      this._applyConfigPayload(data);
+      this.state.formatsSave = { saving: false, result: data, error: '' };
+    } catch (error) {
+      this.state.formatsSave = { saving: false, result: null, error: error?.message || 'Formats save failed.' };
+    }
+
+    this._renderFormats();
+    this._renderSettings();
+  }
+
+  _parseExtensionTextarea(value) {
+    return String(value || '')
+      .split(/[\s,]+/)
+      .map(item => item.trim())
+      .filter(item => item !== '');
+  }
+
+  _applyConfigPayload(data) {
+    if (data.config) {
+      this.state.status = {
+        ...(this.state.status || {}),
+        config: data.config,
+        storage: data.storage || this.state.status?.storage || {},
+        route: data.config.route || this.state.status?.route,
+        formats: data.formats || this.state.status?.formats
+      };
+    }
+
+    if (data.formats) {
+      this.state.formats = data.formats;
+    }
+  }
+
+  _saveResultHtml(state, successText) {
+    if (!state) return '';
+    if (state.error) {
+      return `<div class="message error">${this._esc(state.error)}</div>`;
+    }
+    if (!state.result) {
+      return '';
+    }
+
+    const warnings = Array.isArray(state.result.warnings) ? state.result.warnings : [];
+    const errors = Array.isArray(state.result.errors) ? state.result.errors : [];
+    const saved = Array.isArray(state.result.saved_fields) ? state.result.saved_fields : [];
+    const messages = [];
+    if (saved.length) {
+      messages.push(`<div class="message success">${this._esc(successText)} ${this._esc(saved.join(', '))}. ${state.result.cache_clear_required ? 'Clear Grav cache for all contexts to see the new config.' : ''}</div>`);
+    }
+    errors.forEach(item => messages.push(`<div class="message error">${this._esc(item)}</div>`));
+    warnings.forEach(item => messages.push(`<div class="message warn">${this._esc(item)}</div>`));
+
+    return messages.join('');
+  }
+
+  _textField(name, label, value) {
+    const id = `tv-setting-${name.replace(/[^a-z0-9_-]+/gi, '-')}`;
+    return `
+      <div class="field">
+        <label for="${this._esc(id)}">${this._esc(label)}</label>
+        <input id="${this._esc(id)}" type="text" name="${this._esc(name)}" value="${this._esc(value)}">
+      </div>
+    `;
+  }
+
+  _numberField(name, label, value, min, max) {
+    const id = `tv-setting-${name.replace(/[^a-z0-9_-]+/gi, '-')}`;
+    return `
+      <div class="field">
+        <label for="${this._esc(id)}">${this._esc(label)}</label>
+        <input id="${this._esc(id)}" type="number" name="${this._esc(name)}" value="${this._esc(value)}" min="${this._esc(min)}" max="${this._esc(max)}" step="1">
+      </div>
+    `;
+  }
+
+  _checkboxField(name, label, checked, help = '') {
+    const id = `tv-setting-${name.replace(/[^a-z0-9_-]+/gi, '-')}`;
+    return `
+      <div class="checkbox">
+        <input id="${this._esc(id)}" type="checkbox" name="${this._esc(name)}" ${checked ? 'checked' : ''}>
+        <label for="${this._esc(id)}">${this._esc(label)}</label>
+      </div>
+      ${help ? `<p class="help">${this._esc(help)}</p>` : ''}
+    `;
+  }
+
+  _extensionsFromGroups(groups) {
+    const extensions = [];
+    Object.values(groups || {}).forEach(group => {
+      (group.extensions || []).forEach(extension => {
+        if (!extensions.includes(extension)) {
+          extensions.push(extension);
+        }
+      });
+    });
+    return extensions;
   }
 
   _fallbackFormats() {

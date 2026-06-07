@@ -373,6 +373,8 @@ The bundled Parchment adapter can be used for these broad story families:
 
 Format labels are shown per package, based on package metadata and story-file extension where useful.
 
+Admin2 can edit TerpVault's story and asset extension allowlists. Those settings control what TerpVault accepts and serves through its package-management and public-file boundaries. They do not add interpreter support, install a runtime, or convert files.
+
 Parchment is the current bundled parser/runtime dependency and must remain tracked under `assets/vendor/parchment/` for local/self-contained playback. Future Ink support is planned as a complementary choice-based interactive narrative format, not a replacement for Z-machine, Glulx, TADS, Parchment, Quixe, or parser IF.
 
 Future player presentation work should keep `/if/{slug}/play` supported while separating player placement from story boot behavior. When a user clicks Play on `/if/{slug}` and lands on `/if/{slug}/play`, the ideal future focused page behavior is for Parchment to be loaded and ready at the prompt without a redundant second Play click, unless a technical or accessibility reason requires manual boot. Inline detail-page embedding and terminal theme presets are separate roadmap items. See [docs/PLAYER-PRESENTATION.md](docs/PLAYER-PRESENTATION.md).
@@ -501,11 +503,11 @@ When that setting is enabled and the current request is an Admin2/API request, T
 /plugin/terpvault
 ```
 
-The current page provides package inventory plus metadata/helper/media/story editing:
+The current page provides package inventory, package editing, and limited plugin-configuration editing:
 
 - Library tab with collapsible game package rows and package health badges.
-- Formats tab showing supported interpreter families.
-- Settings tab showing route/storage/player/version diagnostics.
+- Formats tab showing grouped story-format extensions plus editable story and asset allowlists. These allowlists control what TerpVault accepts and serves; they do not add player/interpreter support or conversion.
+- Settings tab with whitelisted edits for library title/intro/card count, public draft visibility, public route/virtual-route toggle, player presentation flags, Admin2 enablement, and validation-warning toggles. Storage path remains read-only.
 - Public Detail and Play links for each package.
 - Advisory validation warnings and Catalog & Provenance summaries where package metadata provides them.
 - Create Package / Terpwright Phase 2 wizard for a draft package from one local story file plus optional local media, helper Markdown, `metadata.iFiction.xml`, feelies, known-differences notes, and manually entered URL/provenance fields.
@@ -518,7 +520,9 @@ The current page provides package inventory plus metadata/helper/media/story edi
 - Export action for downloading a single installed package as `{slug}.terpvault.zip`.
 - Import panel for validating a `.terpvault.zip` package, reporting whether package-root `metadata.iFiction.xml` is present, and committing it as a draft package after server-side revalidation. Import preserves local iFiction XML but does not auto-apply it to `game.yaml`.
 
-Package delete, import overwrite/replace, arbitrary file browsing, remote iFiction/catalog lookup, pagination/virtual scrolling for large libraries, and player settings edits are not implemented yet. Future Admin2 roadmap work includes safe package delete/remove design, richer large-library controls, a preview-driven Metadata Assistant, back-end-configurable metadata source providers, and explicit IFDB/IFWiki/IF Archive metadata lookup/package-builder workflows that stay separate from story-file or asset download. Package creation uses `/api/v1/terpvault/packages`, package export uses `/api/v1/terpvault/packages/{slug}/export`, import inspection uses `/api/v1/terpvault/packages/import/inspect`, import commit uses `/api/v1/terpvault/packages/import`, metadata saves use `/api/v1/terpvault/packages/{slug}/metadata`, iFiction preview/upload/apply uses `/api/v1/terpvault/packages/{slug}/metadata/ifiction`, helper Markdown saves use `/api/v1/terpvault/packages/{slug}/markdown/{type}`, image uploads use `/api/v1/terpvault/packages/{slug}/media/{type}`, authenticated image previews use `/api/v1/terpvault/packages/{slug}/media/preview?path={package-local-image}`, feelies/extras management uses `/api/v1/terpvault/packages/{slug}/feelies`, and story replacement uses `/api/v1/terpvault/packages/{slug}/story` when the Admin2 Library Manager is enabled.
+Admin2 configuration writes use authenticated Admin2/API routes and explicit field allowlists. Unknown config paths are rejected, package `game.yaml` files are not changed, and general YAML editing is not exposed. Config saves write the user plugin config and should be followed by a Grav cache clear when validating public behavior.
+
+Package delete, import overwrite/replace, arbitrary file browsing, remote iFiction/catalog lookup, pagination/virtual scrolling for large libraries, new story engines, and file conversion are not implemented yet. Future Admin2 roadmap work includes safe package delete/remove design, richer large-library controls, a preview-driven Metadata Assistant, back-end-configurable metadata source providers, and explicit IFDB/IFWiki/IF Archive metadata lookup/package-builder workflows that stay separate from story-file or asset download. Package creation uses `/api/v1/terpvault/packages`, package export uses `/api/v1/terpvault/packages/{slug}/export`, import inspection uses `/api/v1/terpvault/packages/import/inspect`, import commit uses `/api/v1/terpvault/packages/import`, config reads/saves use `/api/v1/terpvault/config`, format allowlist saves use `/api/v1/terpvault/formats`, metadata saves use `/api/v1/terpvault/packages/{slug}/metadata`, iFiction preview/upload/apply uses `/api/v1/terpvault/packages/{slug}/metadata/ifiction`, helper Markdown saves use `/api/v1/terpvault/packages/{slug}/markdown/{type}`, image uploads use `/api/v1/terpvault/packages/{slug}/media/{type}`, authenticated image previews use `/api/v1/terpvault/packages/{slug}/media/preview?path={package-local-image}`, feelies/extras management uses `/api/v1/terpvault/packages/{slug}/feelies`, and story replacement uses `/api/v1/terpvault/packages/{slug}/story` when the Admin2 Library Manager is enabled.
 
 A future Admin2 Guide/Help tab is planned as in-product documentation only. It should use a short tab label such as `Guide`, `Help`, or `Help & Docs`, remain read-only, render local bundled documentation without remote fetches, and explain package lifecycle, metadata, iFiction XML, media, helper Markdown, The Oracle, player presentation, content transparency, safety boundaries, troubleshooting, and IF terminology. See [docs/ADMIN2-GUIDE.md](docs/ADMIN2-GUIDE.md).
 

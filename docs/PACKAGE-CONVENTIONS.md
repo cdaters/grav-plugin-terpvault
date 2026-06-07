@@ -497,6 +497,8 @@ Manual folder installation remains available:
 
 Admin2 can also inspect a `.terpvault.zip` package and import it as a draft-only, non-featured package. Admin2 import does not overwrite existing package folders.
 
+Admin2 Formats can edit TerpVault's story and asset extension allowlists. Those allowlists are acceptance and serving policy only: they do not make a story playable in the bundled player, install an interpreter, or convert files. Package authors should still choose formats with an implemented runtime path and document any compatibility caveats in package metadata or helper docs.
+
 Example:
 
 ```bash
